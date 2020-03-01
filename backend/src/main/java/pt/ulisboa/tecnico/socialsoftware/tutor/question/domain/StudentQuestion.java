@@ -15,6 +15,8 @@ public class StudentQuestion extends Question {
         WAITING_FOR_APPROVAL, REJECTED, APPROVED
     }
 
+    // Do we need to have an id and key column?
+
     @Column
     private String justification = "";
 
