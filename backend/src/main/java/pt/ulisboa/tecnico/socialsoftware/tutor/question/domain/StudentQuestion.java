@@ -29,9 +29,7 @@ public class StudentQuestion extends Question {
 
 
 
-    public StudentQuestion() {
-
-    }
+    public StudentQuestion() {}
 
     public StudentQuestion(Course course, QuestionDto questionDto, User student) {
         super(course, questionDto);
