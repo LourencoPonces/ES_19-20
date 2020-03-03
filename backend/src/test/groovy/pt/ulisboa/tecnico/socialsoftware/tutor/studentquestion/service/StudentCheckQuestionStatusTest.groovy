@@ -11,27 +11,27 @@ class StudentCheckStatusTest extends Specification {
     @Autowired
     StudentCheckQuestionStatusService studentCheckQuestionStatusService
 
-    def "check status of existing question that is accepted"() {
+    def "check status of existing suggestion that is accepted"() {
         // return question status
         expect: false
     }
 
-    def "check status of existing question that is waiting revision"() {
+    def "check status of existing suggestion that is rejected"() {
         // return question status
         expect: false
     }
 
-    def "check status of different user"() {
+    def "check status of existing suggestion that is waiting revision"() {
+        // return question status
+        expect: false
+    }
+
+    def "check suggestion status of different user"() {
         // exception thrown
         expect: false
     }
 
-    def "check status of existing question that is rejected"() {
-        // return question status
-        expect: false
-    }
-
-    def "check status of question but there is none"() {
+    def "check status of non exiting suggestion"() {
         // exception thrown
         expect: false
     }
