@@ -37,5 +37,3 @@ class TeacherApprovesStudentQuestionTest extends Specification {
     }
 
 }
-
-

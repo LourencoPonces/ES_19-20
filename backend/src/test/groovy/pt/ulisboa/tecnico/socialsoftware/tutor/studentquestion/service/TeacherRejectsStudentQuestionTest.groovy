@@ -24,11 +24,12 @@ class TeacherRejectsStudentQuestionTest extends Specification {
     def "reject already accepted question"() {
         // question is rejected (can be used to correct an accidental rejection)
         // WARNING: check if question already belongs to a quizz
+        // for now just throw error
         expect: false
     }
 
     def "reject existing question with no justification"() {
-        // suggestion rejected
+        // throws error
         expect: false
     }
 
@@ -37,5 +38,3 @@ class TeacherRejectsStudentQuestionTest extends Specification {
         expect: false
     }
 }
-
-
