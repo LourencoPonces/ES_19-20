@@ -1,13 +1,23 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.studentquestion.service
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.Bean
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.StudentSubmitQuestionService
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.TeacherEvaluatesStudentQuestionService
 import spock.lang.Specification
 
+@DataJpaTest
 class TeacherApprovesStudentQuestionTest extends Specification {
 
-    // def studentSubmitQuestionService
+    @Autowired
+    TeacherEvaluatesStudentQuestionService teacherEvaluatesStudentQuestionService
 
     def setup() {
+        // criar curso
+        // criar sugestao
+
         // studentSubmitQuestionService = new StudentSubmitQuestionService()
     }
 
@@ -36,4 +46,12 @@ class TeacherApprovesStudentQuestionTest extends Specification {
         expect: false
     }
 
+    @TestConfiguration
+    static class TeacherEvaluatesImplTestContextConfiguration {
+
+        @Bean
+        TeacherEvaluatesStudentQuestionService teacherEvaluatesStudentQuestionService1() {
+            return  new TeacherEvaluatesStudentQuestionService();
+        }
+    }
 }
