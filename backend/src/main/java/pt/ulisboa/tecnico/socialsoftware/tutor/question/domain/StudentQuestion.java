@@ -3,10 +3,12 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.question.domain;
 
 import javax.persistence.*;
 
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
 @Entity
 public class StudentQuestion extends Question {
@@ -31,8 +33,9 @@ public class StudentQuestion extends Question {
 
     public StudentQuestion() {}
 
-    public StudentQuestion(Course course, QuestionDto questionDto, User student) {
+    public StudentQuestion(Course course, StudentQuestionDTO questionDto, User student) {
         super(course, questionDto);
+        checkStudentQuestionConsistency(questionDto);
         user = student;
     }
 
@@ -44,4 +47,11 @@ public class StudentQuestion extends Question {
 
     public SubmittedStatus getSubmittedStatus() { return submittedStatus; }
     public void setSubmittedStatus(SubmittedStatus status) { this.submittedStatus = status; }
+
+    public void checkStudentQuestionConsistency(StudentQuestionDTO questionDto) {
+
+        if ((long) questionDto.getTopics().size() == 0) {
+            throw new TutorException(NO_TOPICS);
+        }
+    }
 }
