@@ -12,6 +12,7 @@ import { Student } from '@/models/management/Student';
 import Assessment from '@/models/management/Assessment';
 import AuthDto from '@/models/user/AuthDto';
 import StatementAnswer from '@/models/statement/StatementAnswer';
+import { QuizAnswer } from '@/models/management/QuizAnswer';
 
 const httpClient = axios.create();
 httpClient.defaults.timeout = 10000;
@@ -329,6 +330,30 @@ export default class RemoteServices {
       });
   }
 
+  static async getQuizAnswers(quizId: number): Promise<QuizAnswer[]> {
+    return httpClient
+      .get(`/quizzes/${quizId}/answers`)
+      .then(response => {
+        return response.data.map((quizAnswer: any) => {
+          return new QuizAnswer(quizAnswer);
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async getCorrectSequence(quizId: number): Promise<number[]> {
+    return httpClient
+      .get(`/quizzes/${quizId}/correct-sequence`)
+      .then(response => {
+        return response.data;
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
   static async saveQuiz(quiz: Quiz): Promise<Quiz> {
     if (quiz.id) {
       return httpClient
@@ -352,19 +377,6 @@ export default class RemoteServices {
           throw Error(await this.errorMessage(error));
         });
     }
-  }
-
-  static async getCourseExecutions(): Promise<Course[]> {
-    return httpClient
-      .get(`/courses/${Store.getters.getCurrentCourse.courseId}`)
-      .then(response => {
-        return response.data.map((course: any) => {
-          return new Course(course);
-        });
-      })
-      .catch(async error => {
-        throw Error(await this.errorMessage(error));
-      });
   }
 
   static async getCourseStudents(course: Course) {
