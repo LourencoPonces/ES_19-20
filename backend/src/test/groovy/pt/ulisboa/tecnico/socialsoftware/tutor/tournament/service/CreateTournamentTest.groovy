@@ -20,7 +20,17 @@ class CreateTournamentTest extends Specification {
         expect: false
     }
 
+    def "create a tournament with a non-existing topic"(){
+        // exception is thrown
+        expect: false
+    }
+
     def "create a tournament with available date after conclusion"() {
+        // exception is thrown
+        expect: false
+    }
+
+    def "create a tournament with available date before the current date"() {
         // exception is thrown
         expect: false
     }
