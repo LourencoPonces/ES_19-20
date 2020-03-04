@@ -6,12 +6,14 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.dto.QuizAnswerDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.QuizzesXmlExport;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.QuizzesXmlImport;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Option;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository;
@@ -135,7 +137,8 @@ public class QuizService {
         quiz.setTitle(quizDto.getTitle());
         quiz.setAvailableDate(quizDto.getAvailableDateDate());
         quiz.setConclusionDate(quizDto.getConclusionDateDate());
-        quiz.setScramble(quizDto.getScramble());
+        quiz.setScramble(quizDto.isScramble());
+        quiz.setType(quizDto.getType());
 
         Set<QuizQuestion> quizQuestions = new HashSet<>(quiz.getQuizQuestions());
 
@@ -176,7 +179,7 @@ public class QuizService {
       backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void removeQuiz(Integer quizId) {
-        Quiz quiz = quizRepository.findById(quizId).orElseThrow(() ->new TutorException(QUIZ_NOT_FOUND, quizId));
+        Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new TutorException(QUIZ_NOT_FOUND, quizId));
 
         quiz.remove();
 
@@ -186,6 +189,33 @@ public class QuizService {
         quizQuestions.forEach(quizQuestion -> entityManager.remove(quizQuestion));
 
         entityManager.remove(quiz);
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<QuizAnswerDto> getQuizAnswers(Integer quizId) {
+        Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new TutorException(QUIZ_NOT_FOUND, quizId));
+
+        return quiz.getQuizAnswers().stream().map(QuizAnswerDto::new).collect(Collectors.toList());
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<Integer> getCorrectSequence(Integer quizId) {
+        Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new TutorException(QUIZ_NOT_FOUND, quizId));
+
+        return quiz.getQuizQuestions().stream().sorted(Comparator.comparing(QuizQuestion::getSequence)).map(quizQuestion ->
+            quizQuestion.getQuestion()
+                    .getOptions()
+                    .stream()
+                    .filter(Option::getCorrect)
+                    .findFirst().orElseThrow(() -> new TutorException(NO_CORRECT_OPTION))
+                    .getSequence()
+        ).collect(Collectors.toList());
     }
 
 
@@ -209,5 +239,4 @@ public class QuizService {
 
         xmlImport.importQuizzes(quizzesXml, this, questionRepository, quizQuestionRepository, courseExecutionRepository);
     }
-
 }
