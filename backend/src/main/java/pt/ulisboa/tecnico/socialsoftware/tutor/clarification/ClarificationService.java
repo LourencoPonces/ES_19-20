@@ -6,6 +6,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRe
 public class ClarificationService {
 
     public ClarificationRequestDto submitClarificationRequest(ClarificationRequestDto clarificationRequestDto) {
-        return null;
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 }

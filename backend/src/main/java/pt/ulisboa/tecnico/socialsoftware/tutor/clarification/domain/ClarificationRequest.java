@@ -40,6 +40,7 @@ public class ClarificationRequest {
 
     private void checkConsistentClarificationRequest(User user, Question question, ClarificationRequestDto clarificationRequestDto) {
         // TODO throw necessary exceptions
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     public Integer getId() { return id; }
