@@ -1,4 +1,4 @@
-
+package pt.ulisboa.tecnico.socialsoftware.tutor.clarification.service
 
 import spock.lang.Specification
 
@@ -8,19 +8,18 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
     def setup() {
     }
 
-
-    def "the question has not been answered"() {
-        //throw exception
-        expect: false
-    }
-
-    def "the question has been answered and create request"() {
+    def "the question has been answered and submit request"() {
         //the clarification request is created
         expect: false
     }
 
-    def "submit a created request"() {
-        //the clarification request is saved in the database
+    def "same student submits 2 requests for the same question"() {
+        //throw exception
+        expect: false
+    }
+
+    def "the question has not been answered"() {
+        //throw exception
         expect: false
     }
 

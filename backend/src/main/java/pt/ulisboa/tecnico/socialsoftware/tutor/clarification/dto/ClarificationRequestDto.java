@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter;
 
 public class ClarificationRequestDto {
     private Integer id;
-    private String owner;
+    private Integer owner;
     private Integer question;
     private String content;
     private String creationDate = null;
@@ -20,7 +20,7 @@ public class ClarificationRequestDto {
         this.id = clarificationRequest.getId();
         this.content = clarificationRequest.getContent();
         this.question = clarificationRequest.getQuestion().getId();
-        this.owner = clarificationRequest.getOwner().getUsername();
+        this.owner = clarificationRequest.getOwner().getId();
 
         if (clarificationRequest.getCreationDate() != null)
             this.creationDate = clarificationRequest.getCreationDate().format(formatter);
@@ -28,8 +28,8 @@ public class ClarificationRequestDto {
 
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
-    public String getOwner() { return owner; }
-    public void setOwner(String username) { this.owner = username; }
+    public Integer getOwner() { return owner; }
+    public void setOwner(Integer id) { this.owner = id; }
     public Integer getQuestionId() { return question; }
     public void setQuestionId(Integer id) { this.question = id; }
     public String getContent() { return content; }
