@@ -9,10 +9,10 @@ public class StudentQuestionDTO extends QuestionDto{
 
     public StudentQuestionDTO() {}
 
-    public StudentQuestionDTO(StudentQuestion student) {
-        super(student);
-        justification = student.getJustification();
-        username = student.getUser().getUsername();
+    public StudentQuestionDTO(StudentQuestion studentQuestion) {
+        super(studentQuestion);
+        justification = studentQuestion.getJustification();
+        username = studentQuestion.getUser().getUsername();
     }
 
     public String getJustification() { return justification; }
