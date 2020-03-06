@@ -14,7 +14,7 @@ class SubmitAnswerTest extends Specification {
     def "submit answer to already answered request"() {
         given: "a clarification request that already has an answer"
 
-        expect: "an exception"
+        expect: "the answer was replaced"
         false // TODO: impl
     }
 
