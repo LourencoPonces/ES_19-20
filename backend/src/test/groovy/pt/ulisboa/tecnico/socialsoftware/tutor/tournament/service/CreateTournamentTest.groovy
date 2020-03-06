@@ -25,12 +25,27 @@ class CreateTournamentTest extends Specification {
         expect: false
     }
 
+    def "create a tournament with a non-existing student"() {
+        // exception is thrown
+        except: false
+    }
+
+    def "create a tournament with a non-existing course"() {
+        // exception is thrown
+        except: false
+    }
+
     def "create a tournament with available date after conclusion"() {
         // exception is thrown
         expect: false
     }
 
     def "create a tournament with available date before the current date"() {
+        // exception is thrown
+        expect: false
+    }
+
+    def "create a tournament with student not enrolled in course"() {
         // exception is thrown
         expect: false
     }
