@@ -11,30 +11,5 @@ class TeacherRejectsStudentQuestionTest extends Specification {
         // studentSubmitQuestionService = new StudentSubmitQuestionService()
     }
 
-    def "reject teacher's question"() {
-        // cannot happen: not a suggestion
-        expect: false
-    }
 
-    def "reject already rejected student question"() {
-        // cannot happen: suggestion was already rejected
-        expect: false
-    }
-
-    def "reject already accepted question"() {
-        // question is rejected (can be used to correct an accidental rejection)
-        // WARNING: check if question already belongs to a quizz
-        // for now just throw error
-        expect: false
-    }
-
-    def "reject existing question with no justification"() {
-        // throws error
-        expect: false
-    }
-
-    def "reject existing question with justification"() {
-        // suggestion rejected
-        expect: false
-    }
 }
