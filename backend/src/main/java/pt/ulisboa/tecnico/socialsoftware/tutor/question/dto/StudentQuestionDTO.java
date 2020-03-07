@@ -3,7 +3,9 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.question.dto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 
 public class StudentQuestionDTO extends QuestionDto{
+
     private String justification;
+    private StudentQuestion.SubmittedStatus submittedStatus;
     private String username;
 
 
@@ -12,6 +14,7 @@ public class StudentQuestionDTO extends QuestionDto{
     public StudentQuestionDTO(StudentQuestion studentQuestion) {
         super(studentQuestion);
         justification = studentQuestion.getJustification();
+        submittedStatus = studentQuestion.getSubmittedStatus();
         username = studentQuestion.getUser().getUsername();
     }
 
@@ -20,6 +23,9 @@ public class StudentQuestionDTO extends QuestionDto{
 
     public String getUser() { return username; }
     public void setUser(String username) { this.username = username; }
+
+    public StudentQuestion.SubmittedStatus getSubmittedStatus() { return submittedStatus; }
+    public void setSubmittedStatus(StudentQuestion.SubmittedStatus submittedStatus) { this.submittedStatus = submittedStatus; }
 
     @Override
     public String toString() {

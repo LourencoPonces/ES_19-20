@@ -37,6 +37,8 @@ public class StudentQuestion extends Question {
         super(course, questionDto);
         checkStudentQuestionConsistency(questionDto);
         user = student;
+        submittedStatus = questionDto.getSubmittedStatus();
+        justification = questionDto.getJustification();
     }
 
     public String getJustification() { return justification; }
