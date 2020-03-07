@@ -11,7 +11,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.ImageDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
@@ -23,7 +22,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 import spock.lang.Unroll
 
-
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.ACCESS_DENIED
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.NO_TOPICS
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.NO_CORRECT_OPTIONS
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.NO_OPTIONS
@@ -83,6 +82,7 @@ class StudentSubmitQuestionTest extends Specification {
 
         setTopic(isTopic, exampleQuestionDto)
         setOption(isOption, isCorrect, exampleQuestionDto)
+        setUser(isStudent)
 
         when:
         studentSubmitQuestionService.studentSubmitQuestion(exampleCourse.getId(), exampleQuestionDto, exampleUser.getId())
@@ -92,10 +92,12 @@ class StudentSubmitQuestionTest extends Specification {
         errorMessage == error.errorMessage
 
         where:
-        isTopic | isOption | isCorrect || errorMessage
-        false   | true     | true      || NO_TOPICS
-        true    | false    | false     || NO_OPTIONS
-        true    | true     | false     || NO_CORRECT_OPTIONS
+        isTopic | isOption | isCorrect |isStudent || errorMessage
+        false   |    true  |     true  | true     || NO_TOPICS
+        true    |   false  |   false   | true     || NO_OPTIONS
+        true    |   true   |  false    | true     || NO_CORRECT_OPTIONS
+        true    |   true   |  true     | false    || ACCESS_DENIED
+
     }
 
     def setTopic(isTopic, exampleQuestionDto) {
@@ -119,6 +121,14 @@ class StudentSubmitQuestionTest extends Specification {
             }
             list.add(option)
             exampleQuestionDto.setOptions(list)
+        }
+    }
+
+    def setUser(boolean isUser) {
+        if (isUser) {
+            exampleUser.setRole(User.Role.STUDENT)
+        } else {
+            exampleUser.setRole(User.Role.TEACHER)
         }
     }
 
@@ -210,7 +220,7 @@ class StudentSubmitQuestionTest extends Specification {
 
         @Bean
         StudentSubmitQuestionService studentSubmitQuestionService() {
-            return  new StudentSubmitQuestionService();
+            return new StudentSubmitQuestionService();
         }
     }
 

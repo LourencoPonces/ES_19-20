@@ -35,7 +35,7 @@ public class StudentQuestion extends Question {
 
     public StudentQuestion(Course course, StudentQuestionDTO questionDto, User student) {
         super(course, questionDto);
-        checkStudentQuestionConsistency(questionDto);
+        checkStudentQuestionConsistency(questionDto, student);
         user = student;
         submittedStatus = questionDto.getSubmittedStatus();
         justification = questionDto.getJustification();
@@ -50,10 +50,14 @@ public class StudentQuestion extends Question {
     public SubmittedStatus getSubmittedStatus() { return submittedStatus; }
     public void setSubmittedStatus(SubmittedStatus status) { this.submittedStatus = status; }
 
-    public void checkStudentQuestionConsistency(StudentQuestionDTO questionDto) {
+    public void checkStudentQuestionConsistency(StudentQuestionDTO questionDto, User user) {
 
         if ((long) questionDto.getTopics().size() == 0) {
             throw new TutorException(NO_TOPICS);
+        }
+
+        if(user.getRole() != User.Role.STUDENT) {
+            throw new TutorException(ACCESS_DENIED);
         }
     }
 }
