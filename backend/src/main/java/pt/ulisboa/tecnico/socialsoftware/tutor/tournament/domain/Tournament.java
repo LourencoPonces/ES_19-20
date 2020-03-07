@@ -37,6 +37,9 @@ public class Tournament {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @Column(name = "number_of_questions")
+    private Integer numberOfQuestions;
+
     @ManyToMany(mappedBy = "tournaments")
     private Set<Topic> topics = new HashSet<>();
 
