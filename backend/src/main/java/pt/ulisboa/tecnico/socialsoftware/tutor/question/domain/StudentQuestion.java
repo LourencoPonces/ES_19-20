@@ -11,6 +11,11 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
 @Entity
+@Table(
+        name = "student_question",
+        indexes = {
+                @Index(name = "question_indx_0", columnList = "student_question_key")
+        })
 public class StudentQuestion extends Question {
 
     public enum SubmittedStatus {
@@ -18,6 +23,13 @@ public class StudentQuestion extends Question {
     }
 
     // Do we need to have an id and key column?
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(unique=true, nullable = false, name="student_question_key")
+    private Integer studentQuestionKey;
+
 
     @Column
     private String justification = "";
@@ -36,10 +48,23 @@ public class StudentQuestion extends Question {
     public StudentQuestion(Course course, StudentQuestionDTO questionDto, User student) {
         super(course, questionDto);
         checkStudentQuestionConsistency(questionDto, student);
-        user = student;
-        submittedStatus = questionDto.getSubmittedStatus();
+        this.user = student;
+        this.studentQuestionKey = questionDto.getStudentQuestionKey();
+        if(questionDto.getSubmittedStatus() != null) {
+            submittedStatus = questionDto.getSubmittedStatus();
+        }
         justification = questionDto.getJustification();
     }
+
+    @Override
+    public Integer getId() { return id; }
+
+    @Override
+    public void setId(Integer id) { this.id = id; }
+
+    public Integer getStudentQuestionKey() { return studentQuestionKey; }
+
+    public void setStudentQuestionKey(Integer studentQuestionKey) { this.studentQuestionKey = studentQuestionKey; }
 
     public String getJustification() { return justification; }
     public void setJustification(String justification) { this.justification = justification; }

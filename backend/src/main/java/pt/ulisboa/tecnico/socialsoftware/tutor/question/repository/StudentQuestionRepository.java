@@ -11,6 +11,6 @@ import javax.transaction.Transactional;
 @Transactional
 public interface StudentQuestionRepository extends JpaRepository<StudentQuestion, Integer> {
 
-    @Query(value = "SELECT MAX(key) FROM student_question", nativeQuery = true)
+    @Query(value = "SELECT MAX(student_question_key) FROM student_question", nativeQuery = true)
     Integer getMaxQuestionNumber();
 }
