@@ -93,10 +93,9 @@ class StudentSubmitQuestionTest extends Specification {
 
         where:
         isTopic | isOption | isCorrect || errorMessage
-        false   |    true  |     true  || NO_TOPICS
-        true    |   false  |   false   || NO_OPTIONS
-        true    |   true   |  false    || NO_CORRECT_OPTIONS
-
+        false   | true     | true      || NO_TOPICS
+        true    | false    | false     || NO_OPTIONS
+        true    | true     | false     || NO_CORRECT_OPTIONS
     }
 
     def setTopic(isTopic, exampleQuestionDto) {
@@ -171,10 +170,6 @@ class StudentSubmitQuestionTest extends Specification {
         result.getImage().getWidth() == 20
         result.getOptions().size() == 2
         result.getUser().getId() == exampleUser.getId()
-
-
-
-        
     }
 
     def "create 2 new suggestions with 1 Topic each and submit for approval"() {
