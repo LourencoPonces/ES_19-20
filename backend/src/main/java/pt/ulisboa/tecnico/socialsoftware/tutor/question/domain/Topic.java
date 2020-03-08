@@ -2,6 +2,7 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.question.domain;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 
 import javax.persistence.*;
 import java.util.*;
@@ -22,6 +23,9 @@ public class Topic {
 
     @ManyToMany
     private Set<Question> questions = new HashSet<>();
+
+    @ManyToMany
+    private Set<Tournament> tournaments = new HashSet<>();
 
     @ManyToOne
     private Topic parentTopic;
@@ -63,6 +67,10 @@ public class Topic {
 
     public Set<Question> getQuestions() {
         return questions;
+    }
+
+    public Set<Tournament> getTournaments() {
+        return tournaments;
     }
 
     public Topic getParentTopic() {
