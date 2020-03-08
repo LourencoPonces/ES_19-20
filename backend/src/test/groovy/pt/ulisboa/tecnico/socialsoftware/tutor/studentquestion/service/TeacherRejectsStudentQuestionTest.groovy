@@ -35,7 +35,7 @@ class TeacherRejectsStudentQuestionTest extends Specification {
     public static final String USER_NAME = "ist199999"
 
     public static final Integer STUDENT_QUESTION_KEY = 1
-    public static final Integer FAKE_STUDENT_QUESTION_KEY = 2
+    public static final Integer FAKE_STUDENT_QUESTION_ID = 2
 
     public static final String VALID_JUSTIFICATION = "irrelevant question"
 
@@ -55,6 +55,7 @@ class TeacherRejectsStudentQuestionTest extends Specification {
     @Autowired
     UserRepository userRepository
 
+    def savedQuestionId
 
     def setup() {
         def course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -88,11 +89,12 @@ class TeacherRejectsStudentQuestionTest extends Specification {
 
         // save studentQuestion
         studentQuestionRepository.save(studentQuestion)
+        savedQuestionId = studentQuestion.getId()
     }
 
     def "reject student question with valid justification"() {
         when:
-        teacherEvaluatesStudentQuestionService.rejectStudentQuestion(STUDENT_QUESTION_KEY, VALID_JUSTIFICATION)
+        teacherEvaluatesStudentQuestionService.rejectStudentQuestion(savedQuestionId, VALID_JUSTIFICATION)
 
         then:
         studentQuestionRepository.count() == 1L
@@ -104,7 +106,7 @@ class TeacherRejectsStudentQuestionTest extends Specification {
     // impossible to reject question with no justification parameter
     def "reject student question with invalid justification"() {
         when:
-        teacherEvaluatesStudentQuestionService.rejectStudentQuestion(STUDENT_QUESTION_KEY, justification)
+        teacherEvaluatesStudentQuestionService.rejectStudentQuestion(savedQuestionId, justification)
 
         then:
         def error = thrown(TutorException)
@@ -128,7 +130,7 @@ class TeacherRejectsStudentQuestionTest extends Specification {
 
 
         when:
-        teacherEvaluatesStudentQuestionService.rejectStudentQuestion(STUDENT_QUESTION_KEY, VALID_JUSTIFICATION)
+        teacherEvaluatesStudentQuestionService.rejectStudentQuestion(savedQuestionId, VALID_JUSTIFICATION)
 
         then:
         def error = thrown(TutorException)
@@ -143,7 +145,7 @@ class TeacherRejectsStudentQuestionTest extends Specification {
 
 
         when:
-        teacherEvaluatesStudentQuestionService.rejectStudentQuestion(STUDENT_QUESTION_KEY, VALID_JUSTIFICATION)
+        teacherEvaluatesStudentQuestionService.rejectStudentQuestion(savedQuestionId, VALID_JUSTIFICATION)
 
         then:
         studentQuestionRepository.findAll().get(0).getSubmittedStatus() == StudentQuestion.SubmittedStatus.REJECTED
@@ -151,7 +153,7 @@ class TeacherRejectsStudentQuestionTest extends Specification {
 
     def "reject non existing student question"() {
         when:
-        teacherEvaluatesStudentQuestionService.rejectStudentQuestion(FAKE_STUDENT_QUESTION_KEY, VALID_JUSTIFICATION)
+        teacherEvaluatesStudentQuestionService.rejectStudentQuestion(FAKE_STUDENT_QUESTION_ID, VALID_JUSTIFICATION)
 
         then:
         def error = thrown(TutorException)

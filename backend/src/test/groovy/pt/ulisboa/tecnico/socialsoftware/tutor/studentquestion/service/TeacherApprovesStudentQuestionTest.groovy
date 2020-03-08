@@ -51,6 +51,7 @@ class TeacherApprovesStudentQuestionTest extends Specification {
     @Autowired
     UserRepository userRepository
 
+    def savedQuestionId
 
     def setup() {
         def course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -84,22 +85,25 @@ class TeacherApprovesStudentQuestionTest extends Specification {
 
         // save studentQuestion
         studentQuestionRepository.save(studentQuestion)
+        savedQuestionId = studentQuestion.getId()
+
     }
 
 
     def "approve existing pending question with no justification"() {
         when:
-        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(STUDENT_QUESTION_KEY, JUSTIFICATION)
+        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(savedQuestionId)
 
         then:
         studentQuestionRepository.count() == 1L
         def result = studentQuestionRepository.findAll().get(0)
         result.getSubmittedStatus() == StudentQuestion.SubmittedStatus.APPROVED
+        result.getJustification() == ""
     }
 
     def "approve existing pending question with justification"() {
         when:
-        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(STUDENT_QUESTION_KEY)
+        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(savedQuestionId, JUSTIFICATION)
 
         then:
         studentQuestionRepository.count() == 1L
@@ -116,7 +120,7 @@ class TeacherApprovesStudentQuestionTest extends Specification {
 
 
         when:
-        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(STUDENT_QUESTION_KEY)
+        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(savedQuestionId)
 
         then:
         studentQuestionRepository.findAll().get(0).getSubmittedStatus() == result
