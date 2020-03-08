@@ -56,6 +56,16 @@ public class Tournament {
 
     public Tournament() {}
 
+    public Tournament(TournamentDto tournamentDto) {
+        this.key = tournamentDto.getKey();
+        setTitle(tournamentDto.getTitle());
+        this.status = tournamentDto.getStatus();
+        this.creationDate = tournamentDto.getCreationDateDate();
+        setAvailableDate(tournamentDto.getAvailableDateDate());
+        setConclusionDate(tournamentDto.getConclusionDateDate());
+        this.numberOfQuestions = tournamentDto.getNumberOfQuestions();
+    }
+
     public Integer getId() {
         return id;
     }
@@ -85,6 +95,7 @@ public class Tournament {
     }
 
     public void setAvailableDate(LocalDateTime availableDate) {
+        checkAvailableDate(availableDate);
         this.availableDate = availableDate;
     }
 
@@ -93,6 +104,7 @@ public class Tournament {
     }
 
     public void setConclusionDate(LocalDateTime conclusionDate) {
+        checkConclusionDate(conclusionDate);
         this.conclusionDate = conclusionDate;
     }
 
@@ -167,6 +179,14 @@ public class Tournament {
     }
 
     private void checkTitle(String title) {
+        // TODO
+    }
+
+    private void checkAvailableDate(LocalDateTime availableDate) {
+        // TODO
+    }
+
+    private void checkConclusionDate(LocalDateTime conclusionDate) {
         // TODO
     }
 }
