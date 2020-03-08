@@ -25,7 +25,7 @@ public class TeacherEvaluatesStudentQuestionService {
 
     public void acceptStudentQuestion(Integer studentQuestionId) {
         // not checking justification because it was not provided
-        StudentQuestion studentQuestion = findStudentQuestionByKey(studentQuestionId);
+        StudentQuestion studentQuestion = findStudentQuestionById(studentQuestionId);
 
         doEvaluate(studentQuestion, StudentQuestion.SubmittedStatus.APPROVED, "");
     }
@@ -33,7 +33,7 @@ public class TeacherEvaluatesStudentQuestionService {
     public void acceptStudentQuestion(Integer studentQuestionId, String justification) {
         checkJustification(justification);
 
-        StudentQuestion studentQuestion = findStudentQuestionByKey(studentQuestionId);
+        StudentQuestion studentQuestion = findStudentQuestionById(studentQuestionId);
 
         doEvaluate(studentQuestion, StudentQuestion.SubmittedStatus.APPROVED, justification);
     }
@@ -42,7 +42,7 @@ public class TeacherEvaluatesStudentQuestionService {
     public void rejectStudentQuestion(Integer studentQuestionId, String justification) {
         checkJustification(justification);
 
-        StudentQuestion studentQuestion = findStudentQuestionByKey(studentQuestionId);
+        StudentQuestion studentQuestion = findStudentQuestionById(studentQuestionId);
 
         if(!canReject(studentQuestion)) {
             throw new TutorException(CANNOT_REJECT_ACCEPTED_SUGGESTION);
@@ -56,7 +56,7 @@ public class TeacherEvaluatesStudentQuestionService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    private StudentQuestion findStudentQuestionByKey(Integer id) {
+    private StudentQuestion findStudentQuestionById(Integer id) {
          return studentQuestionRepository.findById(id).orElseThrow(() -> new TutorException(STUDENT_QUESTION_NOT_FOUND, id));
     }
 
