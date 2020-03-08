@@ -76,9 +76,7 @@ class StudentSubmitQuestionTest extends Specification {
     def "invalid arguments where isTopic is #topic, isOption is #option, isCorrect is #correct and errorMessage is #errorMessage"() {
         given: "a questionDTO"
         def questionDTO = new StudentQuestionDTO();
-        questionDTO.setTitle(QUESTION_TITLE)
-        questionDTO.setContent(QUESTION_CONTENT)
-        questionDTO.setStatus(Question.Status.DISABLED.name())
+        StudentQuestionDtoSetup(questionDTO)
         questionDTO.setKey(1);
         questionDTO.setStudentQuestionKey(1)
 
@@ -137,19 +135,17 @@ class StudentSubmitQuestionTest extends Specification {
     def "create new suggestion with Image and two options and 2 Topics and submit for approval"() {
         given: "a questionDto"
         def questionDto = new StudentQuestionDTO()
-        questionDto.setContent(QUESTION_CONTENT)
-        questionDto.setTitle(QUESTION_TITLE)
-        questionDto.setStatus(Question.Status.DISABLED.name())
+        StudentQuestionDtoSetup(questionDto)
         questionDto.setKey(1);
-        questionDto.setStudentQuestionKey(1)
+        questionDto.setStudentQuestionKey(1) // Specific to this test
         and: "2 Topics"
         def topic1 = new TopicDto()
         topic1.setName(TOPIC_NAME)
         def topic2 = new TopicDto()
         topic2.setName(TOPIC_NAME_2)
         def topicList = new ArrayList<TopicDto>()
-        topicList.add(topic1)
-        topicList.add(topic2)
+        addToList(topicList, topic1)
+        addToList(topicList, topic2)
         questionDto.setTopics(topicList)
         and: "2 Options"
         def option1 = new OptionDto()
@@ -159,8 +155,8 @@ class StudentSubmitQuestionTest extends Specification {
         option2.setContent(OPTION_CONTENT)
         option2.setCorrect(false)
         def optionList = new ArrayList<OptionDto>()
-        optionList.add(option1)
-        optionList.add(option2)
+        addToList(optionList, option1)
+        addToList(optionList, option2)
         questionDto.setOptions(optionList)
         and: "an Image"
         def image = new ImageDto()
@@ -186,29 +182,38 @@ class StudentSubmitQuestionTest extends Specification {
         result.getUser().getId() == user.getId()
     }
 
-    def "create 2 new suggestions with 1 Topic each and submit for approval"() {
-        given: " a StudentQuestionDTOs"
-        def questionDto = new StudentQuestionDTO()
+    def StudentQuestionDtoSetup(StudentQuestionDTO questionDto) {
         questionDto.setContent(QUESTION_CONTENT)
         questionDto.setTitle(QUESTION_TITLE)
         questionDto.setStatus(Question.Status.DISABLED.name())
+    }
+
+    def addToList(ArrayList list, Object o) {
+        list.add(o)
+    }
+
+    def "create 2 new suggestions with 1 Topic each and submit for approval"() {
+        given: " a StudentQuestionDTOs"
+        def questionDto = new StudentQuestionDTO()
+        StudentQuestionDtoSetup(questionDto)
         and: "a TopicDTO"
         def topicDto = new TopicDto()
         topicDto.setName(TOPIC_NAME)
         def topicList = new ArrayList<TopicDto>()
-        topicList.add(topicDto)
+        addToList(topicList, topicDto)
         questionDto.setTopics(topicList)
         and: "a OptionDTO"
         def optionDto = new OptionDto()
         optionDto.setContent(OPTION_CONTENT)
         optionDto.setCorrect(true)
         def optionList = new ArrayList<OptionDto>()
-        optionList.add(optionDto)
+        addToList(optionList, optionDto)
         questionDto.setOptions(optionList)
 
         when: "create 2 student questions"
         studentSubmitQuestionService.studentSubmitQuestion(course.getId(), questionDto, user.getId())
         questionDto.setStudentQuestionKey(null)
+        questionDto.setKey(null)
         studentSubmitQuestionService.studentSubmitQuestion(course.getId(), questionDto, user.getId())
 
         then: "the two student questions are created with the correct numbers"
