@@ -66,31 +66,36 @@ class TeacherRejectsStudentQuestionTest extends Specification {
         courseExecutionRepository.save(courseExecution)
 
         // user
-        def user = new User()
-        user.setKey(1)
-        user.setUsername(USER_NAME)
-        user.getCourseExecutions().add(courseExecution)
+        User user = createUser(courseExecution)
         userRepository.save(user)
 
-        // options
-        def option = new Option()
-
-        // topic
-        def topic = new Topic()
-
         // studentQuestion
+        StudentQuestion studentQuestion = createStudentQuestion(user, course)
+        studentQuestionRepository.save(studentQuestion)
+
+        // get studentQuestionId
+        savedQuestionId = studentQuestion.getId()
+    }
+
+    private StudentQuestion createStudentQuestion(User user, Course course) {
         def studentQuestion = new StudentQuestion()
-        studentQuestion.addTopic(topic)
-        studentQuestion.addOption(option)
+        studentQuestion.addTopic(new Topic())
+        studentQuestion.addOption(new Option())
         studentQuestion.setKey(STUDENT_QUESTION_KEY)
         studentQuestion.setStudentQuestionKey(STUDENT_QUESTION_KEY)
         studentQuestion.setUser(user)
         studentQuestion.setCourse(course)
-
-        // save studentQuestion
-        studentQuestionRepository.save(studentQuestion)
-        savedQuestionId = studentQuestion.getId()
+        studentQuestion
     }
+
+    private User createUser(CourseExecution courseExecution) {
+        def user = new User()
+        user.setKey(1)
+        user.setUsername(USER_NAME)
+        user.getCourseExecutions().add(courseExecution)
+        user
+    }
+
 
     def "reject student question with valid justification"() {
         when:
@@ -110,17 +115,17 @@ class TeacherRejectsStudentQuestionTest extends Specification {
 
         then:
         def error = thrown(TutorException)
-        error.errorMessage == INVALID_JUSTIFICATION
+        error.errorMessage == result
 
 
         // invalid justifications:
-        // * empty strings
+        // * empty strings or null
         where:
         justification || result
         ""            || INVALID_JUSTIFICATION
         "   "         || INVALID_JUSTIFICATION
+        null          || INVALID_JUSTIFICATION
     }
-
 
     def "reject already accepted student question"() {
         given: 'pending student question'
@@ -162,11 +167,12 @@ class TeacherRejectsStudentQuestionTest extends Specification {
 
 
     def evaluateQuestion(isAccepted, question) {
-        if(isAccepted) {
-            question.setSubmittedStatus(StudentQuestion.SubmittedStatus.APPROVED)
-        } else {
-            question.setSubmittedStatus(StudentQuestion.SubmittedStatus.REJECTED)
-        }
+        question.setSubmittedStatus(
+                isAccepted ?
+                        StudentQuestion.SubmittedStatus.APPROVED
+                            :
+                        StudentQuestion.SubmittedStatus.REJECTED
+        )
     }
 
     @TestConfiguration
