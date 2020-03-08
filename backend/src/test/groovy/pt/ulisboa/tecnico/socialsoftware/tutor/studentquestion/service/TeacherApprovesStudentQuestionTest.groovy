@@ -123,8 +123,8 @@ class TeacherApprovesStudentQuestionTest extends Specification {
 
         where:
         isApproved || result
-        true || StudentQuestion.SubmittedStatus.APPROVED
-        false || StudentQuestion.SubmittedStatus.APPROVED
+        true       || StudentQuestion.SubmittedStatus.APPROVED
+        false      || StudentQuestion.SubmittedStatus.APPROVED
     }
 
     def "approve non existing student question"(){
