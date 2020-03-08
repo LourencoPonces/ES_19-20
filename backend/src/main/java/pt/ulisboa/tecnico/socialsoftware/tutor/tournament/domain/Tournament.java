@@ -105,6 +105,54 @@ public class Tournament {
         this.title = title;
     }
 
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public Integer getNumberOfQuestions() {
+        return numberOfQuestions;
+    }
+
+    public void setNumberOfQuestions(Integer numberOfQuestions) {
+        this.numberOfQuestions = numberOfQuestions;
+    }
+
+    public Set<Topic> getTopics() {
+        return topics;
+    }
+
+    public void addTopic(Topic topic) {
+        this.topics.add(topic);
+    }
+
+    public CourseExecution getCourseExecution() {
+        return courseExecution;
+    }
+
+    public void setCourseExecution(CourseExecution courseExecution) {
+        this.courseExecution = courseExecution;
+    }
+
+    public User getCreator() {
+        return creator;
+    }
+
+    public void setCreator(User creator) {
+        this.creator = creator;
+    }
+
+    public Set<User> getParticipants() {
+        return participants;
+    }
+
+    public void addParticipant(User participant) {
+        this.participants.add(participant);
+    }
+
     @Override
     public String toString() {
         // TODO
