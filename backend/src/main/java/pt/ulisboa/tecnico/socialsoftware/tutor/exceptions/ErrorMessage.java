@@ -15,6 +15,9 @@ public enum ErrorMessage {
     TOPIC_CONJUNCTION_NOT_FOUND("Topic Conjunction not found with id %d"),
     COURSE_EXECUTION_NOT_FOUND("Course execution not found with name %d"),
 
+    INVALID_JUSTIFICATION("The justification \"%s\" is invalid"),
+    CANNOT_REJECT_ACCEPTED_SUGGESTION("Cannot reject already accepted suggestion"),
+
     COURSE_NOT_FOUND("Course not found with name %s"),
     COURSE_NAME_IS_EMPTY("The course name is empty"),
     COURSE_TYPE_NOT_DEFINED("The course type is not defined"),
