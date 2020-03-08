@@ -10,7 +10,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository;
@@ -33,10 +32,10 @@ public class StudentSubmitQuestionService {
     private CourseRepository courseRepository;
 
     @Autowired
-    private QuestionRepository questionRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private QuestionRepository questionRepository;
 
     @PersistenceContext
     EntityManager entityManager;
@@ -50,11 +49,18 @@ public class StudentSubmitQuestionService {
         Course course = courseRepository.findById(courseId).orElseThrow(() -> new TutorException(COURSE_NOT_FOUND, courseId));
 
         if (studentQuestionDTO.getStudentQuestionKey() == null) {
-            int maxQuestionNumber = studentQuestionRepository.getMaxQuestionNumber() != null ?
+            int maxStudentQuestionNumber = studentQuestionRepository.getMaxQuestionNumber() != null ?
                     studentQuestionRepository.getMaxQuestionNumber() : 0;
-            studentQuestionDTO.setKey(maxQuestionNumber + 1);
-            studentQuestionDTO.setStudentQuestionKey(maxQuestionNumber + 1);
+
+            studentQuestionDTO.setStudentQuestionKey(maxStudentQuestionNumber + 1);
         }
+
+        if(studentQuestionDTO.getKey() == null) {
+            int maxQuestionNumber = questionRepository.getMaxQuestionNumber() != null ?
+                    questionRepository.getMaxQuestionNumber() : 0;
+            studentQuestionDTO.setKey(maxQuestionNumber + 1);
+        }
+
 
         User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(USER_NOT_FOUND, studentId));
         StudentQuestion studentQuestion = new StudentQuestion(course, studentQuestionDTO, student);
