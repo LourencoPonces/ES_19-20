@@ -58,7 +58,7 @@ public class User implements UserDetails, Importable {
     @ManyToMany
     private Set<CourseExecution> courseExecutions = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval=true)
+    @OneToMany
     private Set<ClarificationRequest> clarificationRequests = new HashSet<>();
 
     public User() {
@@ -157,6 +157,8 @@ public class User implements UserDetails, Importable {
     public void setCourseExecutions(Set<CourseExecution> courseExecutions) {
         this.courseExecutions = courseExecutions;
     }
+
+    public Set<ClarificationRequest> getClarificationRequests() { return clarificationRequests; }
 
     public Integer getNumberOfTeacherQuizzes() {
         if (this.numberOfTeacherQuizzes == null)
@@ -292,6 +294,7 @@ public class User implements UserDetails, Importable {
         return numberOfCorrectStudentAnswers;
     }
 
+
     public void setNumberOfCorrectStudentAnswers(Integer numberOfCorrectStudentAnswers) {
         this.numberOfCorrectStudentAnswers = numberOfCorrectStudentAnswers;
     }
@@ -345,6 +348,8 @@ public class User implements UserDetails, Importable {
     public void addCourse(CourseExecution course) {
         this.courseExecutions.add(course);
     }
+
+    public void addClarificationRequest(ClarificationRequest clarificationRequest) { this.clarificationRequests.add(clarificationRequest); }
 
     @Override
     public String toString() {

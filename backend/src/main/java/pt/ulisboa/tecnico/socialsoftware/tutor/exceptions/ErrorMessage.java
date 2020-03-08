@@ -53,7 +53,11 @@ public enum ErrorMessage {
     FENIX_CONFIGURATION_ERROR("Incorrect server configuration files for fenix"),
 
 
-    ACCESS_DENIED("You do not have permission to view this resource");
+    ACCESS_DENIED("You do not have permission to view this resource"),
+
+    CLARIFICATION_REQUEST_MISSING_CONTENT("Missing content of clarification request"),
+    QUESTION_NOT_ANSWERED_BY_STUDENT("Question with id %d wasn't answered by student %d"),
+    DUPLICATE_CLARIFICATION_REQUEST("Student %s already submitted a clarification request for question with id %d");
 
     public final String label;
 
