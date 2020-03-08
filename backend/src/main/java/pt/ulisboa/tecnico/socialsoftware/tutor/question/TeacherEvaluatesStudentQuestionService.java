@@ -9,19 +9,17 @@ public class TeacherEvaluatesStudentQuestionService {
 
     }
 
-    public void acceptStudentQuestion(StudentQuestion s) {
+    public void acceptStudentQuestion(Integer studentQuestionKey) {
 
     }
 
-    public void acceptStudentQuestion(StudentQuestion s, String justification) {
+    public void acceptStudentQuestion(Integer studentQuestionKey, String justification) {
 
     }
 
-    public void rejectStudentQuestion(StudentQuestion s) {
-
-    }
-
-    public void rejectStudentQuestion(StudentQuestion s, String justification) {
+    public void rejectStudentQuestion(Integer studentQuestionKey, String justification) {
+        // if justification is empty throw error
+        // if already accepted throw error
 
     }
 }
