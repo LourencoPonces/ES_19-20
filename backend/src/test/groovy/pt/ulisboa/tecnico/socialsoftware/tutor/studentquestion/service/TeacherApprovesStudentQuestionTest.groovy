@@ -28,6 +28,8 @@ class TeacherApprovesStudentQuestionTest extends Specification {
     public static final String ACRONYM = "AS1"
     public static final String ACADEMIC_TERM = "1 SEM"
 
+    public static final String USER_NAME = "ist199999"
+
     public static final Integer STUDENT_QUESTION_KEY = 1
     public static final Integer FAKE_STUDENT_QUESTION_KEY = 2
 
@@ -35,7 +37,6 @@ class TeacherApprovesStudentQuestionTest extends Specification {
 
     @Autowired
     TeacherEvaluatesStudentQuestionService teacherEvaluatesStudentQuestionService
-
 
 
     @Autowired
@@ -62,7 +63,7 @@ class TeacherApprovesStudentQuestionTest extends Specification {
         // user
         def user = new User()
         user.setKey(1)
-        user.setUsername("ist199999")
+        user.setUsername(USER_NAME)
         user.getCourseExecutions().add(courseExecution)
         userRepository.save(user)
 
@@ -107,7 +108,7 @@ class TeacherApprovesStudentQuestionTest extends Specification {
         result.getJustification() == JUSTIFICATION
     }
 
-    def "approve already evaluated student question, #evaluation->#finalStatus"() {
+    def "approve already evaluated student question, #isApproved->#result"() {
         given: 'pending student question'
         studentQuestionRepository.count() == 1L
         def question = studentQuestionRepository.findAll().get(0)
