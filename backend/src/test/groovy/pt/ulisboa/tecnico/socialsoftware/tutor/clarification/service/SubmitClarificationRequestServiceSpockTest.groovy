@@ -27,7 +27,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User.Role
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 
-
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @DataJpaTest
@@ -146,6 +146,7 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         clarificationRequestRepository.count() == 1L
         def result = clarificationRequestRepository.findAll().get(0)
         result.getId() != null
+        result.getKey() != null
         result.getOwner().getId() == student.getId()
         result.getQuestion().getId() == question.getId()
         result.getCreationDate() != null
