@@ -8,8 +8,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.TeacherEvaluatesStudentQuestionService
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Option
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
@@ -18,14 +18,20 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.STUDENT_QUESTION_NOT_FOUND
+
 @DataJpaTest
 class TeacherApprovesStudentQuestionTest extends Specification {
 
     public static final String COURSE_NAME = "Software Architecture"
+
     public static final String ACRONYM = "AS1"
     public static final String ACADEMIC_TERM = "1 SEM"
-    public static final String OPTION_CONTENT = "optionId content"
-    public static final String TOPIC_NAME = "topic name"
+
+    public static final Integer STUDENT_QUESTION_KEY = 1
+    public static final Integer FAKE_STUDENT_QUESTION_KEY = 2
+
+    public static final String JUSTIFICATION = "very good question"
 
     @Autowired
     TeacherEvaluatesStudentQuestionService teacherEvaluatesStudentQuestionService
@@ -62,8 +68,6 @@ class TeacherApprovesStudentQuestionTest extends Specification {
 
         // options
         def option = new Option()
-        option.setContent(OPTION_CONTENT)
-        option.setCorrect(true);
 
         // topic
         def topic = new Topic()
@@ -72,6 +76,10 @@ class TeacherApprovesStudentQuestionTest extends Specification {
         def studentQuestion = new StudentQuestion()
         studentQuestion.addTopic(topic)
         studentQuestion.addOption(option)
+        studentQuestion.setKey(STUDENT_QUESTION_KEY)
+        studentQuestion.setStudentQuestionKey(STUDENT_QUESTION_KEY)
+        studentQuestion.setUser(user)
+        studentQuestion.setCourse(course)
 
         // save studentQuestion
         studentQuestionRepository.save(studentQuestion)
@@ -79,58 +87,61 @@ class TeacherApprovesStudentQuestionTest extends Specification {
 
 
     def "approve existing pending question with no justification"() {
-        given: 'pending student question'
-        studentQuestionRepository.
-//        given: 'a studentQuestion'
-//        def studentQuestionDTO = new StudentQuestionDTO()
-//        studentQuestionDTO.setUser(user.getUsername())
-//        def studentQuestion = new StudentQuestion(course, studentQuestionDTO, user)
-//        studentQuestionRepository.save(studentQuestion)
-//
-//        when:
-//        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(studentQuestion)
-//
-//        then:
-//        studentQuestion.getSubmittedStatus() == StudentQuestion.SubmittedStatus.APPROVED
+        when:
+        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(STUDENT_QUESTION_KEY, JUSTIFICATION)
+
+        then:
+        studentQuestionRepository.count() == 1L
+        def result = studentQuestionRepository.findAll().get(0)
+        result.getSubmittedStatus() == StudentQuestion.SubmittedStatus.APPROVED
     }
 
     def "approve existing pending question with justification"() {
-//        given: 'a studentQuestion'
-//        def studentQuestionDTO = new StudentQuestionDTO(user)
-//        def studentQuestion = new StudentQuestion(course, studentQuestionDTO, user)
-//        studentQuestionRepository.save(studentQuestion)
-//
-//        def justification = "Very good question"
-//
-//        when:
-//        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(studentQuestion, justification)
-//
-//        then:
-//        studentQuestion.getSubmittedStatus() == StudentQuestion.SubmittedStatus.APPROVED
-//        studentQuestion.getJustification() == justification
+        when:
+        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(STUDENT_QUESTION_KEY)
+
+        then:
+        studentQuestionRepository.count() == 1L
+        def result = studentQuestionRepository.findAll().get(0)
+        result.getSubmittedStatus() == StudentQuestion.SubmittedStatus.APPROVED
+        result.getJustification() == JUSTIFICATION
     }
 
     def "approve already evaluated student question, #evaluation->#finalStatus"() {
-//        given: 'a studentQuestion'
-//        def studentQuestionDTO = new StudentQuestionDTO(user)
-//        studentQuestionDTO.setSubmittedStatus(StudentQuestion.SubmittedStatus.evaluation)
-//
-//        def studentQuestion = new StudentQuestion(course, studentQuestionDTO, user)
-//        studentQuestionRepository.save(studentQuestion)
-//
-//        def justification = "Very good question"
-//
-//        when:
-//        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(studentQuestion, justification)
-//
-//        then:
-//        studentQuestion.getSubmittedStatus() == StudentQuestion.SubmittedStatus.finalStatuss
-//        studentQuestion.getJustification() == justification
-//
-//        where:
-//        evaluation || finalStatus
-//        APPROVED || APPROVED
-//        REJECTED || APPROVED
+        given: 'pending student question'
+        studentQuestionRepository.count() == 1L
+        def question = studentQuestionRepository.findAll().get(0)
+        evaluateQuestion(isApproved, question)
+
+
+        when:
+        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(STUDENT_QUESTION_KEY)
+
+        then:
+        studentQuestionRepository.findAll().get(0).getSubmittedStatus() == result
+
+        where:
+        isApproved || result
+        true || StudentQuestion.SubmittedStatus.APPROVED
+        false || StudentQuestion.SubmittedStatus.APPROVED
+    }
+
+    def "approve non existing student question"(){
+        when:
+        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(FAKE_STUDENT_QUESTION_KEY)
+
+        then:
+        def error = thrown(TutorException)
+        error.errorMessage == STUDENT_QUESTION_NOT_FOUND
+    }
+
+
+    def evaluateQuestion(isAccepted, question) {
+        if(isAccepted) {
+            question.setSubmittedStatus(StudentQuestion.SubmittedStatus.APPROVED)
+        } else {
+            question.setSubmittedStatus(StudentQuestion.SubmittedStatus.REJECTED)
+        }
     }
 
     @TestConfiguration
