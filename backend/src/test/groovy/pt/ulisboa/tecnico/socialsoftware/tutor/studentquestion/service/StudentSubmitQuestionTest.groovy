@@ -11,7 +11,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.ImageDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
@@ -23,7 +22,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 import spock.lang.Unroll
 
-
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.ACCESS_DENIED
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.NO_TOPICS
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.NO_CORRECT_OPTIONS
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.NO_OPTIONS
@@ -55,47 +54,52 @@ class StudentSubmitQuestionTest extends Specification {
     @Autowired
     StudentSubmitQuestionService studentSubmitQuestionService
 
-    def exampleUser
-    def exampleCourse
+    def user
+    def course
     def courseExecution
 
     def setup() {
-        exampleCourse = new Course(COURSE_NAME, Course.Type.TECNICO)
-        courseRepository.save(exampleCourse)
+        course = new Course(COURSE_NAME, Course.Type.TECNICO)
+        courseRepository.save(course)
 
-        courseExecution = new CourseExecution(exampleCourse, ACRONYM, ACADEMIC_TERM, Course.Type.TECNICO)
+        courseExecution = new CourseExecution(course, ACRONYM, ACADEMIC_TERM, Course.Type.TECNICO)
         courseExecutionRepository.save(courseExecution)
 
-        exampleUser = new User()
-        exampleUser.setKey(1)
-        exampleUser.setUsername("ist199999")
-        userRepository.save(exampleUser)
+        user = new User()
+        user.setKey(1)
+        user.setUsername("ist199999")
+        user.setRole(User.Role.STUDENT)
+        userRepository.save(user)
 
     }
      @Unroll
     def "invalid arguments where isTopic is #topic, isOption is #option, isCorrect is #correct and errorMessage is #errorMessage"() {
         given: "a questionDTO"
-        def exampleQuestionDto = new StudentQuestionDTO();
-        exampleQuestionDto.setTitle(QUESTION_TITLE)
-        exampleQuestionDto.setContent(QUESTION_CONTENT)
-        exampleQuestionDto.setKey(1)
-        exampleQuestionDto.setStatus(Question.Status.AVAILABLE.name())
+        def questionDTO = new StudentQuestionDTO();
+        questionDTO.setTitle(QUESTION_TITLE)
+        questionDTO.setContent(QUESTION_CONTENT)
+        questionDTO.setStatus(Question.Status.DISABLED.name())
+        questionDTO.setKey(1);
+        questionDTO.setStudentQuestionKey(1)
 
-        setTopic(isTopic, exampleQuestionDto)
-        setOption(isOption, isCorrect, exampleQuestionDto)
+        setTopic(isTopic, questionDTO)
+        setOption(isOption, isCorrect, questionDTO)
+        setUser(isStudent)
 
         when:
-        studentSubmitQuestionService.studentSubmitQuestion(exampleCourse.getId(), exampleQuestionDto, exampleUser.getId())
+        studentSubmitQuestionService.studentSubmitQuestion(course.getId(), questionDTO, user.getId())
 
         then:
         def error = thrown(TutorException)
         errorMessage == error.errorMessage
 
         where:
-        isTopic | isOption | isCorrect || errorMessage
-        false   | true     | true      || NO_TOPICS
-        true    | false    | false     || NO_OPTIONS
-        true    | true     | false     || NO_CORRECT_OPTIONS
+        isTopic | isOption | isCorrect |isStudent || errorMessage
+        false   |    true  |     true  | true     || NO_TOPICS
+        true    |   false  |   false   | true     || NO_OPTIONS
+        true    |   true   |  false    | true     || NO_CORRECT_OPTIONS
+        true    |   true   |  true     | false    || ACCESS_DENIED
+
     }
 
     def setTopic(isTopic, exampleQuestionDto) {
@@ -122,12 +126,22 @@ class StudentSubmitQuestionTest extends Specification {
         }
     }
 
+    def setUser(boolean isUser) {
+        if (isUser) {
+            user.setRole(User.Role.STUDENT)
+        } else {
+            user.setRole(User.Role.TEACHER)
+        }
+    }
+
     def "create new suggestion with Image and two options and 2 Topics and submit for approval"() {
         given: "a questionDto"
         def questionDto = new StudentQuestionDTO()
         questionDto.setContent(QUESTION_CONTENT)
         questionDto.setTitle(QUESTION_TITLE)
-        questionDto.setKey(1)
+        questionDto.setStatus(Question.Status.DISABLED.name())
+        questionDto.setKey(1);
+        questionDto.setStudentQuestionKey(1)
         and: "2 Topics"
         def topic1 = new TopicDto()
         topic1.setName(TOPIC_NAME)
@@ -155,13 +169,13 @@ class StudentSubmitQuestionTest extends Specification {
         questionDto.setImage(image)
 
         when:
-        studentSubmitQuestionService.studentSubmitQuestion(exampleCourse.getId(), questionDto, exampleUser.getId())
+        studentSubmitQuestionService.studentSubmitQuestion(course.getId(), questionDto, user.getId())
 
         then: "Student Question is created"
         studentQuestionRepository.count() == 1L
         def result = studentQuestionRepository.findAll().get(0)
         result.getId() != null
-        result.getKey() == 1
+        result.getStudentQuestionKey() == 1
         result.getSubmittedStatus() == StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL
         result.getTitle() == QUESTION_TITLE
         result.getContent() == QUESTION_CONTENT
@@ -169,7 +183,7 @@ class StudentSubmitQuestionTest extends Specification {
         result.getImage().getUrl() == URL
         result.getImage().getWidth() == 20
         result.getOptions().size() == 2
-        result.getUser().getId() == exampleUser.getId()
+        result.getUser().getId() == user.getId()
     }
 
     def "create 2 new suggestions with 1 Topic each and submit for approval"() {
@@ -177,7 +191,7 @@ class StudentSubmitQuestionTest extends Specification {
         def questionDto = new StudentQuestionDTO()
         questionDto.setContent(QUESTION_CONTENT)
         questionDto.setTitle(QUESTION_TITLE)
-        questionDto.setKey(1)
+        questionDto.setStatus(Question.Status.DISABLED.name())
         and: "a TopicDTO"
         def topicDto = new TopicDto()
         topicDto.setName(TOPIC_NAME)
@@ -193,15 +207,15 @@ class StudentSubmitQuestionTest extends Specification {
         questionDto.setOptions(optionList)
 
         when: "create 2 student questions"
-        studentSubmitQuestionService.studentSubmitQuestion(exampleCourse.getId(), questionDto, exampleUser.getId())
-        questionDto.setKey(null)
-        studentSubmitQuestionService.studentSubmitQuestion(exampleCourse.getId(), questionDto, exampleUser.getId())
+        studentSubmitQuestionService.studentSubmitQuestion(course.getId(), questionDto, user.getId())
+        questionDto.setStudentQuestionKey(null)
+        studentSubmitQuestionService.studentSubmitQuestion(course.getId(), questionDto, user.getId())
 
         then: "the two student questions are created with the correct numbers"
         studentQuestionRepository.count() == 2L
         def resultOne = studentQuestionRepository.findAll().get(0)
         def resultTwo = studentQuestionRepository.findAll().get(1)
-        resultOne.getKey() + resultTwo.getKey() == 3
+        resultOne.getStudentQuestionKey() + resultTwo.getStudentQuestionKey() == 3
 
     }
 
@@ -210,7 +224,7 @@ class StudentSubmitQuestionTest extends Specification {
 
         @Bean
         StudentSubmitQuestionService studentSubmitQuestionService() {
-            return  new StudentSubmitQuestionService();
+            return new StudentSubmitQuestionService();
         }
     }
 

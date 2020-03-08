@@ -3,7 +3,8 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.question.dto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 
 public class StudentQuestionDTO extends QuestionDto{
-
+    private Integer id;
+    private Integer studentQuestionKey;
     private String justification;
     private StudentQuestion.SubmittedStatus submittedStatus;
     private String username;
@@ -13,9 +14,26 @@ public class StudentQuestionDTO extends QuestionDto{
 
     public StudentQuestionDTO(StudentQuestion studentQuestion) {
         super(studentQuestion);
+        this.id = studentQuestion.getId();
+        this.studentQuestionKey = studentQuestion.getStudentQuestionKey();
         justification = studentQuestion.getJustification();
         submittedStatus = studentQuestion.getSubmittedStatus();
         username = studentQuestion.getUser().getUsername();
+    }
+
+    @Override
+    public Integer getId() { return id; }
+
+    @Override
+    public void setId(Integer id) { this.id = id; }
+
+
+    public Integer getStudentQuestionKey() {
+        return studentQuestionKey;
+    }
+
+    public void setStudentQuestionKey(Integer studentQuestionKey) {
+        this.studentQuestionKey = studentQuestionKey;
     }
 
     public String getJustification() { return justification; }

@@ -49,14 +49,17 @@ public class StudentSubmitQuestionService {
     public StudentQuestionDTO studentSubmitQuestion(int courseId, StudentQuestionDTO studentQuestionDTO, int studentId) {
         Course course = courseRepository.findById(courseId).orElseThrow(() -> new TutorException(COURSE_NOT_FOUND, courseId));
 
-        if (studentQuestionDTO.getKey() == null) {
+        if (studentQuestionDTO.getStudentQuestionKey() == null) {
             int maxQuestionNumber = studentQuestionRepository.getMaxQuestionNumber() != null ?
                     studentQuestionRepository.getMaxQuestionNumber() : 0;
             studentQuestionDTO.setKey(maxQuestionNumber + 1);
+            studentQuestionDTO.setStudentQuestionKey(maxQuestionNumber + 1);
         }
 
         User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(USER_NOT_FOUND, studentId));
         StudentQuestion studentQuestion = new StudentQuestion(course, studentQuestionDTO, student);
+
+        this.entityManager.persist(studentQuestion);
 
         return new StudentQuestionDTO(studentQuestion);
     }
