@@ -8,8 +8,8 @@ import java.util.List;
 
 @Service
 public class TournamentService {
-
-    public TournamentDto createTournament(TournamentDto tournamentDto){
+    
+    public TournamentDto createTournament(int executionId, TournamentDto tournamentDto) {
         return null;
     }
 

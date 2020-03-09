@@ -1,7 +1,9 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
@@ -9,6 +11,9 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.QUIZ_NOT_CONSISTENT;
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.TOURNAMENT_NOT_CONSISTENT;
 
 @Entity
 @Table(name = "tournaments")
@@ -179,14 +184,32 @@ public class Tournament {
     }
 
     private void checkTitle(String title) {
-        // TODO
+        if (title == null || title.trim().length() == 0) {
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Title");
+        }
     }
 
     private void checkAvailableDate(LocalDateTime availableDate) {
-        // TODO
+        if (availableDate == null) {
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Available date");
+        }
+        else if (this.status == Status.AVAILABLE && availableDate.isBefore(LocalDateTime.now())){
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Conclusion date"); //TODO Different message?
+        }
+        else if (this.status == Status.FINISHED && availableDate.isAfter(LocalDateTime.now())){
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Conclusion date"); //TODO Different message?
+        }
     }
 
     private void checkConclusionDate(LocalDateTime conclusionDate) {
-        // TODO
+        if (conclusionDate == null) {
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Conclusion date");
+        }
+        else if (this.status == Status.AVAILABLE && conclusionDate.isBefore(LocalDateTime.now())){
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Conclusion date"); //TODO Different message?
+        }
+        else if (this.status == Status.FINISHED && conclusionDate.isAfter(LocalDateTime.now())){
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Conclusion date"); //TODO Different message?
+        }
     }
 }
