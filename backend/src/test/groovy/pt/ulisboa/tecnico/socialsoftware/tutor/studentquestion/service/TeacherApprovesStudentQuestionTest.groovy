@@ -32,7 +32,7 @@ class TeacherApprovesStudentQuestionTest extends Specification {
     public static final String USER_NAME = "ist199999"
 
     public static final Integer STUDENT_QUESTION_KEY = 1
-    public static final Integer FAKE_STUDENT_QUESTION_KEY = 2
+    public static final Integer FAKE_STUDENT_QUESTION_ID = 2
 
     public static final String JUSTIFICATION = "very good question"
 
@@ -155,7 +155,7 @@ class TeacherApprovesStudentQuestionTest extends Specification {
 
     def "approve non existing student question"(){
         when:
-        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(FAKE_STUDENT_QUESTION_KEY)
+        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(FAKE_STUDENT_QUESTION_ID)
 
         then:
         def error = thrown(TutorException)

@@ -13,6 +13,7 @@ import Assessment from '@/models/management/Assessment';
 import AuthDto from '@/models/user/AuthDto';
 import StatementAnswer from '@/models/statement/StatementAnswer';
 import { QuizAnswer } from '@/models/management/QuizAnswer';
+import { QuizAnswers } from '@/models/management/QuizAnswers';
 
 const httpClient = axios.create();
 httpClient.defaults.timeout = 10000;
@@ -59,6 +60,17 @@ export default class RemoteServices {
   static async demoTeacherLogin(): Promise<AuthDto> {
     return httpClient
       .get('/auth/demo/teacher')
+      .then(response => {
+        return new AuthDto(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async demoAdminLogin(): Promise<AuthDto> {
+    return httpClient
+      .get('/auth/demo/admin')
       .then(response => {
         return new AuthDto(response.data);
       })
@@ -330,24 +342,11 @@ export default class RemoteServices {
       });
   }
 
-  static async getQuizAnswers(quizId: number): Promise<QuizAnswer[]> {
+  static async getQuizAnswers(quizId: number): Promise<QuizAnswers> {
     return httpClient
       .get(`/quizzes/${quizId}/answers`)
       .then(response => {
-        return response.data.map((quizAnswer: any) => {
-          return new QuizAnswer(quizAnswer);
-        });
-      })
-      .catch(async error => {
-        throw Error(await this.errorMessage(error));
-      });
-  }
-
-  static async getCorrectSequence(quizId: number): Promise<number[]> {
-    return httpClient
-      .get(`/quizzes/${quizId}/correct-sequence`)
-      .then(response => {
-        return response.data;
+        return new QuizAnswers(response.data);
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
@@ -478,6 +477,19 @@ export default class RemoteServices {
       .post('/courses', course)
       .then(response => {
         return new Course(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static getCourses(): Promise<Course[]> {
+    return httpClient
+      .get('/admin/courses/executions')
+      .then(response => {
+        return response.data.map((course: any) => {
+          return new Course(course);
+        });
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
