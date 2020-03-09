@@ -50,7 +50,7 @@ public class ClarificationService {
 
         checkIfDuplicate(questionId, user);
 
-        Question question = checkIfAnsweredQuestion(questionId, userId);
+        Question question = tryGetAnsweredQuestion(questionId, userId);
 
         ClarificationRequest clarificationRequest = createClarificationRequest(text, questionId, userId, clarificationRequestDto, user, question);
         entityManager.persist(clarificationRequest);
@@ -81,7 +81,7 @@ public class ClarificationService {
         return clarificationRequest;
     }
 
-    private Question checkIfAnsweredQuestion(int questionId, int userId) {
+    private Question tryGetAnsweredQuestion(int questionId, int userId) {
         boolean answered = false;
         Question question = questionRepository.findById(questionId).orElseThrow(() -> new TutorException(ErrorMessage.QUESTION_NOT_FOUND, questionId));
         Set<QuizQuestion> quizQuestions = question.getQuizQuestions();

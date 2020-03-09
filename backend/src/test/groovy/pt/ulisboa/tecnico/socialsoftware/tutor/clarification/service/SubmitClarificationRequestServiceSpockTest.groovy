@@ -34,11 +34,12 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
     static final String ACRONYM = "AS1"
     static final String ACADEMIC_TERM = "1 SEM"
     static final String CONTENT = "This is a test request."
-    static final Role ROLE = Role.STUDENT
     static final String USERNAME_ONE = "STUDENT_ONE"
     static final String USERNAME_TWO = "STUDENT_TWO"
     static final String NAME = "NAME"
     static final int INEXISTENT_QUESTION_ID = -1
+    static final int KEY_ONE = 1
+    static final int KEY_TWO = 2
 
     @Autowired
     CourseRepository courseRepository
@@ -68,7 +69,7 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
     ClarificationService clarificationService
 
     def course
-    def courseExecution
+    CourseExecution courseExecution
     def question
     def quiz
     def quizQuestion
@@ -82,42 +83,12 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
 
-        course = new Course()
-        course.setName(COURSE_NAME)
-
-        courseExecution = new CourseExecution()
-        courseExecution.setCourse(course)
-        courseExecution.setAcronym(ACRONYM)
-        courseExecution.setAcademicTerm(ACADEMIC_TERM)
-
-        // quiz
-        quiz = new Quiz()
-        quiz.setKey(1)
-        quiz.setType(Quiz.QuizType.GENERATED)
-        quiz.setCourseExecution(courseExecution)
-        courseExecution.addQuiz(quiz)
-
-
-        // question
-        question = new Question()
-        question.setKey(1)
-        question.setCourse(course)
-        course.addQuestion(question)
-
-        // quiz question
+        course = createCourse(COURSE_NAME)
+        courseExecution = createCourseExecution(course, ACRONYM, ACADEMIC_TERM)
+        quiz = createQuiz(KEY_ONE, courseExecution, Quiz.QuizType.GENERATED)
+        question = createQuestion(KEY_ONE, course)
         quizQuestion = new QuizQuestion(quiz, question, 1)
-
-
-        // student
-        student = new User()
-        student.setKey(1)
-        student.setName(NAME)
-        student.setUsername(USERNAME_ONE)
-        student.setRole(ROLE)
-        student.getCourseExecutions().add(courseExecution)
-        courseExecution.getUsers().add(student)
-
-        // quiz answer
+        student = createStudent(new User(), KEY_ONE, NAME, USERNAME_ONE, Role.STUDENT, courseExecution)
         quizAnswer = new QuizAnswer(student, quiz)
 
         courseRepository.save(course)
@@ -131,6 +102,49 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         questionId = question.getId()
         studentId = student.getId()
     }
+
+    private User createStudent(User student, int key, String name, String username, Role role, CourseExecution courseExecution) {
+        student.setKey(key)
+        student.setName(name)
+        student.setUsername(username)
+        student.setRole(role)
+        student.getCourseExecutions().add(courseExecution)
+        courseExecution.getUsers().add(student)
+        return student
+    }
+
+    private Question createQuestion(int key, Course course) {
+        question = new Question()
+        question.setKey(key)
+        question.setCourse(course)
+        course.addQuestion(question)
+        return question
+    }
+
+    private Quiz createQuiz(int key, CourseExecution courseExecution, Quiz.QuizType type) {
+        quiz = new Quiz()
+        quiz.setKey(key)
+        quiz.setType(type)
+        quiz.setCourseExecution(courseExecution)
+        courseExecution.addQuiz(quiz)
+        return quiz
+    }
+
+    private CourseExecution createCourseExecution(Course course, String acronym, String term) {
+        courseExecution = new CourseExecution()
+        courseExecution.setCourse(course)
+        courseExecution.setAcronym(acronym)
+        courseExecution.setAcademicTerm(term)
+        return courseExecution
+    }
+
+    private Course createCourse(String name) {
+        course = new Course()
+        course.setName(name)
+        return course
+    }
+
+
 
     def "the question has been answered and submit request"() {
         //the clarification request is created
@@ -171,20 +185,16 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
     }
 
 
-    @Unroll("invalid content: #content | #is_student | #has_answered || error_message")
-    def "invalid content"() {
+    @Unroll("invalid arguments: #content | #is_student | #has_answered || #error_message")
+    def "invalid arguments"() {
         given:
-        def student2 = new User()
-        student2.setKey(2)
-        student2.setName(NAME)
-        student2.setUsername(USERNAME_TWO)
-        student2.setRole(ROLE)
+        def student2 = createStudent(new User(), KEY_TWO, NAME, USERNAME_TWO, Role.STUDENT, courseExecution)
         userRepository.save(student2)
 
         when:
-        hasAnswered(has_answered, student2)
-        isQuestion((is_question))
-        isStudent(is_student)
+        changeStudentId(has_answered, student2)
+        changeQuestionId(is_question)
+        changeUserRole(is_student)
         clarificationService.submitClarificationRequest(content, questionId, studentId, new ClarificationRequestDto())
 
         then:
@@ -206,19 +216,19 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
     }
 
 
-    def hasAnswered(boolean has_answered, User student2) {
+    def changeStudentId(boolean has_answered, User student2) {
         if (!has_answered) {
             studentId = student2.getId()
         }
     }
 
-    def isQuestion(boolean is_question) {
+    def changeQuestionId(boolean is_question) {
         if (!is_question) {
             questionId = INEXISTENT_QUESTION_ID
         }
     }
 
-    def isStudent(boolean is_student) {
+    def changeUserRole(boolean is_student) {
         if (!is_student) {
             student.setRole(Role.TEACHER)
         }
