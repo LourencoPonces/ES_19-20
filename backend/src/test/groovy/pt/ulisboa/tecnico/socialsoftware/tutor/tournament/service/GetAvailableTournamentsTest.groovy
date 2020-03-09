@@ -45,7 +45,27 @@ class GetAvailableTournamentsTest extends Specification{
         tournamentElement.getConclusionDateDate() == null
     }
 
-    def "get the available tournaments although there are not any"() {
+    def "get the available tournaments, although there are not any"() {
+        // exception is thrown
+        expect: false
+    }
+
+    def "get the available tournaments, although there are only tournaments in RUNNING state"(){
+        // exception is thrown
+        expect: false
+    }
+
+    def "get the available tournaments, although there are only tournaments in FINISHED state"(){
+        // exception is thrown
+        expect: false
+    }
+
+    def "get the available tournaments, although there are only tournaments with available date after the current date"(){
+        // exception is thrown
+        expect: false
+    }
+
+    def "get the available tournaments, although there are only tournaments with conclusion date before the current date"(){
         // exception is thrown
         expect: false
     }
