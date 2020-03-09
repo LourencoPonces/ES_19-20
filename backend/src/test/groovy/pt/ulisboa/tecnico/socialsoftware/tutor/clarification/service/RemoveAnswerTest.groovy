@@ -8,8 +8,9 @@ class RemoveAnswerTest extends Specification {
         given: "answered clarification request"
 
         when: "answer is removed"
+        false
 
-        expect: "clarification request has no answer"
+        then: "clarification request has no answer"
         false
     }
 

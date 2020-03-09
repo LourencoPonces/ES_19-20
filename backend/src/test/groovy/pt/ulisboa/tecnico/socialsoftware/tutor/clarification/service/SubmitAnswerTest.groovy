@@ -7,6 +7,9 @@ class SubmitAnswerTest extends Specification {
     def "submit an answer"() {
         given: "a clarification request"
 
+        when:
+        false
+
         then: "the answer was submitted"
         false // TODO: impl
     }
@@ -14,13 +17,18 @@ class SubmitAnswerTest extends Specification {
     def "submit answer to already answered request"() {
         given: "a clarification request that already has an answer"
 
-        expect: "the answer was replaced"
+        when:
+        false
+
+        then: "the answer was replaced"
         false // TODO: impl
     }
 
     def "submit an answer with no request"() {
         when: "submitting an answer for a null clarification request"
-        expect: "an exception"
+        false
+
+        then: "an exception"
         false // TODO: impl
     }
 
