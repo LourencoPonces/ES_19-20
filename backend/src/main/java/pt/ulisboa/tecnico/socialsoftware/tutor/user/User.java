@@ -58,7 +58,7 @@ public class User implements UserDetails, Importable {
     @ManyToMany
     private Set<CourseExecution> courseExecutions = new HashSet<>();
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner")
     private Set<ClarificationRequest> clarificationRequests = new HashSet<>();
 
     public User() {
