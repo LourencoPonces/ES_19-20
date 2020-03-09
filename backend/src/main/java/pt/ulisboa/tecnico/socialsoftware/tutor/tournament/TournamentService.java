@@ -7,7 +7,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 @Service
 public class TournamentService {
 
-    public TournamentDto createTournament(){
+    public TournamentDto createTournament(int executionId, TournamentDto tournamentDto) {
         return null;
     }
 }
