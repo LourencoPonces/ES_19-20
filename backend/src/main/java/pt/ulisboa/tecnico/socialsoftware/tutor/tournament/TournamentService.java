@@ -9,7 +9,7 @@ import java.util.List;
 @Service
 public class TournamentService {
 
-    public TournamentDto createTournament(){
+    public TournamentDto createTournament(TournamentDto tournamentDto){
         return null;
     }
 
