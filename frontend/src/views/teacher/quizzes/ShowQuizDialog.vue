@@ -1,5 +1,10 @@
 <template>
-  <v-dialog v-model="dialog" @keydown.esc="dialog = false" max-width="75%">
+  <v-dialog
+    :value="dialog"
+    @input="$emit('dialog', false)"
+    @keydown.esc="$emit('dialog', false)"
+    max-width="75%"
+  >
     <v-card v-if="quiz">
       <v-card-title>{{ quiz.title }}</v-card-title>
 
@@ -9,9 +14,7 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn dark color="blue darken-1" @click="$emit('close-quiz-dialog')"
-          >close</v-btn
-        >
+        <v-btn dark color="blue darken-1" @click="$emit('dialog')">close</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
