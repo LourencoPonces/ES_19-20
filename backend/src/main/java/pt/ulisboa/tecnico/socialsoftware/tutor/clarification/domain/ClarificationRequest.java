@@ -21,12 +21,12 @@ public class ClarificationRequest {
     @Column(unique=true, nullable = false)
     private Integer key;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
     private User owner;
 
-    @ManyToOne                  //check this
-    @JoinColumn(name = "question_id")
+    @ManyToOne
+    @JoinColumn(name = "question_id", nullable = false)
     private Question question;
 
     @Column(columnDefinition = "TEXT")
