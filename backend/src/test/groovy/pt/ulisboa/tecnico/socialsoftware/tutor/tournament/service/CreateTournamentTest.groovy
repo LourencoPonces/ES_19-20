@@ -142,6 +142,8 @@ class CreateTournamentTest extends Specification {
         def outsideTopic = new Topic()
         outsideTopic.setName("OUTSIDE_TOPIC")
         topicRepository.save(outsideTopic)
+
+        def topicDto = new TopicDto(outsideTopic)
         topicDtoList.add(topicDto)
 
         when:
@@ -187,7 +189,7 @@ class CreateTournamentTest extends Specification {
     def "create a tournament with available date after conclusion"() {
         given: 'a conclusion date before the available date'
         conclusionDate = availableDate.minusDays(1)
-        tournament.setConclusionDate(conclusionDate)
+        tournament.setConclusionDate(conclusionDate.format(formatter))
 
         when:
         tournamentService.createTournament(courseExecution.getId(), tournament)
