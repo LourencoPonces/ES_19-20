@@ -91,7 +91,7 @@ class CheckStudentQuestionStatusTest extends Specification {
         user
     }
 
-    def "check status of non exiting suggestion"() {
+    def "teacher checks suggestion"() {
         when:
         studentCheckQuestionStatusService.acceptStudentQuestion(FAKE_STUDENT_QUESTION_ID)
 
@@ -100,13 +100,13 @@ class CheckStudentQuestionStatusTest extends Specification {
         error.errorMessage == STUDENT_QUESTION_NOT_FOUND
     }
 
-    def "check status of existing suggestion"() {
+    def "check status of existing suggestions (accepted, rejected, pending)"() {
         // return question status
         expect: false
     }
 
-    def "check suggestion status of different user"() {
-        // exception thrown
+    def "check status of non existing suggestions"() {
+        // empty collection
         expect: false
     }
 
