@@ -1,11 +1,13 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain;
 
+import org.apache.tomcat.jni.Local;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,7 +15,7 @@ import java.util.Set;
 @Entity
 @Table(name = "tournaments")
 public class Tournament {
-    public enum Status {AVAILABLE, RUNNING, FINISHED, CANCELLED}
+    public enum Status {CREATED, AVAILABLE, RUNNING, FINISHED, CANCELLED}
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,6 +29,9 @@ public class Tournament {
 
     @Column(name = "available_date")
     private LocalDateTime availableDate;
+
+    @Column(name = "running_date")
+    private LocalDateTime runningDate;
 
     @Column(name = "conclusion_date")
     private LocalDateTime conclusionDate;
@@ -62,6 +67,7 @@ public class Tournament {
         this.status = tournamentDto.getStatus();
         this.creationDate = tournamentDto.getCreationDateDate();
         setAvailableDate(tournamentDto.getAvailableDateDate());
+        setRunningDate(tournamentDto.getRunningDateDate());
         setConclusionDate(tournamentDto.getConclusionDateDate());
         this.numberOfQuestions = tournamentDto.getNumberOfQuestions();
     }
@@ -97,6 +103,14 @@ public class Tournament {
     public void setAvailableDate(LocalDateTime availableDate) {
         checkAvailableDate(availableDate);
         this.availableDate = availableDate;
+    }
+
+    public LocalDateTime getRunningDate() {
+        return runningDate;
+    }
+
+    public void setRunningDate(LocalDateTime runningDate) {
+        this.runningDate = runningDate;
     }
 
     public LocalDateTime getConclusionDate() {
@@ -183,6 +197,10 @@ public class Tournament {
     }
 
     private void checkAvailableDate(LocalDateTime availableDate) {
+        // TODO
+    }
+
+    private void checkRunningDate(LocalDateTime runningDate) {
         // TODO
     }
 
