@@ -7,11 +7,16 @@ public enum ErrorMessage {
     QUESTION_ANSWER_NOT_FOUND("Question answer not found with id %d"),
     OPTION_NOT_FOUND("Option not found with id %d"),
     QUESTION_NOT_FOUND("Question not found with id %d"),
+    STUDENT_QUESTION_NOT_FOUND("Student Question not found with id %d"),
     USER_NOT_FOUND("User not found with id %d"),
     TOPIC_NOT_FOUND("Topic not found with id %d"),
+    NO_TOPICS("The question has no Topics"),
     ASSESSMENT_NOT_FOUND("Assessment not found with id %d"),
     TOPIC_CONJUNCTION_NOT_FOUND("Topic Conjunction not found with id %d"),
     COURSE_EXECUTION_NOT_FOUND("Course execution not found with name %d"),
+
+    INVALID_JUSTIFICATION("The justification \"%s\" is invalid"),
+    CANNOT_REJECT_ACCEPTED_SUGGESTION("Cannot reject already accepted suggestion"),
 
     COURSE_NOT_FOUND("Course not found with name %s"),
     COURSE_NAME_IS_EMPTY("The course name is empty"),
@@ -24,6 +29,8 @@ public enum ErrorMessage {
     QUIZ_MISMATCH("Quiz Answer Quiz %d does not match Quiz Question Quiz %d"),
     QUESTION_OPTION_MISMATCH("Question %d does not have option %d"),
     COURSE_EXECUTION_MISMATCH("Course Execution %d does not have quiz %d"),
+    NO_OPTIONS("The question has no options"),
+    NO_CORRECT_OPTIONS("The question doesn't have any correct options"),
 
     DUPLICATE_TOPIC("Duplicate topic: %s"),
     DUPLICATE_USER("Duplicate user: %s"),
