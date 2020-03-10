@@ -57,7 +57,7 @@ public class Tournament {
     private User creator;
 
     @ManyToMany(mappedBy = "tournaments")
-    private Set<User> participants;
+    private Set<User> participants = new HashSet<>();
 
     public Tournament() {}
 

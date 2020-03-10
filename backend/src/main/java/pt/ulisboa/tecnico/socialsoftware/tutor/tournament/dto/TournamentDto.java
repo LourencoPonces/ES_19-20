@@ -23,7 +23,7 @@ public class TournamentDto implements Serializable {
     private Integer numberOfQuestions;
 
     private UserDto creator;
-    private List<UserDto> participants;
+    private List<UserDto> participants = new ArrayList<>();
 
     private List<TopicDto> topics = new ArrayList<>();
 
