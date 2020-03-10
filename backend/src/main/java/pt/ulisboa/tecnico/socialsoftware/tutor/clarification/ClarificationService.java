@@ -41,6 +41,10 @@ public class ClarificationService {
     EntityManager entityManager;
 
 
+    public void checkClarificationRequestAnswer(int studentId, int questionId) {
+
+    }
+
     @Retryable(
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
