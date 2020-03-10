@@ -67,7 +67,6 @@ class CreateTournamentTest extends Specification {
 
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-        tournamentService = new TournamentService()
 
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseRepository.save(course)
