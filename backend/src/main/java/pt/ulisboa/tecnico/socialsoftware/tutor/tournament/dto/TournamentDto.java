@@ -32,7 +32,7 @@ public class TournamentDto implements Serializable {
 
     public TournamentDto() {}
 
-    public TournamentDto(Tournament tournament) {
+    public TournamentDto(Tournament tournament, boolean deepCopy) {
         this.id = tournament.getId();
         this.key = tournament.getKey();
         this.title = tournament.getTitle();

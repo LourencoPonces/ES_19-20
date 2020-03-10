@@ -105,6 +105,7 @@ class CreateTournamentTest extends Specification {
 
     def "create a tournament"() {
         given: "a tournament"
+        tournament.setTitle(TOURNAMENT_TITLE)
 
         when:
         tournamentService.createTournament(courseExecution.getId(), tournament)
