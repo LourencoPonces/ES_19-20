@@ -100,7 +100,11 @@ public class TournamentService {
         return new TournamentDto(tournament, true);
     }
 
-    public List<TournamentDto> getAvailableTournaments(){
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<TournamentDto> getAvailableTournaments(int executionId){
         return null;
     }
 }
