@@ -9,6 +9,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import javax.transaction.Transactional;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Repository
 @Transactional
@@ -18,5 +19,5 @@ public interface StudentQuestionRepository extends JpaRepository<StudentQuestion
     Integer getMaxQuestionNumber();
 
     @Query(value = "SELECT * FROM student_question sq WHERE sq.user_id = :user ", nativeQuery = true)
-    List<StudentQuestion> findByUser(Integer user);
+    Stream<StudentQuestion> findByUser(Integer user);
 }

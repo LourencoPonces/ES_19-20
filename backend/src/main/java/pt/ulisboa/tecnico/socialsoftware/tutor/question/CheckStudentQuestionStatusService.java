@@ -12,6 +12,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
@@ -24,13 +25,13 @@ public class CheckStudentQuestionStatusService {
     @Autowired
     StudentQuestionRepository studentQuestionRepository;
 
-    public List<StudentQuestionDTO> getAllStudentQuestion(Integer studentId) {
+    public Stream<StudentQuestion> getAllStudentQuestion(Integer studentId) {
 
         User user = userRepository.findById(studentId).orElseThrow(() -> new TutorException(USER_NOT_FOUND, studentId));
         if(user.getRole() == User.Role.TEACHER) {
             throw new TutorException(ACCESS_DENIED);
         }
-        return studentQuestionRepository.findByUser(studentId).stream().map(StudentQuestionDTO::new).collect(Collectors.toList());
+        return studentQuestionRepository.findByUser(studentId);
     }
 
     // not needed yet

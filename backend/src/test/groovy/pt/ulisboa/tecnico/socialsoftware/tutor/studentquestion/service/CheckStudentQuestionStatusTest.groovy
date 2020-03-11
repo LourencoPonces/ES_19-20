@@ -21,6 +21,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
+import java.util.stream.Collectors
+
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
 @DataJpaTest
@@ -127,7 +129,7 @@ class CheckStudentQuestionStatusTest extends Specification {
         given: 'no questions'
 
         when:
-        List<StudentQuestionDTO> result = studentCheckQuestionStatusService.getAllStudentQuestion(student.getId())
+        List<StudentQuestionDTO> result = studentCheckQuestionStatusService.getAllStudentQuestion(student.getId()).collect(Collectors.toList());
 
         then:
         result.size() == 0;
@@ -161,7 +163,7 @@ class CheckStudentQuestionStatusTest extends Specification {
         studentQuestionRepository.save(studentQuestion)
 
         when:
-        def result = studentCheckQuestionStatusService.getAllStudentQuestion(student.getId())
+        def result = studentCheckQuestionStatusService.getAllStudentQuestion(student.getId()).collect(Collectors.toList())
 
         then:
         result.size() == 1
@@ -191,7 +193,7 @@ class CheckStudentQuestionStatusTest extends Specification {
 
 
         when:
-        List<StudentQuestionDTO> questions = studentCheckQuestionStatusService.getAllStudentQuestion(student.getId())
+        List<StudentQuestion> questions = studentCheckQuestionStatusService.getAllStudentQuestion(student.getId()).collect(Collectors.toList());
 
         then:
         questions.size() == 3;
@@ -201,9 +203,9 @@ class CheckStudentQuestionStatusTest extends Specification {
 
     }
 
-    def numberOfQuestionsWithStatus(List<StudentQuestionDTO> questions, StudentQuestion.SubmittedStatus status) {
+    def numberOfQuestionsWithStatus(List<StudentQuestion> questions, StudentQuestion.SubmittedStatus status) {
         def out = 0
-        for(StudentQuestionDTO question : questions) {
+        for(StudentQuestion question : questions) {
             if(question.getSubmittedStatus() == status)
                 out += 1
         }
