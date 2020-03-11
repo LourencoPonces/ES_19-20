@@ -4,10 +4,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import javax.transaction.Transactional;
 
-import java.util.Optional;
+import java.util.List;
 
 @Repository
 @Transactional
@@ -16,6 +17,6 @@ public interface StudentQuestionRepository extends JpaRepository<StudentQuestion
     @Query(value = "SELECT MAX(student_question_key) FROM student_question", nativeQuery = true)
     Integer getMaxQuestionNumber();
 
-    @Query(value = "SELECT * from student_question sq where sq.student_question_key = :key", nativeQuery = true)
-    Optional<StudentQuestion> findByKey(Integer key);
+    @Query(value = "SELECT * FROM student_question sq WHERE sq.user_id = :user ", nativeQuery = true)
+    List<StudentQuestion> findByUser(Integer user);
 }
