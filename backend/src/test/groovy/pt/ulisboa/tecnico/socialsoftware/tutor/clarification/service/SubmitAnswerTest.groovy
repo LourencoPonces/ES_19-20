@@ -1,9 +1,7 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.clarification.service
 
-import spock.lang.Ignore
 import spock.lang.Specification
 
-@Ignore
 class SubmitAnswerTest extends Specification {
 
     def "submit an answer"() {
