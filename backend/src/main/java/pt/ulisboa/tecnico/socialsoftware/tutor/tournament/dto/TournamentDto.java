@@ -24,7 +24,7 @@ public class TournamentDto implements Serializable {
     private Integer numberOfQuestions;
 
     private UserDto creator;
-    private List<UserDto> participants;
+    private List<UserDto> participants = new ArrayList<>();
 
     private List<TopicDto> topics = new ArrayList<>();
 
@@ -33,7 +33,7 @@ public class TournamentDto implements Serializable {
 
     public TournamentDto() {}
 
-    public TournamentDto(Tournament tournament) {
+    public TournamentDto(Tournament tournament, boolean deepCopy) {
         this.id = tournament.getId();
         this.key = tournament.getKey();
         this.title = tournament.getTitle();

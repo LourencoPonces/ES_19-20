@@ -61,13 +61,13 @@ class CreateTournamentTest extends Specification {
     def courseExecution
     def creationDate
     def availableDate
+    def runningDate
     def conclusionDate
     def formatter
     def topicDtoList
 
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-        tournamentService = new TournamentService()
 
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseRepository.save(course)
@@ -94,17 +94,21 @@ class CreateTournamentTest extends Specification {
         tournament.setTitle(TOURNAMENT_TITLE)
         tournament.setKey(1)
         creationDate = LocalDateTime.now()
-        availableDate = LocalDateTime.now()
-        conclusionDate = LocalDateTime.now().plusDays(1)
+        availableDate = LocalDateTime.now().plusDays(1)
+        runningDate = LocalDateTime.now().plusDays(2)
+        conclusionDate = LocalDateTime.now().plusDays(3)
         tournament.setNumberOfQuestions(1)
         tournament.setCreator(creatorDto)
-        tournament.setAvailableDate(creationDate.format(formatter))
+        tournament.setCreationDate(creationDate.format(formatter))
+        tournament.setAvailableDate(availableDate.format(formatter))
+        tournament.setRunningDate(runningDate.format(formatter))
         tournament.setConclusionDate(conclusionDate.format(formatter))
         tournament.setTopics(topicDtoList)
     }
 
     def "create a tournament"() {
         given: "a tournament"
+        tournament.setTitle(TOURNAMENT_TITLE)
 
         when:
         tournamentService.createTournament(courseExecution.getId(), tournament)
@@ -117,8 +121,9 @@ class CreateTournamentTest extends Specification {
         result.getTitle() == TOURNAMENT_TITLE
         result.getCreationDate() != null
         result.getAvailableDate().format(formatter) == availableDate.format(formatter)
+        result.getRunningDate().format(formatter) == runningDate.format(formatter)
         result.getConclusionDate().format(formatter) == conclusionDate.format(formatter)
-        result.getStatus() == Tournament.Status.AVAILABLE
+        result.getStatus() == Tournament.Status.CREATED
         result.getCreator().getUsername() == CREATOR_USERNAME
         result.getTopics().size() == 1
         result.getParticipants().size() == 1
@@ -142,6 +147,8 @@ class CreateTournamentTest extends Specification {
         def outsideTopic = new Topic()
         outsideTopic.setName("OUTSIDE_TOPIC")
         topicRepository.save(outsideTopic)
+
+        def topicDto = new TopicDto(outsideTopic)
         topicDtoList.add(topicDto)
 
         when:
@@ -149,7 +156,7 @@ class CreateTournamentTest extends Specification {
 
         then:
         def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_CONSISTENT
+        exception.getErrorMessage() == ErrorMessage.TOPIC_NOT_FOUND
         tournamentRepository.count() == 0L
     }
 
@@ -180,14 +187,14 @@ class CreateTournamentTest extends Specification {
 
         then:
         def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_CONSISTENT
+        exception.getErrorMessage() == ErrorMessage.COURSE_EXECUTION_NOT_FOUND
         tournamentRepository.count() == 0L
     }
 
     def "create a tournament with available date after conclusion"() {
         given: 'a conclusion date before the available date'
         conclusionDate = availableDate.minusDays(1)
-        tournament.setConclusionDate(conclusionDate)
+        tournament.setConclusionDate(conclusionDate.format(formatter))
 
         when:
         tournamentService.createTournament(courseExecution.getId(), tournament)
