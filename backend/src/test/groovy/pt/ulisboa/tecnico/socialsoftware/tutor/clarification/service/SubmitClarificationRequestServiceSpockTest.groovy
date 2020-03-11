@@ -88,7 +88,7 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         quiz = createQuiz(KEY_ONE, courseExecution, Quiz.QuizType.GENERATED)
         question = createQuestion(KEY_ONE, course)
         quizQuestion = new QuizQuestion(quiz, question, 1)
-        student = createStudent(new User(), KEY_ONE, NAME, USERNAME_ONE, Role.STUDENT, courseExecution)
+        student = createStudent(new User(), KEY_ONE, NAME, USERNAME_ONE, courseExecution)
         quizAnswer = new QuizAnswer(student, quiz)
 
         courseRepository.save(course)
@@ -103,11 +103,11 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         studentId = student.getId()
     }
 
-    private User createStudent(User student, int key, String name, String username, Role role, CourseExecution courseExecution) {
+    private User createStudent(User student, int key, String name, String username, CourseExecution courseExecution) {
         student.setKey(key)
         student.setName(name)
         student.setUsername(username)
-        student.setRole(role)
+        student.setRole(Role.STUDENT)
         student.getCourseExecutions().add(courseExecution)
         courseExecution.getUsers().add(student)
         return student
@@ -166,20 +166,18 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
 
     def "same student submits 2 requests for the same question"() {
         //throw exception
-        given: "a first clarification request dto"
-        clarificationRequestDto = new ClarificationRequestDto()
-        and: "a second clarification request dto"
+        given: "a second clarification request dto"
         def clarificationDto2 = new ClarificationRequestDto()
 
         when:
-        clarificationService.submitClarificationRequest(CONTENT, questionId, studentId, clarificationRequestDto)
+        clarificationService.submitClarificationRequest(CONTENT, questionId, studentId, new ClarificationRequestDto())
         clarificationService.submitClarificationRequest(CONTENT, questionId, studentId, clarificationDto2)
 
         then: "only the first one is saved and exception thrown"
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.DUPLICATE_CLARIFICATION_REQUEST
         clarificationRequestRepository.count() == 1L
-        and: "the clarification request wasn't added to the student"
+        and: "the second clarification request wasn't added to the student"
         def user = userRepository.findAll().get(0)
         user.getClarificationRequests().size() == 1
     }
@@ -188,7 +186,7 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
     @Unroll("invalid arguments: #content | #is_student | #has_answered || #error_message")
     def "invalid arguments"() {
         given:
-        def student2 = createStudent(new User(), KEY_TWO, NAME, USERNAME_TWO, Role.STUDENT, courseExecution)
+        def student2 = createStudent(new User(), KEY_TWO, NAME, USERNAME_TWO, courseExecution)
         userRepository.save(student2)
 
         when:

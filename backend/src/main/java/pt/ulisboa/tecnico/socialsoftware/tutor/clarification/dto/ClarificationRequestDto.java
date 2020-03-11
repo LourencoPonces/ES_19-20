@@ -12,7 +12,7 @@ public class ClarificationRequestDto {
     private Integer owner;
     private Integer question;
     private String content;
-    private String creationDate = null;
+    private String creationDate;
 
     @Transient
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
