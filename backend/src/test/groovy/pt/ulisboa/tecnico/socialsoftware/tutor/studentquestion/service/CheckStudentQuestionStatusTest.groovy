@@ -11,11 +11,11 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.CheckStudentQuestionStatusService
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Option
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion.SubmittedStatus
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
@@ -34,9 +34,13 @@ class CheckStudentQuestionStatusTest extends Specification {
     public static final String TEACHER_USERNAME = "ist911111"
     public static final String STUDENT_USERNAME = "ist199999"
 
-    public static final Integer STUDENT_QUESTION_KEY = 1
     public static final Integer STUDENT_KEY = 1
     public static final Integer TEACHER_KEY = 2
+
+    public static final String OPTION_CONTENT = "optionId content"
+    public static final String TOPIC_NAME = "topic name"
+    public static final String QUESTION_TITLE = 'question title'
+    public static final String QUESTION_CONTENT = 'question content'
 
     @Autowired
     CheckStudentQuestionStatusService studentCheckQuestionStatusService
@@ -50,6 +54,9 @@ class CheckStudentQuestionStatusTest extends Specification {
 
     @Autowired
     StudentQuestionRepository studentQuestionRepository
+
+    @Autowired
+    QuestionRepository questionRepository
 
     @Autowired
     UserRepository userRepository
@@ -74,14 +81,23 @@ class CheckStudentQuestionStatusTest extends Specification {
     }
 
     private StudentQuestion createStudentQuestion(User user, Course course) {
-        def studentQuestion = new StudentQuestion()
-        studentQuestion.addTopic(new Topic())
-        studentQuestion.addOption(new Option())
-        studentQuestion.setKey(STUDENT_QUESTION_KEY)
-        studentQuestion.setStudentQuestionKey(STUDENT_QUESTION_KEY)
-        studentQuestion.setUser(user)
-        studentQuestion.setCourse(course)
-        studentQuestion
+        def studentQuestion = new StudentQuestionDTO()
+        studentQuestion.setTitle(QUESTION_TITLE)
+        studentQuestion.setContent(QUESTION_CONTENT)
+        def topic =  new TopicDto()
+        topic.setName(TOPIC_NAME)
+        def topicList = new ArrayList<TopicDto>()
+        topicList.add(topic)
+        studentQuestion.setTopics(topicList)
+        def option = new OptionDto()
+        option.setContent(OPTION_CONTENT)
+        option.setCorrect(true)
+        def optionList = new ArrayList<OptionDto>()
+        optionList.add(option)
+        studentQuestion.setOptions(optionList)
+        studentQuestion.setKey(questionRepository.getMaxQuestionNumber() == null ? 1 : questionRepository.getMaxQuestionNumber()+1 )
+        studentQuestion.setStudentQuestionKey( studentQuestionRepository.getMaxQuestionNumber() == null ? 1 : studentQuestionRepository.getMaxQuestionNumber()+1)
+        return new StudentQuestion(course, studentQuestion, user)
     }
 
     private User createUser(CourseExecution courseExecution, String username, Integer key) {
@@ -89,7 +105,7 @@ class CheckStudentQuestionStatusTest extends Specification {
         user.setUsername(username)
         user.setKey(key)
         user.getCourseExecutions().add(courseExecution)
-        user
+        return user
     }
 
     def "check status of non existing suggestions"() {
@@ -149,29 +165,21 @@ class CheckStudentQuestionStatusTest extends Specification {
         def maxKey = 0
 
         StudentQuestion pendingQuestion = createStudentQuestion(student, course)
-        pendingQuestion.setKey(maxKey+1)
-        pendingQuestion.setStudentQuestionKey(maxKey+1)
         studentQuestionRepository.save(pendingQuestion)
 
         and: 'an approved question'
         StudentQuestion approvedQuestion = createStudentQuestion(student, course)
-        maxKey = studentQuestionRepository.getMaxQuestionNumber()
-        approvedQuestion.setKey(maxKey+1)
-        approvedQuestion.setStudentQuestionKey(maxKey+1)
         evaluateQuestion(true, false, approvedQuestion)
         studentQuestionRepository.save(approvedQuestion)
 
         and: 'a rejected question'
         StudentQuestion rejectedQuestion = createStudentQuestion(student, course)
-        maxKey = studentQuestionRepository.getMaxQuestionNumber()
-        rejectedQuestion.setKey(maxKey+1)
-        rejectedQuestion.setStudentQuestionKey(maxKey+1)
         evaluateQuestion(false, true, rejectedQuestion)
         studentQuestionRepository.save(rejectedQuestion)
 
 
         when:
-        List<StudentQuestion> questions = studentCheckQuestionStatusService.getAllStudentQuestion(student.getId())
+        List<StudentQuestionDTO> questions = studentCheckQuestionStatusService.getAllStudentQuestion(student.getId())
 
         then:
         questions.size() == 3;
@@ -183,7 +191,7 @@ class CheckStudentQuestionStatusTest extends Specification {
 
     def numberOfQuestionsWithStatus(List<StudentQuestionDTO> questions, StudentQuestion.SubmittedStatus status) {
         def out = 0
-        for(StudentQuestion question : questions) {
+        for(StudentQuestionDTO question : questions) {
             if(question.getSubmittedStatus() == status)
                 out += 1
         }
