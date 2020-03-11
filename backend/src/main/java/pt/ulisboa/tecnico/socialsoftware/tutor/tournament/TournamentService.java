@@ -6,11 +6,12 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
@@ -22,7 +23,6 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Optional;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
@@ -40,6 +40,9 @@ public class TournamentService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private TopicRepository topicRepository;
+
     @PersistenceContext
     EntityManager entityManager;
 
@@ -52,7 +55,22 @@ public class TournamentService {
 
         User creator = userRepository.findByUsername(tournamentDto.getCreator().getUsername());
 
+        if (tournamentDto.getStatus() == null) {
+            tournamentDto.setStatus(Tournament.Status.CREATED);
+        }
+
         Tournament tournament = new Tournament(tournamentDto);
+
+        tournamentDto.getTopics().stream().forEach(t -> {
+            Topic tmp = topicRepository.findTopicByName(
+                    courseExecution.getCourse().getId(),
+                    t.getName());
+            if (tmp == null) {
+                throw new TutorException(TOPIC_NOT_FOUND, t.getId());
+            } else {
+                tournament.addTopic(tmp);
+            }
+        });
 
         if (!creator.getCourseExecutions().contains(courseExecution)) {
             throw new TutorException(TOURNAMENT_NOT_CONSISTENT, courseExecution.getAcronym());
