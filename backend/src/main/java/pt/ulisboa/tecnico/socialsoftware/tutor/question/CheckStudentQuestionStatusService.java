@@ -33,8 +33,6 @@ public class CheckStudentQuestionStatusService {
         return studentQuestionRepository.findByUser(studentId).stream().map(StudentQuestionDTO::new).collect(Collectors.toList());
     }
 
-    public List<StudentQuestionDTO> getAllQuestionsWithStatus(Integer studentId, StudentQuestion.SubmittedStatus status) {
-        return new ArrayList<StudentQuestionDTO>();
-    }
-
+    // not needed yet
+    // public List<StudentQuestionDTO> getAllQuestionsWithStatus(Integer studentId, StudentQuestion.SubmittedStatus status) {}
 }
