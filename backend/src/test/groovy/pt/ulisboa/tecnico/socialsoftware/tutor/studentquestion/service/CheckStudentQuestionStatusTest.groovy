@@ -75,8 +75,7 @@ class CheckStudentQuestionStatusTest extends Specification {
         courseExecutionRepository.save(courseExecution)
 
         // student
-        student = createUser(courseExecution, STUDENT_USERNAME, STUDENT_KEY)
-        student.setRole(User.Role.STUDENT)
+        student = createUser(courseExecution, User.Role.STUDENT, STUDENT_USERNAME, STUDENT_KEY)
         userRepository.save(student)
     }
 
@@ -84,27 +83,43 @@ class CheckStudentQuestionStatusTest extends Specification {
         def studentQuestion = new StudentQuestionDTO()
         studentQuestion.setTitle(QUESTION_TITLE)
         studentQuestion.setContent(QUESTION_CONTENT)
-        def topic =  new TopicDto()
-        topic.setName(TOPIC_NAME)
-        def topicList = new ArrayList<TopicDto>()
-        topicList.add(topic)
-        studentQuestion.setTopics(topicList)
+        setKey(studentQuestion)
+        setTopics(studentQuestion)
+        setOptions(studentQuestion)
+        return new StudentQuestion(course, studentQuestion, user)
+    }
+
+    private void setKey(StudentQuestionDTO studentQuestion) {
+        def prevMaxQuestion = questionRepository.getMaxQuestionNumber()
+        def questionKey = prevMaxQuestion == null ? 1 : prevMaxQuestion + 1
+        studentQuestion.setKey(questionKey)
+        studentQuestion.setStudentQuestionKey(questionKey)
+    }
+
+    private void setOptions(StudentQuestionDTO studentQuestion) {
         def option = new OptionDto()
         option.setContent(OPTION_CONTENT)
         option.setCorrect(true)
         def optionList = new ArrayList<OptionDto>()
         optionList.add(option)
         studentQuestion.setOptions(optionList)
-        studentQuestion.setKey(questionRepository.getMaxQuestionNumber() == null ? 1 : questionRepository.getMaxQuestionNumber()+1 )
-        studentQuestion.setStudentQuestionKey( studentQuestionRepository.getMaxQuestionNumber() == null ? 1 : studentQuestionRepository.getMaxQuestionNumber()+1)
-        return new StudentQuestion(course, studentQuestion, user)
     }
 
-    private User createUser(CourseExecution courseExecution, String username, Integer key) {
+    private void setTopics(StudentQuestionDTO studentQuestion) {
+        def topic = new TopicDto()
+        topic.setName(TOPIC_NAME)
+        def topicList = new ArrayList<TopicDto>()
+        topicList.add(topic)
+        studentQuestion.setTopics(topicList)
+    }
+
+
+    private User createUser(CourseExecution courseExecution, User.Role role, String username, Integer key) {
         def user = new User()
         user.setUsername(username)
         user.setKey(key)
         user.getCourseExecutions().add(courseExecution)
+        user.setRole(role)
         return user
     }
 
@@ -128,8 +143,7 @@ class CheckStudentQuestionStatusTest extends Specification {
         savedQuestionId = studentQuestion.getId()
 
         and: 'a teacher'
-        def teacher = createUser(courseExecution, TEACHER_USERNAME, TEACHER_KEY)
-        teacher.setRole(User.Role.TEACHER)
+        def teacher = createUser(courseExecution, User.Role.TEACHER, TEACHER_USERNAME, TEACHER_KEY)
         userRepository.save(teacher)
 
         when:
@@ -140,7 +154,7 @@ class CheckStudentQuestionStatusTest extends Specification {
         error.errorMessage == ACCESS_DENIED
     }
 
-    def "check status of existing single suggestion (accepted, rejected, pending)"() {
+    def "check status of existing single suggestion accepted:#isAccepted, rejected:#isRejected)"() {
         given: 'a submitted question'
         StudentQuestion studentQuestion = createStudentQuestion(student, course)
         evaluateQuestion(isAccepted, isRejected, studentQuestion)
@@ -162,8 +176,6 @@ class CheckStudentQuestionStatusTest extends Specification {
 
     def "check status of multiple suggestions"() {
         given: 'a pending question'
-        def maxKey = 0
-
         StudentQuestion pendingQuestion = createStudentQuestion(student, course)
         studentQuestionRepository.save(pendingQuestion)
 
