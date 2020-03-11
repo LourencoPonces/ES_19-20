@@ -1,6 +1,8 @@
 package groovy.pt.ulisboa.tecnico.socialsoftware.tutor.tournament.service
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.Bean
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
@@ -186,4 +188,12 @@ class GetAvailableTournamentsTest extends Specification{
     }*/
 
     //TODO: Test Configuration
+    @TestConfiguration
+    static class TournamentServiceImplTestContextConfiguration {
+
+        @Bean
+        TournamentService tournamentService() {
+            return new TournamentService()
+        }
+    }
 }
