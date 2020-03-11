@@ -27,7 +27,8 @@ public class TeacherEvaluatesStudentQuestionService {
         // not checking justification because it was not provided
         StudentQuestion studentQuestion = findStudentQuestionById(studentQuestionId);
 
-        doEvaluate(studentQuestion, StudentQuestion.SubmittedStatus.APPROVED, "");
+        studentQuestion.setSubmittedStatus(StudentQuestion.SubmittedStatus.APPROVED);
+        studentQuestion.setJustification("");
     }
 
     public void acceptStudentQuestion(Integer studentQuestionId, String justification) {
@@ -35,7 +36,8 @@ public class TeacherEvaluatesStudentQuestionService {
 
         StudentQuestion studentQuestion = findStudentQuestionById(studentQuestionId);
 
-        doEvaluate(studentQuestion, StudentQuestion.SubmittedStatus.APPROVED, justification);
+        studentQuestion.setSubmittedStatus(StudentQuestion.SubmittedStatus.APPROVED);
+        studentQuestion.setJustification(justification);
     }
 
 
@@ -48,7 +50,8 @@ public class TeacherEvaluatesStudentQuestionService {
             throw new TutorException(CANNOT_REJECT_ACCEPTED_SUGGESTION);
         }
 
-        doEvaluate(studentQuestion, StudentQuestion.SubmittedStatus.REJECTED, justification);
+        studentQuestion.setSubmittedStatus(StudentQuestion.SubmittedStatus.REJECTED);
+        studentQuestion.setJustification(justification);
     }
 
 
@@ -70,10 +73,5 @@ public class TeacherEvaluatesStudentQuestionService {
         // if already accepted throw error
         // change later. the question may exist in quizzes, etc
         return studentQuestion.getSubmittedStatus() != StudentQuestion.SubmittedStatus.APPROVED;
-    }
-
-    private void doEvaluate(StudentQuestion studentQuestion, StudentQuestion.SubmittedStatus newStatus, String justification) {
-        studentQuestion.setSubmittedStatus(newStatus);
-        studentQuestion.setJustification(justification);
     }
 }

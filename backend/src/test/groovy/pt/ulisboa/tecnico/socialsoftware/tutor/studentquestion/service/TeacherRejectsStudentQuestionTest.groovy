@@ -124,6 +124,7 @@ class TeacherRejectsStudentQuestionTest extends Specification {
         justification || result
         ""            || INVALID_JUSTIFICATION
         "   "         || INVALID_JUSTIFICATION
+        "\n  \t"      || INVALID_JUSTIFICATION
         null          || INVALID_JUSTIFICATION
     }
 
