@@ -69,16 +69,16 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
     ClarificationService clarificationService
 
     def course
-    CourseExecution courseExecution
+    def courseExecution
     def question
     def quiz
     def quizQuestion
     def quizAnswer
-    User student
+    def student
     def clarificationRequestDto
     def formatter
-    int studentId
-    int questionId
+    def studentId
+    def questionId
 
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
