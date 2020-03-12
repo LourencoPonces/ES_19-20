@@ -40,6 +40,12 @@ public class TutorException extends RuntimeException {
         this.errorMessage = errorMessage;
     }
 
+    public TutorException(ErrorMessage errorMessage, String value1, int value2) {
+        super(String.format(errorMessage.label, value1, value2));
+        logger.error(String.format(errorMessage.label, value1, value2));
+        this.errorMessage = errorMessage;
+    }
+
     public ErrorMessage getErrorMessage() {
         return errorMessage;
     }
