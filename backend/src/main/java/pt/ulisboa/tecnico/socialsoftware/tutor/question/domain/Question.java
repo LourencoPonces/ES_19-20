@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @Table(
         name = "questions",
         indexes = {
@@ -267,6 +268,14 @@ public class Question {
     }
 
     private void checkConsistentQuestion(QuestionDto questionDto) {
+        if ((long) questionDto.getOptions().size() == 0) {
+            throw new TutorException(NO_OPTIONS);
+        }
+
+        if (questionDto.getOptions().stream().noneMatch(OptionDto::getCorrect)) {
+            throw new TutorException(NO_CORRECT_OPTIONS);
+        }
+
         if (questionDto.getTitle().trim().length() == 0 ||
                 questionDto.getContent().trim().length() == 0 ||
                 questionDto.getOptions().stream().anyMatch(optionDto -> optionDto.getContent().trim().length() == 0)) {
