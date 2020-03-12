@@ -1,12 +1,13 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain;
 
-
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
-import java.time.LocalDateTime;
+
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CLARIFICATION_REQUEST_MISSING_CONTENT;
 
@@ -34,6 +35,9 @@ public class ClarificationRequest {
 
     @Column(name = "submission_date")
     private LocalDateTime creationDate;
+
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "request", fetch=FetchType.LAZY, orphanRemoval=true, optional=true)
+    private ClarificationRequestAnswer answer;
 
     public ClarificationRequest() {}
 
@@ -63,4 +67,6 @@ public class ClarificationRequest {
     public void setContent(String content) { this.content = content; }
     public LocalDateTime getCreationDate() { return creationDate; }
     public void setCreationDate(LocalDateTime date) { creationDate = date; }
+    public Optional<ClarificationRequestAnswer> getAnswer() { return Optional.ofNullable(answer); }
+    public void setAnswer(ClarificationRequestAnswer a) { this.answer = a; }
 }
