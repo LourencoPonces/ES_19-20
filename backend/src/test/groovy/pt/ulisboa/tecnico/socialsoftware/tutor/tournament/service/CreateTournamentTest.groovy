@@ -172,7 +172,7 @@ class CreateTournamentTest extends Specification {
 
         then:
         def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_CONSISTENT
+        exception.getErrorMessage() == ErrorMessage.USER_NOT_ENROLLED_IN_COURSE_EXECUTION
         tournamentRepository.count() == 0L
     }
 

@@ -11,6 +11,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
@@ -95,22 +96,20 @@ public class TournamentService {
 
     private void checkCreatorCourseExecution(CourseExecution courseExecution, User creator, Tournament tournament) {
         if (!creator.getCourseExecutions().contains(courseExecution)) {
-            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, courseExecution.getAcronym());
+            throw new TutorException(USER_NOT_ENROLLED_IN_COURSE_EXECUTION, courseExecution.getAcronym());
         } else {
             tournament.setCreator(creator);
         }
     }
 
     private void checkTopics(TournamentDto tournamentDto, CourseExecution courseExecution, Tournament tournament) {
-        tournamentDto.getTopics().stream().forEach(t -> {
-            Topic tmp = topicRepository.findTopicByName(
-                    courseExecution.getCourse().getId(),
-                    t.getName());
-            if (tmp == null) {
+        for(TopicDto t: tournamentDto.getTopics()) {
+            Topic topic = topicRepository.findTopicByName(courseExecution.getCourse().getId(), t.getName());
+            if (topic == null) {
                 throw new TutorException(TOPIC_NOT_FOUND, t.getId());
             } else {
-                tournament.addTopic(tmp);
+                tournament.addTopic(topic);
             }
-        });
+        }
     }
 }
