@@ -16,7 +16,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
-import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -119,7 +118,20 @@ public class TournamentService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void signUpInTournament(TournamentDto tournamentDto, UserDto userDto){
+    public void signUpInTournament(int tournamentId, String username){
+        Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow(() -> new TutorException(TOURNAMENT_NOT_FOUND, tournamentId));
 
+        User user = userRepository.findByUsername(username);
+
+        if (tournament.getStatus() != Tournament.Status.AVAILABLE) {
+            throw new TutorException(TOURNAMENT_NOT_AVAILABLE);
+        }
+
+        if (tournament.getParticipants().contains(user)) {
+            throw new TutorException(USER_ALREADY_SIGNED_UP_IN_TOURNAMENT);
+        }
+
+        tournament.addParticipant(user);
+        entityManager.persist(tournament);
     }
 }

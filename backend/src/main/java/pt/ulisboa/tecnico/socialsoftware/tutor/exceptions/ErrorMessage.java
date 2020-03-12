@@ -14,6 +14,7 @@ public enum ErrorMessage {
     ASSESSMENT_NOT_FOUND("Assessment not found with id %d"),
     TOPIC_CONJUNCTION_NOT_FOUND("Topic Conjunction not found with id %d"),
     COURSE_EXECUTION_NOT_FOUND("Course execution not found with name %d"),
+    TOURNAMENT_NOT_FOUND("Tournament not found with id %d"),
 
     INVALID_JUSTIFICATION("The justification \"%s\" is invalid"),
     CANNOT_REJECT_ACCEPTED_SUGGESTION("Cannot reject already accepted suggestion"),
@@ -62,7 +63,7 @@ public enum ErrorMessage {
 
     TOURNAMENT_NOT_CONSISTENT("Field %s of tournament is not consistent"),
     TOURNAMENT_NOT_AVAILABLE("There aren't any available tournaments"),
-    USER_ALREADY_SIGNUP_IN_TOURNAMENT("User already sign-up in tournament"),
+    USER_ALREADY_SIGNED_UP_IN_TOURNAMENT("User already sign-up in tournament"),
 
     ACCESS_DENIED("You do not have permission to view this resource"),
     CANNOT_OPEN_FILE("Cannot open file"),
