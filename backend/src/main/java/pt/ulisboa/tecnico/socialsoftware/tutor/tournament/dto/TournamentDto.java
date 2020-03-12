@@ -1,7 +1,6 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto;
 
 import org.springframework.data.annotation.Transient;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto;
@@ -33,7 +32,7 @@ public class TournamentDto implements Serializable {
 
     public TournamentDto() {}
 
-    public TournamentDto(Tournament tournament, boolean deepCopy) {
+    public TournamentDto(Tournament tournament) {
         this.id = tournament.getId();
         this.key = tournament.getKey();
         this.title = tournament.getTitle();
@@ -48,8 +47,6 @@ public class TournamentDto implements Serializable {
             this.runningDate = tournament.getRunningDate().format(formatter);
         if (tournament.getConclusionDate() != null)
             this.conclusionDate = tournament.getConclusionDate().format(formatter);
-
-        // TODO: is deepCopy needed?
     }
 
     public Integer getId() {

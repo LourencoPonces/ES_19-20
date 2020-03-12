@@ -73,7 +73,7 @@ public class TournamentService {
         setCreationDate(tournamentDto, tournament);
 
         entityManager.persist(tournament);
-        return new TournamentDto(tournament, true);
+        return new TournamentDto(tournament);
     }
 
     private void addCreator(TournamentDto tournamentDto, User creator, Tournament tournament) {
