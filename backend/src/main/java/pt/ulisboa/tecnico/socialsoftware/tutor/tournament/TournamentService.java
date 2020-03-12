@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class TournamentService {
@@ -120,7 +122,16 @@ public class TournamentService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public List<TournamentDto> getAvailableTournaments(int executionId, TournamentDto tournamentDto){
-        return null;
+    public List<TournamentDto> getAvailableTournaments(int executionId){
+        CourseExecution courseExecution = courseExecutionRepository.findById(executionId).orElseThrow(() -> new TutorException(COURSE_EXECUTION_NOT_FOUND, executionId));
+
+        Set<Tournament> availableTournaments = courseExecution.getTournaments().stream()
+                .filter(tournament -> tournament.getStatus() == tournament.getStatus().AVAILABLE)
+                .collect(Collectors.toSet());
+
+        if (availableTournaments.isEmpty())
+            throw new TutorException(TOURNAMENT_NOT_AVAILABLE);
+
+        return tournamentRepository.findAvailableTournament(executionId).stream().map(TournamentDto::new).collect(Collectors.toList());
     }
 }
