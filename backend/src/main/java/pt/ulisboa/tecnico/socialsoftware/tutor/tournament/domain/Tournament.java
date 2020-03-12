@@ -38,7 +38,7 @@ public class Tournament {
     private LocalDateTime conclusionDate;
 
     @Column(nullable = false)
-    private String title = "Title"; // TODO: why "Title"?
+    private String title = "Title";
 
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -219,8 +219,8 @@ public class Tournament {
 
     private void checkRunningDate(LocalDateTime runningDate) {
         if (!(runningDate != null
-                && availableDate.isBefore(getConclusionDate()))) {
-            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Available date");
+                && runningDate.isBefore(getConclusionDate()))) {
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Running date");
         }
     }
 

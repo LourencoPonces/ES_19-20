@@ -23,6 +23,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.StudentDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -107,9 +108,6 @@ class CreateTournamentTest extends Specification {
     }
 
     def "create a tournament"() {
-        given: "a tournament"
-        tournament.setTitle(TOURNAMENT_TITLE)
-
         when:
         tournamentService.createTournament(courseExecution.getId(), tournament)
 
@@ -117,9 +115,9 @@ class CreateTournamentTest extends Specification {
         tournamentRepository.count() == 1L
         def result = tournamentRepository.findAll().get(0)
         result.getId() != null
-        result.getKey() != null
+        result.getKey() == 1
         result.getTitle() == TOURNAMENT_TITLE
-        result.getCreationDate() != null
+        result.getCreationDate().format(formatter) == creationDate.format(formatter)
         result.getAvailableDate().format(formatter) == availableDate.format(formatter)
         result.getRunningDate().format(formatter) == runningDate.format(formatter)
         result.getConclusionDate().format(formatter) == conclusionDate.format(formatter)
@@ -203,6 +201,34 @@ class CreateTournamentTest extends Specification {
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_CONSISTENT
         tournamentRepository.count() == 0L
+    }
+
+    @Unroll("invalid dates: #availableDateDay | #runningDateDay | #conclusionDateDay || #errorMessage")
+    def "invalid dates"() {
+        given: "dates relative to creationDate"
+        availableDate = creationDate.plusDays(availableDateDay)
+        runningDate = creationDate.plusDays(runningDateDay)
+        conclusionDate = creationDate.plusDays(conclusionDateDay)
+
+        tournament.setAvailableDate(availableDate.format(formatter))
+        tournament.setRunningDate(runningDate.format(formatter))
+        tournament.setConclusionDate(conclusionDate.format(formatter))
+
+        when:
+        tournamentService.createTournament(courseExecution.getId(), tournament)
+
+        then:
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == errorMessage
+        tournamentRepository.count() == 0L
+
+        where:
+        availableDateDay | runningDateDay | conclusionDateDay || errorMessage
+        1                | 3              | 2                 || ErrorMessage.TOURNAMENT_NOT_CONSISTENT
+        2                | 1              | 3                 || ErrorMessage.TOURNAMENT_NOT_CONSISTENT
+        2                | 3              | 1                 || ErrorMessage.TOURNAMENT_NOT_CONSISTENT
+        3                | 1              | 2                 || ErrorMessage.TOURNAMENT_NOT_CONSISTENT
+        3                | 2              | 1                 || ErrorMessage.TOURNAMENT_NOT_CONSISTENT
     }
 
     @TestConfiguration
