@@ -52,7 +52,7 @@ class GetAvailableTournamentsTest extends Specification {
     @Autowired
     TournamentRepository tournamentRepository
 
-    def tournament
+    def tournamentDto
     def creator
     def course
     def courseExecution
@@ -87,28 +87,28 @@ class GetAvailableTournamentsTest extends Specification {
         topicDtoList = new ArrayList<TopicDto>();
         topicDtoList.add(topicDto)
 
-        tournament = new TournamentDto()
-        tournament.setTitle(TOURNAMENT_TITLE)
-        tournament.setKey(1)
+        tournamentDto = new TournamentDto()
+        tournamentDto.setTitle(TOURNAMENT_TITLE)
+        tournamentDto.setKey(1)
         creationDate = LocalDateTime.now()
         availableDate = LocalDateTime.now().plusDays(1)
         runningDate = LocalDateTime.now().plusDays(2)
         conclusionDate = LocalDateTime.now().plusDays(3)
-        tournament.setNumberOfQuestions(1)
-        tournament.setCreator(creatorDto)
-        tournament.setCreationDate(creationDate.format(formatter))
-        tournament.setAvailableDate(availableDate.format(formatter))
-        tournament.setRunningDate(runningDate.format(formatter))
-        tournament.setConclusionDate(conclusionDate.format(formatter))
-        tournament.setTopics(topicDtoList)
+        tournamentDto.setNumberOfQuestions(1)
+        tournamentDto.setCreator(creatorDto)
+        tournamentDto.setCreationDate(creationDate.format(formatter))
+        tournamentDto.setAvailableDate(availableDate.format(formatter))
+        tournamentDto.setRunningDate(runningDate.format(formatter))
+        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
+        tournamentDto.setTopics(topicDtoList)
     }
 
     def "get the available tournaments"() {
         given:
-        tournamentService.createTournament(courseExecution.getId(), tournament)
+        tournamentService.createTournament(courseExecution.getId(), tournamentDto)
 
         when:
-        def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId(), tournament)
+        def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId(), tournamentDto)
 
 
         then: "there are only one tournament in the list"
@@ -140,7 +140,7 @@ class GetAvailableTournamentsTest extends Specification {
 
     def "get the available tournaments, although there are only tournaments in CREATED status"(){
         given: "a tournament with CREATED status"
-        tournament.setStatus(Tournament.Status.CREATED)
+        tournamentDto.setStatus(Tournament.Status.CREATED)
 
         when:
         def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId())
@@ -153,7 +153,7 @@ class GetAvailableTournamentsTest extends Specification {
 
     def "get the available tournaments, although there are only tournaments in RUNNING status"(){
         given: "a tournament with RUNNING status"
-        tournament.setStatus(Tournament.Status.RUNNING)
+        tournamentDto.setStatus(Tournament.Status.RUNNING)
 
         when:
         def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId())
@@ -166,7 +166,7 @@ class GetAvailableTournamentsTest extends Specification {
 
     def "get the available tournaments, although there are only tournaments in FINISHED status"(){
         given: "a tournament with FINISHED status"
-        tournament.setStatus(Tournament.Status.FINISHED)
+        tournamentDto.setStatus(Tournament.Status.FINISHED)
 
         when:
         def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId())
