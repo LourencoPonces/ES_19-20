@@ -8,6 +8,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequestAnswer
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestAnswerDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
@@ -71,6 +73,9 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
     @Autowired
     ClarificationService clarificationService
 
+/*    @Autowired
+    ClarificationRequestAnswerRepository clarificationRequestAnswerRepository
+*/
     def clarificationRequest
     def student
     def question
@@ -149,7 +154,7 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
 
 
     def "the student submitted the request, receives the answer"() {
- /*       given: "a teacher"
+        given: "a teacher"
         def teacher = new User()
         teacher.setKey(KEY_TWO)
         teacher.setUsername(USERNAME_TWO)
@@ -158,16 +163,17 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
         userRepository.save(teacher)
 
         and: "his answer to the clarification request"
-        def answeDto = new ClarifictionResquestAnswerDto()
-        answerDto.setCreationDate(Instant.now())
-        def answer = new ClarificationRequestAnswer(clarificationRequest, teacher, answerDto)
+        def answer = new ClarificationRequestAnswer()
+        answer.setCreator(teacher)
+        answer.setRequest(clarificationRequest)
+        answer.setContent(CONTENT)
         clarificationRequestAnswerRepository.save(answer)
 
         when:
         def result = clarificationService.checkClarificationRequestAnswer(student.geId(), question.getId())
 
         then:"the answer is returned"
-    */    result != null
+        result != null
     }
 
     def "there is no answer available"() {
