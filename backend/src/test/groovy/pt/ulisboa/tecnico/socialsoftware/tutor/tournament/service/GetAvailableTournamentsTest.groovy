@@ -192,6 +192,17 @@ class GetAvailableTournamentsTest extends Specification {
     def "get the available tournaments with a non-existing course"(){
         //thrown exception
         expect: false
+
+
+        given: 'a bad courseId'
+        def badCourseId = 2
+
+        when:
+        tournamentService.getAvailableTournaments(badCourseId)
+
+        then:
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.COURSE_EXECUTION_NOT_FOUND
     }
 
     //TODO: Test Configuration
