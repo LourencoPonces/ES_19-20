@@ -21,6 +21,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -131,9 +132,10 @@ class SignUpInTournamentTest extends Specification{
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_FOUND
     }
 
+    @Unroll("invalid status: #status || #errorMessage")
     def "sign-up in a tournament with CREATED status"() {
         given: "a tournament with CREATED status and a participant"
-        prepareStatus(tournamentDto, Tournament.Status.CREATED)
+        prepareStatus(tournamentDto, status)
         tournamentDto = tournamentService.createTournament(courseExecution.getId(), tournamentDto)
 
         when:
@@ -141,56 +143,21 @@ class SignUpInTournamentTest extends Specification{
 
         then:
         def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_AVAILABLE
+        exception.getErrorMessage() == errorMessage
+
+        where:
+        status                      || errorMessage
+        Tournament.Status.CREATED   || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
+        Tournament.Status.RUNNING   || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
+        Tournament.Status.FINISHED  || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
+        Tournament.Status.CANCELLED || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
     }
 
-    def "sign-up in a tournament with RUNNING status"() {
-        given: "a tournament with RUNNING status and a participant"
-        prepareStatus(tournamentDto, Tournament.Status.RUNNING)
-        tournamentDto = tournamentService.createTournament(courseExecution.getId(), tournamentDto)
-        def participantDto = new UserDto(participant)
-
-        when:
-        tournamentService.signUpInTournament(tournamentDto.getId(), participant.getUsername())
-
-        then:
-        def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_AVAILABLE
-    }
-
-    def "sign-up in an tournament with FINISHED status"() {
-        given: "a tournament with FINISHED status and a participant"
-        prepareStatus(tournamentDto, Tournament.Status.FINISHED)
-        tournamentDto = tournamentService.createTournament(courseExecution.getId(), tournamentDto)
-        def participantDto = new UserDto(participant)
-
-        when:
-        tournamentService.signUpInTournament(tournamentDto.getId(), participant.getUsername())
-
-        then:
-        def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_AVAILABLE
-    }
-
-    def "sign-up in an tournament with CANCELLED status"() {
-        given: "a tournament with CANCELED status and a participant"
-        prepareStatus(tournamentDto, Tournament.Status.CANCELLED)
-        tournamentDto = tournamentService.createTournament(courseExecution.getId(), tournamentDto)
-
-        when:
-        tournamentService.signUpInTournament(tournamentDto.getId(), participant.getUsername())
-
-        then:
-        def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_AVAILABLE
-    }
-
-    def "sign-up in a tournament with a user that is already sign-up"(){
-        given: "a tournament with a user already sign-up and a participant"
+    def "sign-up in a tournament with a user that is already signed-up"(){
+        given: "a tournament with a user already signed-up and a participant"
         prepareStatus(tournamentDto, Tournament.Status.AVAILABLE)
         tournamentDto = tournamentService.createTournament(courseExecution.getId(), tournamentDto)
 
-        def participantDto = new UserDto(participant)
         tournamentService.signUpInTournament(tournamentDto.getId(), participant.getUsername())
 
         when:
