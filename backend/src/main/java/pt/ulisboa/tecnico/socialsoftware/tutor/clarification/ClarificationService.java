@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest;
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequestAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestAnswerDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository;
@@ -43,7 +44,17 @@ public class ClarificationService {
 
 
     public ClarificationRequestAnswerDto getClarificationRequestAnswer(int studentId, int questionId) {
-        return null;
+        User student = getStudent(studentId);
+
+        if (!questionRepository.existsById(questionId)) {
+            throw new TutorException(ErrorMessage.QUESTION_NOT_FOUND, questionId);
+        }
+
+        ClarificationRequest clarificationRequest = clarificationRequestRepository.getByStudentQuestion(studentId, questionId).orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, student.getUsername(), questionId));
+        ClarificationRequestAnswer answer = clarificationRequest.getAnswer().orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_WITH_NO_ANSWER));
+
+        return new ClarificationRequestAnswerDto(answer);
+
     }
 
     @Retryable(

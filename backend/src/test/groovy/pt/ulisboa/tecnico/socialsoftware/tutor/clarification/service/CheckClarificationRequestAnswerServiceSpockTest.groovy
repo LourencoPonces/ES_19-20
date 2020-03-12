@@ -10,6 +10,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationServic
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequestAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
@@ -29,7 +30,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
-@Ignore
+
 @DataJpaTest
 class CheckClarificationRequestAnswerSpockTest extends Specification {
     static final String COURSE_NAME = "Software Architecture"
@@ -71,9 +72,9 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
     @Autowired
     ClarificationService clarificationService
 
-/*    @Autowired
+    @Autowired
     ClarificationRequestAnswerRepository clarificationRequestAnswerRepository
-*/
+
     def clarificationRequest
     def student
     def question
@@ -166,14 +167,16 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
         answer.setRequest(clarificationRequest)
         answer.setContent(CONTENT)
         clarificationRequestAnswerRepository.save(answer)
+        clarificationRequest.setAnswer(answer)
+        clarificationRequestRepository.save(clarificationRequest)
 
         when:
-        def result = clarificationService.getClarificationRequestAnswer(student.geId(), question.getId())
+        def result = clarificationService.getClarificationRequestAnswer(student.getId(), question.getId())
 
         then:"the correct answer is returned"
         result != null
         result.getContent() != null
-        result.getCreator() == student.getId()
+        result.getCreator() == teacher.getId()
         result.getRequestId() == clarificationRequest.getId()
     }
 
