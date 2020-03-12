@@ -90,10 +90,10 @@ class GetAvailableTournamentsTest extends Specification {
         tournamentDto = new TournamentDto()
         tournamentDto.setTitle(TOURNAMENT_TITLE)
         tournamentDto.setKey(1)
-        creationDate = LocalDateTime.now()
-        availableDate = LocalDateTime.now().plusDays(1)
-        runningDate = LocalDateTime.now().plusDays(2)
-        conclusionDate = LocalDateTime.now().plusDays(3)
+        creationDate = LocalDateTime.now().minusDays(1)
+        availableDate = LocalDateTime.now()
+        runningDate = LocalDateTime.now().plusDays(1)
+        conclusionDate = LocalDateTime.now().plusDays(2)
         tournamentDto.setNumberOfQuestions(1)
         tournamentDto.setCreator(creatorDto)
         tournamentDto.setCreationDate(creationDate.format(formatter))
@@ -108,8 +108,7 @@ class GetAvailableTournamentsTest extends Specification {
         tournamentService.createTournament(courseExecution.getId(), tournamentDto)
 
         when:
-        def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId(), tournamentDto)
-
+        def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId())
 
         then: "there are only one tournament in the list"
         tournamentsList.size() == 1
@@ -130,7 +129,7 @@ class GetAvailableTournamentsTest extends Specification {
 
     def "get the available tournaments, although there are not any"() {
         when:
-        def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId())
+        tournamentService.getAvailableTournaments(courseExecution.getId())
 
         then:
         def exception = thrown(TutorException)
@@ -139,23 +138,28 @@ class GetAvailableTournamentsTest extends Specification {
 
     def "get the available tournaments, although there are only tournaments in CREATED status"(){
         given: "a tournament with CREATED status"
-        tournamentDto.setStatus(Tournament.Status.CREATED)
+        creationDate = LocalDateTime.now()
+        availableDate = LocalDateTime.now().plusDays(1)
+        runningDate = LocalDateTime.now().plusDays(2)
+        conclusionDate = LocalDateTime.now().plusDays(3)
 
         when:
-        def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId())
+        tournamentService.getAvailableTournaments(courseExecution.getId())
 
         then:
-        tournamentsList.size() == 0
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_AVAILABLE
     }
 
     def "get the available tournaments, although there are only tournaments in RUNNING status"(){
         given: "a tournament with RUNNING status"
-        tournamentDto.setStatus(Tournament.Status.RUNNING)
+        creationDate = LocalDateTime.now().minusDays(2)
+        availableDate = LocalDateTime.now().minusDays(1)
+        runningDate = LocalDateTime.now()
+        conclusionDate = LocalDateTime.now().plusDays(1)
 
         when:
-        def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId())
+        tournamentService.getAvailableTournaments(courseExecution.getId())
 
         then:
         def exception = thrown(TutorException)
@@ -164,10 +168,13 @@ class GetAvailableTournamentsTest extends Specification {
 
     def "get the available tournaments, although there are only tournaments in FINISHED status"(){
         given: "a tournament with FINISHED status"
-        tournamentDto.setStatus(Tournament.Status.FINISHED)
+        creationDate = LocalDateTime.now().minusDays(3)
+        availableDate = LocalDateTime.now().minusDays(2)
+        runningDate = LocalDateTime.now().minusDays(1)
+        conclusionDate = LocalDateTime.now()
 
         when:
-        def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId())
+        tournamentService.getAvailableTournaments(courseExecution.getId())
 
         then:
         def exception = thrown(TutorException)
@@ -194,6 +201,7 @@ class GetAvailableTournamentsTest extends Specification {
         tournamentService.getAvailableTournaments(badCourseId)
 
         then:
+        def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.COURSE_EXECUTION_NOT_FOUND
     }
 
