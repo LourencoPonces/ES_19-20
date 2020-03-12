@@ -14,13 +14,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
-<<<<<<< HEAD
-import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto;
-
-import java.util.List;
-=======
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -30,7 +26,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
->>>>>>> TdP
 
 @Service
 public class TournamentService {
@@ -99,6 +94,8 @@ public class TournamentService {
         } else {
             tournament.setCreationDate(LocalDateTime.parse(tournamentDto.getCreationDate(), formatter));
         }
+        entityManager.persist(tournament);
+        return new TournamentDto(tournament, true);
     }
 
     public void signUpInTournament(TournamentDto tournamentDto, UserDto userDto){
