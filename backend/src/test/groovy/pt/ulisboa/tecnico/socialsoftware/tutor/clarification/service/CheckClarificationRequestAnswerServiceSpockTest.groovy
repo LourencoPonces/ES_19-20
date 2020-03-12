@@ -9,7 +9,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepos
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequestAnswer
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestAnswerDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
@@ -25,7 +24,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizQuestionRepos
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository
 import spock.lang.Ignore
 
-import java.time.Instant
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
@@ -170,20 +168,20 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
         clarificationRequestAnswerRepository.save(answer)
 
         when:
-        def result = clarificationService.checkClarificationRequestAnswer(student.geId(), question.getId())
+        def result = clarificationService.getClarificationRequestAnswer(student.geId(), question.getId())
 
         then:"the correct answer is returned"
         result != null
         result.getContent() != null
-        result.getCreator().getId() == student.getId()
-        result.getRequest().getId() == clarificationRequest.getId()
+        result.getCreator() == student.getId()
+        result.getRequestId() == clarificationRequest.getId()
     }
 
     def "there is no answer available"() {
         when:
-        clarificationService.checkClarificationRequestAnswer(student.getId(), question.getId())
+        def result = clarificationService.getClarificationRequestAnswer(student.getId(), question.getId())
 
-        then: "an exception is thrown"
+        then: "no answer is returned"
         def exception = thrown(TutorException)
         exception.getErrorMessage() == CLARIFICATION_REQUEST_WITH_NO_ANSWER
     }
@@ -194,7 +192,7 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
         userRepository.save(student2)
 
         when:
-        clarificationService.checkClarificationRequestAnswer(student2.getId(), question.getId())
+        clarificationService.getClarificationRequestAnswer(student2.getId(), question.getId())
 
         then: "an exception is thrown"
         def exception = thrown(TutorException)
@@ -203,7 +201,7 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
 
     def "the question doesn't exist"() {
         when:
-        clarificationService.checkClarificationRequestAnswer(student.getId(), INEXISTENT_QUESTION_ID)
+        clarificationService.getClarificationRequestAnswer(student.getId(), INEXISTENT_QUESTION_ID)
 
         then: "an exception is thrown"
         def exception = thrown(TutorException)
@@ -216,7 +214,7 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
         userRepository.save(student)
 
         when:
-        clarificationService.checkClarificationRequestAnswer(student.getId(), question.getId())
+        clarificationService.getClarificationRequestAnswer(student.getId(), question.getId())
 
         then: "an exception is thrown"
         def exception = thrown(TutorException)
