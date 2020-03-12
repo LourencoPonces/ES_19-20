@@ -20,17 +20,27 @@ class SignUpInTournamentTest extends Specification{
         expect: false
     }
 
-    def "sign-up in a tournament with available date after the current date"() {
+    def "sign-up in a tournament with CREATED status"() {
         // exception is thrown
         expect: false
     }
 
-    def "sign-up in a tournament with conclusion date before the current date\""() {
+    def "sign-up in a tournament with RUNNING status"() {
         // exception is thrown
         expect: false
     }
 
-    def "sign-up in an tournament with a non-existing user"() {
+    def "sign-up in an tournament with FINISHED status"() {
+        // exception is thrown
+        expect: false
+    }
+
+    def "sign-up in an tournament with CANCELLED status"() {
+        // exception is thrown
+        expect: false
+    }
+
+    def "sign-up in a tournament with a user that is already sign-up"(){
         // exception is thrown
         expect: false
     }
