@@ -19,11 +19,12 @@ public class TournamentDto implements Serializable {
     private Tournament.Status status;
     private String creationDate = null;
     private String availableDate = null;
+    private String runningDate = null;
     private String conclusionDate = null;
     private Integer numberOfQuestions;
 
     private UserDto creator;
-    private List<UserDto> participants;
+    private List<UserDto> participants = new ArrayList<>();
 
     private List<TopicDto> topics = new ArrayList<>();
 
@@ -32,7 +33,7 @@ public class TournamentDto implements Serializable {
 
     public TournamentDto() {}
 
-    public TournamentDto(Tournament tournament) {
+    public TournamentDto(Tournament tournament, boolean deepCopy) {
         this.id = tournament.getId();
         this.key = tournament.getKey();
         this.title = tournament.getTitle();
@@ -43,6 +44,8 @@ public class TournamentDto implements Serializable {
             this.creationDate = tournament.getCreationDate().format(formatter);
         if (tournament.getAvailableDate() != null)
             this.availableDate = tournament.getAvailableDate().format(formatter);
+        if (tournament.getRunningDate() != null)
+            this.runningDate = tournament.getRunningDate().format(formatter);
         if (tournament.getConclusionDate() != null)
             this.conclusionDate = tournament.getConclusionDate().format(formatter);
 
@@ -97,6 +100,14 @@ public class TournamentDto implements Serializable {
         this.availableDate = availableDate;
     }
 
+    public String getRunningDate() {
+        return runningDate;
+    }
+
+    public void setRunningDate(String runningDate) {
+        this.runningDate = runningDate;
+    }
+
     public String getConclusionDate() {
         return conclusionDate;
     }
@@ -149,6 +160,13 @@ public class TournamentDto implements Serializable {
             return null;
         }
         return LocalDateTime.parse(getAvailableDate(), formatter);
+    }
+
+    public LocalDateTime getRunningDateDate() {
+        if (getRunningDate() == null || getRunningDate().isEmpty()) {
+            return null;
+        }
+        return LocalDateTime.parse(getRunningDate(), formatter);
     }
 
     public LocalDateTime getConclusionDateDate() {
