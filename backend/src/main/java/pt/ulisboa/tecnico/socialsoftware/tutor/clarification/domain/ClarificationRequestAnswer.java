@@ -34,6 +34,7 @@ public class ClarificationRequestAnswer {
     public ClarificationRequestAnswer() {}
 
     public ClarificationRequestAnswer(ClarificationRequest req, User u, String answer) {
+        this.request = req;
         this.creator = u;
         this.content = answer;
         this.submissionDate = LocalDateTime.now();
