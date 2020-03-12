@@ -65,17 +65,13 @@ public class Tournament {
     public Tournament(TournamentDto tournamentDto) {
         this.key = tournamentDto.getKey();
         setTitle(tournamentDto.getTitle());
-        this.creationDate = tournamentDto.getCreationDateDate();
-        setConclusionDate(tournamentDto.getConclusionDateDate());
-        setRunningDate(tournamentDto.getRunningDateDate());
-        setAvailableDate(tournamentDto.getAvailableDateDate());
+
+        setDates(tournamentDto);
 
         setStatus(tournamentDto.getStatus());
 
         int numQuestions = tournamentDto.getNumberOfQuestions();
-        if (numQuestions <= 0) {
-            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, numQuestions);
-        }
+        checkNumberOfQuestions(numQuestions);
         this.numberOfQuestions = numQuestions;
     }
 
@@ -100,6 +96,7 @@ public class Tournament {
     }
 
     public void setCreationDate(LocalDateTime creationDate) {
+        checkCreationDate(creationDate);
         this.creationDate = creationDate;
     }
 
@@ -153,8 +150,10 @@ public class Tournament {
     }
 
     public void setNumberOfQuestions(Integer numberOfQuestions) {
+        checkNumberOfQuestions(numberOfQuestions);
         this.numberOfQuestions = numberOfQuestions;
     }
+
 
     public Set<Topic> getTopics() {
         return topics;
@@ -195,6 +194,7 @@ public class Tournament {
                 "id=" + id +
                 ", creationDate=" + creationDate +
                 ", availableDate=" + availableDate +
+                ", runningDate=" + runningDate +
                 ", conclusionDate=" + conclusionDate +
                 ", title='" + title + '\'' +
                 ", status=" + status +
@@ -207,26 +207,39 @@ public class Tournament {
         }
     }
 
+    private void checkCreationDate(LocalDateTime creationDate) {
+        if (!(creationDate != null
+                && (creationDate.isBefore(getAvailableDate()) || creationDate.isEqual(getAvailableDate())))) {
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Creation date");
+        }
+    }
+
     private void checkAvailableDate(LocalDateTime availableDate) {
         if (!(availableDate != null
-                && creationDate != null
-                && (creationDate.isBefore(availableDate) || creationDate.isEqual(availableDate))
-                && availableDate.isBefore(getRunningDate())
-                && availableDate.isBefore(getConclusionDate()))) {
+                && (availableDate.isEqual(getCreationDate()) || availableDate.isAfter(getCreationDate()))
+                && availableDate.isBefore(getRunningDate()))) {
             throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Available date");
         }
     }
 
     private void checkRunningDate(LocalDateTime runningDate) {
         if (!(runningDate != null
+                && runningDate.isAfter(getAvailableDate())
                 && runningDate.isBefore(getConclusionDate()))) {
             throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Running date");
         }
     }
 
     private void checkConclusionDate(LocalDateTime conclusionDate) {
-        if (conclusionDate == null) {
+        if (!(conclusionDate != null
+                && conclusionDate.isAfter(getRunningDate()))) {
             throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Conclusion date");
+        }
+    }
+
+    private void checkNumberOfQuestions(Integer numberOfQuestions) {
+        if (numberOfQuestions == null || numberOfQuestions < 1) {
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, numberOfQuestions);
         }
     }
 
@@ -251,5 +264,17 @@ public class Tournament {
         )) {
             throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "State");
         }
+    }
+
+    private void setDates(TournamentDto tournamentDto) {
+        this.creationDate = tournamentDto.getCreationDateDate();
+        this.availableDate = tournamentDto.getAvailableDateDate();
+        this.runningDate = tournamentDto.getRunningDateDate();
+        this.conclusionDate = tournamentDto.getConclusionDateDate();
+
+        checkCreationDate(this.creationDate);
+        checkAvailableDate(this.availableDate);
+        checkRunningDate(this.runningDate);
+        checkConclusionDate(this.conclusionDate);
     }
 }
