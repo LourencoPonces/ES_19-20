@@ -57,7 +57,13 @@ public class ClarificationService {
         ClarificationRequest req = clarificationRequestRepository.findById(reqId)
                 .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, reqId));
 
-        ClarificationRequestAnswer ans = new ClarificationRequestAnswer(req, teacher, answerText);
+        // Create/update answer
+        ClarificationRequestAnswer ans = req.getAnswer().orElseGet(ClarificationRequestAnswer::new);
+        ans.setContent(answerText);
+        ans.setCreationDate(LocalDateTime.now());
+        ans.setCreator(teacher);
+        ans.setRequest(req);
+
         req.setAnswer(ans);
 
         entityManager.persist(ans);
