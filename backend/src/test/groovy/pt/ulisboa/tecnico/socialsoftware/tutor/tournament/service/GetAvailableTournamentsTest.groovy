@@ -190,10 +190,6 @@ class GetAvailableTournamentsTest extends Specification {
     }*/
 
     def "get the available tournaments with a non-existing course"(){
-        //thrown exception
-        expect: false
-
-
         given: 'a bad courseId'
         def badCourseId = 2
 
