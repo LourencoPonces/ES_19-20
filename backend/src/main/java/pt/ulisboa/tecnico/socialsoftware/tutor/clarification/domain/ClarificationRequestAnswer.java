@@ -8,7 +8,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CLARIFICATION_REQUEST_MISSING_CONTENT;
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT;
 
 @Entity
 @Table(name = "clarification_request_answers")
@@ -50,7 +50,7 @@ public class ClarificationRequestAnswer {
 
     private void checkConsistentDto(ClarificationRequestAnswerDto dto) {
         if (dto.getContent() == null || dto.getContent().isBlank())
-            throw new TutorException(CLARIFICATION_REQUEST_MISSING_CONTENT);
+            throw new TutorException(CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT);
     }
 
     public User getCreator() { return this.creator; }
