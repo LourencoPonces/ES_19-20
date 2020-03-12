@@ -98,6 +98,10 @@ public class TournamentService {
         return new TournamentDto(tournament, true);
     }
 
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void signUpInTournament(TournamentDto tournamentDto, UserDto userDto){
 
     }

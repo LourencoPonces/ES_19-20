@@ -1,6 +1,7 @@
-package groovy.pt.ulisboa.tecnico.socialsoftware.tutor.tournament.service
+package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.service
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
@@ -24,6 +25,7 @@ import spock.lang.Specification
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+@DataJpaTest
 class SignUpInTournamentTest extends Specification{
     public static final String COURSE_NAME = "Software Architecture"
     public static final String ACRONYM = "AS1"
@@ -79,7 +81,7 @@ class SignUpInTournamentTest extends Specification{
         userRepository.save(creator)
         def creatorDto = new UserDto(creator)
 
-        participant = new User(PARTICIPANT_NAME, PARTICIPANT_USERNAME, 1, User.Role.STUDENT)
+        participant = new User(PARTICIPANT_NAME, PARTICIPANT_USERNAME, 2, User.Role.STUDENT)
         participant.getCourseExecutions().add(courseExecution)
         courseExecution.getUsers().add(participant)
         userRepository.save(participant)
