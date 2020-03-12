@@ -189,6 +189,11 @@ class GetAvailableTournamentsTest extends Specification {
         expect: false
     }*/
 
+    def "get the available tournaments with a non-existing course"(){
+        //thrown exception
+        expect: false
+    }
+
     //TODO: Test Configuration
     @TestConfiguration
     static class TournamentServiceImplTestContextConfiguration {
