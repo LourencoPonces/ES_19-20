@@ -133,7 +133,6 @@ class GetAvailableTournamentsTest extends Specification {
         def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId())
 
         then:
-        tournamentsList.size() == 0
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_AVAILABLE
     }
@@ -159,7 +158,6 @@ class GetAvailableTournamentsTest extends Specification {
         def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId())
 
         then:
-        tournamentsList.size() == 0
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_AVAILABLE
     }
@@ -172,7 +170,6 @@ class GetAvailableTournamentsTest extends Specification {
         def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId())
 
         then:
-        tournamentsList.size() == 0
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_AVAILABLE
     }
@@ -197,7 +194,6 @@ class GetAvailableTournamentsTest extends Specification {
         tournamentService.getAvailableTournaments(badCourseId)
 
         then:
-        def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.COURSE_EXECUTION_NOT_FOUND
     }
 
