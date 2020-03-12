@@ -95,7 +95,7 @@ public class TournamentService {
 
     private void checkCreatorCourseExecution(CourseExecution courseExecution, User creator, Tournament tournament) {
         if (!creator.getCourseExecutions().contains(courseExecution)) {
-            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, courseExecution.getAcronym());
+            throw new TutorException(USER_NOT_ENROLLED_IN_COURSE_EXECUTION, courseExecution.getAcronym());
         } else {
             tournament.setCreator(creator);
         }
