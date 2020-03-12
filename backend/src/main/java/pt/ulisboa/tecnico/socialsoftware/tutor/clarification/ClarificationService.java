@@ -19,6 +19,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepos
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
@@ -43,8 +44,8 @@ public class ClarificationService {
     EntityManager entityManager;
 
 
-    public void checkClarificationRequestAnswer(int studentId, int questionId) {
-
+    public ClarificationRequestAnswerDto getClarificationRequestAnswer(int studentId, int questionId) {
+        return null;
     }
 
     @Retryable(

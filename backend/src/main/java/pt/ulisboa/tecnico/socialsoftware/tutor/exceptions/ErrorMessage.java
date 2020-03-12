@@ -69,7 +69,7 @@ public enum ErrorMessage {
     DUPLICATE_CLARIFICATION_REQUEST("Student %s already submitted a clarification request for question with id %d"),
     CLARIFICATION_REQUEST_NOT_FOUND("Clarification Request not found with id %d"),
     CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT("Missing content of clarification request answer"),
-    CLARIFICATION_REQUEST_UNANSWERED("Clarification Request has no answer");
+    CLARIFICATION_REQUEST_UNANSWERED("The clarification request wasn't answered yet");
 
     public final String label;
 
