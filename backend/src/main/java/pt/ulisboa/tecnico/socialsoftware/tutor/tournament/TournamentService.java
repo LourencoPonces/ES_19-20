@@ -72,6 +72,8 @@ public class TournamentService {
 
         setCreationDate(tournamentDto, tournament);
 
+
+
         entityManager.persist(tournament);
         return new TournamentDto(tournament);
     }
