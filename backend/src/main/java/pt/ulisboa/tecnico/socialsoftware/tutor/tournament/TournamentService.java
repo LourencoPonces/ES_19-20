@@ -63,6 +63,47 @@ public class TournamentService {
 
         Tournament tournament = new Tournament(tournamentDto);
 
+        checkTopics(tournamentDto, courseExecution, tournament);
+
+        checkCreatorCourseExecution(courseExecution, creator, tournament);
+
+        tournamentDto.setParticipants(new ArrayList<>());
+
+        addCreator(tournamentDto, creator, tournament);
+
+        setCreationDate(tournamentDto, tournament);
+
+        entityManager.persist(tournament);
+        return new TournamentDto(tournament, true);
+    }
+
+    private void addCreator(TournamentDto tournamentDto, User creator, Tournament tournament) {
+        if (creator.getRole() == User.Role.STUDENT) {
+            tournament.addParticipant(creator);
+            tournamentDto.getParticipants().add(tournamentDto.getCreator());
+        }
+    }
+
+    private void setCreationDate(TournamentDto tournamentDto, Tournament tournament) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        if (tournamentDto.getCreationDate() == null) {
+            LocalDateTime now = LocalDateTime.now();
+            tournament.setCreationDate(now);
+            tournamentDto.setCreationDate(now.format(formatter));
+        } else {
+            tournament.setCreationDate(LocalDateTime.parse(tournamentDto.getCreationDate(), formatter));
+        }
+    }
+
+    private void checkCreatorCourseExecution(CourseExecution courseExecution, User creator, Tournament tournament) {
+        if (!creator.getCourseExecutions().contains(courseExecution)) {
+            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, courseExecution.getAcronym());
+        } else {
+            tournament.setCreator(creator);
+        }
+    }
+
+    private void checkTopics(TournamentDto tournamentDto, CourseExecution courseExecution, Tournament tournament) {
         tournamentDto.getTopics().stream().forEach(t -> {
             Topic tmp = topicRepository.findTopicByName(
                     courseExecution.getCourse().getId(),
@@ -73,38 +114,13 @@ public class TournamentService {
                 tournament.addTopic(tmp);
             }
         });
-
-        if (!creator.getCourseExecutions().contains(courseExecution)) {
-            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, courseExecution.getAcronym());
-        } else {
-            tournament.setCreator(creator);
-        }
-
-        tournamentDto.setParticipants(new ArrayList<>());
-
-        if (creator.getRole() == User.Role.STUDENT) {
-            tournament.addParticipant(creator);
-            tournamentDto.getParticipants().add(tournamentDto.getCreator());
-        }
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        if (tournamentDto.getCreationDate() == null) {
-            LocalDateTime now = LocalDateTime.now();
-            tournament.setCreationDate(now);
-            tournamentDto.setCreationDate(now.format(formatter));
-        } else {
-            tournament.setCreationDate(LocalDateTime.parse(tournamentDto.getCreationDate(), formatter));
-        }
-
-        entityManager.persist(tournament);
-        return new TournamentDto(tournament, true);
     }
 
     @Retryable(
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public List<TournamentDto> getAvailableTournaments(int executionId){
+    public List<TournamentDto> getAvailableTournaments(int executionId, TournamentDto tournamentDto){
         return null;
     }
 }
