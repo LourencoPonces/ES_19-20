@@ -2,23 +2,23 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequestAnswer;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 public class ClarificationRequestAnswerDto {
     private Integer creator;
     private Integer request;
     private String content;
-    private Instant creationDate;
+    private LocalDateTime creationDate;
 
     public ClarificationRequestAnswerDto() {}
 
-    public ClarificationRequestAnswerDto(ClarificationRequestAnswer clarificationRequest) {
-        this.request = clarificationRequest.getRequest().getId();
-        this.creator = clarificationRequest.getCreator().getId();
-        this.content = clarificationRequest.getContent();
+    public ClarificationRequestAnswerDto(ClarificationRequestAnswer answer) {
+        this.request = answer.getRequest().getId();
+        this.creator = answer.getCreator().getId();
+        this.content = answer.getContent();
 
-        if (clarificationRequest.getCreationDate() != null)
-            this.creationDate = clarificationRequest.getCreationDate();
+        if (answer.getCreationDate() != null)
+            this.creationDate = answer.getCreationDate();
     }
 
     public Integer getCreator() { return creator; }
@@ -27,6 +27,6 @@ public class ClarificationRequestAnswerDto {
     public void setRequestId(Integer id) { this.request = id; }
     public String getContent() { return this.content; }
     public void setContent(String s) { this.content = s; }
-    public void setCreationDate(Instant date) { this.creationDate = date; }
-    public Instant getCreationDate() { return this.creationDate; }
+    public void setCreationDate(LocalDateTime date) { this.creationDate = date; }
+    public LocalDateTime getCreationDate() { return this.creationDate; }
 }

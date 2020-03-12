@@ -6,7 +6,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import javax.persistence.*;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CLARIFICATION_REQUEST_MISSING_CONTENT;
 
@@ -29,9 +29,15 @@ public class ClarificationRequestAnswer {
     private String content;
 
     @Column
-    private Instant submissionDate;
+    private LocalDateTime submissionDate;
 
     public ClarificationRequestAnswer() {}
+
+    public ClarificationRequestAnswer(ClarificationRequest req, User u, String answer) {
+        this.creator = u;
+        this.content = answer;
+        this.submissionDate = LocalDateTime.now();
+    }
 
     public ClarificationRequestAnswer(ClarificationRequest req, User creator, ClarificationRequestAnswerDto dto) {
         checkConsistentDto(dto);
@@ -52,6 +58,6 @@ public class ClarificationRequestAnswer {
     public void setRequest(ClarificationRequest req) { this.request = req; }
     public String getContent() { return content; }
     public void setContent(String s) { this.content = s; }
-    public Instant getCreationDate() { return submissionDate; }
-    public void setCreationDate(Instant date) { this.submissionDate = date; }
+    public LocalDateTime getCreationDate() { return submissionDate; }
+    public void setCreationDate(LocalDateTime date) { this.submissionDate = date; }
 }
