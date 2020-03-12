@@ -74,10 +74,12 @@ public class ClarificationService {
         ClarificationRequest req = clarificationRequestRepository.findById(reqId)
                 .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, reqId));
 
-        req.getAnswer().ifPresent(ans -> entityManager.remove(ans));
-        req.setAnswer(null);
+        ClarificationRequestAnswer ans = req.getAnswer().orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_UNANSWERED));
 
-        entityManager.remove(req);
+        req.setAnswer(null);
+        entityManager.persist(req);
+
+        entityManager.remove(ans);
     }
 
     @Retryable(
