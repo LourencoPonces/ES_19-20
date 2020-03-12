@@ -57,7 +57,7 @@ public class Tournament {
     @JoinColumn(name = "creator_id")
     private User creator;
 
-    @ManyToMany(mappedBy = "tournaments")
+    @ManyToMany(mappedBy = "participantTournaments")
     private Set<User> participants = new HashSet<>();
 
     public Tournament() {}
