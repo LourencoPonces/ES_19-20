@@ -68,8 +68,6 @@ public class Tournament {
 
         setDates(tournamentDto);
 
-        setStatus(tournamentDto.getStatus());
-
         int numQuestions = tournamentDto.getNumberOfQuestions();
         checkNumberOfQuestions(numQuestions);
         this.numberOfQuestions = numQuestions;
@@ -107,6 +105,7 @@ public class Tournament {
     public void setAvailableDate(LocalDateTime availableDate) {
         checkAvailableDate(availableDate);
         this.availableDate = availableDate;
+        updateStatus();
     }
 
     public LocalDateTime getRunningDate() {
@@ -116,6 +115,7 @@ public class Tournament {
     public void setRunningDate(LocalDateTime runningDate) {
         checkRunningDate(runningDate);
         this.runningDate = runningDate;
+        updateStatus();
     }
 
     public LocalDateTime getConclusionDate() {
@@ -125,6 +125,7 @@ public class Tournament {
     public void setConclusionDate(LocalDateTime conclusionDate) {
         checkConclusionDate(conclusionDate);
         this.conclusionDate = conclusionDate;
+        updateStatus();
     }
 
     public String getTitle() {
@@ -138,11 +139,6 @@ public class Tournament {
 
     public Status getStatus() {
         return status;
-    }
-
-    public void setStatus(Status status) {
-        checkStatus(status);
-        this.status = status;
     }
 
     public Integer getNumberOfQuestions() {
@@ -185,6 +181,10 @@ public class Tournament {
 
     public void addParticipant(User participant) {
         this.participants.add(participant);
+    }
+
+    public void cancel(){
+        status = Status.CANCELLED;
     }
 
     @Override
@@ -243,6 +243,34 @@ public class Tournament {
         }
     }
 
+    private void setDates(TournamentDto tournamentDto) {
+        this.creationDate = tournamentDto.getCreationDateDate();
+        this.availableDate = tournamentDto.getAvailableDateDate();
+        this.runningDate = tournamentDto.getRunningDateDate();
+        this.conclusionDate = tournamentDto.getConclusionDateDate();
+
+        checkCreationDate(this.creationDate);
+        checkAvailableDate(this.availableDate);
+        checkRunningDate(this.runningDate);
+        checkConclusionDate(this.conclusionDate);
+
+        updateStatus();
+    }
+
+    private void updateStatus() {
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isAfter(creationDate) && now.isBefore(availableDate))
+            status = Status.CREATED;
+        else if (now.isAfter(availableDate) && now.isBefore(runningDate))
+            status = Status.AVAILABLE;
+        else if (now.isAfter(runningDate) && now.isBefore(conclusionDate))
+            status = Status.RUNNING;
+        else
+            status = Status.FINISHED;
+    }
+
+    //TODO: Not needed
+    /*
     private void checkStatus(Status status) {
         LocalDateTime now = LocalDateTime.now();
         if (!((status == Status.CREATED
@@ -264,17 +292,6 @@ public class Tournament {
         )) {
             throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "State");
         }
-    }
+    }*/
 
-    private void setDates(TournamentDto tournamentDto) {
-        this.creationDate = tournamentDto.getCreationDateDate();
-        this.availableDate = tournamentDto.getAvailableDateDate();
-        this.runningDate = tournamentDto.getRunningDateDate();
-        this.conclusionDate = tournamentDto.getConclusionDateDate();
-
-        checkCreationDate(this.creationDate);
-        checkAvailableDate(this.availableDate);
-        checkRunningDate(this.runningDate);
-        checkConclusionDate(this.conclusionDate);
-    }
 }
