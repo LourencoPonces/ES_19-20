@@ -120,7 +120,7 @@ public class TournamentService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public List<TournamentDto> getAvailableTournaments(int executionId){
+    public List<TournamentDto> getAvailableTournaments(int executionId, TournamentDto tournamentDto){
         return null;
     }
 }
