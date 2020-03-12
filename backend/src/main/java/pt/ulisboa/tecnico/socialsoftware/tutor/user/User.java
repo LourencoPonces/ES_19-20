@@ -8,7 +8,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 
@@ -61,7 +60,7 @@ public class User implements UserDetails {
     private Set<CourseExecution> courseExecutions = new HashSet<>();
 
     @ManyToMany
-    private Set<Tournament> tournaments;
+    private Set<Tournament> participantTournaments;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator", fetch = FetchType.LAZY, orphanRemoval=true)
     private Set<Tournament> createdTournaments;
@@ -170,6 +169,40 @@ public class User implements UserDetails {
     }
 
     public Set<ClarificationRequest> getClarificationRequests() { return clarificationRequests; }
+
+    public void addCreatedTournament(Tournament newCreatedTournament){
+        createdTournaments.add(newCreatedTournament);
+    }
+
+    public void removeCreatedTournament(Integer createdTournamentId){
+        Tournament createdTournament = getCreatedTournament(createdTournamentId);
+        createdTournaments.remove(createdTournament);
+    }
+
+    public Set<Tournament> getCreatedTournaments(){
+        return createdTournaments;
+    }
+
+    public Tournament getCreatedTournament(Integer createdTournamentId){
+        return createdTournaments.stream().filter(tournament -> tournament.getId() == createdTournamentId).collect(Collectors.toList()).get(0);
+    }
+
+    public void addParticipantTournament(Tournament newParticipantTournament){
+        participantTournaments.add(newParticipantTournament);
+    }
+
+    public void removeParticipantTournament(Integer participantTournamentId){
+        Tournament createdTournament = getCreatedTournament(participantTournamentId);
+        createdTournaments.remove(participantTournamentId);
+    }
+
+    public Set<Tournament> getParticipantTournaments(){
+        return participantTournaments;
+    }
+
+    public Tournament getParticipantTournament(Integer participantTournamentId){
+        return participantTournaments.stream().filter(tournament -> tournament.getId() == participantTournamentId).collect(Collectors.toList()).get(0);
+    }
 
     public Integer getNumberOfTeacherQuizzes() {
         if (this.numberOfTeacherQuizzes == null)
