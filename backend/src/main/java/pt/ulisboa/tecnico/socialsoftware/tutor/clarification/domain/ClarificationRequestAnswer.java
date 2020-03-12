@@ -33,14 +33,6 @@ public class ClarificationRequestAnswer {
 
     public ClarificationRequestAnswer() {}
 
-    public ClarificationRequestAnswer(ClarificationRequest req, User u, String answer) {
-        this.request = req;
-        this.creator = u;
-        this.content = answer;
-        this.submissionDate = LocalDateTime.now();
-        this.ensureConsistent();
-    }
-
     public ClarificationRequestAnswer(ClarificationRequest req, User creator, ClarificationRequestAnswerDto dto) {
         this.creator = creator;
         this.request = req;
@@ -59,7 +51,7 @@ public class ClarificationRequestAnswer {
     public ClarificationRequest getRequest() { return this.request; }
     public void setRequest(ClarificationRequest req) { this.request = req; }
     public String getContent() { return content; }
-    public void setContent(String s) { this.content = s; }
+    public void setContent(String s) { this.content = s; this.ensureConsistent(); }
     public LocalDateTime getCreationDate() { return submissionDate; }
     public void setCreationDate(LocalDateTime date) { this.submissionDate = date; }
 }
