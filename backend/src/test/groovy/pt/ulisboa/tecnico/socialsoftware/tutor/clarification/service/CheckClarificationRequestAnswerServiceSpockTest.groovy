@@ -172,8 +172,11 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
         when:
         def result = clarificationService.checkClarificationRequestAnswer(student.geId(), question.getId())
 
-        then:"the answer is returned"
+        then:"the correct answer is returned"
         result != null
+        result.getContent() != null
+        result.getCreator().getId() == student.getId()
+        result.getRequest().getId() == clarificationRequest.getId()
     }
 
     def "there is no answer available"() {
