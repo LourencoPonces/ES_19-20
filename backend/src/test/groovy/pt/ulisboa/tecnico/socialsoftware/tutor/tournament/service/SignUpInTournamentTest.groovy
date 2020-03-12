@@ -99,22 +99,15 @@ class SignUpInTournamentTest extends Specification{
         tournament = new TournamentDto()
         tournament.setTitle(TOURNAMENT_TITLE)
         tournament.setKey(1)
-        creationDate = LocalDateTime.now()
-        availableDate = LocalDateTime.now().plusDays(1)
-        runningDate = LocalDateTime.now().plusDays(2)
-        conclusionDate = LocalDateTime.now().plusDays(3)
         tournament.setNumberOfQuestions(1)
         tournament.setCreator(creatorDto)
-        tournament.setCreationDate(creationDate.format(formatter))
-        tournament.setAvailableDate(availableDate.format(formatter))
-        tournament.setRunningDate(runningDate.format(formatter))
-        tournament.setConclusionDate(conclusionDate.format(formatter))
         tournament.setTopics(topicDtoList)
     }
 
 
     def "sign-up in a tournament"() {
         given: "a tournament and a participant"
+        prepareStatus(Tournament.Status.AVAILABLE)
         tournamentService.createTournament(courseExecution.getId(), tournament)
         def participantDto = new UserDto(participant)
 
@@ -124,7 +117,7 @@ class SignUpInTournamentTest extends Specification{
         then:
         def tournamentCreated = tournamentRepository.findAll().get(0)
         def participants = tournamentCreated.getParticipants()
-        participants.size() == 1
+        participants.size() == 2
     }
 
     def "sign-up in a tournament although there aren't tournaments"() {
@@ -141,7 +134,7 @@ class SignUpInTournamentTest extends Specification{
 
     def "sign-up in a tournament with CREATED status"() {
         given: "a tournament with CREATED status and a participant"
-        tournament.setStatus(Tournament.Status.CREATED)
+        prepareStatus(Tournament.Status.CREATED)
         tournamentService.createTournament(courseExecution.getId(), tournament)
         def participantDto = new UserDto(participant)
 
@@ -155,7 +148,7 @@ class SignUpInTournamentTest extends Specification{
 
     def "sign-up in a tournament with RUNNING status"() {
         given: "a tournament with RUNNING status and a participant"
-        tournament.setStatus(Tournament.Status.RUNNING)
+        prepareStatus(Tournament.Status.RUNNING)
         tournamentService.createTournament(courseExecution.getId(), tournament)
         def participantDto = new UserDto(participant)
 
@@ -169,7 +162,7 @@ class SignUpInTournamentTest extends Specification{
 
     def "sign-up in an tournament with FINISHED status"() {
         given: "a tournament with FINISHED status and a participant"
-        tournament.setStatus(Tournament.Status.FINISHED)
+        prepareStatus(Tournament.Status.FINISHED)
         tournamentService.createTournament(courseExecution.getId(), tournament)
         def participantDto = new UserDto(participant)
 
@@ -183,7 +176,7 @@ class SignUpInTournamentTest extends Specification{
 
     def "sign-up in an tournament with CANCELLED status"() {
         given: "a tournament with CANCELED status and a participant"
-        tournament.setStatus(Tournament.Status.CANCELLED)
+        prepareStatus(Tournament.Status.CANCELLED)
         tournamentService.createTournament(courseExecution.getId(), tournament)
         def participantDto = new UserDto(participant)
 
@@ -197,9 +190,11 @@ class SignUpInTournamentTest extends Specification{
 
     def "sign-up in a tournament with a user that is already sign-up"(){
         given: "a tournament with a user already sign-up and a participant"
+        prepareStatus(Tournament.Status.AVAILABLE)
         tournamentService.createTournament(courseExecution.getId(), tournament)
-        tournamentService.signUpInTournament(tournament, participantDto)
+
         def participantDto = new UserDto(participant)
+        tournamentService.signUpInTournament(tournament, participantDto)
 
         when:
         tournamentService.signUpInTournament(tournament, participantDto)
@@ -207,6 +202,45 @@ class SignUpInTournamentTest extends Specification{
         then:
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.USER_ALREADY_SIGNUP_IN_TOURNAMENT
+    }
+
+    def prepareStatus(Tournament.Status status) {
+        def now = LocalDateTime.now()
+
+        switch(status) {
+            case Tournament.Status.CREATED:
+                creationDate = now.minusDays(1)
+                availableDate = now.plusDays(1)
+                runningDate = now.plusDays(2)
+                conclusionDate = now.plusDays(3)
+                break;
+            case Tournament.Status.AVAILABLE:
+                creationDate = now.minusDays(2)
+                availableDate = now.minusDays(1)
+                runningDate = now.plusDays(1)
+                conclusionDate = now.plusDays(2)
+                break;
+            case Tournament.Status.RUNNING:
+                creationDate = now.minusDays(3)
+                availableDate = now.minusDays(2)
+                runningDate = now.minusDays(1)
+                conclusionDate = now.plusDays(1)
+                break;
+            case Tournament.Status.FINISHED:
+            case Tournament.Status.CANCELLED:
+                creationDate = now.minusDays(4)
+                availableDate = now.minusDays(3)
+                runningDate = now.minusDays(2)
+                conclusionDate = now.minusDays(1)
+                break;
+        }
+
+        tournament.setCreationDate(creationDate.format(formatter))
+        tournament.setAvailableDate(availableDate.format(formatter))
+        tournament.setRunningDate(runningDate.format(formatter))
+        tournament.setConclusionDate(conclusionDate.format(formatter))
+
+        tournament.setStatus(status)
     }
 
     @TestConfiguration
