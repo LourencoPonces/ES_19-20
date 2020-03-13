@@ -104,7 +104,7 @@ class GetAvailableTournamentsTest extends Specification {
     }
 
     def "get the available tournaments"() {
-        given:
+        given: "an available tournament"
         tournamentService.createTournament(courseExecution.getId(), tournamentDto)
 
         when:
@@ -181,18 +181,6 @@ class GetAvailableTournamentsTest extends Specification {
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_AVAILABLE
     }
 
-    //TODO: Is this repetition of the code above?
-    /*
-    def "get the available tournaments, although there are only tournaments with available date after the current date"(){
-        // exception is thrown
-        expect: false
-    }
-
-    def "get the available tournaments, although there are only tournaments with conclusion date before the current date"(){
-        // exception is thrown
-        expect: false
-    }*/
-
     def "get the available tournaments with a non-existing course"(){
         given: 'a bad courseId'
         def badCourseId = 2
@@ -205,10 +193,9 @@ class GetAvailableTournamentsTest extends Specification {
         exception.getErrorMessage() == ErrorMessage.COURSE_EXECUTION_NOT_FOUND
     }
 
-    //TODO: Test Configuration
+
     @TestConfiguration
     static class TournamentServiceImplTestContextConfiguration {
-
         @Bean
         TournamentService tournamentService() {
             return new TournamentService()

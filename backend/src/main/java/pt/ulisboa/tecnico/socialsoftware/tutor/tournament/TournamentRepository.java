@@ -11,21 +11,21 @@ import java.util.List;
 @Repository
 @Transactional
 public interface TournamentRepository extends JpaRepository<Tournament, Integer> {
-    @Query(value = "select * from tounaments t where t.course_execution_id = :executionId", nativeQuery = true)
+    @Query(value = "select * from tournaments t where t.course_execution_id = :executionId", nativeQuery = true)
     List<Tournament> findTournament(int executionId);
 
-    @Query(value = "select * from tounaments t where t.course_execution_id = :executionId and t.status ='CREATED'", nativeQuery = true)
+    @Query(value = "select * from tournaments t where t.course_execution_id = :executionId and t.creation_date < TIMESTAMP and TIMESTAMP < t.available_date", nativeQuery = true)
     List<Tournament> findCratedTournament(int executionId);
 
-    @Query(value = "select * from tounaments t where t.course_execution_id = :executionId and t.status ='AVAILABLE'", nativeQuery = true)
+    @Query(value = "select * from tournaments t where t.course_execution_id = :executionId and t.available_date < TIMESTAMP and TIMESTAMP < t.running_date", nativeQuery = true)
     List<Tournament> findAvailableTournament(int executionId);
 
-    @Query(value = "select * from tounaments t where t.course_execution_id = :executionId and t.status ='RUNNING'", nativeQuery = true)
+    @Query(value = "select * from tournaments t where t.course_execution_id = :executionId and t.running_date < TIMESTAMP and TIMESTAMP < t.conclusion_date", nativeQuery = true)
     List<Tournament> findRunningTournament(int executionId);
 
-    @Query(value = "select * from tounaments t where t.course_execution_id = :executionId and t.status ='FINISHED'", nativeQuery = true)
+    @Query(value = "select * from tournaments t where t.course_execution_id = :executionId and t.conclusion_date < TIMESTAMP", nativeQuery = true)
     List<Tournament> findFinishedTournament(int executionId);
 
-    @Query(value = "select * from tounaments t where t.course_execution_id = :executionId and t.status ='CANCELED'", nativeQuery = true)
+    @Query(value = "select * from tournaments t where t.course_execution_id = :executionId and t.isCancelled = TRUE", nativeQuery = true)
     List<Tournament> findCanceledTournament(int executionId);
 }

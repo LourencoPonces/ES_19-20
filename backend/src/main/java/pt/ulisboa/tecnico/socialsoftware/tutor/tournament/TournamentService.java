@@ -137,13 +137,11 @@ public class TournamentService {
     public List<TournamentDto> getAvailableTournaments(int executionId){
         CourseExecution courseExecution = courseExecutionRepository.findById(executionId).orElseThrow(() -> new TutorException(COURSE_EXECUTION_NOT_FOUND, executionId));
 
-        Set<Tournament> availableTournaments = courseExecution.getTournaments().stream()
-                .filter(tournament -> tournament.getStatus() == tournament.getStatus().AVAILABLE)
-                .collect(Collectors.toSet());
+        List<TournamentDto> availableTournaments = tournamentRepository.findAvailableTournament(executionId).stream().map(TournamentDto::new).collect(Collectors.toList());
 
         if (availableTournaments.isEmpty())
             throw new TutorException(TOURNAMENT_NOT_AVAILABLE);
 
-        return tournamentRepository.findAvailableTournament(executionId).stream().map(TournamentDto::new).collect(Collectors.toList());
+        return availableTournaments;
     }
 }
