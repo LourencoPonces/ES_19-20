@@ -223,13 +223,12 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
     }
 
     def changeUser(boolean isUser, boolean isStudent, int teacherId) {
-        if (isUser && isStudent) {
-            studentId = student.getId()
-        }
-        else if (isUser && !isStudent) {
-            studentId = teacherId
-        }
-        else {
+        if (isUser) {
+            if (isStudent)
+                studentId = student.getId()
+            else
+                studentId = teacherId
+        } else {
             studentId = INEXISTENT_USER_ID
         }
     }
