@@ -67,18 +67,16 @@ class GetAvailableTournamentsTest extends Specification {
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
 
-        course = new Course(COURSE_NAME, Course.Type.TECNICO)
-        courseRepository.save(course)
+        (courseExecution, course) = setupCourse()
 
-        courseExecution = new CourseExecution(course, ACRONYM, ACADEMIC_TERM, Course.Type.TECNICO)
-        courseExecutionRepository.save(courseExecution)
+        UserDto creatorDto = setupCreator(courseExecution)
 
-        creator = new User(CREATOR_NAME, CREATOR_USERNAME, 1, User.Role.STUDENT)
-        creator.getCourseExecutions().add(courseExecution)
-        courseExecution.getUsers().add(creator)
-        userRepository.save(creator)
-        def creatorDto = new UserDto(creator);
+        topicDtoList = setupTopicList(course)
 
+        setupTournamentDto(creatorDto, formatter, topicDtoList)
+    }
+
+    private ArrayList<TopicDto> setupTopicList(Course course) {
         def topic = new Topic();
         topic.setName("TOPIC")
         topic.setCourse(course)
@@ -87,7 +85,28 @@ class GetAvailableTournamentsTest extends Specification {
         def topicDto = new TopicDto(topic)
         topicDtoList = new ArrayList<TopicDto>();
         topicDtoList.add(topicDto)
+        topicDtoList
+    }
 
+    private UserDto setupCreator(CourseExecution courseExecution) {
+        creator = new User(CREATOR_NAME, CREATOR_USERNAME, 1, User.Role.STUDENT)
+        creator.getCourseExecutions().add(courseExecution)
+        courseExecution.getUsers().add(creator)
+        userRepository.save(creator)
+        def creatorDto = new UserDto(creator);
+        creatorDto
+    }
+
+    private List setupCourse() {
+        course = new Course(COURSE_NAME, Course.Type.TECNICO)
+        courseRepository.save(course)
+
+        courseExecution = new CourseExecution(course, ACRONYM, ACADEMIC_TERM, Course.Type.TECNICO)
+        courseExecutionRepository.save(courseExecution)
+        [courseExecution, course]
+    }
+
+    private void setupTournamentDto(UserDto creatorDto, DateTimeFormatter formatter, ArrayList<TopicDto> topicDtoList) {
         tournamentDto = new TournamentDto()
         tournamentDto.setTitle(TOURNAMENT_TITLE)
         tournamentDto.setKey(1)
@@ -159,9 +178,9 @@ class GetAvailableTournamentsTest extends Specification {
 
         where:
         creationDateDay | availableDateDay | runningDateDay | conclusionDateDay || errorMessage
-         0              | 1              | 2                | 3                 || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
-        -2              |-1              | 0                | 1                 || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
-        -3              |-2              |-1                | 0                 || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
+         0              | 1                | 2              | 3                 || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
+        -2              |-1                | 0              | 1                 || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
+        -3              |-2                |-1              | 0                 || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
     }
 
     def "get the available tournaments with a non-existing course"(){
