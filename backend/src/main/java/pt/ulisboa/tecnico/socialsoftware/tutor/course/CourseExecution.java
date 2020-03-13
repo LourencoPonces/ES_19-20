@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Assessment;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import javax.persistence.*;
@@ -41,6 +42,9 @@ public class CourseExecution {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseExecution", fetch=FetchType.LAZY, orphanRemoval=true)
     private Set<Assessment> assessments = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseExecution", fetch=FetchType.LAZY, orphanRemoval=true)
+    private Set<Tournament> tournaments = new HashSet<>();
 
     public CourseExecution() {
     }
@@ -124,6 +128,10 @@ public class CourseExecution {
     public Set<Assessment> getAssessments() {
         return assessments;
     }
+
+    public Set<Tournament> getTournaments() { return tournaments; }
+
+    public void addTournament(Tournament tournament) { tournaments.add(tournament); }
 
     public void addQuiz(Quiz quiz) {
         quizzes.add(quiz);
