@@ -55,7 +55,7 @@ public class TournamentService {
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public TournamentDto createTournament(int executionId, TournamentDto tournamentDto) {
-        CourseExecution courseExecution = courseExecutionRepository.findById(executionId).orElseThrow(() -> new TutorException(COURSE_EXECUTION_NOT_FOUND, executionId));
+        CourseExecution courseExecution = getCourseExecution(executionId);
 
         User creator = userRepository.findByUsername(tournamentDto.getCreator().getUsername());
 
@@ -124,6 +124,10 @@ public class TournamentService {
         }
     }
 
+    private CourseExecution getCourseExecution(int executionId) {
+        return courseExecutionRepository.findById(executionId).orElseThrow(() -> new TutorException(COURSE_EXECUTION_NOT_FOUND, executionId));
+    }
+
     private void addTournamentToTopics(TournamentDto tournamentDto, CourseExecution courseExecution, Tournament tournament){
         for(TopicDto t: tournamentDto.getTopics()) {
             Topic topic = topicRepository.findTopicByName(courseExecution.getCourse().getId(), t.getName());
@@ -137,7 +141,7 @@ public class TournamentService {
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public List<TournamentDto> getAvailableTournaments(int executionId){
-        CourseExecution courseExecution = courseExecutionRepository.findById(executionId).orElseThrow(() -> new TutorException(COURSE_EXECUTION_NOT_FOUND, executionId));
+        getCourseExecution(executionId);
 
         List<TournamentDto> availableTournaments = tournamentRepository.findAvailableTournaments(executionId).stream().map(TournamentDto::new).collect(Collectors.toList());
 

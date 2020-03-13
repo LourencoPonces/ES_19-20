@@ -21,6 +21,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -136,12 +137,17 @@ class GetAvailableTournamentsTest extends Specification {
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_AVAILABLE
     }
 
-    def "get the available tournaments, although there are only tournaments in CREATED status"(){
+    /*def "get the available tournaments, although there are only tournaments in CREATED status"(){
         given: "a tournament with CREATED status"
         creationDate = LocalDateTime.now()
         availableDate = LocalDateTime.now().plusDays(1)
         runningDate = LocalDateTime.now().plusDays(2)
         conclusionDate = LocalDateTime.now().plusDays(3)
+        tournamentDto.setCreationDate(creationDate.format(formatter))
+        tournamentDto.setAvailableDate(availableDate.format(formatter))
+        tournamentDto.setRunningDate(runningDate.format(formatter))
+        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
+        tournamentService.createTournament(courseExecution.getId(), tournamentDto)
 
         when:
         tournamentService.getAvailableTournaments(courseExecution.getId())
@@ -157,6 +163,11 @@ class GetAvailableTournamentsTest extends Specification {
         availableDate = LocalDateTime.now().minusDays(1)
         runningDate = LocalDateTime.now()
         conclusionDate = LocalDateTime.now().plusDays(1)
+        tournamentDto.setCreationDate(creationDate.format(formatter))
+        tournamentDto.setAvailableDate(availableDate.format(formatter))
+        tournamentDto.setRunningDate(runningDate.format(formatter))
+        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
+        tournamentService.createTournament(courseExecution.getId(), tournamentDto)
 
         when:
         tournamentService.getAvailableTournaments(courseExecution.getId())
@@ -172,6 +183,11 @@ class GetAvailableTournamentsTest extends Specification {
         availableDate = LocalDateTime.now().minusDays(2)
         runningDate = LocalDateTime.now().minusDays(1)
         conclusionDate = LocalDateTime.now()
+        tournamentDto.setCreationDate(creationDate.format(formatter))
+        tournamentDto.setAvailableDate(availableDate.format(formatter))
+        tournamentDto.setRunningDate(runningDate.format(formatter))
+        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
+        tournamentService.createTournament(courseExecution.getId(), tournamentDto)
 
         when:
         tournamentService.getAvailableTournaments(courseExecution.getId())
@@ -179,6 +195,33 @@ class GetAvailableTournamentsTest extends Specification {
         then:
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_AVAILABLE
+    }*/
+
+    @Unroll("get the available tournaments, although there are only tournaments in #createdDateDay | #availableDateDay | #runningDateDay | #conclusionDateDay")
+    def "invalid dates"() {
+        given: "tournaments in different phases"
+        creationDate = LocalDateTime.now().plusDays(creationDateDay)
+        availableDate = LocalDateTime.now().plusDays(availableDateDay)
+        runningDate = LocalDateTime.now().plusDays(runningDateDay)
+        conclusionDate = LocalDateTime.now().plusDays(conclusionDateDay)
+        tournamentDto.setCreationDate(creationDate.format(formatter))
+        tournamentDto.setAvailableDate(availableDate.format(formatter))
+        tournamentDto.setRunningDate(runningDate.format(formatter))
+        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
+        tournamentService.createTournament(courseExecution.getId(), tournamentDto)
+
+        when:
+        tournamentService.getAvailableTournaments(courseExecution.getId())
+
+        then:
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == errorMessage
+
+        where:
+        creationDateDay | availableDateDay | runningDateDay | conclusionDateDay || errorMessage
+         0              | 1              | 2                | 3                 || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
+        -2              |-1              | 0                | 1                 || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
+        -3              |-2              |-1                | 0                 || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
     }
 
     def "get the available tournaments with a non-existing course"(){
