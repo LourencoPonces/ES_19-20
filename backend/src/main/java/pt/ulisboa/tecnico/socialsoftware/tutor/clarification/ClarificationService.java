@@ -94,7 +94,10 @@ public class ClarificationService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void removeClarificationRequestAnswer(int reqId) {
+    public void removeClarificationRequestAnswer(int teacherId, int reqId) {
+        // check if user is a teacher
+        getTeacher(teacherId);
+
         ClarificationRequest req = clarificationRequestRepository.findById(reqId)
                 .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, reqId));
 
