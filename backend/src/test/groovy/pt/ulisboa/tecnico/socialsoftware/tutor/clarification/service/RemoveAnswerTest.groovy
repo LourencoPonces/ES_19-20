@@ -189,7 +189,7 @@ class RemoveAnswerTest extends Specification {
         exception.getErrorMessage() == ErrorMessage.CLARIFICATION_REQUEST_UNANSWERED
     }
 
-    def "don't remove inexistent things"() {
+    def "don't remove non-existent things"() {
         when: "trying to remove an answer from a non-existent clarification request"
         clarificationService.removeClarificationRequestAnswer(teacherId, clarificationRequest.getId() + 10)
 
