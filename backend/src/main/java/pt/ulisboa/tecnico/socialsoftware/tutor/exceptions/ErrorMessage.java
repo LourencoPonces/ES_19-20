@@ -61,7 +61,11 @@ public enum ErrorMessage {
     FENIX_CONFIGURATION_ERROR("Incorrect server configuration files for fenix"),
 
     TOURNAMENT_NOT_CONSISTENT("Field %s of tournament is not consistent"),
+
     TOURNAMENT_NOT_AVAILABLE("There aren't any available tournaments"),
+    TOURNAMENT_CREATED_BY_NON_STUDENT("Tournament created by non-student"),
+    USER_NOT_ENROLLED_IN_COURSE_EXECUTION("User not enrolled in course execution %s"),
+
 
     ACCESS_DENIED("You do not have permission to view this resource"),
     CANNOT_OPEN_FILE("Cannot open file"),

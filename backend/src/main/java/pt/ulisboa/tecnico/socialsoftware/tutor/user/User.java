@@ -60,11 +60,11 @@ public class User implements UserDetails {
     @ManyToMany
     private Set<CourseExecution> courseExecutions = new HashSet<>();
 
-    @ManyToMany
-    private Set<Tournament> tournaments;
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Tournament> participantTournaments = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator", fetch = FetchType.LAZY, orphanRemoval=true)
-    private Set<Tournament> createdTournaments;
+    private Set<Tournament> createdTournaments = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner")
     private Set<ClarificationRequest> clarificationRequests = new HashSet<>();
@@ -170,6 +170,40 @@ public class User implements UserDetails {
     }
 
     public Set<ClarificationRequest> getClarificationRequests() { return clarificationRequests; }
+
+    public void addCreatedTournament(Tournament newCreatedTournament){
+        createdTournaments.add(newCreatedTournament);
+    }
+
+    public void removeCreatedTournament(Integer createdTournamentId){
+        Tournament createdTournament = getCreatedTournament(createdTournamentId);
+        createdTournaments.remove(createdTournament);
+    }
+
+    public Set<Tournament> getCreatedTournaments(){
+        return createdTournaments;
+    }
+
+    public Tournament getCreatedTournament(Integer createdTournamentId){
+        return createdTournaments.stream().filter(tournament -> tournament.getId() == createdTournamentId).collect(Collectors.toList()).get(0);
+    }
+
+    public void addParticipantTournament(Tournament newParticipantTournament){
+        participantTournaments.add(newParticipantTournament);
+    }
+
+    public void removeParticipantTournament(Integer participantTournamentId){
+        Tournament createdTournament = getCreatedTournament(participantTournamentId);
+        createdTournaments.remove(participantTournamentId);
+    }
+
+    public Set<Tournament> getParticipantTournaments(){
+        return participantTournaments;
+    }
+
+    public Tournament getParticipantTournament(Integer participantTournamentId){
+        return participantTournaments.stream().filter(tournament -> tournament.getId() == participantTournamentId).collect(Collectors.toList()).get(0);
+    }
 
     public Integer getNumberOfTeacherQuizzes() {
         if (this.numberOfTeacherQuizzes == null)
