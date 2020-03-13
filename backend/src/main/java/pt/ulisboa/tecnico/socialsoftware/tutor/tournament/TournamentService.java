@@ -82,6 +82,8 @@ public class TournamentService {
         if (creator.getRole() == User.Role.STUDENT) {
             tournament.addParticipant(creator);
             tournamentDto.getParticipants().add(tournamentDto.getCreator());
+        } else {
+            throw new TutorException(TOURNAMENT_CREATED_BY_NON_STUDENT);
         }
     }
 

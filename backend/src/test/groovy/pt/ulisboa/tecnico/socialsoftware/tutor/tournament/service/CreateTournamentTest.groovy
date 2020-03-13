@@ -140,6 +140,19 @@ class CreateTournamentTest extends Specification {
         tournamentRepository.count() == 0L
     }
 
+    def "create a tournament with a non-student"() {
+        given: 'a teacher'
+        creator.setRole(User.Role.TEACHER)
+
+        when:
+        tournamentService.createTournament(courseExecution.getId(), tournament)
+
+        then:
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_CREATED_BY_NON_STUDENT
+        tournamentRepository.count() == 0L
+    }
+
     def "create a tournament with a topic outside the course"(){
         given: 'a topic outside of the tournaments course'
         def outsideTopic = new Topic()
