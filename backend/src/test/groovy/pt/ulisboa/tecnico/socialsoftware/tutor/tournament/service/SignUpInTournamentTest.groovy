@@ -133,10 +133,13 @@ class SignUpInTournamentTest extends Specification{
     }
 
     @Unroll("invalid status: #status || #errorMessage")
-    def "sign-up in a tournament with CREATED status"() {
-        given: "a tournament with CREATED status and a participant"
+    def "sign-up in a tournament with non-available status"() {
+        given: "a tournament with non-available status and a participant"
         prepareStatus(tournamentDto, status)
         tournamentDto = tournamentService.createTournament(courseExecution.getId(), tournamentDto)
+
+        if (status == Tournament.Status.CANCELLED)
+            tournamentRepository.findById(tournamentDto.getId()).get().cancel()
 
         when:
         tournamentService.signUpInTournament(tournamentDto.getId(), participant.getUsername())
@@ -203,8 +206,6 @@ class SignUpInTournamentTest extends Specification{
         tournamentDto.setAvailableDate(availableDate.format(formatter))
         tournamentDto.setRunningDate(runningDate.format(formatter))
         tournamentDto.setConclusionDate(conclusionDate.format(formatter))
-
-        tournamentDto.setStatus(status)
     }
 
     @TestConfiguration
