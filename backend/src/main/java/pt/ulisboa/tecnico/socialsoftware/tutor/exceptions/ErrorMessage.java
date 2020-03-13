@@ -68,6 +68,7 @@ public enum ErrorMessage {
     TOURNAMENT_CREATED_BY_NON_STUDENT("Tournament created by non-student"),
     USER_NOT_ENROLLED_IN_COURSE_EXECUTION("User not enrolled in course execution %s"),
 
+
     ACCESS_DENIED("You do not have permission to view this resource"),
     CANNOT_OPEN_FILE("Cannot open file"),
 

@@ -27,6 +27,9 @@ import java.util.ArrayList;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class TournamentService {
     @Autowired
@@ -52,7 +55,7 @@ public class TournamentService {
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public TournamentDto createTournament(int executionId, TournamentDto tournamentDto) {
-        CourseExecution courseExecution = courseExecutionRepository.findById(executionId).orElseThrow(() -> new TutorException(COURSE_EXECUTION_NOT_FOUND, executionId));
+        CourseExecution courseExecution = getCourseExecution(executionId);
 
         User creator = userRepository.findByUsername(tournamentDto.getCreator().getUsername());
 
@@ -68,14 +71,17 @@ public class TournamentService {
 
         setCreationDate(tournamentDto, tournament);
 
+        tournament.setCourseExecution(courseExecution);
         entityManager.persist(tournament);
-        entityManager.persist(courseExecution);
-        entityManager.persist(creator);
+
         courseExecution.addTournament(tournament);
         creator.addCreatedTournament(tournament);
         creator.addParticipantTournament(tournament);
         addTournamentToTopics(tournamentDto, courseExecution, tournament);
-;
+
+        entityManager.persist(courseExecution);
+        entityManager.persist(creator);
+
         return new TournamentDto(tournament);
     }
 
@@ -118,12 +124,31 @@ public class TournamentService {
         }
     }
 
+    private CourseExecution getCourseExecution(int executionId) {
+        return courseExecutionRepository.findById(executionId).orElseThrow(() -> new TutorException(COURSE_EXECUTION_NOT_FOUND, executionId));
+    }
+
     private void addTournamentToTopics(TournamentDto tournamentDto, CourseExecution courseExecution, Tournament tournament){
         for(TopicDto t: tournamentDto.getTopics()) {
             Topic topic = topicRepository.findTopicByName(courseExecution.getCourse().getId(), t.getName());
             topic.addTournament(tournament);
             entityManager.persist(topic);
         }
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<TournamentDto> getAvailableTournaments(int executionId) {
+        getCourseExecution(executionId);
+
+        List<TournamentDto> availableTournaments = tournamentRepository.findAvailableTournaments(executionId).stream().map(TournamentDto::new).collect(Collectors.toList());
+
+        if (availableTournaments.isEmpty())
+            throw new TutorException(TOURNAMENT_NOT_AVAILABLE);
+
+        return availableTournaments;
     }
 
     @Retryable(
