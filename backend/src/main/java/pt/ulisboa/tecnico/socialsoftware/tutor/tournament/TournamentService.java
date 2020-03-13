@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -72,14 +71,17 @@ public class TournamentService {
 
         setCreationDate(tournamentDto, tournament);
 
+        tournament.setCourseExecution(courseExecution);
         entityManager.persist(tournament);
-        entityManager.persist(courseExecution);
-        entityManager.persist(creator);
+
         courseExecution.addTournament(tournament);
         creator.addCreatedTournament(tournament);
         creator.addParticipantTournament(tournament);
         addTournamentToTopics(tournamentDto, courseExecution, tournament);
-;
+
+        entityManager.persist(courseExecution);
+        entityManager.persist(creator);
+
         return new TournamentDto(tournament);
     }
 
@@ -137,7 +139,7 @@ public class TournamentService {
     public List<TournamentDto> getAvailableTournaments(int executionId){
         CourseExecution courseExecution = courseExecutionRepository.findById(executionId).orElseThrow(() -> new TutorException(COURSE_EXECUTION_NOT_FOUND, executionId));
 
-        List<TournamentDto> availableTournaments = tournamentRepository.findAvailableTournament(executionId).stream().map(TournamentDto::new).collect(Collectors.toList());
+        List<TournamentDto> availableTournaments = tournamentRepository.findAvailableTournaments(executionId).stream().map(TournamentDto::new).collect(Collectors.toList());
 
         if (availableTournaments.isEmpty())
             throw new TutorException(TOURNAMENT_NOT_AVAILABLE);

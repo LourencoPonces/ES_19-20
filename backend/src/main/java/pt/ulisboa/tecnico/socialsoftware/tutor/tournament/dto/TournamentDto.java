@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TournamentDto implements Serializable {
     private Integer id;
@@ -37,6 +38,7 @@ public class TournamentDto implements Serializable {
         this.key = tournament.getKey();
         this.title = tournament.getTitle();
         this.numberOfQuestions = tournament.getNumberOfQuestions();
+        this.isCancelled = tournament.getStatus() == Tournament.Status.CANCELLED;
 
         if (tournament.getCreationDate() != null)
             this.creationDate = tournament.getCreationDate().format(formatter);
@@ -46,6 +48,10 @@ public class TournamentDto implements Serializable {
             this.runningDate = tournament.getRunningDate().format(formatter);
         if (tournament.getConclusionDate() != null)
             this.conclusionDate = tournament.getConclusionDate().format(formatter);
+
+        setCreator(new UserDto(tournament.getCreator()));
+        this.participants = tournament.getParticipants().stream().map(UserDto::new).collect(Collectors.toList());
+        this.topics = tournament.getTopics().stream().map(TopicDto::new).collect(Collectors.toList());
     }
 
     public Integer getId() {

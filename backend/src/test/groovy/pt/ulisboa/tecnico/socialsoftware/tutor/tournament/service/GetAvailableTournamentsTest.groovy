@@ -118,10 +118,10 @@ class GetAvailableTournamentsTest extends Specification {
         tournamentElement.getKey() != null
         tournamentElement.getTitle() == TOURNAMENT_TITLE
         tournamentElement.getCreationDate() != null
-        tournamentElement.getAvailableDate().format(formatter) == availableDate.format(formatter)
-        tournamentElement.getRunningDate().format(formatter) == runningDate.format(formatter)
-        tournamentElement.getConclusionDate().format(formatter) == conclusionDate.format(formatter)
-        tournamentElement.getStatus() == Tournament.Status.CREATED
+        tournamentElement.getAvailableDate() == availableDate.format(formatter)
+        tournamentElement.getRunningDate() == runningDate.format(formatter)
+        tournamentElement.getConclusionDate() == conclusionDate.format(formatter)
+        tournamentElement.getStatus() == Tournament.Status.AVAILABLE
         tournamentElement.getCreator().getUsername() == CREATOR_USERNAME
         tournamentElement.getTopics().size() == 1
         tournamentElement.getParticipants().size() == 1
