@@ -23,8 +23,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizQuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository
-import spock.lang.Ignore
-
+import spock.lang.Unroll
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
@@ -85,6 +84,8 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
     def quizAnswer
     def quizQuestion
     def clarificationRequestDto
+    def studentId
+    def questionId
 
 
     def setup() {
@@ -93,7 +94,7 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
         quiz = createQuiz(KEY_ONE, courseExecution, Quiz.QuizType.GENERATED)
         question = createQuestion(KEY_ONE, course)
         quizQuestion = new QuizQuestion(quiz, question, 1)
-        student = createStudent(new User(), KEY_ONE, NAME, USERNAME_ONE, courseExecution)
+        student = createUser(new User(), KEY_ONE, NAME, USERNAME_ONE, User.Role.STUDENT, courseExecution)
         quizAnswer = new QuizAnswer(student, quiz)
 
         clarificationRequestDto = new ClarificationRequestDto()
@@ -111,14 +112,14 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
         clarificationRequestRepository.save(clarificationRequest)
     }
 
-    private User createStudent(User student, int key, String name, String username, CourseExecution courseExecution) {
-        student.setKey(key)
-        student.setName(name)
-        student.setUsername(username)
-        student.setRole(User.Role.STUDENT)
-        student.getCourseExecutions().add(courseExecution)
-        courseExecution.getUsers().add(student)
-        return student
+    private User createUser(User user, int key, String name, String username, User.Role role, CourseExecution courseExecution) {
+        user.setKey(key)
+        user.setName(name)
+        user.setUsername(username)
+        user.setRole(role)
+        user.getCourseExecutions().add(courseExecution)
+        courseExecution.getUsers().add(user)
+        return user
     }
 
     private Question createQuestion(int key, Course course) {
@@ -155,11 +156,7 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
 
     def "the student submitted the request, receives the answer"() {
         given: "a teacher"
-        def teacher = new User()
-        teacher.setKey(KEY_TWO)
-        teacher.setUsername(USERNAME_TWO)
-        teacher.addCourse(courseExecution)
-        teacher.setRole(User.Role.TEACHER)
+        def teacher = createUser(new User(), KEY_TWO, NAME, USERNAME_TWO, User.Role.TEACHER, courseExecution)
         userRepository.save(teacher)
 
         and: "his answer to the clarification request"
@@ -192,7 +189,7 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
 
     def "the student didn't submit a clarification request for the question"() {
         given: "a student that didnt submit a clarification request"
-        def student2 = createStudent(new User(), KEY_TWO, NAME, USERNAME_TWO, courseExecution)
+        def student2 = createUser(new User(), KEY_TWO, NAME, USERNAME_TWO, User.Role.STUDENT, courseExecution)
         userRepository.save(student2)
 
         when:
@@ -203,36 +200,47 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
         exception.getErrorMessage() == CLARIFICATION_REQUEST_NOT_SUBMITTED
     }
 
-    def "the question doesn't exist"() {
-        when:
-        clarificationService.getClarificationRequestAnswer(student.getId(), INEXISTENT_QUESTION_ID)
+    @Unroll("invalid arguments: #isUser | #isStudent| #isQuestion || #error_message")
+    def "invalid arguments"() {
+        given: "a user that isn't a student"
+        def teacher = createUser(new User(), KEY_TWO, NAME, USERNAME_TWO, User.Role.TEACHER, courseExecution)
+        userRepository.save(teacher)
 
-        then: "an exception is thrown"
+        when:
+        changeUser(isUser, isStudent, teacher.getId())
+        changeQuestion(isQuestion)
+        clarificationService.getClarificationRequestAnswer(studentId, questionId)
+
+        then:
         def exception = thrown(TutorException)
-        exception.getErrorMessage() == QUESTION_NOT_FOUND
+        exception.getErrorMessage() == error_message
+
+        where:
+        isUser | isStudent | isQuestion || error_message
+        false  | true      | true       || USER_NOT_FOUND
+        true   | false     | true       || ACCESS_DENIED
+        true   | true      | false      || QUESTION_NOT_FOUND
     }
 
-    def "the user doesn't exist"() {
-        when:
-        clarificationService.getClarificationRequestAnswer(INEXISTENT_USER_ID, question.getId())
-
-        then: "an exception is thrown"
-        def exception = thrown(TutorException)
-        exception.getErrorMessage() == USER_NOT_FOUND
+    def changeUser(boolean isUser, boolean isStudent, int teacherId) {
+        if (!isUser) {
+            studentId = INEXISTENT_USER_ID
+        }
+        else if (isUser && isStudent) {
+            studentId = student.getId()
+        }
+        else if (isUser && !isStudent) {
+            studentId = teacherId
+        }
     }
 
-    def "the user isn't a student"() {
-        given: "a user that is not a student"
-        student.setRole(User.Role.TEACHER)
-        userRepository.save(student)
-
-        when:
-        clarificationService.getClarificationRequestAnswer(student.getId(), question.getId())
-
-        then: "an exception is thrown"
-        def exception = thrown(TutorException)
-        exception.getErrorMessage() == ACCESS_DENIED
-
+    def changeQuestion(boolean isQuestion) {
+        if (isQuestion) {
+            questionId = question.getId()
+        }
+        else {
+            questionId = INEXISTENT_QUESTION_ID
+        }
     }
 
     @TestConfiguration
