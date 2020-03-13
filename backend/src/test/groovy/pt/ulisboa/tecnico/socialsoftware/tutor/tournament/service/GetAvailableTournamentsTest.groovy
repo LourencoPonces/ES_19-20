@@ -137,66 +137,6 @@ class GetAvailableTournamentsTest extends Specification {
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_AVAILABLE
     }
 
-    /*def "get the available tournaments, although there are only tournaments in CREATED status"(){
-        given: "a tournament with CREATED status"
-        creationDate = LocalDateTime.now()
-        availableDate = LocalDateTime.now().plusDays(1)
-        runningDate = LocalDateTime.now().plusDays(2)
-        conclusionDate = LocalDateTime.now().plusDays(3)
-        tournamentDto.setCreationDate(creationDate.format(formatter))
-        tournamentDto.setAvailableDate(availableDate.format(formatter))
-        tournamentDto.setRunningDate(runningDate.format(formatter))
-        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
-        tournamentService.createTournament(courseExecution.getId(), tournamentDto)
-
-        when:
-        tournamentService.getAvailableTournaments(courseExecution.getId())
-
-        then:
-        def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_AVAILABLE
-    }
-
-    def "get the available tournaments, although there are only tournaments in RUNNING status"(){
-        given: "a tournament with RUNNING status"
-        creationDate = LocalDateTime.now().minusDays(2)
-        availableDate = LocalDateTime.now().minusDays(1)
-        runningDate = LocalDateTime.now()
-        conclusionDate = LocalDateTime.now().plusDays(1)
-        tournamentDto.setCreationDate(creationDate.format(formatter))
-        tournamentDto.setAvailableDate(availableDate.format(formatter))
-        tournamentDto.setRunningDate(runningDate.format(formatter))
-        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
-        tournamentService.createTournament(courseExecution.getId(), tournamentDto)
-
-        when:
-        tournamentService.getAvailableTournaments(courseExecution.getId())
-
-        then:
-        def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_AVAILABLE
-    }
-
-    def "get the available tournaments, although there are only tournaments in FINISHED status"(){
-        given: "a tournament with FINISHED status"
-        creationDate = LocalDateTime.now().minusDays(3)
-        availableDate = LocalDateTime.now().minusDays(2)
-        runningDate = LocalDateTime.now().minusDays(1)
-        conclusionDate = LocalDateTime.now()
-        tournamentDto.setCreationDate(creationDate.format(formatter))
-        tournamentDto.setAvailableDate(availableDate.format(formatter))
-        tournamentDto.setRunningDate(runningDate.format(formatter))
-        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
-        tournamentService.createTournament(courseExecution.getId(), tournamentDto)
-
-        when:
-        tournamentService.getAvailableTournaments(courseExecution.getId())
-
-        then:
-        def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_AVAILABLE
-    }*/
-
     @Unroll("get the available tournaments, although there are only tournaments in #createdDateDay | #availableDateDay | #runningDateDay | #conclusionDateDay")
     def "invalid dates"() {
         given: "tournaments in different phases"
