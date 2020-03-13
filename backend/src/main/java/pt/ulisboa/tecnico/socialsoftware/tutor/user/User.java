@@ -60,11 +60,11 @@ public class User implements UserDetails {
     @ManyToMany
     private Set<CourseExecution> courseExecutions = new HashSet<>();
 
-    @ManyToMany
-    private Set<Tournament> participantTournaments;
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Tournament> participantTournaments = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator", fetch = FetchType.LAZY, orphanRemoval=true)
-    private Set<Tournament> createdTournaments;
+    private Set<Tournament> createdTournaments = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner")
     private Set<ClarificationRequest> clarificationRequests = new HashSet<>();

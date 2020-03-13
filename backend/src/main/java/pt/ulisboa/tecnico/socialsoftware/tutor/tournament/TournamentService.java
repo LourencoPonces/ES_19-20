@@ -72,9 +72,12 @@ public class TournamentService {
 
         setCreationDate(tournamentDto, tournament);
 
-
-
         entityManager.persist(tournament);
+        courseExecution.addTournament(tournament);
+        creator.addCreatedTournament(tournament);
+        creator.addParticipantTournament(tournament);
+        addTournamentToTopics(tournamentDto, courseExecution, tournament);
+;
         return new TournamentDto(tournament);
     }
 
@@ -114,6 +117,13 @@ public class TournamentService {
             } else {
                 tournament.addTopic(topic);
             }
+        }
+    }
+
+    private void addTournamentToTopics(TournamentDto tournamentDto, CourseExecution courseExecution, Tournament tournament){
+        for(TopicDto t: tournamentDto.getTopics()) {
+            Topic topic = topicRepository.findTopicByName(courseExecution.getCourse().getId(), t.getName());
+            topic.addTournament(tournament);
         }
     }
 }

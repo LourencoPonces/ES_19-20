@@ -73,6 +73,8 @@ public class Topic {
         return tournaments;
     }
 
+    public void addTournament(Tournament newTournament){ tournaments.add(newTournament); }
+
     public Topic getParentTopic() {
         return parentTopic;
     }
