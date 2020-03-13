@@ -100,7 +100,7 @@ public class ClarificationService {
 
         ClarificationRequestAnswer ans = req.getAnswer().orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_UNANSWERED));
 
-        req.setAnswer(null);
+        req.removeAnswer();
         entityManager.persist(req);
 
         entityManager.remove(ans);

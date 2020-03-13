@@ -69,4 +69,5 @@ public class ClarificationRequest {
     public void setCreationDate(LocalDateTime date) { creationDate = date; }
     public Optional<ClarificationRequestAnswer> getAnswer() { return Optional.ofNullable(answer); }
     public void setAnswer(ClarificationRequestAnswer a) { this.answer = a; }
+    public void removeAnswer() { this.setAnswer(null); }
 }
