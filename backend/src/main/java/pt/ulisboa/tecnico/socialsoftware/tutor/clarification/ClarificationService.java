@@ -44,6 +44,10 @@ public class ClarificationService {
     EntityManager entityManager;
 
 
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public ClarificationRequestAnswerDto getClarificationRequestAnswer(int studentId, int questionId) {
         User student = getStudent(studentId);
 
@@ -51,8 +55,11 @@ public class ClarificationService {
             throw new TutorException(ErrorMessage.QUESTION_NOT_FOUND, questionId);
         }
 
-        ClarificationRequest clarificationRequest = clarificationRequestRepository.getByStudentQuestion(studentId, questionId).orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_SUBMITTED, student.getUsername(), questionId));
-        ClarificationRequestAnswer answer = clarificationRequest.getAnswer().orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_UNANSWERED));
+        ClarificationRequest clarificationRequest = clarificationRequestRepository.getByStudentQuestion(studentId, questionId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_SUBMITTED, student.getUsername(), questionId));
+
+        ClarificationRequestAnswer answer = clarificationRequest.getAnswer()
+                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_UNANSWERED));
 
         return new ClarificationRequestAnswerDto(answer);
 
