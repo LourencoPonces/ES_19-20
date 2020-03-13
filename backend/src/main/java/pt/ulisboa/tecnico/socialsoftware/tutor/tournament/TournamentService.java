@@ -73,6 +73,8 @@ public class TournamentService {
         setCreationDate(tournamentDto, tournament);
 
         entityManager.persist(tournament);
+        entityManager.persist(courseExecution);
+        entityManager.persist(creator);
         courseExecution.addTournament(tournament);
         creator.addCreatedTournament(tournament);
         creator.addParticipantTournament(tournament);
@@ -124,6 +126,7 @@ public class TournamentService {
         for(TopicDto t: tournamentDto.getTopics()) {
             Topic topic = topicRepository.findTopicByName(courseExecution.getCourse().getId(), t.getName());
             topic.addTournament(tournament);
+            entityManager.persist(topic);
         }
     }
 }
