@@ -13,19 +13,16 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
-import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentService
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
-import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.StudentDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -70,18 +67,34 @@ class CreateTournamentTest extends Specification {
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
 
+        (courseExecution, course) = setupCourse()
+
+        UserDto creatorDto = setupCreator(courseExecution)
+
+        topicDtoList = setupTopic(course)
+
+        setupTournament(creatorDto, formatter, topicDtoList)
+    }
+
+    private List setupCourse() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseRepository.save(course)
 
         courseExecution = new CourseExecution(course, ACRONYM, ACADEMIC_TERM, Course.Type.TECNICO)
         courseExecutionRepository.save(courseExecution)
+        [courseExecution, course]
+    }
 
+    private UserDto setupCreator(CourseExecution courseExecution) {
         creator = new User(CREATOR_NAME, CREATOR_USERNAME, 1, User.Role.STUDENT)
         creator.getCourseExecutions().add(courseExecution)
         courseExecution.getUsers().add(creator)
         userRepository.save(creator)
         def creatorDto = new UserDto(creator);
+        creatorDto
+    }
 
+    private ArrayList<TopicDto> setupTopic(Course course) {
         def topic = new Topic();
         topic.setName("TOPIC")
         topic.setCourse(course)
@@ -90,14 +103,17 @@ class CreateTournamentTest extends Specification {
         def topicDto = new TopicDto(topic)
         topicDtoList = new ArrayList<TopicDto>();
         topicDtoList.add(topicDto)
+        topicDtoList
+    }
 
+    private void setupTournament(UserDto creatorDto, DateTimeFormatter formatter, ArrayList<TopicDto> topicDtoList) {
         tournament = new TournamentDto()
         tournament.setTitle(TOURNAMENT_TITLE)
         tournament.setKey(1)
         creationDate = LocalDateTime.now()
-        availableDate = LocalDateTime.now().plusDays(1)
-        runningDate = LocalDateTime.now().plusDays(2)
-        conclusionDate = LocalDateTime.now().plusDays(3)
+        availableDate = creationDate.plusDays(1)
+        runningDate = creationDate.plusDays(2)
+        conclusionDate = creationDate.plusDays(3)
         tournament.setNumberOfQuestions(1)
         tournament.setCreator(creatorDto)
         tournament.setCreationDate(creationDate.format(formatter))
