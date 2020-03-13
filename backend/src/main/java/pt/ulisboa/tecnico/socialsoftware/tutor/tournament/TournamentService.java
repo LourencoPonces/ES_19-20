@@ -125,4 +125,28 @@ public class TournamentService {
             entityManager.persist(topic);
         }
     }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void signUpInTournament(int tournamentId, String username){
+        Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow(() -> new TutorException(TOURNAMENT_NOT_FOUND, tournamentId));
+
+        User user = userRepository.findByUsername(username);
+
+        if (tournament.getStatus() != Tournament.Status.AVAILABLE) {
+            throw new TutorException(TOURNAMENT_NOT_AVAILABLE);
+        }
+
+        if (tournament.getParticipants().contains(user)) {
+            throw new TutorException(USER_ALREADY_SIGNED_UP_IN_TOURNAMENT);
+        }
+
+        tournament.addParticipant(user);
+        entityManager.persist(tournament);
+
+        user.addParticipantTournament(tournament);
+        entityManager.persist(user);
+    }
 }
