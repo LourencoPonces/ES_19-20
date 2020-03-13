@@ -13,6 +13,6 @@ public interface ClarificationRequestRepository extends JpaRepository<Clarificat
     @Query(value = "SELECT MAX(key) FROM clarification_requests", nativeQuery = true)
     Integer getMaxClarificationRequestKey();
 
-    @Query(value = "SELECT * FROM clarification_requests cr WHERE user_id = :sId and question_id = :qId", nativeQuery = true)
+    @Query(value = "SELECT * FROM clarification_requests cr WHERE cr.user_id = :sId and cr.question_id = :qId", nativeQuery = true)
     Optional<ClarificationRequest> getByStudentQuestion(int sId, int qId);
 }

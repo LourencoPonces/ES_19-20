@@ -41,6 +41,7 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
     static final String USERNAME_TWO = "STUDENT_TWO"
     static final String NAME = "NAME"
     static final int INEXISTENT_QUESTION_ID = -1
+    static final int INEXISTENT_USER_ID = -1
     static final int KEY_ONE = 1
     static final int KEY_TWO = 2
 
@@ -186,7 +187,7 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
 
         then: "no answer is returned"
         def exception = thrown(TutorException)
-        exception.getErrorMessage() == CLARIFICATION_REQUEST_WITH_NO_ANSWER
+        exception.getErrorMessage() == CLARIFICATION_REQUEST_UNANSWERED
     }
 
     def "the student didn't submit a clarification request for the question"() {
@@ -199,7 +200,7 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
 
         then: "an exception is thrown"
         def exception = thrown(TutorException)
-        exception.getErrorMessage() == CLARIFICATION_REQUEST_NOT_FOUND
+        exception.getErrorMessage() == CLARIFICATION_REQUEST_NOT_SUBMITTED
     }
 
     def "the question doesn't exist"() {
@@ -209,6 +210,15 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
         then: "an exception is thrown"
         def exception = thrown(TutorException)
         exception.getErrorMessage() == QUESTION_NOT_FOUND
+    }
+
+    def "the user doesn't exist"() {
+        when:
+        clarificationService.getClarificationRequestAnswer(INEXISTENT_USER_ID, question.getId())
+
+        then: "an exception is thrown"
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == USER_NOT_FOUND
     }
 
     def "the user isn't a student"() {
