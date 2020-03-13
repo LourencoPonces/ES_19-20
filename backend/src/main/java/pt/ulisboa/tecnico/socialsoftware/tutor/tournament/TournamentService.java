@@ -60,10 +60,6 @@ public class TournamentService {
 
         User creator = userRepository.findByUsername(tournamentDto.getCreator().getUsername());
 
-        if (tournamentDto.getStatus() == null) {
-            tournamentDto.setStatus(Tournament.Status.CREATED);
-        }
-
         Tournament tournament = new Tournament(tournamentDto);
 
         checkTopics(tournamentDto, courseExecution, tournament);

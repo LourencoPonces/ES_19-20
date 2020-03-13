@@ -7,6 +7,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
@@ -184,25 +186,27 @@ public class User implements UserDetails {
         return createdTournaments;
     }
 
-    public Tournament getCreatedTournament(Integer createdTournamentId){
-        return createdTournaments.stream().filter(tournament -> tournament.getId() == createdTournamentId).collect(Collectors.toList()).get(0);
+    public Tournament getCreatedTournament(Integer createdTournamentId) {
+        return createdTournaments.stream().filter(tournament -> tournament.getId() == createdTournamentId)
+                .findFirst().orElseThrow(() -> new TutorException(ErrorMessage.TOURNAMENT_NOT_FOUND, createdTournamentId));
     }
 
-    public void addParticipantTournament(Tournament newParticipantTournament){
+    public void addParticipantTournament(Tournament newParticipantTournament) {
         participantTournaments.add(newParticipantTournament);
     }
 
-    public void removeParticipantTournament(Integer participantTournamentId){
+    public void removeParticipantTournament(Integer participantTournamentId) {
         Tournament createdTournament = getCreatedTournament(participantTournamentId);
         createdTournaments.remove(participantTournamentId);
     }
 
-    public Set<Tournament> getParticipantTournaments(){
+    public Set<Tournament> getParticipantTournaments() {
         return participantTournaments;
     }
 
-    public Tournament getParticipantTournament(Integer participantTournamentId){
-        return participantTournaments.stream().filter(tournament -> tournament.getId() == participantTournamentId).collect(Collectors.toList()).get(0);
+    public Tournament getParticipantTournament(Integer participantTournamentId) {
+        return participantTournaments.stream().filter(tournament -> tournament.getId() == participantTournamentId)
+                .findFirst().orElseThrow(() -> new TutorException(ErrorMessage.TOURNAMENT_NOT_FOUND, participantTournamentId));
     }
 
     public Integer getNumberOfTeacherQuizzes() {

@@ -15,12 +15,12 @@ public class TournamentDto implements Serializable {
     private Integer id;
     private Integer key;
     private String title;
-    private Tournament.Status status;
     private String creationDate = null;
     private String availableDate = null;
     private String runningDate = null;
     private String conclusionDate = null;
     private Integer numberOfQuestions;
+    private boolean isCancelled;
 
     private UserDto creator;
     private List<UserDto> participants = new ArrayList<>();
@@ -36,7 +36,6 @@ public class TournamentDto implements Serializable {
         this.id = tournament.getId();
         this.key = tournament.getKey();
         this.title = tournament.getTitle();
-        this.status = tournament.getStatus();
         this.numberOfQuestions = tournament.getNumberOfQuestions();
 
         if (tournament.getCreationDate() != null)
@@ -74,11 +73,22 @@ public class TournamentDto implements Serializable {
     }
 
     public Tournament.Status getStatus() {
-        return status;
-    }
+        if (isCancelled) return Tournament.Status.CANCELLED;
 
-    public void setStatus(Tournament.Status status) {
-        this.status = status;
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime creationDate = getCreationDateDate();
+        LocalDateTime availableDate = getAvailableDateDate();
+        LocalDateTime runningDate = getRunningDateDate();
+        LocalDateTime conclusionDate = getConclusionDateDate();
+
+        if (now.isAfter(creationDate) && now.isBefore(availableDate))
+            return Tournament.Status.CREATED;
+        else if (now.isAfter(availableDate) && now.isBefore(runningDate))
+            return Tournament.Status.AVAILABLE;
+        else if (now.isAfter(runningDate) && now.isBefore(conclusionDate))
+            return Tournament.Status.RUNNING;
+        else
+            return Tournament.Status.FINISHED;
     }
 
     public String getCreationDate() {
@@ -172,7 +182,4 @@ public class TournamentDto implements Serializable {
         }
         return LocalDateTime.parse(getConclusionDate(), formatter);
     }
-
-
-
 }
