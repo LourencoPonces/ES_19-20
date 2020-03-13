@@ -202,20 +202,6 @@ class CreateTournamentTest extends Specification {
         tournamentRepository.count() == 0L
     }
 
-    def "create a tournament with available date after conclusion"() {
-        given: 'a conclusion date before the available date'
-        conclusionDate = availableDate.minusDays(1)
-        tournament.setConclusionDate(conclusionDate.format(formatter))
-
-        when:
-        tournamentService.createTournament(courseExecution.getId(), tournament)
-
-        then:
-        def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_CONSISTENT
-        tournamentRepository.count() == 0L
-    }
-
     @Unroll("invalid dates: #availableDateDay | #runningDateDay | #conclusionDateDay || #errorMessage")
     def "invalid dates"() {
         given: "dates relative to creationDate"
