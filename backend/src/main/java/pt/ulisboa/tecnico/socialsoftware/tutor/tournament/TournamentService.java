@@ -145,5 +145,8 @@ public class TournamentService {
 
         tournament.addParticipant(user);
         entityManager.persist(tournament);
+
+        user.addParticipantTournament(tournament);
+        entityManager.persist(user);
     }
 }
