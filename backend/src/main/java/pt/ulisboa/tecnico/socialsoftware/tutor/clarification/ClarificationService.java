@@ -45,7 +45,17 @@ public class ClarificationService {
 
 
     public ClarificationRequestAnswerDto getClarificationRequestAnswer(int studentId, int questionId) {
-        return null;
+        User student = getStudent(studentId);
+
+        if (!questionRepository.existsById(questionId)) {
+            throw new TutorException(ErrorMessage.QUESTION_NOT_FOUND, questionId);
+        }
+
+        ClarificationRequest clarificationRequest = clarificationRequestRepository.getByStudentQuestion(studentId, questionId).orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_SUBMITTED, student.getUsername(), questionId));
+        ClarificationRequestAnswer answer = clarificationRequest.getAnswer().orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_UNANSWERED));
+
+        return new ClarificationRequestAnswerDto(answer);
+
     }
 
     @Retryable(

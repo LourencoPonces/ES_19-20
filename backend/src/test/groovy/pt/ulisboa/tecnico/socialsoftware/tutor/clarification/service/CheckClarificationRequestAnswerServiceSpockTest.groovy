@@ -10,6 +10,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationServic
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequestAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
@@ -29,7 +30,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
-@Ignore
+
 @DataJpaTest
 class CheckClarificationRequestAnswerSpockTest extends Specification {
     static final String COURSE_NAME = "Software Architecture"
@@ -40,6 +41,7 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
     static final String USERNAME_TWO = "STUDENT_TWO"
     static final String NAME = "NAME"
     static final int INEXISTENT_QUESTION_ID = -1
+    static final int INEXISTENT_USER_ID = -1
     static final int KEY_ONE = 1
     static final int KEY_TWO = 2
 
@@ -71,9 +73,9 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
     @Autowired
     ClarificationService clarificationService
 
-/*    @Autowired
+    @Autowired
     ClarificationRequestAnswerRepository clarificationRequestAnswerRepository
-*/
+
     def clarificationRequest
     def student
     def question
@@ -166,14 +168,16 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
         answer.setRequest(clarificationRequest)
         answer.setContent(CONTENT)
         clarificationRequestAnswerRepository.save(answer)
+        clarificationRequest.setAnswer(answer)
+        clarificationRequestRepository.save(clarificationRequest)
 
         when:
-        def result = clarificationService.getClarificationRequestAnswer(student.geId(), question.getId())
+        def result = clarificationService.getClarificationRequestAnswer(student.getId(), question.getId())
 
         then:"the correct answer is returned"
         result != null
         result.getContent() != null
-        result.getCreator() == student.getId()
+        result.getCreator() == teacher.getId()
         result.getRequestId() == clarificationRequest.getId()
     }
 
@@ -183,7 +187,7 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
 
         then: "no answer is returned"
         def exception = thrown(TutorException)
-        exception.getErrorMessage() == CLARIFICATION_REQUEST_WITH_NO_ANSWER
+        exception.getErrorMessage() == CLARIFICATION_REQUEST_UNANSWERED
     }
 
     def "the student didn't submit a clarification request for the question"() {
@@ -196,7 +200,7 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
 
         then: "an exception is thrown"
         def exception = thrown(TutorException)
-        exception.getErrorMessage() == CLARIFICATION_REQUEST_NOT_FOUND
+        exception.getErrorMessage() == CLARIFICATION_REQUEST_NOT_SUBMITTED
     }
 
     def "the question doesn't exist"() {
@@ -206,6 +210,15 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
         then: "an exception is thrown"
         def exception = thrown(TutorException)
         exception.getErrorMessage() == QUESTION_NOT_FOUND
+    }
+
+    def "the user doesn't exist"() {
+        when:
+        clarificationService.getClarificationRequestAnswer(INEXISTENT_USER_ID, question.getId())
+
+        then: "an exception is thrown"
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == USER_NOT_FOUND
     }
 
     def "the user isn't a student"() {
