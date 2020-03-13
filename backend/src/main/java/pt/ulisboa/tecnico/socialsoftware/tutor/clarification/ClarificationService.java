@@ -19,6 +19,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepos
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
@@ -55,6 +56,47 @@ public class ClarificationService {
 
         return new ClarificationRequestAnswerDto(answer);
 
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public ClarificationRequestAnswerDto submitClarificationRequestAnswer(int teacherId, int reqId, String answerText) {
+        User teacher = getTeacher(teacherId);
+
+        ClarificationRequest req = clarificationRequestRepository.findById(reqId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, reqId));
+
+        // Create/update answer
+        ClarificationRequestAnswer ans = req.getAnswer().orElseGet(ClarificationRequestAnswer::new);
+        ans.setContent(answerText);
+        ans.setCreationDate(LocalDateTime.now());
+        ans.setCreator(teacher);
+        ans.setRequest(req);
+
+        req.setAnswer(ans);
+
+        entityManager.persist(ans);
+        entityManager.persist(req);
+
+        return new ClarificationRequestAnswerDto(ans);
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void removeClarificationRequestAnswer(int reqId) {
+        ClarificationRequest req = clarificationRequestRepository.findById(reqId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, reqId));
+
+        ClarificationRequestAnswer ans = req.getAnswer().orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_UNANSWERED));
+
+        req.setAnswer(null);
+        entityManager.persist(req);
+
+        entityManager.remove(ans);
     }
 
     @Retryable(
@@ -127,6 +169,15 @@ public class ClarificationService {
         User user = userRepository.findById(userId).orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, userId));
 
         if (user.getRole() != User.Role.STUDENT) {
+            throw new TutorException(ErrorMessage.ACCESS_DENIED);
+        }
+        return user;
+    }
+
+    private User getTeacher(int userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, userId));
+
+        if (user.getRole() != User.Role.TEACHER) {
             throw new TutorException(ErrorMessage.ACCESS_DENIED);
         }
         return user;
