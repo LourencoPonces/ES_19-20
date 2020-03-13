@@ -40,8 +40,8 @@ public class Tournament {
     @Column(nullable = false)
     private String title = "Title";
 
-    @Enumerated(EnumType.STRING)
-    private Status status;
+    @Column(columnDefinition = "boolean default false")
+    private boolean isCancelled;
 
     @Column(name = "number_of_questions")
     private Integer numberOfQuestions;
@@ -57,7 +57,7 @@ public class Tournament {
     @JoinColumn(name = "creator_id")
     private User creator;
 
-    @ManyToMany(mappedBy = "tournaments")
+    @ManyToMany(mappedBy = "participantTournaments")
     private Set<User> participants = new HashSet<>();
 
     public Tournament() {}
@@ -105,7 +105,6 @@ public class Tournament {
     public void setAvailableDate(LocalDateTime availableDate) {
         checkAvailableDate(availableDate);
         this.availableDate = availableDate;
-        updateStatus();
     }
 
     public LocalDateTime getRunningDate() {
@@ -115,7 +114,6 @@ public class Tournament {
     public void setRunningDate(LocalDateTime runningDate) {
         checkRunningDate(runningDate);
         this.runningDate = runningDate;
-        updateStatus();
     }
 
     public LocalDateTime getConclusionDate() {
@@ -125,7 +123,6 @@ public class Tournament {
     public void setConclusionDate(LocalDateTime conclusionDate) {
         checkConclusionDate(conclusionDate);
         this.conclusionDate = conclusionDate;
-        updateStatus();
     }
 
     public String getTitle() {
@@ -138,7 +135,17 @@ public class Tournament {
     }
 
     public Status getStatus() {
-        return status;
+        if (isCancelled) return Status.CANCELLED;
+
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isAfter(creationDate) && now.isBefore(availableDate))
+            return Status.CREATED;
+        else if (now.isAfter(availableDate) && now.isBefore(runningDate))
+            return Status.AVAILABLE;
+        else if (now.isAfter(runningDate) && now.isBefore(conclusionDate))
+            return Status.RUNNING;
+        else
+            return Status.FINISHED;
     }
 
     public Integer getNumberOfQuestions() {
@@ -184,7 +191,7 @@ public class Tournament {
     }
 
     public void cancel(){
-        status = Status.CANCELLED;
+        isCancelled = true;
     }
 
     @Override
@@ -197,7 +204,6 @@ public class Tournament {
                 ", runningDate=" + runningDate +
                 ", conclusionDate=" + conclusionDate +
                 ", title='" + title + '\'' +
-                ", status=" + status +
                 '}';
     }
 
@@ -253,45 +259,6 @@ public class Tournament {
         checkAvailableDate(this.availableDate);
         checkRunningDate(this.runningDate);
         checkConclusionDate(this.conclusionDate);
-
-        updateStatus();
     }
-
-    private void updateStatus() {
-        LocalDateTime now = LocalDateTime.now();
-        if (now.isAfter(creationDate) && now.isBefore(availableDate))
-            status = Status.CREATED;
-        else if (now.isAfter(availableDate) && now.isBefore(runningDate))
-            status = Status.AVAILABLE;
-        else if (now.isAfter(runningDate) && now.isBefore(conclusionDate))
-            status = Status.RUNNING;
-        else
-            status = Status.FINISHED;
-    }
-
-    //TODO: Not needed
-    /*
-    private void checkStatus(Status status) {
-        LocalDateTime now = LocalDateTime.now();
-        if (!((status == Status.CREATED
-                && (now.isEqual(creationDate)   || now.isAfter(creationDate))
-                && (now.isEqual(availableDate)  || now.isBefore(availableDate)))
-
-                || (status == Status.AVAILABLE
-                && (now.isEqual(availableDate)  || now.isAfter(availableDate))
-                && (now.isEqual(runningDate)    || now.isBefore(runningDate)))
-
-                || (status == Status.RUNNING
-                && (now.isEqual(runningDate)    || now.isAfter(runningDate))
-                && (now.isEqual(conclusionDate) || now.isBefore(conclusionDate)))
-
-                || (status == Status.FINISHED
-                && (now.isEqual(conclusionDate) || now.isAfter(conclusionDate)))
-
-                || status == Status.CANCELLED
-        )) {
-            throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "State");
-        }
-    }*/
 
 }
