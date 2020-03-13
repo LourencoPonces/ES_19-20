@@ -13,7 +13,8 @@ public enum ErrorMessage {
     NO_TOPICS("The question has no Topics"),
     ASSESSMENT_NOT_FOUND("Assessment not found with id %d"),
     TOPIC_CONJUNCTION_NOT_FOUND("Topic Conjunction not found with id %d"),
-    COURSE_EXECUTION_NOT_FOUND("Course execution not found with name %d"),
+    COURSE_EXECUTION_NOT_FOUND("Course execution not found with id %d"),
+    TOURNAMENT_NOT_FOUND("Tournament not found with id %d"),
 
     INVALID_JUSTIFICATION("The justification \"%s\" is invalid"),
     CANNOT_REJECT_ACCEPTED_SUGGESTION("Cannot reject already accepted suggestion"),
@@ -23,6 +24,7 @@ public enum ErrorMessage {
     COURSE_TYPE_NOT_DEFINED("The course type is not defined"),
     COURSE_EXECUTION_ACRONYM_IS_EMPTY("The course execution acronym is empty"),
     COURSE_EXECUTION_ACADEMIC_TERM_IS_EMPTY("The course execution academic term is empty"),
+    CANNOT_DELETE_COURSE_EXECUTION("The course execution cannot be deleted %s"),
     USERNAME_NOT_FOUND("Username %s not found"),
 
     QUIZ_USER_MISMATCH("Quiz %s is not assigned to student %s"),
@@ -60,13 +62,23 @@ public enum ErrorMessage {
     AUTHENTICATION_ERROR("Authentication Error"),
     FENIX_CONFIGURATION_ERROR("Incorrect server configuration files for fenix"),
 
+    TOURNAMENT_NOT_CONSISTENT("Field %s of tournament is not consistent"),
+    TOURNAMENT_NOT_AVAILABLE("There aren't any available tournaments"),
+    USER_ALREADY_SIGNED_UP_IN_TOURNAMENT("User already sign-up in tournament"),
+    TOURNAMENT_CREATED_BY_NON_STUDENT("Tournament created by non-student"),
+    USER_NOT_ENROLLED_IN_COURSE_EXECUTION("User not enrolled in course execution %s"),
+
 
     ACCESS_DENIED("You do not have permission to view this resource"),
     CANNOT_OPEN_FILE("Cannot open file"),
 
     CLARIFICATION_REQUEST_MISSING_CONTENT("Missing content of clarification request"),
     QUESTION_NOT_ANSWERED_BY_STUDENT("Question with id %d wasn't answered by student %d"),
-    DUPLICATE_CLARIFICATION_REQUEST("Student %s already submitted a clarification request for question with id %d");
+    DUPLICATE_CLARIFICATION_REQUEST("Student %s already submitted a clarification request for question with id %d"),
+    CLARIFICATION_REQUEST_NOT_FOUND("Clarification Request not found with id %d"),
+    CLARIFICATION_REQUEST_NOT_SUBMITTED("Student %s didn't submit a clarification request for the question with id %d"),
+    CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT("Missing content of clarification request answer"),
+    CLARIFICATION_REQUEST_UNANSWERED("The clarification request wasn't answered yet");
 
     public final String label;
 

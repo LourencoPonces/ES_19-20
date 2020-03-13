@@ -129,16 +129,16 @@ class CheckStudentQuestionStatusTest extends Specification {
         given: 'no questions'
 
         when:
-        List<StudentQuestionDTO> result = studentCheckQuestionStatusService.getAllStudentQuestion(student.getId()).collect(Collectors.toList());
+        def result = studentCheckQuestionStatusService.getAllStudentQuestion(student.getId())
 
         then:
-        result.size() == 0;
+        result.count() == 0;
     }
 
     def "teacher checks suggestion"() {
         given: 'a question'
         // studentQuestion
-        StudentQuestion studentQuestion = createStudentQuestion(student, course)
+        def studentQuestion = createStudentQuestion(student, course)
         studentQuestionRepository.save(studentQuestion)
 
         // get studentQuestionId
@@ -158,7 +158,7 @@ class CheckStudentQuestionStatusTest extends Specification {
 
     def "check status of existing single suggestion accepted:#isAccepted, rejected:#isRejected)"() {
         given: 'a submitted question'
-        StudentQuestion studentQuestion = createStudentQuestion(student, course)
+        def studentQuestion = createStudentQuestion(student, course)
         evaluateQuestion(isAccepted, isRejected, studentQuestion)
         studentQuestionRepository.save(studentQuestion)
 
@@ -178,22 +178,22 @@ class CheckStudentQuestionStatusTest extends Specification {
 
     def "check status of multiple suggestions"() {
         given: 'a pending question'
-        StudentQuestion pendingQuestion = createStudentQuestion(student, course)
+        def pendingQuestion = createStudentQuestion(student, course)
         studentQuestionRepository.save(pendingQuestion)
 
         and: 'an approved question'
-        StudentQuestion approvedQuestion = createStudentQuestion(student, course)
+        def approvedQuestion = createStudentQuestion(student, course)
         evaluateQuestion(true, false, approvedQuestion)
         studentQuestionRepository.save(approvedQuestion)
 
         and: 'a rejected question'
-        StudentQuestion rejectedQuestion = createStudentQuestion(student, course)
+        def rejectedQuestion = createStudentQuestion(student, course)
         evaluateQuestion(false, true, rejectedQuestion)
         studentQuestionRepository.save(rejectedQuestion)
 
 
         when:
-        List<StudentQuestion> questions = studentCheckQuestionStatusService.getAllStudentQuestion(student.getId()).collect(Collectors.toList());
+        def questions = studentCheckQuestionStatusService.getAllStudentQuestion(student.getId()).collect(Collectors.toList());
 
         then:
         questions.size() == 3;
@@ -203,9 +203,9 @@ class CheckStudentQuestionStatusTest extends Specification {
 
     }
 
-    def numberOfQuestionsWithStatus(List<StudentQuestion> questions, StudentQuestion.SubmittedStatus status) {
+    def numberOfQuestionsWithStatus(List<StudentQuestionDTO> questions, StudentQuestion.SubmittedStatus status) {
         def out = 0
-        for(StudentQuestion question : questions) {
+        for(StudentQuestionDTO question : questions) {
             if(question.getSubmittedStatus() == status)
                 out += 1
         }
