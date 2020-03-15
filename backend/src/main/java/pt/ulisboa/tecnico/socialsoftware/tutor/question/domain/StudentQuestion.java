@@ -5,6 +5,7 @@ import javax.persistence.*;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 
@@ -54,6 +55,12 @@ public class StudentQuestion extends Question {
             submittedStatus = questionDto.getSubmittedStatus();
         }
         justification = questionDto.getJustification();
+
+        for (TopicDto topicDto : questionDto.getTopics()) {
+            Topic t = new Topic(course, topicDto);
+            addTopic(t);
+        }
+
     }
 
     @Override
@@ -84,5 +91,22 @@ public class StudentQuestion extends Question {
         if(user.getRole() != User.Role.STUDENT) {
             throw new TutorException(ACCESS_DENIED);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "StudentQuestion{" +
+                "id=" + id +
+                ", key=" + getKey() +
+                ", studentQuestionKey=" + studentQuestionKey +
+                ", content='" + getContent() + '\'' +
+                ", title='" + getTitle() + '\'' +
+                ", numberOfAnswers=" + getNumberOfAnswers() +
+                ", numberOfCorrect=" + getNumberOfCorrect() +
+                ", status=" + getStatus() +
+                ", image=" + getImage() +
+                ", options=" + getOptions() +
+                ", topics=" + getTopics() +
+                '}';
     }
 }
