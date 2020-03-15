@@ -25,7 +25,7 @@ public class StudentQuestionController {
      * ===========================================
      */
 
-    @PostMapping("courses/{courseId}/studentQuestions/")
+    @PostMapping("courses/{courseId}/studentQuestions")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#courseId, 'COURSE.ACCESS')")
     public StudentQuestionDTO createStudentQuestion(@PathVariable int courseId, @Valid @RequestBody StudentQuestionDTO studentQuestion, Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
