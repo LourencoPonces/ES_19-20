@@ -22,15 +22,17 @@ public class StudentQuestionController {
     CheckStudentQuestionStatusService checkStudentQuestionStatusService;
 
 
+//    @GetMapping("/courses/{courseId}/studentQuestions")
+//    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#executionId, 'EXECUTION.ACCESS')") // TODO: check this
+//    public void getAllSuggestedQuestionStatus(@PathVariable int studentQuestionID, @PathVariable int courseID) {
+//        // gets all student questions
+//        return;
+//    }
 
-
-    @GetMapping("/courses/{courseId}/studentQuestions")
-    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
-    public void getAllSuggestedQuestionStatus(@PathVariable int studentQuestionID, @PathVariable int courseID) {
-        // gets all student questions
-        return;
-    }
-
+    /* ===========================================
+     * F3: Student check suggested question status
+     * ===========================================
+     */
     // get all suggested student questions of a given course
     @GetMapping("/courses/{courseId}/studentQuestions/{studentId}")
     @PreAuthorize("hasRole('ROLE_STUDENT')") // TODO: check this
