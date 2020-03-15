@@ -30,13 +30,17 @@ public class CheckStudentQuestionStatusService {
     @Autowired
     StudentQuestionRepository studentQuestionRepository;
 
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public Stream<StudentQuestionDTO> getAllStudentQuestion(Integer studentId) {
 
         User user = userRepository.findById(studentId).orElseThrow(() -> new TutorException(USER_NOT_FOUND, studentId));
         if(user.getRole() == User.Role.TEACHER) {
             throw new TutorException(ACCESS_DENIED);
         }
-        return studentQuestionRepository.findByUser(studentId).map(StudentQuestionDTO::new);
+        return studentQuestionRepository.findByUser(studentId).stream().map(StudentQuestionDTO::new);
     }
 
     @Retryable(
@@ -47,6 +51,19 @@ public class CheckStudentQuestionStatusService {
         return studentQuestionRepository.findByCourse(courseId).stream().map(StudentQuestionDTO::new).collect(Collectors.toList());
     }
 
-    // not needed yet
-    // public List<StudentQuestionDTO> getAllQuestionsWithStatus(Integer studentId, StudentQuestion.SubmittedStatus status) {}
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<StudentQuestionDTO> findByCourseAndUser(Integer courseId, Integer studentId) {
+        return studentQuestionRepository.findByCourseAndUser(courseId, studentId).stream().map(StudentQuestionDTO::new).collect(Collectors.toList());
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<StudentQuestionDTO> findByCourseUserAndStatus(Integer courseId, Integer studentId, StudentQuestion.SubmittedStatus status) {
+        return studentQuestionRepository.findByCourseUserAndStatus(courseId, studentId, status).stream().map(StudentQuestionDTO::new).collect(Collectors.toList());
+    }
 }
