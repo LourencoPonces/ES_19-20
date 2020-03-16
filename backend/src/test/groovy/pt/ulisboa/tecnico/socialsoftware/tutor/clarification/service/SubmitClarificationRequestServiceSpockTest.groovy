@@ -99,6 +99,8 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         userRepository.save(student)
         quizAnswerRepository.save(quizAnswer)
 
+
+        clarificationRequestDto = new ClarificationRequestDto()
         questionId = question.getId()
         studentId = student.getId()
     }
@@ -149,7 +151,8 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
     def "the question has been answered and submit request"() {
         //the clarification request is created
         when:
-        clarificationRequestDto = clarificationService.submitClarificationRequest(CONTENT, questionId, studentId, new ClarificationRequestDto())
+        clarificationRequestDto.setContent(CONTENT)
+        clarificationRequestDto = clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
 
         then:"request is created and is in the repository"
         clarificationRequestRepository.count() == 1L
@@ -167,11 +170,13 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
     def "same student submits 2 requests for the same question"() {
         //throw exception
         given: "a second clarification request dto"
+        clarificationRequestDto.setContent(CONTENT)
         def clarificationDto2 = new ClarificationRequestDto()
+        clarificationDto2.setContent(CONTENT)
 
         when:
-        clarificationService.submitClarificationRequest(CONTENT, questionId, studentId, new ClarificationRequestDto())
-        clarificationService.submitClarificationRequest(CONTENT, questionId, studentId, clarificationDto2)
+        clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
+        clarificationService.submitClarificationRequest(questionId, studentId, clarificationDto2)
 
         then: "only the first one is saved and exception thrown"
         def exception = thrown(TutorException)
@@ -193,7 +198,8 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         changeStudentId(has_answered, student2)
         changeQuestionId(is_question)
         changeUserRole(is_student)
-        clarificationService.submitClarificationRequest(content, questionId, studentId, new ClarificationRequestDto())
+        clarificationRequestDto.setContent(content)
+        clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
 
         then:
         def exception = thrown(TutorException)
