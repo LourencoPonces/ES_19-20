@@ -14,8 +14,9 @@ import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 @Entity
 @Table(
         name = "student_question",
+        uniqueConstraints=@UniqueConstraint(columnNames = {"student_question_key", "user_id"}),
         indexes = {
-                @Index(name = "question_indx_0", columnList = "student_question_key")
+                @Index(name = "student_question_indx_0", columnList="student_question_key, user_id")
         })
 public class StudentQuestion extends Question {
 
@@ -28,7 +29,8 @@ public class StudentQuestion extends Question {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(unique=true, nullable = false, name="student_question_key")
+
+    @Column(name="student_question_key")
     private Integer studentQuestionKey;
 
 
