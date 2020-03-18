@@ -57,13 +57,13 @@ public class StudentQuestionController {
      */
     // get all suggested student questions of a given course
     @GetMapping("/courses/{courseId}/studentQuestions/{studentId}")
-    @PreAuthorize("hasRole('ROLE_STUDENT')") // TODO: check this
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#courseId, 'COURSE.ACCESS')") // TODO: check this
     public List<StudentQuestionDTO> getStudentSuggestedQuestionStatus(@PathVariable int studentQuestionID, @PathVariable int courseID) {
         return checkStudentQuestionStatusService.findByCourseAndUser(studentQuestionID, courseID);
     }
 
     @GetMapping("/courses/{courseId}/studentQuestions/{studentId}/{status}")
-    @PreAuthorize("hasRole('ROLE_STUDENT')") // TODO: check this
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#courseId, 'COURSE.ACCESS')") // TODO: check this
     public List<StudentQuestionDTO> getStudentSuggestedQuestionStatus(@PathVariable int studentQuestionID, @PathVariable int courseID, @PathVariable String status) {
         StudentQuestion.SubmittedStatus s;
         switch (status) {
