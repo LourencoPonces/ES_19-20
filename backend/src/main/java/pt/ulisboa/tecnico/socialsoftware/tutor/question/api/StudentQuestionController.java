@@ -56,15 +56,26 @@ public class StudentQuestionController {
      * ===========================================
      */
     // get all suggested student questions of a given course
-    @GetMapping("/courses/{courseId}/studentQuestions/{studentId}")
+    @GetMapping("/courses/{courseId}/studentQuestions/")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#courseId, 'COURSE.ACCESS')") // TODO: check this
-    public List<StudentQuestionDTO> getStudentSuggestedQuestionStatus(@PathVariable int studentQuestionID, @PathVariable int courseID) {
-        return checkStudentQuestionStatusService.findByCourseAndUser(studentQuestionID, courseID);
+    public List<StudentQuestionDTO> getStudentSuggestedQuestionStatus(@PathVariable int courseID, Principal principal) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        if(user == null){
+            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
+        }
+        return checkStudentQuestionStatusService.findByCourseAndUser(user.getId(), courseID);
     }
 
-    @GetMapping("/courses/{courseId}/studentQuestions/{studentId}/{status}")
+    @GetMapping("/courses/{courseId}/studentQuestions/{status}")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#courseId, 'COURSE.ACCESS')") // TODO: check this
-    public List<StudentQuestionDTO> getStudentSuggestedQuestionStatus(@PathVariable int studentQuestionID, @PathVariable int courseID, @PathVariable String status) {
+    public List<StudentQuestionDTO> getStudentSuggestedQuestionStatus(@PathVariable int courseID, @PathVariable String status, Principal principal) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        if(user == null){
+            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
+        }
+
         StudentQuestion.SubmittedStatus s;
         switch (status) {
             case "approved":
@@ -77,10 +88,10 @@ public class StudentQuestionController {
                 s = StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL;
                 break;
             case "all":
-                return checkStudentQuestionStatusService.findByCourseAndUser(studentQuestionID, courseID);
+                return checkStudentQuestionStatusService.findByCourseAndUser(user.getId(), courseID);
             default:
                 throw new TutorException(ErrorMessage.INVALID_STATUS, status);
         }
-        return checkStudentQuestionStatusService.findByCourseUserAndStatus(studentQuestionID, courseID, s);
+        return checkStudentQuestionStatusService.findByCourseUserAndStatus(user.getId(), courseID, s);
     }
 }
