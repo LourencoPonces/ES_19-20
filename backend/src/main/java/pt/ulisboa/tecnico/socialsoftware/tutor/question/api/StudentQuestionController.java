@@ -14,20 +14,42 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
 import java.util.List;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.StudentSubmitQuestionService;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO;
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
+import javax.validation.Valid;
+
+import java.security.Principal;
+
 
 @RestController
 public class StudentQuestionController {
 
     @Autowired
+    StudentSubmitQuestionService studentSubmitQuestionService;
+
+    @Autowired
     CheckStudentQuestionStatusService checkStudentQuestionStatusService;
 
 
-//    @GetMapping("/courses/{courseId}/studentQuestions")
-//    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#executionId, 'EXECUTION.ACCESS')") // TODO: check this
-//    public void getAllSuggestedQuestionStatus(@PathVariable int studentQuestionID, @PathVariable int courseID) {
-//        // gets all student questions
-//        return;
-//    }
+    /* ===========================================
+     * F1: Student check suggested question status
+     * ===========================================
+     */
+    @PostMapping("courses/{courseId}/studentQuestions")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#courseId, 'COURSE.ACCESS')")
+    public StudentQuestionDTO createStudentQuestion(@PathVariable int courseId, @Valid @RequestBody StudentQuestionDTO studentQuestion, Principal principal) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        if(user == null){
+            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
+        }
+        return studentSubmitQuestionService.studentSubmitQuestion(courseId, studentQuestion, user.getId());
+    }
 
     /* ===========================================
      * F3: Student check suggested question status
