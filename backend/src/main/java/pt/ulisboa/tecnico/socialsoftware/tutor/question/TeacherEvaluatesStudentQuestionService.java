@@ -8,9 +8,12 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository;
 
 import java.sql.SQLException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
@@ -23,25 +26,33 @@ public class TeacherEvaluatesStudentQuestionService {
 
     public void TeacherEvaluatesStudentQuestionService() {}
 
-    public void acceptStudentQuestion(Integer studentQuestionId) {
+
+
+    public List<StudentQuestionDTO> getAllStudentQuestions(int courseId) {
+        return studentQuestionRepository.findByCourse(courseId).stream().map(StudentQuestionDTO::new).collect(Collectors.toList());
+    }
+
+    public StudentQuestionDTO acceptStudentQuestion(Integer studentQuestionId) {
         // not checking justification because it was not provided
         StudentQuestion studentQuestion = findStudentQuestionById(studentQuestionId);
 
         studentQuestion.setSubmittedStatus(StudentQuestion.SubmittedStatus.APPROVED);
         studentQuestion.setJustification("");
+        return new StudentQuestionDTO(studentQuestion);
     }
 
-    public void acceptStudentQuestion(Integer studentQuestionId, String justification) {
+    public StudentQuestionDTO acceptStudentQuestion(Integer studentQuestionId, String justification) {
         checkJustification(justification);
 
         StudentQuestion studentQuestion = findStudentQuestionById(studentQuestionId);
 
         studentQuestion.setSubmittedStatus(StudentQuestion.SubmittedStatus.APPROVED);
         studentQuestion.setJustification(justification);
+        return new StudentQuestionDTO(studentQuestion);
     }
 
 
-    public void rejectStudentQuestion(Integer studentQuestionId, String justification) {
+    public StudentQuestionDTO rejectStudentQuestion(Integer studentQuestionId, String justification) {
         checkJustification(justification);
 
         StudentQuestion studentQuestion = findStudentQuestionById(studentQuestionId);
@@ -52,6 +63,7 @@ public class TeacherEvaluatesStudentQuestionService {
 
         studentQuestion.setSubmittedStatus(StudentQuestion.SubmittedStatus.REJECTED);
         studentQuestion.setJustification(justification);
+        return new StudentQuestionDTO(studentQuestion);
     }
 
 
