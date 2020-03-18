@@ -36,38 +36,4 @@ public class StudentQuestionController {
         return studentSubmitQuestionService.studentSubmitQuestion(courseId, studentQuestion, user.getId());
     }
 
-
-
-    /* ===========================================
-     * F3: Student check suggested question status
-     * ===========================================
-     */
-    // get all suggested student questions of a given course
-    /*@GetMapping("/courses/{courseId}/studentQuestions/{studentId}")
-    @PreAuthorize("hasRole('ROLE_STUDENT')") // TODO: check this
-    public List<StudentQuestionDTO> getStudentSuggestedQuestionStatus(@PathVariable int studentQuestionID, @PathVariable int courseID) {
-        return checkStudentQuestionStatusService.findByCourseAndUser(studentQuestionID, courseID);
-    }
-
-    @GetMapping("/courses/{courseId}/studentQuestions/{studentId}/{status}")
-    @PreAuthorize("hasRole('ROLE_STUDENT')") // TODO: check this
-    public List<StudentQuestionDTO> getStudentSuggestedQuestionStatus(@PathVariable int studentQuestionID, @PathVariable int courseID, @PathVariable String status) {
-        StudentQuestion.SubmittedStatus s;
-        switch (status) {
-            case "approved":
-                s = StudentQuestion.SubmittedStatus.APPROVED;
-                break;
-            case "rejected":
-                s = StudentQuestion.SubmittedStatus.REJECTED;
-                break;
-            case "pending":
-                s = StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL;
-                break;
-            case "all":
-                return checkStudentQuestionStatusService.findByCourseAndUser(studentQuestionID, courseID);
-            default:
-                throw new TutorException(ErrorMessage.INVALID_STATUS, status);
-        }
-        return checkStudentQuestionStatusService.findByCourseUserAndStatus(studentQuestionID, courseID, s);
-    }*/
 }
