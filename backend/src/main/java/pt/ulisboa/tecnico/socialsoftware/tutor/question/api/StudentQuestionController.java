@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.StudentSubmitQuestionService;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import javax.validation.Valid;
@@ -33,6 +34,8 @@ public class StudentQuestionController {
         if(user == null){
             throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
         }
+
+        studentQuestion.setSubmittedStatus(StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL); // ensure it is pending
         return studentSubmitQuestionService.studentSubmitQuestion(courseId, studentQuestion, user.getId());
     }
 
