@@ -39,20 +39,10 @@ public class TeacherEvaluatesStudentQuestionService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public StudentQuestionDTO acceptStudentQuestion(Integer studentQuestionId) {
-        // not checking justification because it was not provided
-        StudentQuestion studentQuestion = findStudentQuestionById(studentQuestionId);
-
-        studentQuestion.setSubmittedStatus(StudentQuestion.SubmittedStatus.APPROVED);
-        studentQuestion.setJustification("");
-        return new StudentQuestionDTO(studentQuestion);
-    }
-
-    @Retryable(
-            value = { SQLException.class },
-            backoff = @Backoff(delay = 5000))
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public StudentQuestionDTO acceptStudentQuestion(Integer studentQuestionId, String justification) {
+        if(justification == null) { justification = ""; } // null justification -> empty justification
+
+        // approved questions can have no justification
         if(!justification.isEmpty()) {
             checkJustification(justification);
         }
