@@ -8,6 +8,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.StudentSubmitQuestionService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.TeacherEvaluatesStudentQuestionService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.EvaluationDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;;
 
@@ -15,7 +16,6 @@ import javax.validation.Valid;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.INVALID_STUDENT_QUESTION_EVALUATION;
@@ -59,10 +59,11 @@ public class StudentQuestionController {
         return teacherEvaluatesStudentQuestionService.getAllStudentQuestions(courseId);
     }
 
-    @PutMapping("/courses/{courseId}/studentQuestions/{studentQuestionId}/{evaluation}")
-    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#courseId, 'COURSE.ACCESS')")
-    public StudentQuestionDTO evaluateStudentQuestion(@PathVariable int studentQuestionId, @PathVariable String evaluation, @Valid @RequestBody String justification){
-        StudentQuestion.SubmittedStatus newStatus = StudentQuestion.SubmittedStatus.valueOf(evaluation);
+    @PostMapping("/courses/{courseId}/studentQuestions/{studentQuestionId}/evaluate")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#studentQuestionId, 'QUESTION.ACCESS')")
+    public StudentQuestionDTO evaluateStudentQuestion(@PathVariable int studentQuestionId, @Valid @RequestBody EvaluationDto evaluation){
+        String justification = evaluation.getJustification();
+        StudentQuestion.SubmittedStatus newStatus = evaluation.getEvaluation();
         switch (newStatus) {
             case APPROVED:
                 return teacherEvaluatesStudentQuestionService.acceptStudentQuestion(studentQuestionId, justification);
@@ -72,5 +73,4 @@ public class StudentQuestionController {
                 throw new TutorException(INVALID_STUDENT_QUESTION_EVALUATION);
         }
     }
-
 }
