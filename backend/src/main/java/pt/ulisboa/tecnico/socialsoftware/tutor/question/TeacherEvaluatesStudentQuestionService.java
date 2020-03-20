@@ -27,11 +27,18 @@ public class TeacherEvaluatesStudentQuestionService {
     public void TeacherEvaluatesStudentQuestionService() {}
 
 
-
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public List<StudentQuestionDTO> getAllStudentQuestions(int courseId) {
         return studentQuestionRepository.findByCourse(courseId).stream().map(StudentQuestionDTO::new).collect(Collectors.toList());
     }
 
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public StudentQuestionDTO acceptStudentQuestion(Integer studentQuestionId) {
         // not checking justification because it was not provided
         StudentQuestion studentQuestion = findStudentQuestionById(studentQuestionId);
@@ -41,17 +48,28 @@ public class TeacherEvaluatesStudentQuestionService {
         return new StudentQuestionDTO(studentQuestion);
     }
 
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public StudentQuestionDTO acceptStudentQuestion(Integer studentQuestionId, String justification) {
-        checkJustification(justification);
+        if(!justification.isEmpty()) {
+            checkJustification(justification);
+        }
 
         StudentQuestion studentQuestion = findStudentQuestionById(studentQuestionId);
 
         studentQuestion.setSubmittedStatus(StudentQuestion.SubmittedStatus.APPROVED);
         studentQuestion.setJustification(justification);
+
         return new StudentQuestionDTO(studentQuestion);
     }
 
 
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public StudentQuestionDTO rejectStudentQuestion(Integer studentQuestionId, String justification) {
         checkJustification(justification);
 
