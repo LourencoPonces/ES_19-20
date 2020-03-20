@@ -15,8 +15,8 @@ import java.util.stream.Stream;
 @Transactional
 public interface StudentQuestionRepository extends JpaRepository<StudentQuestion, Integer> {
 
-    @Query(value = "SELECT MAX(student_question_key) FROM student_question", nativeQuery = true)
-    Integer getMaxQuestionNumber();
+    @Query(value = "SELECT MAX(student_question_key) FROM student_question WHERE user_id = :userId", nativeQuery = true)
+    Integer getMaxQuestionNumberByUser(Integer userId);
 
     @Query(value = "SELECT * FROM student_question sq WHERE sq.user_id = :user ", nativeQuery = true)
     Stream<StudentQuestion> findByUser(Integer user);
