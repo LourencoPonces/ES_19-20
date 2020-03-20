@@ -5,7 +5,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 
 public class EvaluationDto {
     private StudentQuestion.SubmittedStatus evaluation;
-    private String justification = "";
+    private String justification;
 
     public EvaluationDto(StudentQuestion.SubmittedStatus s, String j) {
         evaluation = s;
