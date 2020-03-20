@@ -39,13 +39,8 @@ public class TeacherEvaluatesStudentQuestionService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public StudentQuestionDTO acceptStudentQuestion(Integer studentQuestionId) {
-        // not checking justification because it was not provided
-        StudentQuestion studentQuestion = findStudentQuestionById(studentQuestionId);
-
-        studentQuestion.setSubmittedStatus(StudentQuestion.SubmittedStatus.APPROVED);
-        studentQuestion.setJustification("");
-        return new StudentQuestionDTO(studentQuestion);
+    public List<StudentQuestionDTO> getAllStudentQuestionsWithStatus(int courseId, StudentQuestion.SubmittedStatus status) {
+        return studentQuestionRepository.findByCourseWithStatus(courseId, status).stream().map(StudentQuestionDTO::new).collect(Collectors.toList());
     }
 
     @Retryable(
@@ -53,9 +48,8 @@ public class TeacherEvaluatesStudentQuestionService {
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public StudentQuestionDTO acceptStudentQuestion(Integer studentQuestionId, String justification) {
-        if(!justification.isEmpty()) {
-            checkJustification(justification);
-        }
+        // can accept question with no justification
+        if(justification != null) { checkJustification(justification); }
 
         StudentQuestion studentQuestion = findStudentQuestionById(studentQuestionId);
 

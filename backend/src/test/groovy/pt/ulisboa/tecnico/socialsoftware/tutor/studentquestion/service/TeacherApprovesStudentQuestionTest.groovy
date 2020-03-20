@@ -101,13 +101,13 @@ class TeacherApprovesStudentQuestionTest extends Specification {
 
     def "approve existing pending question with no justification"() {
         when:
-        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(savedQuestionId)
+        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(savedQuestionId, null)
 
         then:
         studentQuestionRepository.count() == 1L
         def result = studentQuestionRepository.findAll().get(0)
         result.getSubmittedStatus() == StudentQuestion.SubmittedStatus.APPROVED
-        result.getJustification() == ""
+        result.getJustification() == null
     }
 
     def "approve existing pending question with valid justification"() {
@@ -136,7 +136,6 @@ class TeacherApprovesStudentQuestionTest extends Specification {
         ""            || INVALID_JUSTIFICATION
         "   "         || INVALID_JUSTIFICATION
         "\n  \t"      || INVALID_JUSTIFICATION
-        null          || INVALID_JUSTIFICATION
     }
 
     def "approve already evaluated student question, #isApproved->#result"() {
@@ -147,7 +146,7 @@ class TeacherApprovesStudentQuestionTest extends Specification {
 
 
         when:
-        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(savedQuestionId)
+        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(savedQuestionId, null)
 
         then:
         studentQuestionRepository.findAll().get(0).getSubmittedStatus() == result
@@ -160,7 +159,7 @@ class TeacherApprovesStudentQuestionTest extends Specification {
 
     def "approve non existing student question"(){
         when:
-        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(FAKE_STUDENT_QUESTION_ID)
+        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(FAKE_STUDENT_QUESTION_ID, null)
 
         then:
         def error = thrown(TutorException)
