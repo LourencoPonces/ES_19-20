@@ -39,6 +39,15 @@ public class TeacherEvaluatesStudentQuestionService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<StudentQuestionDTO> getAllStudentQuestionsWithStatus(int courseId, StudentQuestion.SubmittedStatus status) {
+        return studentQuestionRepository.findByCourseAndStatus(courseId, status.toString()).stream().map(StudentQuestionDTO::new).collect(Collectors.toList());
+    }
+
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public StudentQuestionDTO acceptStudentQuestion(Integer studentQuestionId, String justification) {
         if(justification == null) { justification = ""; } // null justification -> empty justification
 
@@ -54,7 +63,6 @@ public class TeacherEvaluatesStudentQuestionService {
 
         return new StudentQuestionDTO(studentQuestion);
     }
-
 
     @Retryable(
             value = { SQLException.class },

@@ -59,6 +59,22 @@ public class StudentQuestionController {
         return teacherEvaluatesStudentQuestionService.getAllStudentQuestions(courseId);
     }
 
+    @GetMapping("/courses/{courseId}/studentQuestions/{status}")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#courseId, 'COURSE.ACCESS')")
+    public List<StudentQuestionDTO> getCourseStudentQuestionsWithStatus(@PathVariable int courseId, @PathVariable String status){
+        switch (status) {
+            case "approved":
+                return teacherEvaluatesStudentQuestionService.getAllStudentQuestionsWithStatus(courseId, StudentQuestion.SubmittedStatus.APPROVED);
+            case "rejected":
+                return teacherEvaluatesStudentQuestionService.getAllStudentQuestionsWithStatus(courseId, StudentQuestion.SubmittedStatus.REJECTED);
+            case "pending":
+                return teacherEvaluatesStudentQuestionService.getAllStudentQuestionsWithStatus(courseId, StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL);
+            default:
+                throw new TutorException(INVALID_STUDENT_QUESTION_EVALUATION);
+        }
+    }
+
+
     @PostMapping("/courses/{courseId}/studentQuestions/{studentQuestionId}/evaluate")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#studentQuestionId, 'QUESTION.ACCESS')")
     public StudentQuestionDTO evaluateStudentQuestion(@PathVariable int studentQuestionId, @Valid @RequestBody EvaluationDto evaluation){
