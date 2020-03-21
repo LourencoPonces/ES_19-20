@@ -18,3 +18,5 @@ If you don't have `jmeter` on your path, you can specify an alternate path to JM
 If you want to run all tests sequentially, use the `runall.sh` script. All arguments passed to it will be passed to JMeter.
 
 It simply executes `runone.sh` for every JMeter test existent, so all property loading behaviors and environment variables are inherited.
+
+Tip: to run tests in CLI mode use the `-n` flag.
