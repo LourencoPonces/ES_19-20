@@ -20,4 +20,4 @@ fi
 test="$1"
 shift
 
-exec $JMETER $@ -t "$test" -p "$PROPERTIES_FILE"
+exec $JMETER $@ -t "$test" -q "$PROPERTIES_FILE"
