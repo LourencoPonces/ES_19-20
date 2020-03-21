@@ -8,7 +8,6 @@ JMETER="${JMETER:=jmeter}"
 
 # properties file to load
 PROPERTIES_FILE="${PROPERTIES_FILE:=$SCRIPT_DIR/jmeter-docker.properties}"
-PROPERTIES_FILE="$(realpath "$PROPERTIES_FILE")"
 
 if [[ $# -lt 1 ]]; then
 	echo "Usage: $0 <test> [extra arguments]"
@@ -21,9 +20,4 @@ fi
 test="$1"
 shift
 
-test_abs="$(realpath $test)"
-pushd "$(dirname $test)" # ensure all resources can be properly loaded
-
-$JMETER $@ -t "$test_abs" -p "$PROPERTIES_FILE"
-
-popd # restore cwd
+exec $JMETER $@ -t "$test" -p "$PROPERTIES_FILE"
