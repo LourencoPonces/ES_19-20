@@ -7,9 +7,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -59,12 +62,17 @@ public class User implements UserDetails {
     @ManyToMany
     private Set<CourseExecution> courseExecutions = new HashSet<>();
 
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Tournament> participantTournaments = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator", fetch = FetchType.LAZY, orphanRemoval=true)
+    private Set<Tournament> createdTournaments = new HashSet<>();
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner")
     private Set<ClarificationRequest> clarificationRequests = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Set<StudentQuestion> studentQuestions = new HashSet<>();
-
 
     public User() {
     }
@@ -164,6 +172,42 @@ public class User implements UserDetails {
     }
 
     public Set<ClarificationRequest> getClarificationRequests() { return clarificationRequests; }
+
+    public void addCreatedTournament(Tournament newCreatedTournament){
+        createdTournaments.add(newCreatedTournament);
+    }
+
+    public void removeCreatedTournament(Integer createdTournamentId){
+        Tournament createdTournament = getCreatedTournament(createdTournamentId);
+        createdTournaments.remove(createdTournament);
+    }
+
+    public Set<Tournament> getCreatedTournaments(){
+        return createdTournaments;
+    }
+
+    public Tournament getCreatedTournament(Integer createdTournamentId) {
+        return createdTournaments.stream().filter(tournament -> tournament.getId() == createdTournamentId)
+                .findFirst().orElseThrow(() -> new TutorException(ErrorMessage.TOURNAMENT_NOT_FOUND, createdTournamentId));
+    }
+
+    public void addParticipantTournament(Tournament newParticipantTournament) {
+        participantTournaments.add(newParticipantTournament);
+    }
+
+    public void removeParticipantTournament(Integer participantTournamentId) {
+        Tournament createdTournament = getCreatedTournament(participantTournamentId);
+        createdTournaments.remove(participantTournamentId);
+    }
+
+    public Set<Tournament> getParticipantTournaments() {
+        return participantTournaments;
+    }
+
+    public Tournament getParticipantTournament(Integer participantTournamentId) {
+        return participantTournaments.stream().filter(tournament -> tournament.getId() == participantTournamentId)
+                .findFirst().orElseThrow(() -> new TutorException(ErrorMessage.TOURNAMENT_NOT_FOUND, participantTournamentId));
+    }
 
     public Integer getNumberOfTeacherQuizzes() {
         if (this.numberOfTeacherQuizzes == null)
