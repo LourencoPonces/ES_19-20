@@ -20,4 +20,10 @@ public interface StudentQuestionRepository extends JpaRepository<StudentQuestion
 
     @Query(value = "SELECT * FROM student_question sq WHERE sq.user_id = :user ", nativeQuery = true)
     Stream<StudentQuestion> findByUser(Integer user);
+
+    @Query(value = "SELECT * FROM student_question sq, questions q WHERE q.course_id = :courseId AND sq.id=q.id", nativeQuery = true)
+    List<StudentQuestion> findByCourse(Integer courseId);
+
+    @Query(value = "SELECT * FROM student_question sq, questions q WHERE q.course_id = :courseId AND sq.id=q.id AND sq.submitted_status= :status", nativeQuery = true)
+    List<StudentQuestion> findByCourseAndStatus(Integer courseId, String status);
 }
