@@ -40,7 +40,7 @@ public class CheckStudentQuestionStatusService {
         if(user.getRole() == User.Role.TEACHER) {
             throw new TutorException(ACCESS_DENIED);
         }
-        return studentQuestionRepository.findByUser(studentId).stream().map(StudentQuestionDTO::new);
+        return studentQuestionRepository.findByUser(studentId).map(StudentQuestionDTO::new);
     }
 
     @Retryable(

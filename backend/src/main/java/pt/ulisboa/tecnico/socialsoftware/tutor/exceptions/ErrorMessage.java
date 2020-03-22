@@ -80,7 +80,9 @@ public enum ErrorMessage {
     CLARIFICATION_REQUEST_NOT_FOUND("Clarification Request not found with id %d"),
     CLARIFICATION_REQUEST_NOT_SUBMITTED("Student %s didn't submit a clarification request for the question with id %d"),
     CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT("Missing content of clarification request answer"),
-    CLARIFICATION_REQUEST_UNANSWERED("The clarification request wasn't answered yet");
+    CLARIFICATION_REQUEST_UNANSWERED("The clarification request wasn't answered yet"),
+
+    INVALID_STUDENT_QUESTION_EVALUATION("Invalid StudentQuestion Evaluation");
 
     public final String label;
 
