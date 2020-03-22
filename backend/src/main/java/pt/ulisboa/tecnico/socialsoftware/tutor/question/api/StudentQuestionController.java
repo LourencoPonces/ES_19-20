@@ -42,6 +42,7 @@ public class StudentQuestionController {
     @Autowired
     CheckStudentQuestionStatusService checkStudentQuestionStatusService;
 
+    @Autowired
     TeacherEvaluatesStudentQuestionService teacherEvaluatesStudentQuestionService;
 
 
@@ -60,7 +61,7 @@ public class StudentQuestionController {
         studentQuestion.setSubmittedStatus(StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL); // ensure it is pending
         return studentSubmitQuestionService.studentSubmitQuestion(courseId, studentQuestion, user.getId());
     }
-    
+
     /* ===========================================
      * F2: Teacher evaluates student question
      * ===========================================
