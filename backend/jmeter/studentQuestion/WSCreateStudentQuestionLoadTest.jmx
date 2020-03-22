@@ -137,7 +137,7 @@
             <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="Data to create course executions" enabled="true">
               <stringProp name="delimiter">,</stringProp>
               <stringProp name="fileEncoding"></stringProp>
-              <stringProp name="filename">/home/daniel/Desktop/ES/es20al_19-project/backend/jmeter/studentQuestion/StudentQuestionData.csv</stringProp>
+              <stringProp name="filename">./StudentQuestionData.csv</stringProp>
               <boolProp name="ignoreFirstLine">false</boolProp>
               <boolProp name="quotedData">false</boolProp>
               <boolProp name="recycle">false</boolProp>
@@ -294,9 +294,9 @@
         <hashTree/>
         <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="JDBC Request" enabled="true">
           <stringProp name="dataSource">sampleReq</stringProp>
-          <stringProp name="query">DELETE FROM student_question;
+          <stringProp name="query">DELETE FROM student_question USING questions WHERE questions.id = student_question.id and questions.title  LIKE &apos;TEST_studentQuestion%&apos;;
 DELETE FROM options WHERE content LIKE &apos;Option_Content&apos;;
-DELETE FROM questions WHERE title LIKE &apos;Question_Title_%&apos;;</stringProp>
+DELETE FROM questions WHERE title LIKE &apos;TEST_studentQuestion%&apos;;</stringProp>
           <stringProp name="queryArguments"></stringProp>
           <stringProp name="queryArgumentsTypes"></stringProp>
           <stringProp name="queryTimeout"></stringProp>
