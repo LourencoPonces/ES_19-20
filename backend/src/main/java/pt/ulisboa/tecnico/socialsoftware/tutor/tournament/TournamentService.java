@@ -75,8 +75,6 @@ public class TournamentService {
 
         addCreator(tournamentDto, creator, tournament);
 
-        setCreationDate(tournamentDto, tournament);
-
         tournament.setCourseExecution(courseExecution);
         entityManager.persist(tournament);
 
@@ -97,17 +95,6 @@ public class TournamentService {
             tournamentDto.getParticipants().add(tournamentDto.getCreator());
         } else {
             throw new TutorException(TOURNAMENT_CREATED_BY_NON_STUDENT);
-        }
-    }
-
-    private void setCreationDate(TournamentDto tournamentDto, Tournament tournament) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        if (tournamentDto.getCreationDate() == null) {
-            LocalDateTime now = LocalDateTime.now();
-            tournament.setCreationDate(now);
-            tournamentDto.setCreationDate(now.format(formatter));
-        } else {
-            tournament.setCreationDate(LocalDateTime.parse(tournamentDto.getCreationDate(), formatter));
         }
     }
 
