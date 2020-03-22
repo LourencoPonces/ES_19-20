@@ -103,4 +103,41 @@ public class StudentQuestionController {
                 throw new TutorException(INVALID_STUDENT_QUESTION_EVALUATION);
         }
     }
+
+
+    /* ===========================================
+     * F3: Student checks questions status
+     * ===========================================
+     */
+
+    @GetMapping("/courses/{courseId}/studentQuestions/check")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#courseId, 'COURSE.ACCESS')")
+    public List<StudentQuestionDTO> checkAllStudentQuestions(@PathVariable int courseId, Principal principal) {
+
+        User user = (User) ((Authentication) principal).getPrincipal();
+        if(user == null) {
+            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
+        }
+        return checkStudentQuestionStatusService.findByCourseAndUser(courseId, user.getId());
+    }
+
+    @GetMapping("/courses/{courseId}/studentQuestions/check/{status}")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#courseId, 'COURSE.ACCESS')")
+    public List<StudentQuestionDTO> checkAllStudentQuestions(@PathVariable int courseId, @PathVariable String status, Principal principal) {
+
+        User user = (User) ((Authentication) principal).getPrincipal();
+        if(user == null) {
+            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
+        }
+        switch (status) {
+            case "approved":
+                return checkStudentQuestionStatusService.findByCourseUserAndStatus(courseId, user.getId(), StudentQuestion.SubmittedStatus.APPROVED);
+            case "rejected":
+                return checkStudentQuestionStatusService.findByCourseUserAndStatus(courseId, user.getId(), StudentQuestion.SubmittedStatus.REJECTED);
+            case "pending":
+                return checkStudentQuestionStatusService.findByCourseUserAndStatus(courseId, user.getId(), StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL);
+            default:
+                throw new TutorException(INVALID_STUDENT_QUESTION_EVALUATION);
+        }
+    }
 }
