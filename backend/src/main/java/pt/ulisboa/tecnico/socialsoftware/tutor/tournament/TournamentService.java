@@ -59,6 +59,12 @@ public class TournamentService {
 
         User creator = userRepository.findByUsername(tournamentDto.getCreator().getUsername());
 
+        if (tournamentDto.getKey() == null) {
+            int maxQuestionNumber = tournamentRepository.getMaxTournamentKey() != null ?
+                    tournamentRepository.getMaxTournamentKey() : 0;
+            tournamentDto.setKey(maxQuestionNumber + 1);
+        }
+
         Tournament tournament = new Tournament(tournamentDto);
 
         checkTopics(tournamentDto, courseExecution, tournament);
