@@ -56,6 +56,6 @@ public class CheckStudentQuestionStatusService {
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public List<StudentQuestionDTO> findByCourseUserAndStatus(Integer courseId, Integer studentId, StudentQuestion.SubmittedStatus status) {
-        return studentQuestionRepository.findByCourseUserAndStatus(courseId, studentId, status).stream().map(StudentQuestionDTO::new).collect(Collectors.toList());
+        return studentQuestionRepository.findByCourseUserAndStatus(courseId, studentId, status.toString()).stream().map(StudentQuestionDTO::new).collect(Collectors.toList());
     }
 }

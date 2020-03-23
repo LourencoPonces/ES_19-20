@@ -27,7 +27,7 @@ public interface StudentQuestionRepository extends JpaRepository<StudentQuestion
     List<StudentQuestion> findByCourseAndUser(Integer courseId, Integer userId);
 
     @Query(value = "SELECT * FROM student_question sq NATURAL JOIN questions q WHERE q.course_id = :courseId AND sq.user_id = :userId and sq.submitted_status = :status", nativeQuery = true)
-    List<StudentQuestion> findByCourseUserAndStatus(Integer courseId, Integer userId, StudentQuestion.SubmittedStatus status);
+    List<StudentQuestion> findByCourseUserAndStatus(Integer courseId, Integer userId, String status);
 
     @Query(value = "SELECT * FROM student_question sq, questions q WHERE q.course_id = :courseId AND sq.id=q.id AND sq.submitted_status= :status", nativeQuery = true)
     List<StudentQuestion> findByCourseAndStatus(Integer courseId, String status);
