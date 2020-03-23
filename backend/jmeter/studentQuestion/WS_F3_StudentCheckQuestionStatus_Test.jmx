@@ -314,6 +314,51 @@ INSERT INTO student_question(id, user_id, submitted_status, justification, stude
               <stringProp name="Scope.variable">questionId_matchNr</stringProp>
             </ResponseAssertion>
             <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Check Status" enabled="true">
+              <stringProp name="JSON_PATH">$[0].submittedStatus</stringProp>
+              <stringProp name="EXPECTED_VALUE">APPROVED</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">true</boolProp>
+            </JSONPathAssertion>
+            <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Check Status" enabled="true">
+              <stringProp name="JSON_PATH">$[1].submittedStatus</stringProp>
+              <stringProp name="EXPECTED_VALUE">APPROVED</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">true</boolProp>
+            </JSONPathAssertion>
+            <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Check Status" enabled="true">
+              <stringProp name="JSON_PATH">$[2].submittedStatus</stringProp>
+              <stringProp name="EXPECTED_VALUE">APPROVED</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">true</boolProp>
+            </JSONPathAssertion>
+            <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Check Status" enabled="true">
+              <stringProp name="JSON_PATH">$[3].submittedStatus</stringProp>
+              <stringProp name="EXPECTED_VALUE">APPROVED</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">true</boolProp>
+            </JSONPathAssertion>
+            <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Check Status" enabled="true">
+              <stringProp name="JSON_PATH">$[4].submittedStatus</stringProp>
+              <stringProp name="EXPECTED_VALUE">APPROVED</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">true</boolProp>
+            </JSONPathAssertion>
+            <hashTree/>
           </hashTree>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get all Rejected Student Questions" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
@@ -341,7 +386,7 @@ INSERT INTO student_question(id, user_id, submitted_status, justification, stude
               <boolProp name="JSONPostProcessor.compute_concat">true</boolProp>
             </JSONPostProcessor>
             <hashTree/>
-            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Check 5 rejected questions" enabled="true">
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Check 5 approved questions" enabled="true">
               <collectionProp name="Asserion.test_strings">
                 <stringProp name="53">5</stringProp>
               </collectionProp>
@@ -352,6 +397,51 @@ INSERT INTO student_question(id, user_id, submitted_status, justification, stude
               <stringProp name="Assertion.scope">variable</stringProp>
               <stringProp name="Scope.variable">questionId_matchNr</stringProp>
             </ResponseAssertion>
+            <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Check Status" enabled="true">
+              <stringProp name="JSON_PATH">$[0].submittedStatus</stringProp>
+              <stringProp name="EXPECTED_VALUE">REJECTED</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">true</boolProp>
+            </JSONPathAssertion>
+            <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Check Status" enabled="true">
+              <stringProp name="JSON_PATH">$[1].submittedStatus</stringProp>
+              <stringProp name="EXPECTED_VALUE">REJECTED</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">true</boolProp>
+            </JSONPathAssertion>
+            <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Check Status" enabled="true">
+              <stringProp name="JSON_PATH">$[2].submittedStatus</stringProp>
+              <stringProp name="EXPECTED_VALUE">REJECTED</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">true</boolProp>
+            </JSONPathAssertion>
+            <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Check Status" enabled="true">
+              <stringProp name="JSON_PATH">$[3].submittedStatus</stringProp>
+              <stringProp name="EXPECTED_VALUE">REJECTED</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">true</boolProp>
+            </JSONPathAssertion>
+            <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Check Status" enabled="true">
+              <stringProp name="JSON_PATH">$[4].submittedStatus</stringProp>
+              <stringProp name="EXPECTED_VALUE">REJECTED</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">true</boolProp>
+            </JSONPathAssertion>
             <hashTree/>
           </hashTree>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get all Pending Student Questions" enabled="true">
@@ -380,7 +470,7 @@ INSERT INTO student_question(id, user_id, submitted_status, justification, stude
               <boolProp name="JSONPostProcessor.compute_concat">true</boolProp>
             </JSONPostProcessor>
             <hashTree/>
-            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Check 5 pending questions" enabled="true">
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Check 5 approved questions" enabled="true">
               <collectionProp name="Asserion.test_strings">
                 <stringProp name="53">5</stringProp>
               </collectionProp>
@@ -391,6 +481,51 @@ INSERT INTO student_question(id, user_id, submitted_status, justification, stude
               <stringProp name="Assertion.scope">variable</stringProp>
               <stringProp name="Scope.variable">questionId_matchNr</stringProp>
             </ResponseAssertion>
+            <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Check Status" enabled="true">
+              <stringProp name="JSON_PATH">$[0].submittedStatus</stringProp>
+              <stringProp name="EXPECTED_VALUE">WAITING_FOR_APPROVAL</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">true</boolProp>
+            </JSONPathAssertion>
+            <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Check Status" enabled="true">
+              <stringProp name="JSON_PATH">$[1].submittedStatus</stringProp>
+              <stringProp name="EXPECTED_VALUE">WAITING_FOR_APPROVAL</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">true</boolProp>
+            </JSONPathAssertion>
+            <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Check Status" enabled="true">
+              <stringProp name="JSON_PATH">$[2].submittedStatus</stringProp>
+              <stringProp name="EXPECTED_VALUE">WAITING_FOR_APPROVAL</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">true</boolProp>
+            </JSONPathAssertion>
+            <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Check Status" enabled="true">
+              <stringProp name="JSON_PATH">$[3].submittedStatus</stringProp>
+              <stringProp name="EXPECTED_VALUE">WAITING_FOR_APPROVAL</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">true</boolProp>
+            </JSONPathAssertion>
+            <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Check Status" enabled="true">
+              <stringProp name="JSON_PATH">$[4].submittedStatus</stringProp>
+              <stringProp name="EXPECTED_VALUE">WAITING_FOR_APPROVAL</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">true</boolProp>
+            </JSONPathAssertion>
             <hashTree/>
           </hashTree>
         </hashTree>
