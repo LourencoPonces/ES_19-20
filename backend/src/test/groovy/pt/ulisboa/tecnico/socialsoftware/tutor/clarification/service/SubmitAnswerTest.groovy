@@ -166,7 +166,7 @@ class SubmitAnswerTest extends Specification {
 
     def "submit an answer"() {
         when:
-        clarificationService.submitClarificationRequestAnswer(teacherId, reqId, ANSWER_1)
+        clarificationService.submitClarificationRequestAnswer(teacher, reqId, ANSWER_1)
 
         then: "the answer was submitted"
         clarificationRequestAnswerRepository.count() == 1
@@ -178,10 +178,10 @@ class SubmitAnswerTest extends Specification {
 
     def "submit answer to already answered request"() {
         given: "a clarification request that already has an answer"
-        clarificationService.submitClarificationRequestAnswer(teacherId, reqId, ANSWER_1)
+        clarificationService.submitClarificationRequestAnswer(teacher, reqId, ANSWER_1)
 
         when:
-        clarificationService.submitClarificationRequestAnswer(teacherId, reqId, ANSWER_2)
+        clarificationService.submitClarificationRequestAnswer(teacher, reqId, ANSWER_2)
 
         then: "the answer was replaced"
         def saved_answer = clarificationRequest.getAnswer().map({a -> a.getContent()}).get()
@@ -189,22 +189,22 @@ class SubmitAnswerTest extends Specification {
     }
 
     @Unroll
-    def "validity check: (validTeacher=#validT, validRequest=#validR, answer=#answer) -> #errorMessage"() {
+    def "validity check: (userIsTeacher=#isTeacher, validRequest=#validR, answer=#answer) -> #errorMessage"() {
         when: "submitting an answer for a null clarification request"
-        def tid = validT ? teacherId : studentId
+        def user = isTeacher ? teacher : student
         def rid = validR ? reqId : -1
-        clarificationService.submitClarificationRequestAnswer(tid, rid, answer)
+        clarificationService.submitClarificationRequestAnswer(user, rid, answer)
 
         then: "an exception"
         def exception = thrown(TutorException)
         exception.getErrorMessage() == errorMessage
 
         where:
-        validT | validR | answer     || errorMessage
-        true   | false  | ANSWER_1   || ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND
-        false  | true   | ANSWER_1   || ErrorMessage.ACCESS_DENIED
-        true   | true   | " \n  \t " || ErrorMessage.CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT
-        true   | true   | null       || ErrorMessage.CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT
+        isTeacher | validR | answer     || errorMessage
+        true      | false  | ANSWER_1   || ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND
+        false     | true   | ANSWER_1   || ErrorMessage.ACCESS_DENIED
+        true      | true   | " \n  \t " || ErrorMessage.CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT
+        true      | true   | null       || ErrorMessage.CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT
     }
 
     @TestConfiguration

@@ -69,8 +69,15 @@ public class ClarificationService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public ClarificationRequestAnswerDto submitClarificationRequestAnswer(int teacherId, int reqId, String answerText) {
-        User teacher = getTeacher(teacherId);
+    public ClarificationRequestAnswerDto submitClarificationRequestAnswer(User teacher, int reqId, String answerText) {
+        if (teacher == null) {
+            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
+        }
+
+        // TODO: is this check really necessary? the controller already does it anyway
+        if (teacher.getRole() != User.Role.TEACHER) {
+            throw new TutorException(ErrorMessage.ACCESS_DENIED);
+        }
 
         ClarificationRequest req = clarificationRequestRepository.findById(reqId)
                 .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, reqId));
