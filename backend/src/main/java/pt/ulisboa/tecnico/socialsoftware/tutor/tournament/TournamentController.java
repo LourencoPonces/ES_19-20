@@ -30,7 +30,7 @@ public class TournamentController {
             throw new TutorException(AUTHENTICATION_ERROR);
         }
 
-        return tournamentService.createTournament(executionId, tournamentDto);
+        return tournamentService.createTournament(user.getUsername(), executionId, tournamentDto);
     }
 
     @PostMapping("/executions/{executionId}/tournaments/available")

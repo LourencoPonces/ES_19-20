@@ -54,10 +54,10 @@ public class TournamentService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public TournamentDto createTournament(int executionId, TournamentDto tournamentDto) {
+    public TournamentDto createTournament(String username, int executionId, TournamentDto tournamentDto) {
         CourseExecution courseExecution = getCourseExecution(executionId);
 
-        User creator = userRepository.findByUsername(tournamentDto.getCreator().getUsername());
+        User creator = userRepository.findByUsername(username);
 
         if (tournamentDto.getKey() == null) {
             int maxQuestionNumber = tournamentRepository.getMaxTournamentKey() != null ?

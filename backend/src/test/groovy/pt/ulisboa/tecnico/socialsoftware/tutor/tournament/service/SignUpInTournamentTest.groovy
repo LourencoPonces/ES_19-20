@@ -100,7 +100,6 @@ class SignUpInTournamentTest extends Specification{
         tournamentDto.setTitle(TOURNAMENT_TITLE)
         tournamentDto.setKey(1)
         tournamentDto.setNumberOfQuestions(1)
-        tournamentDto.setCreator(creatorDto)
         tournamentDto.setTopics(topicDtoList)
     }
 
@@ -109,7 +108,7 @@ class SignUpInTournamentTest extends Specification{
         given: "a tournament and a participant"
         prepareStatus(tournamentDto, Tournament.Status.AVAILABLE)
 
-        tournamentDto = tournamentService.createTournament(courseExecution.getId(), tournamentDto)
+        tournamentDto = tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
 
         when:
         tournamentService.signUpInTournament(tournamentDto.getId(), participant.getUsername())
@@ -136,7 +135,7 @@ class SignUpInTournamentTest extends Specification{
     def "sign-up in a tournament with non-available status"() {
         given: "a tournament with non-available status and a participant"
         prepareStatus(tournamentDto, status)
-        tournamentDto = tournamentService.createTournament(courseExecution.getId(), tournamentDto)
+        tournamentDto = tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
 
         if (status == Tournament.Status.CANCELLED)
             tournamentRepository.findById(tournamentDto.getId()).get().cancel()
@@ -159,7 +158,7 @@ class SignUpInTournamentTest extends Specification{
     def "sign-up in a tournament with a user that is already signed-up"(){
         given: "a tournament with a user already signed-up and a participant"
         prepareStatus(tournamentDto, Tournament.Status.AVAILABLE)
-        tournamentDto = tournamentService.createTournament(courseExecution.getId(), tournamentDto)
+        tournamentDto = tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
 
         tournamentService.signUpInTournament(tournamentDto.getId(), participant.getUsername())
 
