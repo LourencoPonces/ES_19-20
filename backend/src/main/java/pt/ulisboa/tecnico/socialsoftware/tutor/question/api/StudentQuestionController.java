@@ -110,18 +110,7 @@ public class StudentQuestionController {
      * ===========================================
      */
 
-    @GetMapping("/courses/{courseId}/studentQuestions/check")
-    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#courseId, 'COURSE.ACCESS')")
-    public List<StudentQuestionDTO> checkAllStudentQuestions(@PathVariable int courseId, Principal principal) {
-
-        User user = (User) ((Authentication) principal).getPrincipal();
-        if(user == null) {
-            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
-        }
-        return checkStudentQuestionStatusService.findByCourseAndUser(courseId, user.getId());
-    }
-
-    @GetMapping("/courses/{courseId}/studentQuestions/check/{status}")
+    @GetMapping("/courses/{courseId}/studentQuestions/checkStatus/{status}")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#courseId, 'COURSE.ACCESS')")
     public List<StudentQuestionDTO> checkAllStudentQuestions(@PathVariable int courseId, @PathVariable String status, Principal principal) {
 
@@ -129,7 +118,11 @@ public class StudentQuestionController {
         if(user == null) {
             throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
         }
+
         switch (status) {
+            case "":
+            case "all":
+                return checkStudentQuestionStatusService.findByCourseAndUser(courseId, user.getId());
             case "approved":
                 return checkStudentQuestionStatusService.findByCourseUserAndStatus(courseId, user.getId(), StudentQuestion.SubmittedStatus.APPROVED);
             case "rejected":
