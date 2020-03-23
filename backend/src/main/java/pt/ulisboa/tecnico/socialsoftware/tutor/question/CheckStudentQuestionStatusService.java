@@ -46,7 +46,7 @@ public class CheckStudentQuestionStatusService {
     @Retryable(
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public List<StudentQuestionDTO> findByCourseAndUser(Integer courseId, Integer studentId) {
         return studentQuestionRepository.findByCourseAndUser(courseId, studentId).stream().map(StudentQuestionDTO::new).collect(Collectors.toList());
     }
@@ -54,7 +54,7 @@ public class CheckStudentQuestionStatusService {
     @Retryable(
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public List<StudentQuestionDTO> findByCourseUserAndStatus(Integer courseId, Integer studentId, StudentQuestion.SubmittedStatus status) {
         return studentQuestionRepository.findByCourseUserAndStatus(courseId, studentId, status.toString()).stream().map(StudentQuestionDTO::new).collect(Collectors.toList());
     }
