@@ -406,6 +406,8 @@ public class User implements UserDetails {
 
     public void addClarificationRequest(ClarificationRequest clarificationRequest) { this.clarificationRequests.add(clarificationRequest); }
 
+    public void addStudentQuestion (StudentQuestion studentQuestion) {this.studentQuestions.add(studentQuestion); }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> list = new ArrayList<>();
