@@ -50,8 +50,8 @@ public class StudentSubmitQuestionService {
         Course course = courseRepository.findById(courseId).orElseThrow(() -> new TutorException(COURSE_NOT_FOUND, courseId));
 
         if (studentQuestionDTO.getStudentQuestionKey() == null) {
-            int maxStudentQuestionNumber = studentQuestionRepository.getMaxQuestionNumber() != null ?
-                    studentQuestionRepository.getMaxQuestionNumber() : 0;
+            int maxStudentQuestionNumber = studentQuestionRepository.getMaxQuestionNumberByUser(studentId) != null ?
+                    studentQuestionRepository.getMaxQuestionNumberByUser(studentId) : 0;
 
             studentQuestionDTO.setStudentQuestionKey(maxStudentQuestionNumber + 1);
         }

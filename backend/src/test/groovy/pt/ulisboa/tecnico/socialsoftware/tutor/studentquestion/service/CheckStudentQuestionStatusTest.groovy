@@ -87,14 +87,14 @@ class CheckStudentQuestionStatusTest extends Specification {
         studentQuestion.setTitle(QUESTION_TITLE)
         studentQuestion.setContent(QUESTION_CONTENT)
         studentQuestion.setCreationDate(LocalDateTime.now().format(Course.formatter));
-        setKey(studentQuestion)
+        setKey(studentQuestion, user.getId())
         setTopics(studentQuestion)
         setOptions(studentQuestion)
         return new StudentQuestion(course, studentQuestion, user)
     }
-
-    private void setKey(StudentQuestionDTO studentQuestion) {
-        def prevMaxQuestion = studentQuestionRepository.getMaxQuestionNumber()
+    
+    private void setKey(StudentQuestionDTO studentQuestion, Integer userId) {
+        def prevMaxQuestion = studentQuestionRepository.getMaxQuestionNumberByUser(userId)
         def questionKey = prevMaxQuestion == null ? 1 : prevMaxQuestion + 1
         studentQuestion.setStudentQuestionKey(questionKey)
     }
