@@ -77,7 +77,6 @@ class StudentSubmitQuestionTest extends Specification {
         given: "a questionDTO"
         def questionDTO = new StudentQuestionDTO();
         StudentQuestionDtoSetup(questionDTO)
-        questionDTO.setKey(1);
         questionDTO.setStudentQuestionKey(1)
 
         setTopic(isTopic, questionDTO)
@@ -136,7 +135,6 @@ class StudentSubmitQuestionTest extends Specification {
         given: "a questionDto"
         def questionDto = new StudentQuestionDTO()
         StudentQuestionDtoSetup(questionDto)
-        questionDto.setKey(1);
         questionDto.setStudentQuestionKey(1) // Specific to this test
         and: "2 Topics"
         def topic1 = new TopicDto()
@@ -213,7 +211,6 @@ class StudentSubmitQuestionTest extends Specification {
         when: "create 2 student questions"
         studentSubmitQuestionService.studentSubmitQuestion(course.getId(), questionDto, user.getId())
         questionDto.setStudentQuestionKey(null)
-        questionDto.setKey(null)
         studentSubmitQuestionService.studentSubmitQuestion(course.getId(), questionDto, user.getId())
 
         then: "the two student questions are created with the correct numbers"
