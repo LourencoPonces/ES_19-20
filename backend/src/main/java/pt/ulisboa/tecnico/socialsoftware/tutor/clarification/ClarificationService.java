@@ -129,7 +129,11 @@ public class ClarificationService {
         return new ClarificationRequestDto(clarificationRequest);
     }
 
-    private ClarificationRequest createClarificationRequest(User user, Question question, ClarificationRequestDto clarificationRequestDto) {
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    protected ClarificationRequest createClarificationRequest(User user, Question question, ClarificationRequestDto clarificationRequestDto) {
         if (clarificationRequestDto.getKey() == null) {
             int max = clarificationRequestRepository.getMaxClarificationRequestKey() != null ?
                     clarificationRequestRepository.getMaxClarificationRequestKey() : 0;

@@ -27,7 +27,7 @@ public class ClarificationRequestController {
      * ===========================================
      */
 
-    @PostMapping("/questions/{questionId}/clarificationRequests")
+    @PostMapping("/student/results/{questionId}/clarifications")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#questionId, 'QUESTION.ACCESS')")
     public ClarificationRequestDto createClarificationRequest(@PathVariable int questionId, @Valid @RequestBody ClarificationRequestDto clarificationRequestDto, Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
