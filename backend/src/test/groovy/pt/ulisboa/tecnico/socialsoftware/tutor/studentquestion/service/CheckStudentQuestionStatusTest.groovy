@@ -21,6 +21,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
+import java.time.LocalDateTime
 import java.util.stream.Collectors
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
@@ -85,6 +86,7 @@ class CheckStudentQuestionStatusTest extends Specification {
         def studentQuestion = new StudentQuestionDTO()
         studentQuestion.setTitle(QUESTION_TITLE)
         studentQuestion.setContent(QUESTION_CONTENT)
+        studentQuestion.setCreationDate(LocalDateTime.now().format(Course.formatter));
         setKey(studentQuestion)
         setTopics(studentQuestion)
         setOptions(studentQuestion)
@@ -92,9 +94,8 @@ class CheckStudentQuestionStatusTest extends Specification {
     }
 
     private void setKey(StudentQuestionDTO studentQuestion) {
-        def prevMaxQuestion = questionRepository.getMaxQuestionNumber()
+        def prevMaxQuestion = studentQuestionRepository.getMaxQuestionNumber()
         def questionKey = prevMaxQuestion == null ? 1 : prevMaxQuestion + 1
-        studentQuestion.setKey(questionKey)
         studentQuestion.setStudentQuestionKey(questionKey)
     }
 
