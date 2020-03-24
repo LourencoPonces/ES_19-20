@@ -23,4 +23,12 @@ public class ClarificationController {
         return clarificationService.submitClarificationRequestAnswer(user, requestId, answer);
     }
 
+    @DeleteMapping("/clarifications/{requestId}/answer")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#requestId, 'CLARIFICATION.DELETE_ANSWER')")
+    public void deleteAnswer(Principal principal, @PathVariable int requestId) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        clarificationService.deleteClarificationRequestAnswer(user, requestId);
+    }
+
 }

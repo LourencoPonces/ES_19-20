@@ -165,7 +165,7 @@ class RemoveAnswerTest extends Specification {
         clarificationService.submitClarificationRequestAnswer(teacher, reqId, "some answer")
 
         when: "answer is removed"
-        clarificationService.removeClarificationRequestAnswer(teacher, reqId)
+        clarificationService.deleteClarificationRequestAnswer(teacher, reqId)
 
         then: "clarification request has no answer"
         clarificationRequest.getAnswer().isEmpty()
@@ -182,7 +182,7 @@ class RemoveAnswerTest extends Specification {
         // empty
 
         when: "answer is removed"
-        clarificationService.removeClarificationRequestAnswer(teacher, reqId)
+        clarificationService.deleteClarificationRequestAnswer(teacher, reqId)
 
         then: "thrown exception"
         def exception = thrown(TutorException)
@@ -191,7 +191,7 @@ class RemoveAnswerTest extends Specification {
 
     def "don't remove non-existent things"() {
         when: "trying to remove an answer from a non-existent clarification request"
-        clarificationService.removeClarificationRequestAnswer(teacher, clarificationRequest.getId() + 10)
+        clarificationService.deleteClarificationRequestAnswer(teacher, clarificationRequest.getId() + 10)
 
         then: "thrown exception"
         def exception = thrown(TutorException)
@@ -203,7 +203,7 @@ class RemoveAnswerTest extends Specification {
         clarificationService.submitClarificationRequestAnswer(teacher, reqId, "some answer")
 
         when: "student tries to remove an answer"
-        clarificationService.removeClarificationRequestAnswer(student, reqId)
+        clarificationService.deleteClarificationRequestAnswer(student, reqId)
 
         then: "thrown exception"
         def exception = thrown(TutorException)

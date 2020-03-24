@@ -101,7 +101,7 @@ public class ClarificationService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void removeClarificationRequestAnswer(User teacher, int reqId) {
+    public void deleteClarificationRequestAnswer(User teacher, int reqId) {
         if (teacher == null) {
             throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
         }
