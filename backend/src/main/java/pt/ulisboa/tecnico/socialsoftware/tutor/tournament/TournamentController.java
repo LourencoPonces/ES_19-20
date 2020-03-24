@@ -57,4 +57,5 @@ public class TournamentController {
 
         tournamentService.signUpInTournament(tournamentId, user.getUsername());
     }
+
 }

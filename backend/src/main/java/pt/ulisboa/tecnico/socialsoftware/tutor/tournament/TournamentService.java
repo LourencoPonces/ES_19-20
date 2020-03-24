@@ -6,6 +6,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
@@ -13,6 +14,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
@@ -166,5 +168,13 @@ public class TournamentService {
 
         user.addParticipantTournament(tournament);
         entityManager.persist(user);
+    }
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public CourseDto findTournamentCourseExecution(int tournamentId) {
+        return this.tournamentRepository.findById(tournamentId)
+                .map(Tournament::getCourseExecution)
+                .map(CourseDto::new)
+                .orElseThrow(() -> new TutorException(TOURNAMENT_NOT_FOUND, tournamentId));
     }
 }
