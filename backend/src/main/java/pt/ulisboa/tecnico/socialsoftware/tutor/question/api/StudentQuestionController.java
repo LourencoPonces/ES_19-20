@@ -28,6 +28,7 @@ import javax.validation.Valid;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.INVALID_STUDENT_QUESTION_EVALUATION;
@@ -66,22 +67,26 @@ public class StudentQuestionController {
      * F2: Teacher evaluates student question
      * ===========================================
      */
+//
+//    @GetMapping("/courses/{courseId}/studentQuestions")
+//    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#courseId, 'COURSE.ACCESS')")
+//    public List<StudentQuestionDTO> getCourseStudentQuestions(@PathVariable int courseId){
+//
+//    }
 
     @GetMapping("/courses/{courseId}/studentQuestions")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#courseId, 'COURSE.ACCESS')")
-    public List<StudentQuestionDTO> getCourseStudentQuestions(@PathVariable int courseId){
-        return teacherEvaluatesStudentQuestionService.getAllStudentQuestions(courseId);
-    }
-
-    @GetMapping("/courses/{courseId}/studentQuestions/{status}")
-    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#courseId, 'COURSE.ACCESS')")
-    public List<StudentQuestionDTO> getCourseStudentQuestionsWithStatus(@PathVariable int courseId, @PathVariable String status){
-        switch (status) {
-            case "approved":
+    public List<StudentQuestionDTO> getCourseStudentQuestionsWithStatus(@PathVariable int courseId, @RequestParam Optional<StudentQuestion.SubmittedStatus> status){
+        if(status.isEmpty()) {
+            return teacherEvaluatesStudentQuestionService.getAllStudentQuestions(courseId);
+        }
+        StudentQuestion.SubmittedStatus newStatus = status.get();
+        switch (newStatus) {
+            case APPROVED:
                 return teacherEvaluatesStudentQuestionService.getAllStudentQuestionsWithStatus(courseId, StudentQuestion.SubmittedStatus.APPROVED);
-            case "rejected":
+            case REJECTED:
                 return teacherEvaluatesStudentQuestionService.getAllStudentQuestionsWithStatus(courseId, StudentQuestion.SubmittedStatus.REJECTED);
-            case "pending":
+            case WAITING_FOR_APPROVAL:
                 return teacherEvaluatesStudentQuestionService.getAllStudentQuestionsWithStatus(courseId, StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL);
             default:
                 throw new TutorException(INVALID_STUDENT_QUESTION_EVALUATION);
@@ -110,24 +115,24 @@ public class StudentQuestionController {
      * ===========================================
      */
 
-    @GetMapping("/courses/{courseId}/studentQuestions/checkStatus/{status}")
+    @GetMapping("/courses/{courseId}/studentQuestions/checkStatus")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#courseId, 'COURSE.ACCESS')")
-    public List<StudentQuestionDTO> checkAllStudentQuestions(@PathVariable int courseId, @PathVariable String status, Principal principal) {
+    public List<StudentQuestionDTO> checkAllStudentQuestions(@PathVariable int courseId, @RequestParam Optional<StudentQuestion.SubmittedStatus> status, Principal principal) {
 
         User user = (User) ((Authentication) principal).getPrincipal();
         if(user == null) {
             throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
         }
-
-        switch (status) {
-            case "":
-            case "all":
-                return checkStudentQuestionStatusService.findByCourseAndUser(courseId, user.getId());
-            case "approved":
+        if(status.isEmpty()) {
+            return checkStudentQuestionStatusService.findByCourseAndUser(courseId, user.getId());
+        }
+        StudentQuestion.SubmittedStatus newStatus = status.get();
+        switch (newStatus) {
+            case APPROVED:
                 return checkStudentQuestionStatusService.findByCourseUserAndStatus(courseId, user.getId(), StudentQuestion.SubmittedStatus.APPROVED);
-            case "rejected":
+            case REJECTED:
                 return checkStudentQuestionStatusService.findByCourseUserAndStatus(courseId, user.getId(), StudentQuestion.SubmittedStatus.REJECTED);
-            case "pending":
+            case WAITING_FOR_APPROVAL:
                 return checkStudentQuestionStatusService.findByCourseUserAndStatus(courseId, user.getId(), StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL);
             default:
                 throw new TutorException(INVALID_STUDENT_QUESTION_EVALUATION);
