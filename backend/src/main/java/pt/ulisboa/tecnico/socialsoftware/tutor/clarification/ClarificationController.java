@@ -16,7 +16,7 @@ public class ClarificationController {
     private ClarificationService clarificationService;
 
     @PutMapping("/clarifications/{requestId}/answer")
-    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#requestId, 'CLARIFICATION.SUBMIT_ANSWER')")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#requestId, 'CLARIFICATION.ACCESS')")
     public ClarificationRequestAnswerDto submitAnswer(Principal principal, @PathVariable int requestId, @RequestBody String answer) {
         User user = (User) ((Authentication) principal).getPrincipal();
 
@@ -24,7 +24,7 @@ public class ClarificationController {
     }
 
     @DeleteMapping("/clarifications/{requestId}/answer")
-    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#requestId, 'CLARIFICATION.DELETE_ANSWER')")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#requestId, 'CLARIFICATION.ACCESS')")
     public void deleteAnswer(Principal principal, @PathVariable int requestId) {
         User user = (User) ((Authentication) principal).getPrincipal();
 

@@ -12,6 +12,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.Clarificatio
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestAnswerDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
@@ -195,5 +197,11 @@ public class ClarificationService {
             throw new TutorException(ErrorMessage.ACCESS_DENIED);
         }
         return user;
+    }
+
+    public Integer findClarificationRequestCourseId(int requestId) {
+        return clarificationRequestRepository.findById(requestId)
+                .map(req -> req.getQuestion().getCourse().getId())
+                .orElse(-1);
     }
 }
