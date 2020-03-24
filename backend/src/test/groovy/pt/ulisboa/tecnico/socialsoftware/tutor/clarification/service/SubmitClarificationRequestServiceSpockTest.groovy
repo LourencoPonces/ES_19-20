@@ -99,6 +99,8 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         userRepository.save(student)
         quizAnswerRepository.save(quizAnswer)
 
+
+        clarificationRequestDto = new ClarificationRequestDto()
         questionId = question.getId()
         studentId = student.getId()
     }
@@ -149,7 +151,8 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
     def "the question has been answered and submit request"() {
         //the clarification request is created
         when:
-        clarificationRequestDto = clarificationService.submitClarificationRequest(CONTENT, questionId, studentId, new ClarificationRequestDto())
+        clarificationRequestDto.setContent(CONTENT)
+        clarificationRequestDto = clarificationService.submitClarificationRequest(questionId, student, clarificationRequestDto)
 
         then:"request is created and is in the repository"
         clarificationRequestRepository.count() == 1L
@@ -167,11 +170,13 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
     def "same student submits 2 requests for the same question"() {
         //throw exception
         given: "a second clarification request dto"
+        clarificationRequestDto.setContent(CONTENT)
         def clarificationDto2 = new ClarificationRequestDto()
+        clarificationDto2.setContent(CONTENT)
 
         when:
-        clarificationService.submitClarificationRequest(CONTENT, questionId, studentId, new ClarificationRequestDto())
-        clarificationService.submitClarificationRequest(CONTENT, questionId, studentId, clarificationDto2)
+        clarificationService.submitClarificationRequest(questionId, student, clarificationRequestDto)
+        clarificationService.submitClarificationRequest(questionId, student, clarificationDto2)
 
         then: "only the first one is saved and exception thrown"
         def exception = thrown(TutorException)
@@ -183,17 +188,17 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
     }
 
 
-    @Unroll("invalid arguments: #content | #is_student | #has_answered || #error_message")
+    @Unroll("invalid arguments: #content | #has_answered || #error_message")
     def "invalid arguments"() {
         given:
         def student2 = createStudent(new User(), KEY_TWO, NAME, USERNAME_TWO, courseExecution)
         userRepository.save(student2)
 
         when:
-        changeStudentId(has_answered, student2)
+        User s = changeStudent(has_answered, student2)
         changeQuestionId(is_question)
-        changeUserRole(is_student)
-        clarificationService.submitClarificationRequest(content, questionId, studentId, new ClarificationRequestDto())
+        clarificationRequestDto.setContent(content)
+        clarificationService.submitClarificationRequest(questionId, s, clarificationRequestDto)
 
         then:
         def exception = thrown(TutorException)
@@ -204,36 +209,26 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         result.getClarificationRequests().size() == 0
 
         where:
-        content | is_student | is_question | has_answered || error_message
-        ""      | true       | true        | true         || ErrorMessage.CLARIFICATION_REQUEST_MISSING_CONTENT
-        "    "  | true       | true        | true         || ErrorMessage.CLARIFICATION_REQUEST_MISSING_CONTENT
-        null    | true       | true        | true         || ErrorMessage.CLARIFICATION_REQUEST_MISSING_CONTENT
-        CONTENT | false      | true        | true         || ErrorMessage.ACCESS_DENIED
-        CONTENT | true       | false       | true         || ErrorMessage.QUESTION_NOT_FOUND
-        CONTENT | true       | true        | false        || ErrorMessage.QUESTION_NOT_ANSWERED_BY_STUDENT
+        content | is_question | has_answered || error_message
+        ""      | true        | true         || ErrorMessage.CLARIFICATION_REQUEST_MISSING_CONTENT
+        "    "  | true        | true         || ErrorMessage.CLARIFICATION_REQUEST_MISSING_CONTENT
+        null    | true        | true         || ErrorMessage.CLARIFICATION_REQUEST_MISSING_CONTENT
+        CONTENT | false       | true         || ErrorMessage.QUESTION_NOT_FOUND
+        CONTENT | true        | false        || ErrorMessage.QUESTION_NOT_ANSWERED_BY_STUDENT
     }
 
 
-    def changeStudentId(boolean has_answered, User student2) {
+    def changeStudent(boolean has_answered, User student2) {
         if (!has_answered) {
-            studentId = student2.getId()
+            return student2
         }
+        return student
     }
 
     def changeQuestionId(boolean is_question) {
         if (!is_question) {
             questionId = INEXISTENT_QUESTION_ID
         }
-    }
-
-    def changeUserRole(boolean is_student) {
-        if (!is_student) {
-            student.setRole(Role.TEACHER)
-        }
-        else {
-            student.setRole(Role.STUDENT)
-        }
-        userRepository.save(student)
     }
 
     @TestConfiguration
