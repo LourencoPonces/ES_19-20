@@ -1720,7 +1720,7 @@ INSERT INTO student_question(id, user_id, submitted_status, justification, stude
             <stringProp name="HTTPSampler.port">${port}</stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/courses/${courseId}/studentQuestions/checkStatus/all</stringProp>
+            <stringProp name="HTTPSampler.path">/courses/${courseId}/studentQuestions/checkStatus</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1759,7 +1759,7 @@ INSERT INTO student_question(id, user_id, submitted_status, justification, stude
             <stringProp name="HTTPSampler.port">${port}</stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/courses/${courseId}/studentQuestions/checkStatus/approved</stringProp>
+            <stringProp name="HTTPSampler.path">/courses/${courseId}/studentQuestions/checkStatus?status=APPROVED</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1798,7 +1798,7 @@ INSERT INTO student_question(id, user_id, submitted_status, justification, stude
             <stringProp name="HTTPSampler.port">${port}</stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/courses/${courseId}/studentQuestions/checkStatus/rejected</stringProp>
+            <stringProp name="HTTPSampler.path">/courses/${courseId}/studentQuestions/checkStatus?status=REJECTED</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -1837,7 +1837,7 @@ INSERT INTO student_question(id, user_id, submitted_status, justification, stude
             <stringProp name="HTTPSampler.port">${port}</stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/courses/${courseId}/studentQuestions/checkStatus/pending</stringProp>
+            <stringProp name="HTTPSampler.path">/courses/${courseId}/studentQuestions/checkStatus?status=WAITING_FOR_APPROVAL</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>

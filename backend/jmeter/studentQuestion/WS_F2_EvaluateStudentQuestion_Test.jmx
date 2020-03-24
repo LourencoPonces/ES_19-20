@@ -492,7 +492,7 @@ INSERT INTO student_question(id, user_id, submitted_status, student_question_key
             <stringProp name="HTTPSampler.port">${port}</stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/courses/${courseId}/studentQuestions/approved</stringProp>
+            <stringProp name="HTTPSampler.path">/courses/${courseId}/studentQuestions?status=APPROVED</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -567,7 +567,7 @@ INSERT INTO student_question(id, user_id, submitted_status, student_question_key
             <stringProp name="HTTPSampler.port">${port}</stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/courses/${courseId}/studentQuestions/rejected</stringProp>
+            <stringProp name="HTTPSampler.path">/courses/${courseId}/studentQuestions?status=REJECTED</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -624,7 +624,7 @@ INSERT INTO student_question(id, user_id, submitted_status, student_question_key
             <stringProp name="HTTPSampler.port">${port}</stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/courses/${courseId}/studentQuestions/pending</stringProp>
+            <stringProp name="HTTPSampler.path">/courses/${courseId}/studentQuestions?status=WAITING_FOR_APPROVAL</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
