@@ -162,10 +162,10 @@ class RemoveAnswerTest extends Specification {
 
     def "remove an answer"() {
         given: "answered clarification request"
-        clarificationService.submitClarificationRequestAnswer(teacherId, reqId, "some answer")
+        clarificationService.submitClarificationRequestAnswer(teacher, reqId, "some answer")
 
         when: "answer is removed"
-        clarificationService.removeClarificationRequestAnswer(teacherId, reqId)
+        clarificationService.removeClarificationRequestAnswer(teacher, reqId)
 
         then: "clarification request has no answer"
         clarificationRequest.getAnswer().isEmpty()
@@ -182,7 +182,7 @@ class RemoveAnswerTest extends Specification {
         // empty
 
         when: "answer is removed"
-        clarificationService.removeClarificationRequestAnswer(teacherId, reqId)
+        clarificationService.removeClarificationRequestAnswer(teacher, reqId)
 
         then: "thrown exception"
         def exception = thrown(TutorException)
@@ -191,7 +191,7 @@ class RemoveAnswerTest extends Specification {
 
     def "don't remove non-existent things"() {
         when: "trying to remove an answer from a non-existent clarification request"
-        clarificationService.removeClarificationRequestAnswer(teacherId, clarificationRequest.getId() + 10)
+        clarificationService.removeClarificationRequestAnswer(teacher, clarificationRequest.getId() + 10)
 
         then: "thrown exception"
         def exception = thrown(TutorException)
@@ -200,10 +200,10 @@ class RemoveAnswerTest extends Specification {
 
     def "students can't remove answers"() {
         given: "an answered clarification request"
-        clarificationService.submitClarificationRequestAnswer(teacherId, reqId, "some answer")
+        clarificationService.submitClarificationRequestAnswer(teacher, reqId, "some answer")
 
         when: "student tries to remove an answer"
-        clarificationService.removeClarificationRequestAnswer(studentId, reqId)
+        clarificationService.removeClarificationRequestAnswer(student, reqId)
 
         then: "thrown exception"
         def exception = thrown(TutorException)

@@ -101,9 +101,15 @@ public class ClarificationService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void removeClarificationRequestAnswer(int teacherId, int reqId) {
-        // check if user is a teacher
-        getTeacher(teacherId);
+    public void removeClarificationRequestAnswer(User teacher, int reqId) {
+        if (teacher == null) {
+            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
+        }
+
+        // TODO: is this check really necessary? the controller already does it anyway
+        if (teacher.getRole() != User.Role.TEACHER) {
+            throw new TutorException(ErrorMessage.ACCESS_DENIED);
+        }
 
         ClarificationRequest req = clarificationRequestRepository.findById(reqId)
                 .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, reqId));
@@ -186,15 +192,6 @@ public class ClarificationService {
         User user = userRepository.findById(userId).orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, userId));
 
         if (user.getRole() != User.Role.STUDENT) {
-            throw new TutorException(ErrorMessage.ACCESS_DENIED);
-        }
-        return user;
-    }
-
-    private User getTeacher(int userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, userId));
-
-        if (user.getRole() != User.Role.TEACHER) {
             throw new TutorException(ErrorMessage.ACCESS_DENIED);
         }
         return user;
