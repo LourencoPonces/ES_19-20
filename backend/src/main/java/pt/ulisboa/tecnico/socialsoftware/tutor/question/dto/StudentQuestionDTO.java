@@ -47,9 +47,10 @@ public class StudentQuestionDTO extends QuestionDto{
 
     @Override
     public String toString() {
-        return "QuestionDto{" +
+        return "StudentQuestionDto{" +
                 "id=" + this.getId() +
-                ", id=" + this.getId() +
+                ", key=" + this.getKey() +
+                ", studentQuestionKey=" + this.getStudentQuestionKey() +
                 ", title='" + this.getTitle() + '\'' +
                 ", content='" + this.getContent() + '\'' +
                 ", difficulty=" + this.getDifficulty() +
