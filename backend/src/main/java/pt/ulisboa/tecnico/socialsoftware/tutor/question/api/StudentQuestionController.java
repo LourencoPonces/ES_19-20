@@ -67,12 +67,6 @@ public class StudentQuestionController {
      * F2: Teacher evaluates student question
      * ===========================================
      */
-//
-//    @GetMapping("/courses/{courseId}/studentQuestions")
-//    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#courseId, 'COURSE.ACCESS')")
-//    public List<StudentQuestionDTO> getCourseStudentQuestions(@PathVariable int courseId){
-//
-//    }
 
     @GetMapping("/courses/{courseId}/studentQuestions")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#courseId, 'COURSE.ACCESS')")
@@ -81,16 +75,8 @@ public class StudentQuestionController {
             return teacherEvaluatesStudentQuestionService.getAllStudentQuestions(courseId);
         }
         StudentQuestion.SubmittedStatus newStatus = status.get();
-        switch (newStatus) {
-            case APPROVED:
-                return teacherEvaluatesStudentQuestionService.getAllStudentQuestionsWithStatus(courseId, StudentQuestion.SubmittedStatus.APPROVED);
-            case REJECTED:
-                return teacherEvaluatesStudentQuestionService.getAllStudentQuestionsWithStatus(courseId, StudentQuestion.SubmittedStatus.REJECTED);
-            case WAITING_FOR_APPROVAL:
-                return teacherEvaluatesStudentQuestionService.getAllStudentQuestionsWithStatus(courseId, StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL);
-            default:
-                throw new TutorException(INVALID_STUDENT_QUESTION_EVALUATION);
-        }
+
+        return teacherEvaluatesStudentQuestionService.getAllStudentQuestionsWithStatus(courseId, newStatus);
     }
 
 
@@ -127,15 +113,7 @@ public class StudentQuestionController {
             return checkStudentQuestionStatusService.findByCourseAndUser(courseId, user.getId());
         }
         StudentQuestion.SubmittedStatus newStatus = status.get();
-        switch (newStatus) {
-            case APPROVED:
-                return checkStudentQuestionStatusService.findByCourseUserAndStatus(courseId, user.getId(), StudentQuestion.SubmittedStatus.APPROVED);
-            case REJECTED:
-                return checkStudentQuestionStatusService.findByCourseUserAndStatus(courseId, user.getId(), StudentQuestion.SubmittedStatus.REJECTED);
-            case WAITING_FOR_APPROVAL:
-                return checkStudentQuestionStatusService.findByCourseUserAndStatus(courseId, user.getId(), StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL);
-            default:
-                throw new TutorException(INVALID_STUDENT_QUESTION_EVALUATION);
-        }
+
+        return checkStudentQuestionStatusService.findByCourseUserAndStatus(courseId, user.getId(), newStatus);
     }
 }
