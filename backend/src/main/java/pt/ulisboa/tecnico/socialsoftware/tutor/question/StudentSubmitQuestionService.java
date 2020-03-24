@@ -60,9 +60,11 @@ public class StudentSubmitQuestionService {
             studentQuestionDTO.setCreationDate(LocalDateTime.now().format(Course.formatter));
         }
 
+
         User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(USER_NOT_FOUND, studentId));
         StudentQuestion studentQuestion = new StudentQuestion(course, studentQuestionDTO, student);
 
+        student.addStudentQuestion(studentQuestion);
         this.entityManager.persist(studentQuestion);
 
         return new StudentQuestionDTO(studentQuestion);
