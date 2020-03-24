@@ -116,7 +116,6 @@ class GetAvailableTournamentsTest extends Specification {
         runningDate = LocalDateTime.now().plusDays(1)
         conclusionDate = LocalDateTime.now().plusDays(2)
         tournamentDto.setNumberOfQuestions(1)
-        tournamentDto.setCreator(creatorDto)
         tournamentDto.setCreationDate(creationDate.format(formatter))
         tournamentDto.setAvailableDate(availableDate.format(formatter))
         tournamentDto.setRunningDate(runningDate.format(formatter))
@@ -126,7 +125,7 @@ class GetAvailableTournamentsTest extends Specification {
 
     def "get the available tournaments"() {
         given: "an available tournament"
-        tournamentService.createTournament(courseExecution.getId(), tournamentDto)
+        tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
 
         when:
         def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId())
@@ -168,7 +167,7 @@ class GetAvailableTournamentsTest extends Specification {
         tournamentDto.setAvailableDate(availableDate.format(formatter))
         tournamentDto.setRunningDate(runningDate.format(formatter))
         tournamentDto.setConclusionDate(conclusionDate.format(formatter))
-        tournamentService.createTournament(courseExecution.getId(), tournamentDto)
+        tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
 
         when:
         tournamentService.getAvailableTournaments(courseExecution.getId())

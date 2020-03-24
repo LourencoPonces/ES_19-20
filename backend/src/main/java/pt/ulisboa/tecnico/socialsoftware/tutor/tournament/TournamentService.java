@@ -54,10 +54,16 @@ public class TournamentService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public TournamentDto createTournament(int executionId, TournamentDto tournamentDto) {
+    public TournamentDto createTournament(String username, int executionId, TournamentDto tournamentDto) {
         CourseExecution courseExecution = getCourseExecution(executionId);
 
-        User creator = userRepository.findByUsername(tournamentDto.getCreator().getUsername());
+        User creator = userRepository.findByUsername(username);
+
+        if (tournamentDto.getKey() == null) {
+            int maxQuestionNumber = tournamentRepository.getMaxTournamentKey() != null ?
+                    tournamentRepository.getMaxTournamentKey() : 0;
+            tournamentDto.setKey(maxQuestionNumber + 1);
+        }
 
         Tournament tournament = new Tournament(tournamentDto);
 
@@ -68,8 +74,6 @@ public class TournamentService {
         tournamentDto.setParticipants(new ArrayList<>());
 
         addCreator(tournamentDto, creator, tournament);
-
-        setCreationDate(tournamentDto, tournament);
 
         tournament.setCourseExecution(courseExecution);
         entityManager.persist(tournament);
@@ -91,17 +95,6 @@ public class TournamentService {
             tournamentDto.getParticipants().add(tournamentDto.getCreator());
         } else {
             throw new TutorException(TOURNAMENT_CREATED_BY_NON_STUDENT);
-        }
-    }
-
-    private void setCreationDate(TournamentDto tournamentDto, Tournament tournament) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        if (tournamentDto.getCreationDate() == null) {
-            LocalDateTime now = LocalDateTime.now();
-            tournament.setCreationDate(now);
-            tournamentDto.setCreationDate(now.format(formatter));
-        } else {
-            tournament.setCreationDate(LocalDateTime.parse(tournamentDto.getCreationDate(), formatter));
         }
     }
 
