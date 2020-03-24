@@ -190,6 +190,33 @@ class StudentSubmitQuestionTest extends Specification {
         list.add(o)
     }
 
+    def "performance test to create 1000 student questions" () {
+        given: " a StudentQuestionDTOs"
+        def questionDto = new StudentQuestionDTO()
+        StudentQuestionDtoSetup(questionDto)
+        and: "a TopicDTO"
+        def topicDto = new TopicDto()
+        topicDto.setName(TOPIC_NAME)
+        def topicList = new ArrayList<TopicDto>()
+        addToList(topicList, topicDto)
+        questionDto.setTopics(topicList)
+        and: "a OptionDTO"
+        def optionDto = new OptionDto()
+        optionDto.setContent(OPTION_CONTENT)
+        optionDto.setCorrect(true)
+        def optionList = new ArrayList<OptionDto>()
+        addToList(optionList, optionDto)
+        questionDto.setOptions(optionList)
+
+        when:
+        1.upto(1000, {
+            studentSubmitQuestionService.studentSubmitQuestion(course.getId(), questionDto, user.getId())
+            questionDto.setStudentQuestionKey(null)})
+
+        then:
+        true
+    }
+
     def "create 2 new suggestions with 1 Topic each and submit for approval"() {
         given: " a StudentQuestionDTOs"
         def questionDto = new StudentQuestionDTO()
