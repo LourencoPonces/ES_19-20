@@ -27,7 +27,7 @@ public class TournamentController {
     public TournamentDto createTournament(Principal principal, @PathVariable int executionId, @RequestBody TournamentDto tournamentDto) {
         User user = (User) ((Authentication) principal).getPrincipal();
 
-        if(user == null){
+        if (user == null) {
             throw new TutorException(AUTHENTICATION_ERROR);
         }
 
@@ -39,7 +39,7 @@ public class TournamentController {
     public List<TournamentDto> getAvailableTournaments(Principal principal, @PathVariable int executionId) {
         User user = (User) ((Authentication) principal).getPrincipal();
 
-        if(user == null){
+        if (user == null) {
             throw new TutorException(AUTHENTICATION_ERROR);
         }
 
@@ -47,15 +47,14 @@ public class TournamentController {
     }
 
     @PostMapping("/tournaments/{tournamentId}/sign-up")
-    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#tournamentId, 'TOURNAMENT.ACESS')") //Does it works?
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#tournamentId, 'TOURNAMENT.ACCESS')")
     public void signUpInTournament(Principal principal, @PathVariable int tournamentId) {
         User user = (User) ((Authentication) principal).getPrincipal();
 
-        if(user == null){
+        if (user == null) {
             throw new TutorException(AUTHENTICATION_ERROR);
         }
 
-        String username = user.getUsername();
-        tournamentService.signUpInTournament(tournamentId, username);
+        tournamentService.signUpInTournament(tournamentId, user.getUsername());
     }
 }
