@@ -125,7 +125,6 @@ public class Topic {
         return "Topic{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", parentTopic=" + parentTopic +
                 '}';
     }
 
@@ -136,15 +135,7 @@ public class Topic {
         getQuestions().forEach(question -> question.getTopics().remove(this));
         getQuestions().clear();
 
-        if (this.parentTopic != null) {
-            parentTopic.getChildrenTopics().remove(this);
-            parentTopic.getChildrenTopics().addAll(this.getChildrenTopics());
-        }
-
-        this.childrenTopics.forEach(topic -> topic.parentTopic = this.parentTopic);
         this.topicConjunctions.forEach(topicConjunction -> topicConjunction.getTopics().remove(this));
 
-        this.parentTopic = null;
-        this.childrenTopics.clear();
     }
 }
