@@ -47,13 +47,13 @@
         <stringProp name="driver">org.postgresql.Driver</stringProp>
         <stringProp name="initQuery"></stringProp>
         <boolProp name="keepAlive">true</boolProp>
-        <stringProp name="password">ES2020</stringProp>
+        <stringProp name="password"></stringProp>
         <stringProp name="poolMax">0</stringProp>
         <boolProp name="preinit">false</boolProp>
         <stringProp name="timeout">10000</stringProp>
         <stringProp name="transactionIsolation">DEFAULT</stringProp>
         <stringProp name="trimInterval">60000</stringProp>
-        <stringProp name="username">daniel</stringProp>
+        <stringProp name="username">lulatheboo</stringProp>
       </JDBCDataSource>
       <hashTree/>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Users Thread Group" enabled="true">
@@ -153,61 +153,63 @@
           <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Set up student Questions" enabled="true">
             <stringProp name="dataSource">sampleReq</stringProp>
             <stringProp name="query">
-INSERT INTO courses(id, name, type) values(3, &apos;TEST_COURSE&apos;, &apos;TECNICO&apos;);
-INSERT INTO questions(id, title, content, course_id, status) VALUES(10000, &apos;Question10000&apos;, &apos;Content10000&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10000);
-INSERT INTO options(question_id, content, correct) VALUES(10000, &apos;EVAL_STUDENT_QUESTION_OPTION&apos;, true);
-INSERT INTO student_question(id, user_id, submitted_status, student_question_key) VALUES(10000, 676, &apos;WAITING_FOR_APPROVAL&apos;, 10000);
+INSERT INTO topics(id, name, course_id) VALUES(1000, &apos;Testing topic&apos;, 2);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10001, &apos;Question10001&apos;, &apos;Content10001&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10001);
-INSERT INTO options(question_id, content, correct) VALUES(10001, &apos;EVAL_STUDENT_QUESTION_OPTION&apos;, true);
-INSERT INTO student_question(id, user_id, submitted_status, student_question_key) VALUES(10001, 676, &apos;WAITING_FOR_APPROVAL&apos;, 10001);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10001);
+INSERT INTO options(question_id, content, correct) VALUES(10001, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
+INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10001, 676, &apos;WAITING_FOR_APPROVAL&apos;, &apos;&apos;, 10001);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10002, &apos;Question10002&apos;, &apos;Content10002&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10002);
-INSERT INTO options(question_id, content, correct) VALUES(10002, &apos;EVAL_STUDENT_QUESTION_OPTION&apos;, true);
-INSERT INTO student_question(id, user_id, submitted_status, student_question_key) VALUES(10002, 676, &apos;WAITING_FOR_APPROVAL&apos;, 10002);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10002);
+INSERT INTO options(question_id, content, correct) VALUES(10002, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
+INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10002, 676, &apos;WAITING_FOR_APPROVAL&apos;, &apos;&apos;, 10002);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10003, &apos;Question10003&apos;, &apos;Content10003&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10003);
-INSERT INTO options(question_id, content, correct) VALUES(10003, &apos;EVAL_STUDENT_QUESTION_OPTION&apos;, true);
-INSERT INTO student_question(id, user_id, submitted_status, student_question_key) VALUES(10003, 676, &apos;WAITING_FOR_APPROVAL&apos;, 10003);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10003);
+INSERT INTO options(question_id, content, correct) VALUES(10003, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
+INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10003, 676, &apos;WAITING_FOR_APPROVAL&apos;, &apos;&apos;, 10003);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10004, &apos;Question10004&apos;, &apos;Content10004&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10004);
-INSERT INTO options(question_id, content, correct) VALUES(10004, &apos;EVAL_STUDENT_QUESTION_OPTION&apos;, true);
-INSERT INTO student_question(id, user_id, submitted_status, student_question_key) VALUES(10004, 676, &apos;WAITING_FOR_APPROVAL&apos;, 10004);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10004);
+INSERT INTO options(question_id, content, correct) VALUES(10004, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
+INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10004, 676, &apos;WAITING_FOR_APPROVAL&apos;, &apos;&apos;, 10004);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10005, &apos;Question10005&apos;, &apos;Content10005&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10005);
-INSERT INTO options(question_id, content, correct) VALUES(10005, &apos;EVAL_STUDENT_QUESTION_OPTION&apos;, true);
-INSERT INTO student_question(id, user_id, submitted_status, student_question_key) VALUES(10005, 676, &apos;WAITING_FOR_APPROVAL&apos;, 10005);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10005);
+INSERT INTO options(question_id, content, correct) VALUES(10005, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
+INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10005, 676, &apos;WAITING_FOR_APPROVAL&apos;, &apos;&apos;, 10005);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10006, &apos;Question10006&apos;, &apos;Content10006&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10006);
-INSERT INTO options(question_id, content, correct) VALUES(10006, &apos;EVAL_STUDENT_QUESTION_OPTION&apos;, true);
-INSERT INTO student_question(id, user_id, submitted_status, student_question_key) VALUES(10006, 676, &apos;WAITING_FOR_APPROVAL&apos;, 10006);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10006);
+INSERT INTO options(question_id, content, correct) VALUES(10006, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
+INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10006, 676, &apos;WAITING_FOR_APPROVAL&apos;, &apos;&apos;, 10006);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10007, &apos;Question10007&apos;, &apos;Content10007&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10007);
-INSERT INTO options(question_id, content, correct) VALUES(10007, &apos;EVAL_STUDENT_QUESTION_OPTION&apos;, true);
-INSERT INTO student_question(id, user_id, submitted_status, student_question_key) VALUES(10007, 676, &apos;WAITING_FOR_APPROVAL&apos;, 10007);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10007);
+INSERT INTO options(question_id, content, correct) VALUES(10007, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
+INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10007, 676, &apos;WAITING_FOR_APPROVAL&apos;, &apos;&apos;, 10007);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10008, &apos;Question10008&apos;, &apos;Content10008&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10008);
-INSERT INTO options(question_id, content, correct) VALUES(10008, &apos;EVAL_STUDENT_QUESTION_OPTION&apos;, true);
-INSERT INTO student_question(id, user_id, submitted_status, student_question_key) VALUES(10008, 676, &apos;WAITING_FOR_APPROVAL&apos;, 10008);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10008);
+INSERT INTO options(question_id, content, correct) VALUES(10008, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
+INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10008, 676, &apos;WAITING_FOR_APPROVAL&apos;, &apos;&apos;, 10008);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10009, &apos;Question10009&apos;, &apos;Content10009&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10009);
-INSERT INTO options(question_id, content, correct) VALUES(10009, &apos;EVAL_STUDENT_QUESTION_OPTION&apos;, true);
-INSERT INTO student_question(id, user_id, submitted_status, student_question_key) VALUES(10009, 676, &apos;WAITING_FOR_APPROVAL&apos;, 10009);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10009);
+INSERT INTO options(question_id, content, correct) VALUES(10009, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
+INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10009, 676, &apos;WAITING_FOR_APPROVAL&apos;, &apos;&apos;, 10009);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10010, &apos;Question10010&apos;, &apos;Content10010&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10010);
-INSERT INTO options(question_id, content, correct) VALUES(10010, &apos;EVAL_STUDENT_QUESTION_OPTION&apos;, true);
-INSERT INTO student_question(id, user_id, submitted_status, student_question_key) VALUES(10010, 676, &apos;WAITING_FOR_APPROVAL&apos;, 10010);</stringProp>
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10010);
+INSERT INTO options(question_id, content, correct) VALUES(10010, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
+INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10010, 676, &apos;WAITING_FOR_APPROVAL&apos;, &apos;&apos;, 10010);
+
+INSERT INTO questions(id, title, content, course_id, status) VALUES(10011, &apos;Question10011&apos;, &apos;Content10011&apos;, 2, &apos;DISABLED&apos;);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10011);
+INSERT INTO options(question_id, content, correct) VALUES(10011, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
+INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10011, 676, &apos;WAITING_FOR_APPROVAL&apos;, &apos;&apos;, 10011);
+</stringProp>
             <stringProp name="queryArguments"></stringProp>
             <stringProp name="queryArgumentsTypes"></stringProp>
             <stringProp name="queryTimeout"></stringProp>
@@ -765,43 +767,6 @@ INSERT INTO student_question(id, user_id, submitted_status, student_question_key
           <stringProp name="filename"></stringProp>
         </ResultCollector>
         <hashTree/>
-        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
-          <boolProp name="ResultCollector.error_logging">false</boolProp>
-          <objProp>
-            <name>saveConfig</name>
-            <value class="SampleSaveConfiguration">
-              <time>true</time>
-              <latency>true</latency>
-              <timestamp>true</timestamp>
-              <success>true</success>
-              <label>true</label>
-              <code>true</code>
-              <message>true</message>
-              <threadName>true</threadName>
-              <dataType>true</dataType>
-              <encoding>false</encoding>
-              <assertions>true</assertions>
-              <subresults>true</subresults>
-              <responseData>false</responseData>
-              <samplerData>false</samplerData>
-              <xml>false</xml>
-              <fieldNames>true</fieldNames>
-              <responseHeaders>false</responseHeaders>
-              <requestHeaders>false</requestHeaders>
-              <responseDataOnError>false</responseDataOnError>
-              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
-              <assertionsResultsToSave>0</assertionsResultsToSave>
-              <bytes>true</bytes>
-              <sentBytes>true</sentBytes>
-              <url>true</url>
-              <threadCounts>true</threadCounts>
-              <idleTime>true</idleTime>
-              <connectTime>true</connectTime>
-            </value>
-          </objProp>
-          <stringProp name="filename"></stringProp>
-        </ResultCollector>
-        <hashTree/>
         <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
@@ -857,11 +822,10 @@ INSERT INTO student_question(id, user_id, submitted_status, student_question_key
         <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="JDBC Request" enabled="true">
           <stringProp name="dataSource">sampleReq</stringProp>
           <stringProp name="query">DELETE FROM student_question;
-DELETE FROM options where content = &apos;EVAL_STUDENT_QUESTION_OPTION&apos;;
-DELETE FROM topics_questions where questions_id &gt;= 10000 and questions_id &lt;= 10010;
-DELETE FROM questions where id &gt;= 10000 and id &lt;= 10010;
-DELETE FROM courses WHERE id = 3;
-</stringProp>
+DELETE FROM options where content = &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;;
+DELETE FROM topics_questions where questions_id &gt;= 10001 and questions_id &lt;= 10012;
+DELETE FROM questions where id &gt;= 10001 and id &lt; 10012;
+DELETE FROM topics where id = 1000;</stringProp>
           <stringProp name="queryArguments"></stringProp>
           <stringProp name="queryArgumentsTypes"></stringProp>
           <stringProp name="queryTimeout"></stringProp>

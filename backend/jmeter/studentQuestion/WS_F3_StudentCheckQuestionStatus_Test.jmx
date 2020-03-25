@@ -153,79 +153,81 @@
           <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Set up student Questions" enabled="true">
             <stringProp name="dataSource">sampleReq</stringProp>
             <stringProp name="query">
+INSERT INTO topics(id, name, course_id) VALUES(1000, &apos;Testing topic&apos;, 2);
+
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10001, &apos;Question10001&apos;, &apos;Content10001&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10001);
-INSERT INTO options(question_id, content, correct) VALUES(10001, &apos;CHECK_STUDENT_QUESTION_STATUS_TOPIC&apos;, true);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10001);
+INSERT INTO options(question_id, content, correct) VALUES(10001, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
 INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10001, 676, &apos;WAITING_FOR_APPROVAL&apos;, &apos;&apos;, 10001);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10002, &apos;Question10002&apos;, &apos;Content10002&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10002);
-INSERT INTO options(question_id, content, correct) VALUES(10002, &apos;CHECK_STUDENT_QUESTION_STATUS_TOPIC&apos;, true);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10002);
+INSERT INTO options(question_id, content, correct) VALUES(10002, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
 INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10002, 676, &apos;APPROVED&apos;, &apos;&apos;, 10002);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10003, &apos;Question10003&apos;, &apos;Content10003&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10003);
-INSERT INTO options(question_id, content, correct) VALUES(10003, &apos;CHECK_STUDENT_QUESTION_STATUS_TOPIC&apos;, true);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10003);
+INSERT INTO options(question_id, content, correct) VALUES(10003, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
 INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10003, 676, &apos;REJECTED&apos;, &apos;Inappropriate question&apos;, 10003);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10004, &apos;Question10004&apos;, &apos;Content10004&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10004);
-INSERT INTO options(question_id, content, correct) VALUES(10004, &apos;CHECK_STUDENT_QUESTION_STATUS_TOPIC&apos;, true);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10004);
+INSERT INTO options(question_id, content, correct) VALUES(10004, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
 INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10004, 676, &apos;WAITING_FOR_APPROVAL&apos;, &apos;&apos;, 10004);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10005, &apos;Question10005&apos;, &apos;Content10005&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10005);
-INSERT INTO options(question_id, content, correct) VALUES(10005, &apos;CHECK_STUDENT_QUESTION_STATUS_TOPIC&apos;, true);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10005);
+INSERT INTO options(question_id, content, correct) VALUES(10005, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
 INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10005, 676, &apos;APPROVED&apos;, &apos;&apos;, 10005);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10006, &apos;Question10006&apos;, &apos;Content10006&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10006);
-INSERT INTO options(question_id, content, correct) VALUES(10006, &apos;CHECK_STUDENT_QUESTION_STATUS_TOPIC&apos;, true);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10006);
+INSERT INTO options(question_id, content, correct) VALUES(10006, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
 INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10006, 676, &apos;REJECTED&apos;, &apos;Inappropriate question&apos;, 10006);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10007, &apos;Question10007&apos;, &apos;Content10007&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10007);
-INSERT INTO options(question_id, content, correct) VALUES(10007, &apos;CHECK_STUDENT_QUESTION_STATUS_TOPIC&apos;, true);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10007);
+INSERT INTO options(question_id, content, correct) VALUES(10007, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
 INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10007, 676, &apos;WAITING_FOR_APPROVAL&apos;, &apos;&apos;, 10007);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10008, &apos;Question10008&apos;, &apos;Content10008&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10008);
-INSERT INTO options(question_id, content, correct) VALUES(10008, &apos;CHECK_STUDENT_QUESTION_STATUS_TOPIC&apos;, true);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10008);
+INSERT INTO options(question_id, content, correct) VALUES(10008, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
 INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10008, 676, &apos;APPROVED&apos;, &apos;&apos;, 10008);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10009, &apos;Question10009&apos;, &apos;Content10009&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10009);
-INSERT INTO options(question_id, content, correct) VALUES(10009, &apos;CHECK_STUDENT_QUESTION_STATUS_TOPIC&apos;, true);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10009);
+INSERT INTO options(question_id, content, correct) VALUES(10009, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
 INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10009, 676, &apos;REJECTED&apos;, &apos;Inappropriate question&apos;, 10009);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10010, &apos;Question10010&apos;, &apos;Content10010&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10010);
-INSERT INTO options(question_id, content, correct) VALUES(10010, &apos;CHECK_STUDENT_QUESTION_STATUS_TOPIC&apos;, true);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10010);
+INSERT INTO options(question_id, content, correct) VALUES(10010, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
 INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10010, 676, &apos;WAITING_FOR_APPROVAL&apos;, &apos;&apos;, 10010);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10011, &apos;Question10011&apos;, &apos;Content10011&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10011);
-INSERT INTO options(question_id, content, correct) VALUES(10011, &apos;CHECK_STUDENT_QUESTION_STATUS_TOPIC&apos;, true);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10011);
+INSERT INTO options(question_id, content, correct) VALUES(10011, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
 INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10011, 676, &apos;APPROVED&apos;, &apos;&apos;, 10011);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10012, &apos;Question10012&apos;, &apos;Content10012&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10012);
-INSERT INTO options(question_id, content, correct) VALUES(10012, &apos;CHECK_STUDENT_QUESTION_STATUS_TOPIC&apos;, true);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10012);
+INSERT INTO options(question_id, content, correct) VALUES(10012, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
 INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10012, 676, &apos;REJECTED&apos;, &apos;Inappropriate question&apos;, 10012);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10013, &apos;Question10013&apos;, &apos;Content10013&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10013);
-INSERT INTO options(question_id, content, correct) VALUES(10013, &apos;CHECK_STUDENT_QUESTION_STATUS_TOPIC&apos;, true);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10013);
+INSERT INTO options(question_id, content, correct) VALUES(10013, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
 INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10013, 676, &apos;WAITING_FOR_APPROVAL&apos;, &apos;&apos;, 10013);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10014, &apos;Question10014&apos;, &apos;Content10014&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10014);
-INSERT INTO options(question_id, content, correct) VALUES(10014, &apos;CHECK_STUDENT_QUESTION_STATUS_TOPIC&apos;, true);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10014);
+INSERT INTO options(question_id, content, correct) VALUES(10014, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
 INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10014, 676, &apos;APPROVED&apos;, &apos;&apos;, 10014);
 
 INSERT INTO questions(id, title, content, course_id, status) VALUES(10015, &apos;Question10015&apos;, &apos;Content10015&apos;, 2, &apos;DISABLED&apos;);
-INSERT INTO topics_questions(topics_id, questions_id) VALUES(125, 10015);
-INSERT INTO options(question_id, content, correct) VALUES(10015, &apos;CHECK_STUDENT_QUESTION_STATUS_TOPIC&apos;, true);
+INSERT INTO topics_questions(topics_id, questions_id) VALUES(1000, 10015);
+INSERT INTO options(question_id, content, correct) VALUES(10015, &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;, true);
 INSERT INTO student_question(id, user_id, submitted_status, justification, student_question_key) VALUES(10015, 676, &apos;REJECTED&apos;, &apos;Inappropriate question&apos;, 10015);</stringProp>
             <stringProp name="queryArguments"></stringProp>
             <stringProp name="queryArgumentsTypes"></stringProp>
@@ -621,9 +623,10 @@ INSERT INTO student_question(id, user_id, submitted_status, justification, stude
         <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="JDBC Request" enabled="true">
           <stringProp name="dataSource">sampleReq</stringProp>
           <stringProp name="query">DELETE FROM student_question;
-DELETE FROM options where content = &apos;CHECK_STUDENT_QUESTION_STATUS_TOPIC&apos;;
+DELETE FROM options where content = &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;;
 DELETE FROM topics_questions where questions_id &gt;= 10001 and questions_id &lt;= 10016;
 DELETE FROM questions where id &gt;= 10001 and id &lt; 10016;
+DELETE FROM topics where id = 1000;
 </stringProp>
           <stringProp name="queryArguments"></stringProp>
           <stringProp name="queryArgumentsTypes"></stringProp>
