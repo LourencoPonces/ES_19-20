@@ -24,10 +24,6 @@ public class StudentQuestion extends Question {
         WAITING_FOR_APPROVAL, REJECTED, APPROVED
     }
 
-    // Do we need to have an id and key column?
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
 
 
     @Column(name="student_question_key")
@@ -65,12 +61,6 @@ public class StudentQuestion extends Question {
 
     }
 
-    @Override
-    public Integer getId() { return id; }
-
-    @Override
-    public void setId(Integer id) { this.id = id; }
-
     public Integer getStudentQuestionKey() { return studentQuestionKey; }
 
     public void setStudentQuestionKey(Integer studentQuestionKey) { this.studentQuestionKey = studentQuestionKey; }
@@ -98,7 +88,7 @@ public class StudentQuestion extends Question {
     @Override
     public String toString() {
         return "StudentQuestion{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", key=" + getKey() +
                 ", studentQuestionKey=" + studentQuestionKey +
                 ", content='" + getContent() + '\'' +
