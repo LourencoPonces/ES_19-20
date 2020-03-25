@@ -8,7 +8,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
-import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.TeacherEvaluatesStudentQuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Option
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion
@@ -18,11 +17,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
-import java.util.List
-
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.INVALID_JUSTIFICATION
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CANNOT_REJECT_ACCEPTED_SUGGESTION
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.STUDENT_QUESTION_NOT_FOUND
 
 @DataJpaTest
 class TeacherEvaluatesStudentQuestionProfilingTest extends Specification {
@@ -34,11 +28,6 @@ class TeacherEvaluatesStudentQuestionProfilingTest extends Specification {
     public static final String ACADEMIC_TERM = "1 SEM"
 
     public static final String USER_NAME = "ist199999"
-
-    public static final Integer STUDENT_QUESTION_KEY = 1
-    public static final Integer FAKE_STUDENT_QUESTION_ID = 2
-
-    public static final String VALID_JUSTIFICATION = "irrelevant question"
 
     @Autowired
     TeacherEvaluatesStudentQuestionService teacherEvaluatesStudentQuestionService
@@ -103,7 +92,7 @@ class TeacherEvaluatesStudentQuestionProfilingTest extends Specification {
      * ===========================================
      */
     def "performance testing to evaluate 10000 student questions"() {
-        def limit = 10000
+        def limit = 1  // USE 10000
         List<Integer> studentQuestions =new LinkedList<Integer>();
 
         Random random = new Random()
