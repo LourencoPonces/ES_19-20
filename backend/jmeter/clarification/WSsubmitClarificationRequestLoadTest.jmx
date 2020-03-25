@@ -1072,7 +1072,7 @@ INSERT INTO question_answers(id, quiz_answer_id, quiz_question_id, sequence) val
           </LoopController>
           <hashTree>
             <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
-              <stringProp name="filename">/home/mariana/Desktop/ES/quizzes-tutor/backend/jmeter/clarification/submitCarificationRequestData.csv</stringProp>
+              <stringProp name="filename">./submitCarificationRequestData.csv</stringProp>
               <stringProp name="fileEncoding">UTF-8</stringProp>
               <stringProp name="variableNames">questionId,test_key</stringProp>
               <boolProp name="ignoreFirstLine">false</boolProp>
@@ -1102,7 +1102,7 @@ INSERT INTO question_answers(id, quiz_answer_id, quiz_question_id, sequence) val
               <stringProp name="HTTPSampler.port">${port}</stringProp>
               <stringProp name="HTTPSampler.protocol"></stringProp>
               <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">/student/results/${questionId}/clarifications</stringProp>
+              <stringProp name="HTTPSampler.path">/student/results/questions/${questionId}/clarifications</stringProp>
               <stringProp name="HTTPSampler.method">POST</stringProp>
               <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
               <boolProp name="HTTPSampler.auto_redirects">false</boolProp>

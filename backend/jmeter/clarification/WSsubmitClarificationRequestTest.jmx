@@ -204,7 +204,7 @@ INSERT INTO question_answers(id, quiz_answer_id, quiz_question_id, sequence) val
             <stringProp name="HTTPSampler.port">${port}</stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/student/results/${questionId}/clarifications</stringProp>
+            <stringProp name="HTTPSampler.path">/student/results/questions/${questionId}/clarifications</stringProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
