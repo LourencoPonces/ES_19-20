@@ -61,11 +61,7 @@ public class TournamentService {
 
         User creator = userRepository.findByUsername(username);
 
-        if (tournamentDto.getKey() == null) {
-            int maxQuestionNumber = tournamentRepository.getMaxTournamentKey() != null ?
-                    tournamentRepository.getMaxTournamentKey() : 0;
-            tournamentDto.setKey(maxQuestionNumber + 1);
-        }
+        checkKey(tournamentDto);
 
         Tournament tournament = new Tournament(tournamentDto);
 
@@ -89,6 +85,14 @@ public class TournamentService {
         entityManager.persist(creator);
 
         return new TournamentDto(tournament);
+    }
+
+    private void checkKey(TournamentDto tournamentDto) {
+        if (tournamentDto.getKey() == null) {
+            int maxQuestionNumber = tournamentRepository.getMaxTournamentKey() != null ?
+                    tournamentRepository.getMaxTournamentKey() : 0;
+            tournamentDto.setKey(maxQuestionNumber + 1);
+        }
     }
 
     private void addCreator(TournamentDto tournamentDto, User creator, Tournament tournament) {
