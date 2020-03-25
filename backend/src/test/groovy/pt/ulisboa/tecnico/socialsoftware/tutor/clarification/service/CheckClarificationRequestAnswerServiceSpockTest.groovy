@@ -40,6 +40,7 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
     static final String USERNAME_TWO = "STUDENT_TWO"
     static final String NAME = "NAME"
     static final int INEXISTENT_QUESTION_ID = -1
+    static final int INEXISTENT_USER_ID = -1
     static final int KEY_ONE = 1
     static final int KEY_TWO = 2
 
@@ -168,7 +169,7 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
         clarificationRequestRepository.save(clarificationRequest)
 
         when:
-        def result = clarificationService.getClarificationRequestAnswer(student, question.getId())
+        def result = clarificationService.getClarificationRequestAnswer(student.getId(), question.getId())
 
         then:"the correct answer is returned"
         result != null
@@ -179,7 +180,7 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
 
     def "there is no answer available"() {
         when:
-        clarificationService.getClarificationRequestAnswer(student, question.getId())
+        def result = clarificationService.getClarificationRequestAnswer(student.getId(), question.getId())
 
         then: "no answer is returned"
         def exception = thrown(TutorException)
@@ -192,22 +193,54 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
         userRepository.save(student2)
 
         when:
-        clarificationService.getClarificationRequestAnswer(student2, question.getId())
+        clarificationService.getClarificationRequestAnswer(student2.getId(), question.getId())
 
         then: "an exception is thrown"
         def exception = thrown(TutorException)
         exception.getErrorMessage() == CLARIFICATION_REQUEST_NOT_SUBMITTED
     }
 
-    def "invalid question selected"() {
+    @Unroll("invalid arguments: #isUser | #isStudent| #isQuestion || #error_message")
+    def "invalid arguments"() {
+        given: "a user that isn't a student"
+        def teacher = createUser(new User(), KEY_TWO, NAME, USERNAME_TWO, User.Role.TEACHER, courseExecution)
+        userRepository.save(teacher)
+
         when:
-        clarificationService.getClarificationRequestAnswer(studentId, INEXISTENT_QUESTION_ID)
+        changeUser(isUser, isStudent, teacher.getId())
+        changeQuestion(isQuestion)
+        clarificationService.getClarificationRequestAnswer(studentId, questionId)
 
         then:
         def exception = thrown(TutorException)
-        exception.getErrorMessage() == QUESTION_NOT_FOUND
+        exception.getErrorMessage() == error_message
+
+        where:
+        isUser | isStudent | isQuestion || error_message
+        false  | true      | true       || USER_NOT_FOUND
+        true   | false     | true       || ACCESS_DENIED
+        true   | true      | false      || QUESTION_NOT_FOUND
     }
 
+    def changeUser(boolean isUser, boolean isStudent, int teacherId) {
+        if (isUser) {
+            if (isStudent)
+                studentId = student.getId()
+            else
+                studentId = teacherId
+        } else {
+            studentId = INEXISTENT_USER_ID
+        }
+    }
+
+    def changeQuestion(boolean isQuestion) {
+        if (isQuestion) {
+            questionId = question.getId()
+        }
+        else {
+            questionId = INEXISTENT_QUESTION_ID
+        }
+    }
 
     @TestConfiguration
     static class ClarificationServiceImplTestContextConfiguration {

@@ -35,6 +35,6 @@ public class ClarificationRequestController {
         if (user == null) {
             throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
         }
-        return clarificationService.submitClarificationRequest(questionId, user, clarificationRequestDto);
+        return clarificationService.submitClarificationRequest(questionId, user.getId(), clarificationRequestDto);
     }
 }
