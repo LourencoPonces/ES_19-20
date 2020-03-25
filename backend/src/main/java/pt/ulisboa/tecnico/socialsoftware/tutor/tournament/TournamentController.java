@@ -3,10 +3,7 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.tournament;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
@@ -33,7 +30,7 @@ public class TournamentController {
         return tournamentService.createTournament(user.getUsername(), executionId, tournamentDto);
     }
 
-    @PostMapping("/executions/{executionId}/tournaments/available")
+    @GetMapping("/executions/{executionId}/tournaments/available")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
     public List<TournamentDto> getAvailableTournaments(Principal principal, @PathVariable int executionId) {
         User user = (User) ((Authentication) principal).getPrincipal();
