@@ -226,13 +226,13 @@
             <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config" enabled="true">
               <stringProp name="delimiter">,</stringProp>
               <stringProp name="fileEncoding"></stringProp>
-              <stringProp name="filename">/home/tosmarcel/Documents/leic/es/es20al_19-project/backend/jmeter/tournament/tournaments.csv</stringProp>
+              <stringProp name="filename">./tournaments.csv</stringProp>
               <boolProp name="ignoreFirstLine">false</boolProp>
               <boolProp name="quotedData">false</boolProp>
               <boolProp name="recycle">true</boolProp>
               <stringProp name="shareMode">shareMode.all</stringProp>
               <boolProp name="stopThread">false</boolProp>
-              <stringProp name="variableNames">tournamentTitle</stringProp>
+              <stringProp name="variableNames">tournamentTitle,key</stringProp>
             </CSVDataSet>
             <hashTree/>
             <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create Tournament Request" enabled="true">
@@ -244,6 +244,7 @@
                     <stringProp name="Argument.value">{&#xd;
 	&quot;title&quot;: &quot;${tournamentTitle}&quot;,&#xd;
 	&quot;numberOfQuestions&quot;: 1,&#xd;
+	&quot;key&quot;: ${key},&#xd;
 	&quot;topics&quot;: ${__property(topics)},&#xd;
 	&quot;availableDate&quot;: &quot;2030-01-01 00:00&quot;,&#xd;
 	&quot;runningDate&quot;: &quot;2030-01-02 00:00&quot;,&#xd;
