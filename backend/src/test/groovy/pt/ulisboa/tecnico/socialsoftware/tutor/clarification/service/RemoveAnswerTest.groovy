@@ -198,18 +198,6 @@ class RemoveAnswerTest extends Specification {
         exception.getErrorMessage() == ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND
     }
 
-    def "students can't remove answers"() {
-        given: "an answered clarification request"
-        clarificationService.submitClarificationRequestAnswer(teacher, reqId, "some answer")
-
-        when: "student tries to remove an answer"
-        clarificationService.deleteClarificationRequestAnswer(student, reqId)
-
-        then: "thrown exception"
-        def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.ACCESS_DENIED
-    }
-
     @TestConfiguration
     static class ClarificationServiceImplTestContextConfiguration {
 

@@ -12,8 +12,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.Clarificatio
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestAnswerDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
@@ -27,7 +25,6 @@ import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Set;
-
 
 
 @Service
@@ -47,7 +44,7 @@ public class ClarificationService {
 
 
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public ClarificationRequestAnswerDto getClarificationRequestAnswer(int studentId, int questionId) {
@@ -68,19 +65,10 @@ public class ClarificationService {
     }
 
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public ClarificationRequestAnswerDto submitClarificationRequestAnswer(User teacher, int reqId, String answerText) {
-        if (teacher == null) {
-            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
-        }
-
-        // TODO: is this check really necessary? the controller already does it anyway
-        if (teacher.getRole() != User.Role.TEACHER) {
-            throw new TutorException(ErrorMessage.ACCESS_DENIED);
-        }
-
         ClarificationRequest req = clarificationRequestRepository.findById(reqId)
                 .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, reqId));
 
@@ -100,19 +88,10 @@ public class ClarificationService {
     }
 
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void deleteClarificationRequestAnswer(User teacher, int reqId) {
-        if (teacher == null) {
-            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
-        }
-
-        // TODO: is this check really necessary? the controller already does it anyway
-        if (teacher.getRole() != User.Role.TEACHER) {
-            throw new TutorException(ErrorMessage.ACCESS_DENIED);
-        }
-
         ClarificationRequest req = clarificationRequestRepository.findById(reqId)
                 .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, reqId));
 
@@ -125,7 +104,7 @@ public class ClarificationService {
     }
 
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public ClarificationRequestDto submitClarificationRequest(String text, int questionId, int userId, ClarificationRequestDto clarificationRequestDto) {

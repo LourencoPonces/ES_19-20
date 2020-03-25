@@ -189,22 +189,20 @@ class SubmitAnswerTest extends Specification {
     }
 
     @Unroll
-    def "validity check: (userIsTeacher=#isTeacher, validRequest=#validR, answer=#answer) -> #errorMessage"() {
+    def "validity check: (validRequest=#validR, answer=#answer) -> #errorMessage"() {
         when: "submitting an answer for a null clarification request"
-        def user = isTeacher ? teacher : student
         def rid = validR ? reqId : -1
-        clarificationService.submitClarificationRequestAnswer(user, rid, answer)
+        clarificationService.submitClarificationRequestAnswer(teacher, rid, answer)
 
         then: "an exception"
         def exception = thrown(TutorException)
         exception.getErrorMessage() == errorMessage
 
         where:
-        isTeacher | validR | answer     || errorMessage
-        true      | false  | ANSWER_1   || ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND
-        false     | true   | ANSWER_1   || ErrorMessage.ACCESS_DENIED
-        true      | true   | " \n  \t " || ErrorMessage.CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT
-        true      | true   | null       || ErrorMessage.CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT
+        validR | answer     || errorMessage
+        false  | ANSWER_1   || ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND
+        true   | " \n  \t " || ErrorMessage.CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT
+        true   | null       || ErrorMessage.CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT
     }
 
     @TestConfiguration
