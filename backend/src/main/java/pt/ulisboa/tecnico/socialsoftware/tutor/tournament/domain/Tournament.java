@@ -250,8 +250,9 @@ public class Tournament {
     }
 
     private void setDates(TournamentDto tournamentDto) {
-        creationDate = tournamentDto.getCreationDateDate();
-        this.creationDate = creationDate == null ? LocalDateTime.now() : creationDate;
+        this.creationDate = tournamentDto.getCreationDateDate();
+        if (this.creationDate == null) this.creationDate = LocalDateTime.now();
+
         this.availableDate = tournamentDto.getAvailableDateDate();
         this.runningDate = tournamentDto.getRunningDateDate();
         this.conclusionDate = tournamentDto.getConclusionDateDate();
