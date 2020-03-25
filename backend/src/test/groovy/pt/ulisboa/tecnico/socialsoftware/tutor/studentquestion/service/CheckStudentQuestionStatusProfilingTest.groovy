@@ -128,7 +128,7 @@ class CheckStudentQuestionStatusProfilingTest extends Specification {
      * ===========================================
      */
 
-    def "performace testing to evaluate 10000 students checking 300 questions"() {
+    def "performace testing to evaluate 300 questions 10000 times"() {
         def limit = 1 //USE 10000
         def limitQuestions = 1 //USE 300
         given: '10000 studentQuestions '
