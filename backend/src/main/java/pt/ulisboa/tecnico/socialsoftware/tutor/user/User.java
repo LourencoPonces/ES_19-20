@@ -68,7 +68,7 @@ public class User implements UserDetails {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator", fetch = FetchType.LAZY, orphanRemoval=true)
     private Set<Tournament> createdTournaments = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner", fetch = FetchType.LAZY)
     private Set<ClarificationRequest> clarificationRequests = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
@@ -405,6 +405,8 @@ public class User implements UserDetails {
     }
 
     public void addClarificationRequest(ClarificationRequest clarificationRequest) { this.clarificationRequests.add(clarificationRequest); }
+
+    public void addStudentQuestion (StudentQuestion studentQuestion) {this.studentQuestions.add(studentQuestion); }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

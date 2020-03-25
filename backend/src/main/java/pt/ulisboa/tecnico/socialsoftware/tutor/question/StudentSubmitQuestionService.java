@@ -19,6 +19,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
@@ -49,22 +50,21 @@ public class StudentSubmitQuestionService {
         Course course = courseRepository.findById(courseId).orElseThrow(() -> new TutorException(COURSE_NOT_FOUND, courseId));
 
         if (studentQuestionDTO.getStudentQuestionKey() == null) {
-            int maxStudentQuestionNumber = studentQuestionRepository.getMaxQuestionNumber() != null ?
-                    studentQuestionRepository.getMaxQuestionNumber() : 0;
+            int maxStudentQuestionNumber = studentQuestionRepository.getMaxQuestionNumberByUser(studentId) != null ?
+                    studentQuestionRepository.getMaxQuestionNumberByUser(studentId) : 0;
 
             studentQuestionDTO.setStudentQuestionKey(maxStudentQuestionNumber + 1);
         }
 
-        if(studentQuestionDTO.getKey() == null) {
-            int maxQuestionNumber = questionRepository.getMaxQuestionNumber() != null ?
-                    questionRepository.getMaxQuestionNumber() : 0;
-            studentQuestionDTO.setKey(maxQuestionNumber + 1);
+        if (studentQuestionDTO.getCreationDate() == null) {
+            studentQuestionDTO.setCreationDate(LocalDateTime.now().format(Course.formatter));
         }
 
 
         User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(USER_NOT_FOUND, studentId));
         StudentQuestion studentQuestion = new StudentQuestion(course, studentQuestionDTO, student);
 
+        student.addStudentQuestion(studentQuestion);
         this.entityManager.persist(studentQuestion);
 
         return new StudentQuestionDTO(studentQuestion);

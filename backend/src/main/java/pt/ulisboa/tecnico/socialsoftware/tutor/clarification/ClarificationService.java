@@ -107,14 +107,14 @@ public class ClarificationService {
             value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public ClarificationRequestDto submitClarificationRequest(String text, int questionId, int userId, ClarificationRequestDto clarificationRequestDto) {
+    public ClarificationRequestDto submitClarificationRequest(int questionId, int userId, ClarificationRequestDto clarificationRequestDto) {
         User user = getStudent(userId);
 
         checkIfDuplicate(questionId, user);
 
         Question question = tryGetAnsweredQuestion(questionId, userId);
 
-        ClarificationRequest clarificationRequest = createClarificationRequest(text, user, question, clarificationRequestDto);
+        ClarificationRequest clarificationRequest = createClarificationRequest(user, question, clarificationRequestDto);
         entityManager.persist(clarificationRequest);
 
         user.addClarificationRequest(clarificationRequest);
@@ -123,7 +123,11 @@ public class ClarificationService {
         return new ClarificationRequestDto(clarificationRequest);
     }
 
-    private ClarificationRequest createClarificationRequest(String text, User user, Question question, ClarificationRequestDto clarificationRequestDto) {
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    private ClarificationRequest createClarificationRequest(User user, Question question, ClarificationRequestDto clarificationRequestDto) {
         if (clarificationRequestDto.getKey() == null) {
             int max = clarificationRequestRepository.getMaxClarificationRequestKey() != null ?
                     clarificationRequestRepository.getMaxClarificationRequestKey() : 0;
@@ -132,7 +136,6 @@ public class ClarificationService {
 
         clarificationRequestDto.setOwner(user.getId());
         clarificationRequestDto.setQuestionId(question.getId());
-        clarificationRequestDto.setContent(text);
         ClarificationRequest clarificationRequest = new ClarificationRequest(user, question, clarificationRequestDto);
 
         if (clarificationRequestDto.getCreationDate() == null) {
@@ -143,6 +146,10 @@ public class ClarificationService {
         return clarificationRequest;
     }
 
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     private Question tryGetAnsweredQuestion(int questionId, int userId) {
         boolean answered = false;
         Question question = questionRepository.findById(questionId).orElseThrow(() -> new TutorException(ErrorMessage.QUESTION_NOT_FOUND, questionId));
@@ -169,6 +176,10 @@ public class ClarificationService {
         }
     }
 
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     private User getStudent(int userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, userId));
 
