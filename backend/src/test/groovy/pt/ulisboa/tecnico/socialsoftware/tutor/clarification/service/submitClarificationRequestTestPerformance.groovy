@@ -9,7 +9,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuestionAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
@@ -37,6 +36,7 @@ class SubmitClarificationRequestTestPerformance extends Specification {
     static final String USERNAME_ONE = "STUDENT_ONE"
     static final String NAME = "NAME"
     static final int KEY_ONE = 1
+    static final int TEST_COUNT = 2 //test with 2000
 
     @Autowired
     CourseRepository courseRepository
@@ -94,7 +94,7 @@ class SubmitClarificationRequestTestPerformance extends Specification {
         student = createStudent(new User(), KEY_ONE, NAME, USERNAME_ONE, courseExecution)
         userRepository.save(student)
 
-        1.upto(1000, {
+        1.upto(TEST_COUNT, {
             int i = it as int
             question = createQuestion(course)
             quiz = createQuiz(i, courseExecution, Quiz.QuizType.GENERATED)
@@ -163,9 +163,9 @@ class SubmitClarificationRequestTestPerformance extends Specification {
         return course
     }
 
-    def "submit 1000 requests to 1000 different questions"() {
+    def "submit 2000 requests to 2000 different questions"() {
         when:
-        1.upto(1000, {
+        1.upto(TEST_COUNT, {
             clarificationRequest = new ClarificationRequestDto()
             clarificationRequest.setContent(CONTENT)
             clarificationService.submitClarificationRequest(it as int, student.getId(), clarificationRequest)
