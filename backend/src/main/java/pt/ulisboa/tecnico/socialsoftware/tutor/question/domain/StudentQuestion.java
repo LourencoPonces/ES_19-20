@@ -54,11 +54,6 @@ public class StudentQuestion extends Question {
         }
         justification = questionDto.getJustification();
 
-        for (TopicDto topicDto : questionDto.getTopics()) {
-            Topic t = new Topic(course, topicDto);
-            addTopic(t);
-        }
-
     }
 
     public Integer getStudentQuestionKey() { return studentQuestionKey; }
