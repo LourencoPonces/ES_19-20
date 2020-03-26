@@ -77,7 +77,11 @@ class TeacherApprovesStudentQuestionTest extends Specification {
     private StudentQuestion createStudentQuestion(User user, Course course) {
         def studentQuestion = new StudentQuestion()
         studentQuestion.addTopic(new Topic())
-        studentQuestion.addOption(new Option())
+
+        Option o = new Option()
+        o.setCorrect(true)
+        o.setQuestion(studentQuestion)
+        studentQuestion.addOption(o)
         studentQuestion.setKey(STUDENT_QUESTION_KEY)
         studentQuestion.setStudentQuestionKey(STUDENT_QUESTION_KEY)
         studentQuestion.setUser(user)
@@ -97,7 +101,7 @@ class TeacherApprovesStudentQuestionTest extends Specification {
 
     def "approve existing pending question with no justification"() {
         when:
-        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(savedQuestionId)
+        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(savedQuestionId, null)
 
         then:
         studentQuestionRepository.count() == 1L
@@ -129,10 +133,8 @@ class TeacherApprovesStudentQuestionTest extends Specification {
         //   empty strings or null
         where:
         justification || result
-        ""            || INVALID_JUSTIFICATION
         "   "         || INVALID_JUSTIFICATION
         "\n  \t"      || INVALID_JUSTIFICATION
-        null          || INVALID_JUSTIFICATION
     }
 
     def "approve already evaluated student question, #isApproved->#result"() {
@@ -143,7 +145,7 @@ class TeacherApprovesStudentQuestionTest extends Specification {
 
 
         when:
-        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(savedQuestionId)
+        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(savedQuestionId, null)
 
         then:
         studentQuestionRepository.findAll().get(0).getSubmittedStatus() == result
@@ -156,7 +158,7 @@ class TeacherApprovesStudentQuestionTest extends Specification {
 
     def "approve non existing student question"(){
         when:
-        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(FAKE_STUDENT_QUESTION_ID)
+        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(FAKE_STUDENT_QUESTION_ID, null)
 
         then:
         def error = thrown(TutorException)
