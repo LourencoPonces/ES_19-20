@@ -4,12 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
-import org.springframework.test.annotation.DirtiesContext
-import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
-import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuestionAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
@@ -17,6 +15,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
@@ -26,11 +26,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
-import spock.lang.Unroll
 
 @DataJpaTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class RemoveAnswerPerformanceTest extends Specification {
+class DeleteAnswerTest extends Specification {
     static final String COURSE_NAME = "Software Architecture"
     static final String ACRONYM = "AS1"
     static final String ACADEMIC_TERM = "1 SEM"
@@ -63,30 +61,53 @@ class RemoveAnswerPerformanceTest extends Specification {
     ClarificationRequestAnswerRepository clarificationRequestAnswerRepository;
 
     @Autowired
-    QuestionAnswerRepository questionAnswerRepository;
-
-    @Autowired
     ClarificationService clarificationService
 
     Course course
     CourseExecution courseExecution
+    Question question
+    Quiz quiz
+    QuizQuestion quizQuestion
+    QuizAnswer quizAnswer
     User student
     User teacher
+    ClarificationRequest clarificationRequest
+    int studentId
+    int teacherId
+    int reqId
 
     def setup() {
         course = createCourse(COURSE_NAME)
         courseExecution = createCourseExecution(course, ACRONYM, ACADEMIC_TERM)
+        quiz = createQuiz(1, courseExecution, Quiz.QuizType.GENERATED)
+        question = createQuestion(1, course)
+        quizQuestion = new QuizQuestion(quiz, question, 1)
         student = createStudent(1, "STUDENT", courseExecution)
         teacher = createTeacher(2, "TEACHER", courseExecution)
+        quizAnswer = new QuizAnswer(student, quiz)
+
+        def dto = new ClarificationRequestDto()
+        dto.setKey(1)
+        dto.setContent("some request")
+        clarificationRequest = new ClarificationRequest(student, question, dto)
+        student.addClarificationRequest(clarificationRequest)
 
         courseRepository.save(course)
         courseExecutionRepository.save(courseExecution)
-        userRepository.save(teacher)
+        quizRepository.save(quiz)
+        questionRepository.save(question)
+        quizQuestionRepository.save(quizQuestion)
         userRepository.save(student)
+        userRepository.save(teacher)
+        quizAnswerRepository.save(quizAnswer)
+        clarificationRequestRepository.save(clarificationRequest)
 
+        studentId = student.getId()
+        teacherId = teacher.getId()
+        reqId = clarificationRequest.getId()
     }
 
-    private static User createStudent(int key, String name, CourseExecution courseExecution) {
+    private User createStudent(int key, String name, CourseExecution courseExecution) {
         def u = new User()
         u.setKey(key)
         u.setName(name)
@@ -97,7 +118,7 @@ class RemoveAnswerPerformanceTest extends Specification {
         return u
     }
 
-    private static User createTeacher(int key, String name, CourseExecution courseExecution) {
+    private User createTeacher(int key, String name, CourseExecution courseExecution) {
         def u = new User()
         u.setKey(key)
         u.setName(name)
@@ -108,24 +129,15 @@ class RemoveAnswerPerformanceTest extends Specification {
         return u
     }
 
-    private static Question createQuestion(Course course) {
+    private Question createQuestion(int key, Course course) {
         def question = new Question()
+        question.setKey(key)
         question.setCourse(course)
         course.addQuestion(question)
         return question
     }
 
-    private static QuestionAnswer createQuestionAnswer(QuizAnswer quizAnswer, QuizQuestion quizQuestion) {
-        def questionAnswer = new QuestionAnswer()
-        questionAnswer.setQuizAnswer(quizAnswer)
-        questionAnswer.setQuizQuestion(quizQuestion)
-        questionAnswer.setSequence(0)
-
-        return questionAnswer
-    }
-
-
-    private static Quiz createQuiz(int key, CourseExecution courseExecution, Quiz.QuizType type) {
+    private Quiz createQuiz(int key, CourseExecution courseExecution, Quiz.QuizType type) {
         def quiz = new Quiz()
         quiz.setKey(key)
         quiz.setType(type)
@@ -134,7 +146,7 @@ class RemoveAnswerPerformanceTest extends Specification {
         return quiz
     }
 
-    private static CourseExecution createCourseExecution(Course course, String acronym, String term) {
+    private CourseExecution createCourseExecution(Course course, String acronym, String term) {
         def courseExecution = new CourseExecution()
         courseExecution.setCourse(course)
         courseExecution.setAcronym(acronym)
@@ -142,47 +154,48 @@ class RemoveAnswerPerformanceTest extends Specification {
         return courseExecution
     }
 
-    private static Course createCourse(String name) {
+    private Course createCourse(String name) {
         def course = new Course()
         course.setName(name)
         return course
     }
 
-    @Unroll
-    def "remove #count clarification request answers"() {
-        given:
-        1.upto(count, {
-            int i = it as int
+    def "remove an answer"() {
+        given: "answered clarification request"
+        clarificationService.submitClarificationRequestAnswer(teacher, reqId, "some answer")
 
-            def question = createQuestion(course)
-            def quiz = createQuiz(i, courseExecution, Quiz.QuizType.GENERATED)
-            def quizQuestion = new QuizQuestion(quiz, question, 1)
-            def quizAnswer = new QuizAnswer(student, quiz)
-            def questionAnswer = createQuestionAnswer(quizAnswer, quizQuestion)
+        when: "answer is removed"
+        clarificationService.deleteClarificationRequestAnswer(teacher, reqId)
 
-            questionRepository.save(question)
-            quizRepository.save(quiz)
-            quizQuestionRepository.save(quizQuestion)
-            quizAnswerRepository.save(quizAnswer)
-            questionAnswerRepository.save(questionAnswer)
+        then: "clarification request has no answer"
+        clarificationRequest.getAnswer().isEmpty()
 
-            def clarificationRequest = new ClarificationRequestDto()
-            clarificationRequest.setContent("i need help with my performance")
-            clarificationService.submitClarificationRequest(i, student.getId(), clarificationRequest)
-            clarificationService.submitClarificationRequestAnswer(teacher, it as int, "0.75")
-        })
+        and: "answer was deleted"
+        clarificationRequestAnswerRepository.count() == 0
 
+        and: "clarification request still exists"
+        clarificationRequestRepository.count() == 1
+    }
 
-        when:
-        1.upto(count, {
-            clarificationService.deleteClarificationRequestAnswer(teacher, it as int)
-        })
+    def "remove non-existent answer"() {
+        given: "unanswered clarification request"
+        // empty
 
-        then:
-        true
+        when: "answer is removed"
+        clarificationService.deleteClarificationRequestAnswer(teacher, reqId)
 
-        where:
-        count = 1 // set to a big number like 1000 for a proper test
+        then: "thrown exception"
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.CLARIFICATION_REQUEST_UNANSWERED
+    }
+
+    def "don't remove non-existent things"() {
+        when: "trying to remove an answer from a non-existent clarification request"
+        clarificationService.deleteClarificationRequestAnswer(teacher, clarificationRequest.getId() + 10)
+
+        then: "thrown exception"
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND
     }
 
     @TestConfiguration
