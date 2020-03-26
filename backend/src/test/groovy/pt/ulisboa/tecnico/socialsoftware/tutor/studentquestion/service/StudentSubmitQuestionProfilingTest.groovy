@@ -10,10 +10,12 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.StudentSubmitQuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
@@ -35,6 +37,9 @@ class StudentSubmitQuestionProfilingTest extends Specification {
     CourseExecutionRepository courseExecutionRepository
 
     @Autowired
+    TopicRepository topicRepository
+
+    @Autowired
     StudentQuestionRepository studentQuestionRepository
 
     @Autowired
@@ -46,6 +51,7 @@ class StudentSubmitQuestionProfilingTest extends Specification {
     def user
     def course
     def courseExecution
+    def topic
 
     def setup() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -53,6 +59,11 @@ class StudentSubmitQuestionProfilingTest extends Specification {
 
         courseExecution = new CourseExecution(course, ACRONYM, ACADEMIC_TERM, Course.Type.TECNICO)
         courseExecutionRepository.save(courseExecution)
+
+        topic = new Topic()
+        topic.setName(TOPIC_NAME)
+        topic.setCourse(course)
+        topicRepository.save(topic)
 
         user = new User()
         user.setKey(1)
@@ -83,8 +94,7 @@ class StudentSubmitQuestionProfilingTest extends Specification {
         def questionDto = new StudentQuestionDTO()
         StudentQuestionDtoSetup(questionDto)
         and: "a TopicDTO"
-        def topicDto = new TopicDto()
-        topicDto.setName(TOPIC_NAME)
+        def topicDto = new TopicDto(topic)
         def topicList = new ArrayList<TopicDto>()
         addToList(topicList, topicDto)
         questionDto.setTopics(topicList)

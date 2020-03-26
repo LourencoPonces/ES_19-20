@@ -11,11 +11,13 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.CheckStudentQuestionStatusService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
@@ -54,6 +56,9 @@ class CheckStudentQuestionStatusProfilingTest extends Specification {
 
     @Autowired
     QuestionRepository questionRepository
+
+    @Autowired
+    TopicRepository topicRepository
 
     @Autowired
     UserRepository userRepository
@@ -97,10 +102,13 @@ class CheckStudentQuestionStatusProfilingTest extends Specification {
     }
 
     private void setTopics(StudentQuestionDTO studentQuestion) {
-        def topic = new TopicDto()
+        def topic = new Topic()
         topic.setName(TOPIC_NAME)
+        topic.setCourse(course)
+        topicRepository.save(topic)
+        def topicDto = new TopicDto(topic)
         def topicList = new ArrayList<TopicDto>()
-        topicList.add(topic)
+        topicList.add(topicDto)
         studentQuestion.setTopics(topicList)
     }
 
@@ -128,7 +136,7 @@ class CheckStudentQuestionStatusProfilingTest extends Specification {
      * ===========================================
      */
 
-    def "performace testing to evaluate 300 questions 10000 times"() {
+    def "performance testing to evaluate 300 questions 10000 times"() {
         def limit = 1 //USE 10000
         def limitQuestions = 1 //USE 300
         given: '10000 studentQuestions '
