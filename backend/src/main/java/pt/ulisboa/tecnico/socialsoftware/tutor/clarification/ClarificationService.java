@@ -47,15 +47,15 @@ public class ClarificationService {
             value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public ClarificationRequestAnswerDto getClarificationRequestAnswer(int studentId, int questionId) {
+    public ClarificationRequestAnswerDto getClarificationRequestAnswer(int studentId, int requestId) {
         User student = getStudent(studentId);
 
-        if (!questionRepository.existsById(questionId)) {
-            throw new TutorException(ErrorMessage.QUESTION_NOT_FOUND, questionId);
-        }
+        ClarificationRequest clarificationRequest = clarificationRequestRepository.findById(requestId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_SUBMITTED, student.getUsername()));
 
-        ClarificationRequest clarificationRequest = clarificationRequestRepository.getByStudentQuestion(studentId, questionId)
-                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_SUBMITTED, student.getUsername(), questionId));
+        if (clarificationRequest.getOwner().getId() != studentId) {
+            throw new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_SUBMITTED, student.getUsername());
+        }
 
         ClarificationRequestAnswer answer = clarificationRequest.getAnswer()
                 .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_UNANSWERED));

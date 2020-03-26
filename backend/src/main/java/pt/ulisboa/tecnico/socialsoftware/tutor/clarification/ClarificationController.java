@@ -54,4 +54,20 @@ public class ClarificationController {
         clarificationService.deleteClarificationRequestAnswer(user, requestId);
     }
 
+    /* ===========================================
+     * F3: Student checks Clarification Request and Answer
+     * ===========================================
+     */
+
+    @GetMapping("/clarifications/{requestId}/answer")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#requestId, 'CLARIFICATION.ACCESS')")
+    public ClarificationRequestAnswerDto getClarificationRequestAnswer(@PathVariable int requestId, Principal principal) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        if (user == null) {
+            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
+        }
+
+        return clarificationService.getClarificationRequestAnswer(user.getId(), requestId);
+    }
 }
