@@ -163,16 +163,33 @@ class SubmitClarificationRequestTestPerformance extends Specification {
         return course
     }
 
+
     def "submit 2000 requests to 2000 different questions"() {
         when:
         1.upto(TEST_COUNT, {
-            clarificationRequest = new ClarificationRequestDto()
-            clarificationRequest.setContent(CONTENT)
+            clarificationRequest = createRequest()
             clarificationService.submitClarificationRequest(it as int, student.getId(), clarificationRequest)
         })
 
         then:
         true
+    }
+
+    def "student answered 2000 quizzes and submits one clarification request"() {
+        when:
+        int questionId = 4   // test with number between 1 and TEST_COUNT
+        clarificationRequest = createRequest()
+        clarificationService.submitClarificationRequest(questionId, student.getId(), clarificationRequest)
+
+        then:
+        true
+    }
+
+    def createRequest() {
+        clarificationRequest = new ClarificationRequestDto()
+        clarificationRequest.setContent(CONTENT)
+
+        return clarificationRequest
     }
 
 
