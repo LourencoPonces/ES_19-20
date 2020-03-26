@@ -232,7 +232,7 @@
               <boolProp name="recycle">false</boolProp>
               <stringProp name="shareMode">shareMode.all</stringProp>
               <boolProp name="stopThread">true</boolProp>
-              <stringProp name="variableNames">title,content,student_question_key,optionsContent,correct,t</stringProp>
+              <stringProp name="variableNames">title,content,student_question_key,optionsContent,correct</stringProp>
             </CSVDataSet>
             <hashTree/>
             <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request to create course execution" enabled="true">
