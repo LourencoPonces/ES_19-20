@@ -118,8 +118,12 @@ class CreateTournamentPerformanceTest extends Specification {
     }
 
     def "performance testing to create 1000 tournaments"() {
+        given:
+        int top = 1
+        // top = 1000 // This is the desired value. It's commented out so that running every test
+        // doesn't take much time
         when:
-        1.upto(1000,{
+        1.upto(top,{
             tournament.setKey(it)
             tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournament)
         })
