@@ -12,6 +12,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.AUTHENTICATION_ERROR;
 
@@ -47,7 +48,7 @@ public class TournamentController {
 
     @PostMapping("/tournaments/{tournamentId}/sign-up")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#tournamentId, 'TOURNAMENT.ACCESS')")
-    public void signUpInTournament(Principal principal, @PathVariable int tournamentId, @RequestBody UserDto userDto) {
+    public void signUpInTournament(Principal principal, @PathVariable int tournamentId, @RequestBody(required = false) Optional<UserDto> userDtoOpt) {
         User user = (User) ((Authentication) principal).getPrincipal();
 
         if (user == null) {
@@ -59,8 +60,8 @@ public class TournamentController {
         // in the Jmeter tests, we have to accept a username from the request, as
         // suggested by the professor.
         String username;
-        if (userDto != null && userDto.getUsername() != null) {
-            username = userDto.getUsername();
+        if (userDtoOpt.isPresent() && userDtoOpt.get().getUsername() != null) {
+            username = userDtoOpt.get().getUsername();
         } else {
             username = user.getUsername();
         }
