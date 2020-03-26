@@ -40,7 +40,7 @@ public class Tournament {
     @Column(nullable = false)
     private String title = "Title";
 
-    @Column(columnDefinition = "boolean default false")
+    @Column(name = "is_cancelled", columnDefinition = "boolean default false")
     private boolean isCancelled;
 
     @Column(name = "number_of_questions")
