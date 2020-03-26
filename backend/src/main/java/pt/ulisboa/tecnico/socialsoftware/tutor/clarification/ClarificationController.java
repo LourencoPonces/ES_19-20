@@ -60,7 +60,7 @@ public class ClarificationController {
      */
 
     @GetMapping("/clarifications/{requestId}/answer")
-    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#requestId, 'CLARIFICATION.ACCESS')")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#requestId, 'CLARIFICATION.ACCESS')")
     public ClarificationRequestAnswerDto getClarificationRequestAnswer(@PathVariable int requestId, Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
 
