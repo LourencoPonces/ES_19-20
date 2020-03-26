@@ -126,6 +126,9 @@ public class ClarificationService {
         user.addClarificationRequest(clarificationRequest);
         entityManager.persist(user);
 
+        question.addClarificationRequest(clarificationRequest);
+        entityManager.persist(question);
+
         return new ClarificationRequestDto(clarificationRequest);
     }
 
@@ -134,12 +137,6 @@ public class ClarificationService {
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     private ClarificationRequest createClarificationRequest(User user, Question question, ClarificationRequestDto clarificationRequestDto) {
-        if (clarificationRequestDto.getKey() == null) {
-            int max = clarificationRequestRepository.getMaxClarificationRequestKey() != null ?
-                    clarificationRequestRepository.getMaxClarificationRequestKey() : 0;
-            clarificationRequestDto.setKey(max + 1);
-        }
-
         clarificationRequestDto.setOwner(user.getId());
         clarificationRequestDto.setQuestionId(question.getId());
         ClarificationRequest clarificationRequest = new ClarificationRequest(user, question, clarificationRequestDto);

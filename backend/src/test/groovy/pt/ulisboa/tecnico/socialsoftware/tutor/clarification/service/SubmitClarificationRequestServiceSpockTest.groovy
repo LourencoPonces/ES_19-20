@@ -158,7 +158,6 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         clarificationRequestRepository.count() == 1L
         def result = clarificationRequestRepository.findAll().get(0)
         result.getId() != null
-        result.getKey() != null
         result.getOwner().getId() == student.getId()
         result.getQuestion().getId() == question.getId()
         result.getCreationDate() != null
