@@ -311,7 +311,7 @@
                   <stringProp name="Argument.value">{&#xd;
 	&quot;title&quot;: &quot;TEST_TOURNAMENT&quot;,&#xd;
 	&quot;numberOfQuestions&quot;: 1,&#xd;
-	&quot;topics&quot;: ${__property(topics)},&#xd;
+	&quot;topics&quot;: ${topics},&#xd;
 	&quot;creationDate&quot;: &quot;2010-01-01 00:00&quot;,&#xd;
 	&quot;availableDate&quot;: &quot;2010-01-02 00:00&quot;,&#xd;
 	&quot;runningDate&quot;: &quot;2030-01-01 00:00&quot;,&#xd;
