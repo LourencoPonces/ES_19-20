@@ -129,7 +129,7 @@ class SignUpInTournamentPerformanceTest extends Specification {
     def "performance testing to sign up 1000 users in one tournament"() {
         given:
         int base = 2
-        int iterations = 1000
+        int iterations = 1
         // iterations = 1000 // This is the desired value. It's commented out so that running every test
                              // doesn't take much time
 
