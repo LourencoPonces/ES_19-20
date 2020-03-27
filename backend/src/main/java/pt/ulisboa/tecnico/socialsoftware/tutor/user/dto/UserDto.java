@@ -22,6 +22,8 @@ public class UserDto implements Serializable {
             this.creationDate = user.getCreationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
     }
 
+    public UserDto() {}
+
     public int getId() {
         return id;
     }
