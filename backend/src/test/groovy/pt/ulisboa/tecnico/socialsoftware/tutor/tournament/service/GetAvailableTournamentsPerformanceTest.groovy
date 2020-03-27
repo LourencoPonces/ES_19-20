@@ -23,7 +23,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @DataJpaTest
-class SignUpInTournamentPerformanceTest extends Specification {
+class GetAvailableTournamentsPerformanceTest extends Specification {
     public static final String COURSE_NAME = "Software Architecture"
     public static final String ACRONYM = "AS1"
     public static final String ACADEMIC_TERM = "1 SEM"
@@ -125,25 +125,16 @@ class SignUpInTournamentPerformanceTest extends Specification {
         tournamentDto.setTopics(topicDtoList)
     }
 
-    def "performance testing to sign up 1000 users in one tournament"() {
+    def "performance testing to get available tournaments 1000 times"() {
         given:
-        int base = 2
-        int iterations = 1
+
         // iterations = 1000 // This is the desired value. It's commented out so that running every test
-                             // doesn't take much time
-
-        int top = base + iterations - 1
-
-        base.upto(top, {
-            def participant = new User()
-            participant.setKey(it)
-            participant.setUsername(String.format("TEST%d", it))
-            userRepository.save(participant)
-        })
+        // doesn't take much time
+        int top = 1
 
         when:
-        base.upto(top,{
-            tournamentService.signUpInTournament(tournament.getId(), String.format("TEST%d", it))
+        1.upto(top,{
+            tournamentService.getAvailableTournaments(courseExecution.getId())
         })
 
         then:
