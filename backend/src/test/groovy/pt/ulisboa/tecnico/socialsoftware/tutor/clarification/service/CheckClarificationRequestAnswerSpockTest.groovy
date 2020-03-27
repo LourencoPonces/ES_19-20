@@ -26,9 +26,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
-import spock.lang.Unroll
 
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CLARIFICATION_REQUEST_NOT_SUBMITTED
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CLARIFICATION_REQUEST_UNANSWERED
 
 @DataJpaTest
 class CheckClarificationRequestAnswerSpockTest extends Specification {
@@ -196,37 +196,6 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
         then: "an exception is thrown"
         def exception = thrown(TutorException)
         exception.getErrorMessage() == CLARIFICATION_REQUEST_NOT_SUBMITTED
-    }
-
-    @Unroll("invalid arguments: #isUser | #isStudent || #error_message")
-    def "invalid arguments"() {
-        given: "a user that isn't a student"
-        def teacher = createUser(new User(), KEY_TWO, NAME, USERNAME_TWO, User.Role.TEACHER, courseExecution)
-        userRepository.save(teacher)
-
-        when:
-        changeUser(isUser, isStudent, teacher.getId())
-        clarificationService.getClarificationRequestAnswer(studentId, clarificationRequest.getId())
-
-        then:
-        def exception = thrown(TutorException)
-        exception.getErrorMessage() == error_message
-
-        where:
-        isUser | isStudent || error_message
-        false  | true      || USER_NOT_FOUND
-        true   | false     || ACCESS_DENIED
-    }
-
-    def changeUser(boolean isUser, boolean isStudent, int teacherId) {
-        if (isUser) {
-            if (isStudent)
-                studentId = student.getId()
-            else
-                studentId = teacherId
-        } else {
-            studentId = INEXISTENT_USER_ID
-        }
     }
 
     @TestConfiguration

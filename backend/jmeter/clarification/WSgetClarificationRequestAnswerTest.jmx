@@ -102,7 +102,7 @@ INSERT INTO quiz_questions(id, sequence, question_id, quiz_id) values (41000, 0,
 INSERT INTO quiz_answers(id, completed, quiz_id, user_id, used_in_statistics) values (9000, &apos;t&apos;, 6000, 676, &apos;f&apos;);
 INSERT INTO question_answers(id, quiz_answer_id, quiz_question_id, sequence) values (6700, 9000, 41000, 0);
 INSERT INTO clarification_requests(id, user_id, question_id) VALUES (${requestId}, ${studentId}, ${questionId});
-INSERT INTO clarification_request_answers(request_id, content, creator_id) VALUES (1, &apos;test_content&apos;, ${studentId});
+INSERT INTO clarification_request_answers(request_id, content, creator_id, submission_date) VALUES (${requestId}, &apos;test_content&apos;, ${studentId}, &apos;2020-03-27 17:23&apos;);
 </stringProp>
           <stringProp name="queryArguments"></stringProp>
           <stringProp name="queryArgumentsTypes"></stringProp>
@@ -262,8 +262,17 @@ INSERT INTO clarification_request_answers(request_id, content, creator_id) VALUE
             <stringProp name="HTTPSampler.response_timeout"></stringProp>
           </HTTPSamplerProxy>
           <hashTree>
-            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert creator" enabled="true">
-              <stringProp name="JSON_PATH">$.creator</stringProp>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert requestId" enabled="true">
+              <stringProp name="JSON_PATH">$.requestId</stringProp>
+              <stringProp name="EXPECTED_VALUE">${requestId}</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">false</boolProp>
+            </JSONPathAssertion>
+            <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert creatorId" enabled="true">
+              <stringProp name="JSON_PATH">$.creatorId</stringProp>
               <stringProp name="EXPECTED_VALUE">${studentId}</stringProp>
               <boolProp name="JSONVALIDATION">true</boolProp>
               <boolProp name="EXPECT_NULL">false</boolProp>
@@ -274,6 +283,15 @@ INSERT INTO clarification_request_answers(request_id, content, creator_id) VALUE
             <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert content" enabled="true">
               <stringProp name="JSON_PATH">$.content</stringProp>
               <stringProp name="EXPECTED_VALUE">test_content</stringProp>
+              <boolProp name="JSONVALIDATION">true</boolProp>
+              <boolProp name="EXPECT_NULL">false</boolProp>
+              <boolProp name="INVERT">false</boolProp>
+              <boolProp name="ISREGEX">false</boolProp>
+            </JSONPathAssertion>
+            <hashTree/>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert creationDate" enabled="true">
+              <stringProp name="JSON_PATH">$.creationDate</stringProp>
+              <stringProp name="EXPECTED_VALUE">2020-03-27 17:23</stringProp>
               <boolProp name="JSONVALIDATION">true</boolProp>
               <boolProp name="EXPECT_NULL">false</boolProp>
               <boolProp name="INVERT">false</boolProp>
