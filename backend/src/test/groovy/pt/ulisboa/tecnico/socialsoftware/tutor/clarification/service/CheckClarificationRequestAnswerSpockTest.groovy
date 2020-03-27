@@ -23,12 +23,12 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizQuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository
-import spock.lang.Unroll
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
+import spock.lang.Unroll
 
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*
 
 @DataJpaTest
 class CheckClarificationRequestAnswerSpockTest extends Specification {
@@ -171,10 +171,10 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
         when:
         def result = clarificationService.getClarificationRequestAnswer(student.getId(), question.getId())
 
-        then:"the correct answer is returned"
+        then: "the correct answer is returned"
         result != null
         result.getContent() != null
-        result.getCreator() == teacher.getId()
+        result.getCreatorId() == teacher.getId()
         result.getRequestId() == clarificationRequest.getId()
     }
 
@@ -236,8 +236,7 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
     def changeQuestion(boolean isQuestion) {
         if (isQuestion) {
             questionId = question.getId()
-        }
-        else {
+        } else {
             questionId = INEXISTENT_QUESTION_ID
         }
     }

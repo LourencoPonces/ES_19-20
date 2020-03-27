@@ -53,16 +53,16 @@ class CreateTournamentTest extends Specification {
     @Autowired
     TournamentRepository tournamentRepository
 
-    def tournament
-    def creator
-    def course
-    def courseExecution
-    def creationDate
-    def availableDate
-    def runningDate
-    def conclusionDate
-    def formatter
-    def topicDtoList
+    TournamentDto tournament
+    User creator
+    Course course
+    CourseExecution courseExecution
+    LocalDateTime creationDate
+    LocalDateTime availableDate
+    LocalDateTime runningDate
+    LocalDateTime conclusionDate
+    DateTimeFormatter formatter
+    List<TopicDto> topicDtoList
 
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
@@ -76,13 +76,13 @@ class CreateTournamentTest extends Specification {
         setupTournament(creatorDto, formatter, topicDtoList)
     }
 
-    private List setupCourse() {
+    private Tuple setupCourse() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseRepository.save(course)
 
         courseExecution = new CourseExecution(course, ACRONYM, ACADEMIC_TERM, Course.Type.TECNICO)
         courseExecutionRepository.save(courseExecution)
-        [courseExecution, course]
+        new Tuple(courseExecution, course)
     }
 
     private UserDto setupCreator(CourseExecution courseExecution) {
@@ -168,7 +168,7 @@ class CreateTournamentTest extends Specification {
         tournamentRepository.count() == 0L
     }
 
-    def "create a tournament with a topic outside the course"(){
+    def "create a tournament with a topic outside the course"() {
         given: 'a topic outside of the tournaments course'
         def outsideTopic = new Topic()
         outsideTopic.setName("OUTSIDE_TOPIC")
