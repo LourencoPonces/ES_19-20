@@ -23,11 +23,12 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @DataJpaTest
-class CreateTournamentPerformanceTest extends Specification {
+class GetAvailableTournamentsPerformanceTest extends Specification {
     public static final String COURSE_NAME = "Software Architecture"
     public static final String ACRONYM = "AS1"
     public static final String ACADEMIC_TERM = "1 SEM"
     public static final String TOURNAMENT_TITLE = "tournament title"
+    public static final Integer TOURNAMENT_KEY = 1
     public static final String CREATOR_NAME = "user"
     public static final String CREATOR_USERNAME = "username"
 
@@ -46,10 +47,7 @@ class CreateTournamentPerformanceTest extends Specification {
     @Autowired
     TopicRepository topicRepository
 
-    @Autowired
-    TournamentRepository tournamentRepository
-
-    def tournament
+    def tournamentDto
     def creator
     def course
     def courseExecution
@@ -69,7 +67,7 @@ class CreateTournamentPerformanceTest extends Specification {
 
         topicDtoList = setupTopic(course)
 
-        setupTournament(creatorDto, formatter, topicDtoList)
+        setupTournamentDto(creatorDto, formatter, topicDtoList)
     }
 
     private List setupCourse() {
@@ -102,30 +100,38 @@ class CreateTournamentPerformanceTest extends Specification {
         topicDtoList
     }
 
-    private void setupTournament(UserDto creatorDto, DateTimeFormatter formatter, ArrayList<TopicDto> topicDtoList) {
-        tournament = new TournamentDto()
-        tournament.setTitle(TOURNAMENT_TITLE)
-        creationDate = LocalDateTime.now()
-        availableDate = creationDate.plusDays(1)
-        runningDate = creationDate.plusDays(2)
-        conclusionDate = creationDate.plusDays(3)
-        tournament.setNumberOfQuestions(1)
-        tournament.setCreationDate(creationDate.format(formatter))
-        tournament.setAvailableDate(availableDate.format(formatter))
-        tournament.setRunningDate(runningDate.format(formatter))
-        tournament.setConclusionDate(conclusionDate.format(formatter))
-        tournament.setTopics(topicDtoList)
+    private void setupTournamentDto(UserDto creatorDto, DateTimeFormatter formatter, ArrayList<TopicDto> topicDtoList) {
+        tournamentDto = new TournamentDto()
+        tournamentDto.setTitle(TOURNAMENT_TITLE)
+        tournamentDto.setKey(TOURNAMENT_KEY)
+        def now = LocalDateTime.now()
+        creationDate = now.minusDays(2)
+        availableDate = now.minusDays(1)
+        runningDate = now.plusDays(1)
+        conclusionDate = now.plusDays(2)
+        tournamentDto.setNumberOfQuestions(1)
+        tournamentDto.setCreationDate(creationDate.format(formatter))
+        tournamentDto.setAvailableDate(availableDate.format(formatter))
+        tournamentDto.setRunningDate(runningDate.format(formatter))
+        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
+        tournamentDto.setTopics(topicDtoList)
     }
 
-    def "performance testing to create 1000 tournaments"() {
+    def "performance testing to get available tournaments 1000 times"() {
         given:
-        int top = 1
-        // top = 1000 // This is the desired value. It's commented out so that running every test
-        // doesn't take much time
+        int numTournaments = 10
+        1.upto(numTournaments, {
+            tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
+            tournamentDto.setKey(tournamentDto.getKey()+1)
+        })
+
+        int iterations = 1
+        // iterations = 1000 // This is the desired value. It's commented out so that running every test
+                             // doesn't take much time
+
         when:
-        1.upto(top,{
-            tournament.setKey(it)
-            tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournament)
+        1.upto(iterations,{
+            tournamentService.getAvailableTournaments(courseExecution.getId())
         })
 
         then:
