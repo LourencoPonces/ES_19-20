@@ -84,7 +84,6 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
     def quizQuestion
     def clarificationRequestDto
     def studentId
-    def questionId
 
 
     def setup() {
