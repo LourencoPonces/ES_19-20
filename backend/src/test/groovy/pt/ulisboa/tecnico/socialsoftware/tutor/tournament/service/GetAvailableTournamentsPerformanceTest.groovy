@@ -47,16 +47,16 @@ class GetAvailableTournamentsPerformanceTest extends Specification {
     @Autowired
     TopicRepository topicRepository
 
-    def tournamentDto
-    def creator
-    def course
-    def courseExecution
-    def creationDate
-    def availableDate
-    def runningDate
-    def conclusionDate
+    TournamentDto tournamentDto
+    User creator
+    Course course
+    CourseExecution courseExecution
+    LocalDateTime creationDate
+    LocalDateTime availableDate
+    LocalDateTime runningDate
+    LocalDateTime conclusionDate
+    List<TopicDto> topicDtoList
     def formatter
-    def topicDtoList
 
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
@@ -67,7 +67,7 @@ class GetAvailableTournamentsPerformanceTest extends Specification {
 
         topicDtoList = setupTopic(course)
 
-        setupTournamentDto(creatorDto, formatter, topicDtoList)
+        setupTournamentDto(formatter, topicDtoList)
     }
 
     private Tuple setupCourse() {
@@ -100,7 +100,7 @@ class GetAvailableTournamentsPerformanceTest extends Specification {
         topicDtoList
     }
 
-    private void setupTournamentDto(UserDto creatorDto, DateTimeFormatter formatter, ArrayList<TopicDto> topicDtoList) {
+    private void setupTournamentDto(DateTimeFormatter formatter, ArrayList<TopicDto> topicDtoList) {
         tournamentDto = new TournamentDto()
         tournamentDto.setTitle(TOURNAMENT_TITLE)
         tournamentDto.setKey(TOURNAMENT_KEY)
@@ -126,7 +126,7 @@ class GetAvailableTournamentsPerformanceTest extends Specification {
         })
 
         int iterations = 1
-        // iterations = 1000 // This is the desired value. It's commented out so that running every test
+        // iterations = 10000 // This is the desired value. It's commented out so that running every test
                              // doesn't take much time
 
         when:
