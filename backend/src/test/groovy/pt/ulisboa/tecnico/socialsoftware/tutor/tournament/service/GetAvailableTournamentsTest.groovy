@@ -20,7 +20,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto
-
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -54,16 +53,16 @@ class GetAvailableTournamentsTest extends Specification {
     @Autowired
     TournamentRepository tournamentRepository
 
-    def tournamentDto
-    def creator
-    def course
-    def courseExecution
-    def creationDate
-    def availableDate
-    def runningDate
-    def conclusionDate
-    def formatter
-    def topicDtoList
+    TournamentDto tournamentDto
+    User creator
+    Course course
+    CourseExecution courseExecution
+    LocalDateTime creationDate
+    LocalDateTime availableDate
+    LocalDateTime runningDate
+    LocalDateTime conclusionDate
+    DateTimeFormatter formatter
+    List<TopicDto> topicDtoList
 
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
@@ -98,13 +97,13 @@ class GetAvailableTournamentsTest extends Specification {
         creatorDto
     }
 
-    private List setupCourse() {
+    private Tuple setupCourse() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseRepository.save(course)
 
         courseExecution = new CourseExecution(course, ACRONYM, ACADEMIC_TERM, Course.Type.TECNICO)
         courseExecutionRepository.save(courseExecution)
-        [courseExecution, course]
+        new Tuple(courseExecution, course)
     }
 
     private void setupTournamentDto(UserDto creatorDto, DateTimeFormatter formatter, ArrayList<TopicDto> topicDtoList) {
@@ -178,12 +177,12 @@ class GetAvailableTournamentsTest extends Specification {
 
         where:
         creationDateDay | availableDateDay | runningDateDay | conclusionDateDay || errorMessage
-         0              | 1                | 2              | 3                 || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
-        -2              |-1                | 0              | 1                 || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
-        -3              |-2                |-1              | 0                 || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
+         0              |  1               |  2             | 3                 || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
+        -2              | -1               |  0             | 1                 || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
+        -3              | -2               | -1             | 0                 || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
     }
 
-    def "get the available tournaments with a non-existing course"(){
+    def "get the available tournaments with a non-existing course"() {
         given: 'a bad courseId'
         def badCourseId = 2
 
