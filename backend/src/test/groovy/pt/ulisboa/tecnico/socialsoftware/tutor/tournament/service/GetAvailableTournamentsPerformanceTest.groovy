@@ -63,7 +63,7 @@ class GetAvailableTournamentsPerformanceTest extends Specification {
 
         (courseExecution, course) = setupCourse()
 
-        UserDto creatorDto = setupCreator(courseExecution)
+        setupCreator(courseExecution)
 
         topicDtoList = setupTopic(course)
 
