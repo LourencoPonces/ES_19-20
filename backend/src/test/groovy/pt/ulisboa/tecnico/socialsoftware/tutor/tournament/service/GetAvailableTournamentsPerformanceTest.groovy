@@ -70,7 +70,7 @@ class GetAvailableTournamentsPerformanceTest extends Specification {
         setupTournamentDto(creatorDto, formatter, topicDtoList)
     }
 
-    private List setupCourse() {
+    private Tuple setupCourse() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseRepository.save(course)
 
