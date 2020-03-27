@@ -26,16 +26,12 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
-import spock.lang.Unroll
 
 @DataJpaTest
-class SubmitAnswerTest extends Specification {
+class DeleteAnswerTest extends Specification {
     static final String COURSE_NAME = "Software Architecture"
     static final String ACRONYM = "AS1"
     static final String ACADEMIC_TERM = "1 SEM"
-
-    static final String ANSWER_1 = "some answer 1"
-    static final String ANSWER_2 = "some answer 2"
 
     @Autowired
     CourseRepository courseRepository
@@ -164,45 +160,42 @@ class SubmitAnswerTest extends Specification {
         return course
     }
 
-    def "submit an answer"() {
-        when:
-        clarificationService.submitClarificationRequestAnswer(teacher, reqId, ANSWER_1)
+    def "remove an answer"() {
+        given: "answered clarification request"
+        clarificationService.submitClarificationRequestAnswer(teacher, reqId, "some answer")
 
-        then: "the answer was submitted"
-        clarificationRequestAnswerRepository.count() == 1
-        def ans = clarificationRequestAnswerRepository.findAll().get(0)
-        ans.getContent() == ANSWER_1
-        ans.getCreator().getId() == teacherId
-        ans.getRequest().getId() == reqId
+        when: "answer is removed"
+        clarificationService.deleteClarificationRequestAnswer(teacher, reqId)
+
+        then: "clarification request has no answer"
+        clarificationRequest.getAnswer().isEmpty()
+
+        and: "answer was deleted"
+        clarificationRequestAnswerRepository.count() == 0
+
+        and: "clarification request still exists"
+        clarificationRequestRepository.count() == 1
     }
 
-    def "submit answer to already answered request"() {
-        given: "a clarification request that already has an answer"
-        clarificationService.submitClarificationRequestAnswer(teacher, reqId, ANSWER_1)
+    def "remove non-existent answer"() {
+        given: "unanswered clarification request"
+        // empty
 
-        when:
-        clarificationService.submitClarificationRequestAnswer(teacher, reqId, ANSWER_2)
+        when: "answer is removed"
+        clarificationService.deleteClarificationRequestAnswer(teacher, reqId)
 
-        then: "the answer was replaced"
-        def saved_answer = clarificationRequest.getAnswer().map({a -> a.getContent()}).get()
-        saved_answer == ANSWER_2
-    }
-
-    @Unroll
-    def "validity check: (validRequest=#validR, answer=#answer) -> #errorMessage"() {
-        when: "submitting an answer for a null clarification request"
-        def rid = validR ? reqId : -1
-        clarificationService.submitClarificationRequestAnswer(teacher, rid, answer)
-
-        then: "an exception"
+        then: "thrown exception"
         def exception = thrown(TutorException)
-        exception.getErrorMessage() == errorMessage
+        exception.getErrorMessage() == ErrorMessage.CLARIFICATION_REQUEST_UNANSWERED
+    }
 
-        where:
-        validR | answer     || errorMessage
-        false  | ANSWER_1   || ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND
-        true   | " \n  \t " || ErrorMessage.CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT
-        true   | null       || ErrorMessage.CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT
+    def "don't remove non-existent things"() {
+        when: "trying to remove an answer from a non-existent clarification request"
+        clarificationService.deleteClarificationRequestAnswer(teacher, clarificationRequest.getId() + 10)
+
+        then: "thrown exception"
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND
     }
 
     @TestConfiguration
