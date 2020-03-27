@@ -32,13 +32,14 @@ public class ClarificationRequestAnswer {
     @Column
     private LocalDateTime submissionDate;
 
-    public ClarificationRequestAnswer() {}
+    public ClarificationRequestAnswer() {
+    }
 
     public ClarificationRequestAnswer(ClarificationRequest req, User creator, ClarificationRequestAnswerDto dto) {
         this.creator = creator;
         this.request = req;
         this.content = dto.getContent();
-        this.submissionDate = dto.getCreationDate();
+        this.submissionDate = dto.getCreationDateDate();
         this.ensureConsistent();
     }
 
@@ -47,12 +48,36 @@ public class ClarificationRequestAnswer {
             throw new TutorException(CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT);
     }
 
-    public User getCreator() { return this.creator; }
-    public void setCreator(User u) { this.creator = u; }
-    public ClarificationRequest getRequest() { return this.request; }
-    public void setRequest(ClarificationRequest req) { this.request = req; }
-    public String getContent() { return content; }
-    public void setContent(String s) { this.content = s; this.ensureConsistent(); }
-    public LocalDateTime getCreationDate() { return submissionDate; }
-    public void setCreationDate(LocalDateTime date) { this.submissionDate = date; }
+    public User getCreator() {
+        return this.creator;
+    }
+
+    public void setCreator(User u) {
+        this.creator = u;
+    }
+
+    public ClarificationRequest getRequest() {
+        return this.request;
+    }
+
+    public void setRequest(ClarificationRequest req) {
+        this.request = req;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String s) {
+        this.content = s;
+        this.ensureConsistent();
+    }
+
+    public LocalDateTime getCreationDate() {
+        return submissionDate;
+    }
+
+    public void setCreationDate(LocalDateTime date) {
+        this.submissionDate = date;
+    }
 }
