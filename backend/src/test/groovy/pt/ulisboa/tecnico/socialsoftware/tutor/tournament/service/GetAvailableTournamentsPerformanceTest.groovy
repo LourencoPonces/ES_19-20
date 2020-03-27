@@ -47,10 +47,6 @@ class GetAvailableTournamentsPerformanceTest extends Specification {
     @Autowired
     TopicRepository topicRepository
 
-    @Autowired
-    TournamentRepository tournamentRepository
-
-    def tournament
     def tournamentDto
     def creator
     def course
@@ -72,10 +68,6 @@ class GetAvailableTournamentsPerformanceTest extends Specification {
         topicDtoList = setupTopic(course)
 
         setupTournamentDto(creatorDto, formatter, topicDtoList)
-
-        tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
-
-        tournament = tournamentRepository.findAll().get(0)
     }
 
     private List setupCourse() {
@@ -127,13 +119,18 @@ class GetAvailableTournamentsPerformanceTest extends Specification {
 
     def "performance testing to get available tournaments 1000 times"() {
         given:
+        int numTournaments = 10
+        1.upto(numTournaments, {
+            tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
+            tournamentDto.setKey(tournamentDto.getKey()+1)
+        })
 
+        int iterations = 1
         // iterations = 1000 // This is the desired value. It's commented out so that running every test
-        // doesn't take much time
-        int top = 1
+                             // doesn't take much time
 
         when:
-        1.upto(top,{
+        1.upto(iterations,{
             tournamentService.getAvailableTournaments(courseExecution.getId())
         })
 
