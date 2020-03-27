@@ -14,10 +14,11 @@ import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CL
 @Table(name = "clarification_request_answers")
 public class ClarificationRequestAnswer {
     @Id
-    private Integer id;
+    @Column(name = "request_id")
+    private Integer requestId;
 
     @OneToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "request_id")
     @MapsId
     private ClarificationRequest request;
 
