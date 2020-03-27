@@ -7,19 +7,23 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CLARIFICATION_REQUEST_MISSING_CONTENT;
 
+
+
 @Entity
 @Table(name = "clarification_requests")
-
 public class ClarificationRequest {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(unique=true, nullable = false)
     private Integer key;
 
     @ManyToOne
@@ -57,7 +61,30 @@ public class ClarificationRequest {
 
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
-    public Integer getKey() { return key; }
+    public Integer getKey() {
+        if (this.key == null) {
+            generateKeys();
+        }
+        return key;
+    }
+
+    private void generateKeys() {
+        Integer max = this.question.getClarificationRequests().stream()
+                .filter(request -> request.key != null)
+                .map(ClarificationRequest::getKey)
+                .max(Comparator.comparing(Integer::valueOf))
+                .orElse(0);
+
+        List<ClarificationRequest> nullKeyClarificationRequests = this.question.getClarificationRequests().stream()
+                .filter(cr -> cr.key == null).collect(Collectors.toList());
+
+        for (ClarificationRequest cr : nullKeyClarificationRequests) {
+            max = max + 1;
+            cr.key = max;
+
+        }
+    }
+
     public void setKey(Integer key) { this.key = key; }
     public User getOwner() { return owner; }
     public void setOwner(User student) { owner = student; }

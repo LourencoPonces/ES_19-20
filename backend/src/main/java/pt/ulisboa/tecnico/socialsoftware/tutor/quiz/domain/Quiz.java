@@ -1,8 +1,10 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
+import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.dto.QuizDto;
@@ -23,7 +25,7 @@ import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.QU
         indexes = {
                 @Index(name = "quizzes_indx_0", columnList = "key")
         })
-public class Quiz {
+public class Quiz implements DomainEntity {
     public enum QuizType {
         EXAM, TEST, GENERATED, PROPOSED, IN_CLASS
     }
@@ -46,6 +48,12 @@ public class Quiz {
 
     @Column(columnDefinition = "boolean default false")
     private boolean scramble = false;
+
+    @Column(columnDefinition = "boolean default false")
+    private boolean qrCodeOnly = false;
+
+    @Column(columnDefinition = "boolean default false")
+    private boolean oneWay = false;
 
     @Column(nullable = false)
     private String title = "Title";
@@ -75,11 +83,18 @@ public class Quiz {
         setTitle(quizDto.getTitle());
         this.type = quizDto.getType();
         this.scramble = quizDto.isScramble();
+        this.qrCodeOnly = quizDto.isQrCodeOnly();
+        this.oneWay = quizDto.isOneWay();
         this.creationDate = quizDto.getCreationDateDate();
         setAvailableDate(quizDto.getAvailableDateDate());
         setConclusionDate(quizDto.getConclusionDateDate());
         this.series = quizDto.getSeries();
         this.version = quizDto.getVersion();
+    }
+
+    @Override
+    public void accept(Visitor visitor) {
+        visitor.visitQuiz(this);
     }
 
     public Integer getId() {
@@ -104,6 +119,22 @@ public class Quiz {
 
     public void setScramble(boolean scramble) {
     this.scramble = scramble;
+    }
+
+    public boolean isQrCodeOnly() {
+        return qrCodeOnly;
+    }
+
+    public void setQrCodeOnly(boolean qrCodeOnly) {
+        this.qrCodeOnly = qrCodeOnly;
+    }
+
+    public boolean isOneWay() {
+        return oneWay;
+    }
+
+    public void setOneWay(boolean noBack) {
+        this.oneWay = noBack;
     }
 
     public String getTitle() {

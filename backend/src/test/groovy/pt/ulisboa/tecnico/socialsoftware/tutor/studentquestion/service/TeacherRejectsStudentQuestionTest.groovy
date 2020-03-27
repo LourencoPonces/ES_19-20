@@ -80,7 +80,11 @@ class TeacherRejectsStudentQuestionTest extends Specification {
     private StudentQuestion createStudentQuestion(User user, Course course) {
         def studentQuestion = new StudentQuestion()
         studentQuestion.addTopic(new Topic())
-        studentQuestion.addOption(new Option())
+
+        Option o = new Option()
+        o.setCorrect(true)
+        o.setQuestion(studentQuestion)
+        studentQuestion.addOption(o)
         studentQuestion.setKey(STUDENT_QUESTION_KEY)
         studentQuestion.setStudentQuestionKey(STUDENT_QUESTION_KEY)
         studentQuestion.setUser(user)

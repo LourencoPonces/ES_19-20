@@ -18,6 +18,7 @@ public enum ErrorMessage {
 
     INVALID_JUSTIFICATION("The justification \"%s\" is invalid"),
     CANNOT_REJECT_ACCEPTED_SUGGESTION("Cannot reject already accepted suggestion"),
+    INVALID_STATUS("Non existing status %s"),
 
     COURSE_NOT_FOUND("Course not found with name %s"),
     COURSE_NAME_IS_EMPTY("The course name is empty"),
@@ -57,6 +58,7 @@ public enum ErrorMessage {
     QUESTION_CHANGE_CORRECT_OPTION_HAS_ANSWERS("Can not change correct option of answered question"),
     QUIZ_HAS_ANSWERS("Quiz already has answers"),
     QUIZ_ALREADY_COMPLETED("Quiz already completed"),
+    QUIZ_ALREADY_STARTED("Quiz was already started"),
     QUIZ_QUESTION_HAS_ANSWERS("Quiz question has answers"),
     FENIX_ERROR("Fenix Error"),
     AUTHENTICATION_ERROR("Authentication Error"),
@@ -64,7 +66,7 @@ public enum ErrorMessage {
 
     TOURNAMENT_NOT_CONSISTENT("Field %s of tournament is not consistent"),
     TOURNAMENT_NOT_AVAILABLE("There aren't any available tournaments"),
-    USER_ALREADY_SIGNED_UP_IN_TOURNAMENT("User already sign-up in tournament"),
+    USER_ALREADY_SIGNED_UP_IN_TOURNAMENT("User already signed-up in tournament"),
     TOURNAMENT_CREATED_BY_NON_STUDENT("Tournament created by non-student"),
     USER_NOT_ENROLLED_IN_COURSE_EXECUTION("User not enrolled in course execution %s"),
 
@@ -76,9 +78,11 @@ public enum ErrorMessage {
     QUESTION_NOT_ANSWERED_BY_STUDENT("Question with id %d wasn't answered by student %d"),
     DUPLICATE_CLARIFICATION_REQUEST("Student %s already submitted a clarification request for question with id %d"),
     CLARIFICATION_REQUEST_NOT_FOUND("Clarification Request not found with id %d"),
-    CLARIFICATION_REQUEST_NOT_SUBMITTED("Student %s didn't submit a clarification request for the question with id %d"),
+    CLARIFICATION_REQUEST_NOT_SUBMITTED("Student %s didn't submit a clarification request"),
     CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT("Missing content of clarification request answer"),
-    CLARIFICATION_REQUEST_UNANSWERED("The clarification request wasn't answered yet");
+    CLARIFICATION_REQUEST_UNANSWERED("The clarification request wasn't answered yet"),
+
+    INVALID_STUDENT_QUESTION_EVALUATION("Invalid StudentQuestion Evaluation");
 
     public final String label;
 

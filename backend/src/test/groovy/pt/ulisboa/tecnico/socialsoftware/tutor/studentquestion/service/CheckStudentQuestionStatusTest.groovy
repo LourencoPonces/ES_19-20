@@ -12,15 +12,18 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.CheckStudentQuestionStatusService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
+import java.time.LocalDateTime
 import java.util.stream.Collectors
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
@@ -61,6 +64,9 @@ class CheckStudentQuestionStatusTest extends Specification {
     QuestionRepository questionRepository
 
     @Autowired
+    TopicRepository topicRepository
+
+    @Autowired
     UserRepository userRepository
 
     def savedQuestionId
@@ -85,16 +91,16 @@ class CheckStudentQuestionStatusTest extends Specification {
         def studentQuestion = new StudentQuestionDTO()
         studentQuestion.setTitle(QUESTION_TITLE)
         studentQuestion.setContent(QUESTION_CONTENT)
-        setKey(studentQuestion)
+        studentQuestion.setCreationDate(LocalDateTime.now().format(Course.formatter));
+        setKey(studentQuestion, user.getId())
         setTopics(studentQuestion)
         setOptions(studentQuestion)
         return new StudentQuestion(course, studentQuestion, user)
     }
-
-    private void setKey(StudentQuestionDTO studentQuestion) {
-        def prevMaxQuestion = questionRepository.getMaxQuestionNumber()
+    
+    private void setKey(StudentQuestionDTO studentQuestion, Integer userId) {
+        def prevMaxQuestion = studentQuestionRepository.getMaxQuestionNumberByUser(userId)
         def questionKey = prevMaxQuestion == null ? 1 : prevMaxQuestion + 1
-        studentQuestion.setKey(questionKey)
         studentQuestion.setStudentQuestionKey(questionKey)
     }
 
@@ -108,10 +114,13 @@ class CheckStudentQuestionStatusTest extends Specification {
     }
 
     private void setTopics(StudentQuestionDTO studentQuestion) {
-        def topic = new TopicDto()
+        def topic = new Topic()
         topic.setName(TOPIC_NAME)
+        topic.setCourse(course)
+        topicRepository.save(topic)
+        def topicDto = new TopicDto(topic)
         def topicList = new ArrayList<TopicDto>()
-        topicList.add(topic)
+        topicList.add(topicDto)
         studentQuestion.setTopics(topicList)
     }
 

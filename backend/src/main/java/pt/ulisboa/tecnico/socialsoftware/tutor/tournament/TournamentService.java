@@ -6,6 +6,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
@@ -13,16 +14,16 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
@@ -54,10 +55,12 @@ public class TournamentService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public TournamentDto createTournament(int executionId, TournamentDto tournamentDto) {
+    public TournamentDto createTournament(String username, int executionId, TournamentDto tournamentDto) {
         CourseExecution courseExecution = getCourseExecution(executionId);
 
-        User creator = userRepository.findByUsername(tournamentDto.getCreator().getUsername());
+        User creator = userRepository.findByUsername(username);
+
+        checkKey(tournamentDto);
 
         Tournament tournament = new Tournament(tournamentDto);
 
@@ -68,8 +71,6 @@ public class TournamentService {
         tournamentDto.setParticipants(new ArrayList<>());
 
         addCreator(tournamentDto, creator, tournament);
-
-        setCreationDate(tournamentDto, tournament);
 
         tournament.setCourseExecution(courseExecution);
         entityManager.persist(tournament);
@@ -85,23 +86,20 @@ public class TournamentService {
         return new TournamentDto(tournament);
     }
 
+    private void checkKey(TournamentDto tournamentDto) {
+        if (tournamentDto.getKey() == null) {
+            int maxQuestionNumber = tournamentRepository.getMaxTournamentKey() != null ?
+                    tournamentRepository.getMaxTournamentKey() : 0;
+            tournamentDto.setKey(maxQuestionNumber + 1);
+        }
+    }
+
     private void addCreator(TournamentDto tournamentDto, User creator, Tournament tournament) {
         if (creator.getRole() == User.Role.STUDENT) {
             tournament.addParticipant(creator);
             tournamentDto.getParticipants().add(tournamentDto.getCreator());
         } else {
             throw new TutorException(TOURNAMENT_CREATED_BY_NON_STUDENT);
-        }
-    }
-
-    private void setCreationDate(TournamentDto tournamentDto, Tournament tournament) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        if (tournamentDto.getCreationDate() == null) {
-            LocalDateTime now = LocalDateTime.now();
-            tournament.setCreationDate(now);
-            tournamentDto.setCreationDate(now.format(formatter));
-        } else {
-            tournament.setCreationDate(LocalDateTime.parse(tournamentDto.getCreationDate(), formatter));
         }
     }
 
@@ -173,5 +171,13 @@ public class TournamentService {
 
         user.addParticipantTournament(tournament);
         entityManager.persist(user);
+    }
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public CourseDto findTournamentCourseExecution(int tournamentId) {
+        return this.tournamentRepository.findById(tournamentId)
+                .map(Tournament::getCourseExecution)
+                .map(CourseDto::new)
+                .orElseThrow(() -> new TutorException(TOURNAMENT_NOT_FOUND, tournamentId));
     }
 }

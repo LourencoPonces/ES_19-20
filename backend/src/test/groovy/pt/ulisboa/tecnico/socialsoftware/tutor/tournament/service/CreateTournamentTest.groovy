@@ -13,7 +13,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
-import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentService
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto
@@ -53,16 +53,16 @@ class CreateTournamentTest extends Specification {
     @Autowired
     TournamentRepository tournamentRepository
 
-    def tournament
-    def creator
-    def course
-    def courseExecution
-    def creationDate
-    def availableDate
-    def runningDate
-    def conclusionDate
-    def formatter
-    def topicDtoList
+    TournamentDto tournament
+    User creator
+    Course course
+    CourseExecution courseExecution
+    LocalDateTime creationDate
+    LocalDateTime availableDate
+    LocalDateTime runningDate
+    LocalDateTime conclusionDate
+    DateTimeFormatter formatter
+    List<TopicDto> topicDtoList
 
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
@@ -76,13 +76,13 @@ class CreateTournamentTest extends Specification {
         setupTournament(creatorDto, formatter, topicDtoList)
     }
 
-    private List setupCourse() {
+    private Tuple setupCourse() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseRepository.save(course)
 
         courseExecution = new CourseExecution(course, ACRONYM, ACADEMIC_TERM, Course.Type.TECNICO)
         courseExecutionRepository.save(courseExecution)
-        [courseExecution, course]
+        new Tuple(courseExecution, course)
     }
 
     private UserDto setupCreator(CourseExecution courseExecution) {
@@ -115,7 +115,6 @@ class CreateTournamentTest extends Specification {
         runningDate = creationDate.plusDays(2)
         conclusionDate = creationDate.plusDays(3)
         tournament.setNumberOfQuestions(1)
-        tournament.setCreator(creatorDto)
         tournament.setCreationDate(creationDate.format(formatter))
         tournament.setAvailableDate(availableDate.format(formatter))
         tournament.setRunningDate(runningDate.format(formatter))
@@ -125,7 +124,7 @@ class CreateTournamentTest extends Specification {
 
     def "create a tournament"() {
         when:
-        tournamentService.createTournament(courseExecution.getId(), tournament)
+        tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournament)
 
         then: "the correct tournament is inside the repository"
         tournamentRepository.count() == 1L
@@ -148,7 +147,7 @@ class CreateTournamentTest extends Specification {
         tournament.setNumberOfQuestions(0)
 
         when:
-        tournamentService.createTournament(courseExecution.getId(), tournament)
+        tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournament)
 
         then:
         def exception = thrown(TutorException)
@@ -161,7 +160,7 @@ class CreateTournamentTest extends Specification {
         creator.setRole(User.Role.TEACHER)
 
         when:
-        tournamentService.createTournament(courseExecution.getId(), tournament)
+        tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournament)
 
         then:
         def exception = thrown(TutorException)
@@ -169,7 +168,7 @@ class CreateTournamentTest extends Specification {
         tournamentRepository.count() == 0L
     }
 
-    def "create a tournament with a topic outside the course"(){
+    def "create a tournament with a topic outside the course"() {
         given: 'a topic outside of the tournaments course'
         def outsideTopic = new Topic()
         outsideTopic.setName("OUTSIDE_TOPIC")
@@ -179,7 +178,7 @@ class CreateTournamentTest extends Specification {
         topicDtoList.add(topicDto)
 
         when:
-        tournamentService.createTournament(courseExecution.getId(), tournament)
+        tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournament)
 
         then:
         def exception = thrown(TutorException)
@@ -190,14 +189,15 @@ class CreateTournamentTest extends Specification {
     def "create a tournament with a student not enrolled in the course"() {
         given: 'A student not enrolled in course'
 
-        def unregisteredUser = new User("UNREGISTERED_NAME", "UNREGISTERED_USERNAME", 2, User.Role.STUDENT)
+        def username = "UNREGISTERED_USERNAME"
+        def unregisteredUser = new User("UNREGISTERED_NAME", username, 2, User.Role.STUDENT)
         userRepository.save(unregisteredUser)
         def unregisteredUserDto = new UserDto(unregisteredUser)
 
         tournament.setCreator(unregisteredUserDto)
 
         when:
-        tournamentService.createTournament(courseExecution.getId(), tournament)
+        tournamentService.createTournament(username, courseExecution.getId(), tournament)
 
         then:
         def exception = thrown(TutorException)
@@ -210,7 +210,7 @@ class CreateTournamentTest extends Specification {
         def badCourseId = 2
 
         when:
-        tournamentService.createTournament(badCourseId, tournament)
+        tournamentService.createTournament(CREATOR_USERNAME, badCourseId, tournament)
 
         then:
         def exception = thrown(TutorException)
@@ -230,7 +230,7 @@ class CreateTournamentTest extends Specification {
         tournament.setConclusionDate(conclusionDate.format(formatter))
 
         when:
-        tournamentService.createTournament(courseExecution.getId(), tournament)
+        tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournament)
 
         then:
         def exception = thrown(TutorException)

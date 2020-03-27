@@ -9,9 +9,11 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.ImageDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
@@ -46,6 +48,9 @@ class StudentSubmitQuestionTest extends Specification {
     CourseExecutionRepository courseExecutionRepository
 
     @Autowired
+    TopicRepository topicRepository
+
+    @Autowired
     StudentQuestionRepository studentQuestionRepository
 
     @Autowired
@@ -57,6 +62,7 @@ class StudentSubmitQuestionTest extends Specification {
     def user
     def course
     def courseExecution
+    def topic
 
     def setup() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -64,6 +70,11 @@ class StudentSubmitQuestionTest extends Specification {
 
         courseExecution = new CourseExecution(course, ACRONYM, ACADEMIC_TERM, Course.Type.TECNICO)
         courseExecutionRepository.save(courseExecution)
+
+        topic = new Topic()
+        topic.setName(TOPIC_NAME)
+        topic.setCourse(course)
+        topicRepository.save(topic)
 
         user = new User()
         user.setKey(1)
@@ -77,7 +88,6 @@ class StudentSubmitQuestionTest extends Specification {
         given: "a questionDTO"
         def questionDTO = new StudentQuestionDTO();
         StudentQuestionDtoSetup(questionDTO)
-        questionDTO.setKey(1);
         questionDTO.setStudentQuestionKey(1)
 
         setTopic(isTopic, questionDTO)
@@ -102,10 +112,9 @@ class StudentSubmitQuestionTest extends Specification {
 
     def setTopic(isTopic, exampleQuestionDto) {
         if(isTopic) {
-            def topic = new TopicDto()
+            def topicDto = new TopicDto(topic)
             def list = new ArrayList<TopicDto>()
-            topic.setName(TOPIC_NAME)
-            list.add(topic)
+            list.add(topicDto)
             exampleQuestionDto.setTopics(list)
         }
     }
@@ -136,16 +145,17 @@ class StudentSubmitQuestionTest extends Specification {
         given: "a questionDto"
         def questionDto = new StudentQuestionDTO()
         StudentQuestionDtoSetup(questionDto)
-        questionDto.setKey(1);
         questionDto.setStudentQuestionKey(1) // Specific to this test
         and: "2 Topics"
-        def topic1 = new TopicDto()
-        topic1.setName(TOPIC_NAME)
-        def topic2 = new TopicDto()
+        def topic1Dto = new TopicDto(topic)
+        def topic2 = new Topic()
         topic2.setName(TOPIC_NAME_2)
+        topic2.setCourse(course)
+        topicRepository.save(topic2)
+        def topic2Dto = new TopicDto(topic2)
         def topicList = new ArrayList<TopicDto>()
-        addToList(topicList, topic1)
-        addToList(topicList, topic2)
+        addToList(topicList, topic1Dto)
+        addToList(topicList, topic2Dto)
         questionDto.setTopics(topicList)
         and: "2 Options"
         def option1 = new OptionDto()
@@ -197,8 +207,7 @@ class StudentSubmitQuestionTest extends Specification {
         def questionDto = new StudentQuestionDTO()
         StudentQuestionDtoSetup(questionDto)
         and: "a TopicDTO"
-        def topicDto = new TopicDto()
-        topicDto.setName(TOPIC_NAME)
+        def topicDto = new TopicDto(topic)
         def topicList = new ArrayList<TopicDto>()
         addToList(topicList, topicDto)
         questionDto.setTopics(topicList)
@@ -213,7 +222,6 @@ class StudentSubmitQuestionTest extends Specification {
         when: "create 2 student questions"
         studentSubmitQuestionService.studentSubmitQuestion(course.getId(), questionDto, user.getId())
         questionDto.setStudentQuestionKey(null)
-        questionDto.setKey(null)
         studentSubmitQuestionService.studentSubmitQuestion(course.getId(), questionDto, user.getId())
 
         then: "the two student questions are created with the correct numbers"
