@@ -5,26 +5,24 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.Clarificatio
 import java.time.LocalDateTime;
 
 public class ClarificationRequestAnswerDto {
-    private Integer creator;
-    private Integer request;
+    private Integer creatorId;
+    private Integer requestId;
     private String content;
     private LocalDateTime creationDate;
 
-    public ClarificationRequestAnswerDto() {}
-
     public ClarificationRequestAnswerDto(ClarificationRequestAnswer answer) {
-        this.request = answer.getRequest().getId();
-        this.creator = answer.getCreator().getId();
+        this.requestId = answer.getRequest().getId();
+        this.creatorId = answer.getCreator().getId();
         this.content = answer.getContent();
 
         if (answer.getCreationDate() != null)
             this.creationDate = answer.getCreationDate();
     }
 
-    public Integer getCreator() { return creator; }
-    public void setCreator(Integer id) { this.creator = id; }
-    public Integer getRequestId() { return request; }
-    public void setRequestId(Integer id) { this.request = id; }
+    public Integer getCreatorId() { return creatorId; }
+    public void setCreatorId(Integer id) { this.creatorId = id; }
+    public Integer getRequestId() { return requestId; }
+    public void setRequestId(Integer id) { this.requestId = id; }
     public String getContent() { return this.content; }
     public void setContent(String s) { this.content = s; }
     public void setCreationDate(LocalDateTime date) { this.creationDate = date; }
