@@ -21,7 +21,6 @@ public class ClarificationRequestDto {
 
     public ClarificationRequestDto(ClarificationRequest clarificationRequest) {
         this.id = clarificationRequest.getId();
-        this.key = clarificationRequest.getKey();
         this.content = clarificationRequest.getContent();
         this.question = clarificationRequest.getQuestion().getId();
         this.owner = clarificationRequest.getOwner().getId();
