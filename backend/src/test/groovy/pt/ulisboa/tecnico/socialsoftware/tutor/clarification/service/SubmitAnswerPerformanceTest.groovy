@@ -79,8 +79,8 @@ class SubmitAnswerPerformanceTest extends Specification {
     def setup() {
         course = createCourse(COURSE_NAME)
         courseExecution = createCourseExecution(course, ACRONYM, ACADEMIC_TERM)
-        student = createStudent(1, "STUDENT", courseExecution)
-        teacher = createTeacher(2, "TEACHER", courseExecution)
+        student = createUser(User.Role.STUDENT, 1, "STUDENT", courseExecution)
+        teacher = createUser(User.Role.TEACHER, 2, "TEACHER", courseExecution)
 
         courseRepository.save(course)
         courseExecutionRepository.save(courseExecution)
@@ -89,23 +89,12 @@ class SubmitAnswerPerformanceTest extends Specification {
 
     }
 
-    private static User createStudent(int key, String name, CourseExecution courseExecution) {
+    private static User createUser(User.Role role, int key, String name, CourseExecution courseExecution) {
         def u = new User()
         u.setKey(key)
         u.setName(name)
         u.setUsername(name)
-        u.setRole(User.Role.STUDENT)
-        u.getCourseExecutions().add(courseExecution)
-        courseExecution.getUsers().add(u)
-        return u
-    }
-
-    private static User createTeacher(int key, String name, CourseExecution courseExecution) {
-        def u = new User()
-        u.setKey(key)
-        u.setName(name)
-        u.setUsername(name)
-        u.setRole(User.Role.TEACHER)
+        u.setRole(role)
         u.getCourseExecutions().add(courseExecution)
         courseExecution.getUsers().add(u)
         return u
