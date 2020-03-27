@@ -11,7 +11,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
-import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentService
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
@@ -31,7 +31,6 @@ class SignUpInTournamentPerformanceTest extends Specification {
     public static final Integer TOURNAMENT_KEY = 1
     public static final String CREATOR_NAME = "user"
     public static final String CREATOR_USERNAME = "username"
-    public static final String PARTICIPANT_USERNAME = "participant"
 
     @Autowired
     TournamentService tournamentService
