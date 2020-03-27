@@ -52,6 +52,7 @@ class SignUpInTournamentPerformanceTest extends Specification {
     TournamentRepository tournamentRepository
 
     def tournament
+    def tournamentDto
     def creator
     def course
     def courseExecution
@@ -71,10 +72,11 @@ class SignUpInTournamentPerformanceTest extends Specification {
 
         topicDtoList = setupTopic(course)
 
-        setupTournament(creatorDto, formatter, topicDtoList)
+        setupTournamentDto(creatorDto, formatter, topicDtoList)
 
-        tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournament)
+        tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
 
+        tournament = tournamentRepository.findAll().get(0)
     }
 
     private List setupCourse() {
@@ -107,35 +109,42 @@ class SignUpInTournamentPerformanceTest extends Specification {
         topicDtoList
     }
 
-    private void setupTournament(UserDto creatorDto, DateTimeFormatter formatter, ArrayList<TopicDto> topicDtoList) {
-        tournament = new TournamentDto()
-        tournament.setTitle(TOURNAMENT_TITLE)
-        tournament.setKey(TOURNAMENT_KEY)
-        creationDate = LocalDateTime.now()
-        availableDate = creationDate.plusDays(1)
-        runningDate = creationDate.plusDays(2)
-        conclusionDate = creationDate.plusDays(3)
-        tournament.setNumberOfQuestions(1)
-        tournament.setCreationDate(creationDate.format(formatter))
-        tournament.setAvailableDate(availableDate.format(formatter))
-        tournament.setRunningDate(runningDate.format(formatter))
-        tournament.setConclusionDate(conclusionDate.format(formatter))
-        tournament.setTopics(topicDtoList)
+    private void setupTournamentDto(UserDto creatorDto, DateTimeFormatter formatter, ArrayList<TopicDto> topicDtoList) {
+        tournamentDto = new TournamentDto()
+        tournamentDto.setTitle(TOURNAMENT_TITLE)
+        tournamentDto.setKey(TOURNAMENT_KEY)
+        def now = LocalDateTime.now()
+        creationDate = now.minusDays(2)
+        availableDate = now.minusDays(1)
+        runningDate = now.plusDays(1)
+        conclusionDate = now.plusDays(2)
+        tournamentDto.setNumberOfQuestions(1)
+        tournamentDto.setCreationDate(creationDate.format(formatter))
+        tournamentDto.setAvailableDate(availableDate.format(formatter))
+        tournamentDto.setRunningDate(runningDate.format(formatter))
+        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
+        tournamentDto.setTopics(topicDtoList)
     }
 
     def "performance testing to sign up 1000 users in one tournament"() {
         given:
-        int top = 1
-        // top = 1000 // This is the desired value. It's commented out so that running every test
-        // doesn't take much time
-        when:
-        1.upto(top,{
-            def participant = new User()
-            participant.setKey(1000)
-            participant.setUsername("TEST1000")
-            userRepository.save(participant)
+        int base = 2
+        int iterations = 1000
+        // iterations = 1000 // This is the desired value. It's commented out so that running every test
+                             // doesn't take much time
 
-            tournamentService.signUpInTournament(tournament.getId(), participant.getUsername())
+        int top = base + iterations - 1
+
+        base.upto(top, {
+            def participant = new User()
+            participant.setKey(it)
+            participant.setUsername(String.format("TEST%d", it))
+            userRepository.save(participant)
+        })
+
+        when:
+        base.upto(top,{
+            tournamentService.signUpInTournament(tournament.getId(), String.format("TEST%d", it))
         })
 
         then:
