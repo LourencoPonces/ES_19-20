@@ -8,9 +8,12 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository;
 
 import java.sql.SQLException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
@@ -23,25 +26,49 @@ public class TeacherEvaluatesStudentQuestionService {
 
     public void TeacherEvaluatesStudentQuestionService() {}
 
-    public void acceptStudentQuestion(Integer studentQuestionId) {
-        // not checking justification because it was not provided
-        StudentQuestion studentQuestion = findStudentQuestionById(studentQuestionId);
 
-        studentQuestion.setSubmittedStatus(StudentQuestion.SubmittedStatus.APPROVED);
-        studentQuestion.setJustification("");
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<StudentQuestionDTO> getAllStudentQuestions(int courseId) {
+        return studentQuestionRepository.findByCourse(courseId).stream().map(StudentQuestionDTO::new).collect(Collectors.toList());
     }
 
-    public void acceptStudentQuestion(Integer studentQuestionId, String justification) {
-        checkJustification(justification);
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<StudentQuestionDTO> getAllStudentQuestionsWithStatus(int courseId, StudentQuestion.SubmittedStatus status) {
+        return studentQuestionRepository.findByCourseAndStatus(courseId, status.toString()).stream().map(StudentQuestionDTO::new).collect(Collectors.toList());
+    }
+
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public StudentQuestionDTO acceptStudentQuestion(Integer studentQuestionId, String justification) {
+        if(justification == null) { justification = ""; } // null justification -> empty justification
+
+        // approved questions can have no justification
+        if(!justification.isEmpty()) {
+            checkJustification(justification);
+        }
 
         StudentQuestion studentQuestion = findStudentQuestionById(studentQuestionId);
 
         studentQuestion.setSubmittedStatus(StudentQuestion.SubmittedStatus.APPROVED);
         studentQuestion.setJustification(justification);
+
+        return new StudentQuestionDTO(studentQuestion);
     }
 
-
-    public void rejectStudentQuestion(Integer studentQuestionId, String justification) {
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public StudentQuestionDTO rejectStudentQuestion(Integer studentQuestionId, String justification) {
         checkJustification(justification);
 
         StudentQuestion studentQuestion = findStudentQuestionById(studentQuestionId);
@@ -52,6 +79,7 @@ public class TeacherEvaluatesStudentQuestionService {
 
         studentQuestion.setSubmittedStatus(StudentQuestion.SubmittedStatus.REJECTED);
         studentQuestion.setJustification(justification);
+        return new StudentQuestionDTO(studentQuestion);
     }
 
 

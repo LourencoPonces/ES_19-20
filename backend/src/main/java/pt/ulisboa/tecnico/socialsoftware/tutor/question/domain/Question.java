@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.question.domain;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
@@ -63,6 +64,9 @@ public class Question implements DomainEntity {
 
     @ManyToMany(mappedBy = "questions")
     private Set<Topic> topics = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "question", orphanRemoval=true)
+    private Set<ClarificationRequest> clarificationRequests = new HashSet<>();
 
     @ManyToOne
     @JoinColumn(name = "course_id")
@@ -222,6 +226,10 @@ public class Question implements DomainEntity {
     public void addQuizQuestion(QuizQuestion quizQuestion) {
         quizQuestions.add(quizQuestion);
     }
+
+    public Set<ClarificationRequest> getClarificationRequests() { return clarificationRequests; }
+
+    public void addClarificationRequest(ClarificationRequest request) { clarificationRequests.add(request); }
 
     public void addTopic(Topic topic) {
         topics.add(topic);

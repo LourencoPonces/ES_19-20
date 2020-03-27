@@ -254,6 +254,8 @@ public class Tournament {
         if (this.creationDate == null) this.creationDate = LocalDateTime.now();
 
         this.availableDate = tournamentDto.getAvailableDateDate();
+        if (this.availableDate == null) this.availableDate = creationDate;
+
         this.runningDate = tournamentDto.getRunningDateDate();
         this.conclusionDate = tournamentDto.getConclusionDateDate();
 
