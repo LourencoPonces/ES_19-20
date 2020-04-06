@@ -47,6 +47,7 @@
       @increase-order="increaseOrder"
       @decrease-order="decreaseOrder"
     />
+    <discussion-component />
   </div>
 </template>
 
@@ -54,10 +55,12 @@
 import { Component, Vue } from 'vue-property-decorator';
 import StatementManager from '@/models/statement/StatementManager';
 import ResultComponent from '@/views/student/quiz/ResultComponent.vue';
+import DiscussionComponent from '@/views/student/quiz/DiscussionComponent.vue';
 
 @Component({
   components: {
-    'result-component': ResultComponent
+    'result-component': ResultComponent,
+    'discussion-component': DiscussionComponent
   }
 })
 export default class ResultsView extends Vue {

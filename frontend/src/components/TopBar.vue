@@ -163,7 +163,7 @@
                 <v-list-item-title>Questions</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item to="">
+            <v-list-item to="/student/clarifications">
               <v-list-item-action>
                 <v-icon>fas fa-question</v-icon>
               </v-list-item-action>
