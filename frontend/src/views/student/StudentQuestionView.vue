@@ -1,10 +1,4 @@
 <template>
-  <div>
-    <h1>My Student Questions</h1>
-  </div>
-</template>
-
-<!-- <template>
   <v-card class="table">
     <v-data-table
       :headers="headers"
@@ -26,10 +20,9 @@
           />
 
           <v-spacer />
-          <v-btn color="primary" dark @click="newQuestion">New Question</v-btn>
-          <v-btn color="primary" dark @click="exportCourseQuestions"
-            >Export Questions</v-btn
-          >
+          <v-btn color="primary" dark @click="newStudentQuestion">
+            New Question
+          </v-btn>
         </v-card-title>
       </template>
 
@@ -129,45 +122,43 @@
         </v-tooltip>
       </template>
     </v-data-table>
-    <edit-question-dialog
-      v-if="currentQuestion"
-      v-model="editQuestionDialog"
-      :question="currentQuestion"
+    <edit-student-question-dialog
+      v-if="currentStudentQuestion"
+      v-model="editStudentQuestionDialog"
+      :studentQuestion="currentStudentQuestion"
+      :topics="topics"
       v-on:save-question="onSaveQuestion"
     />
-    <show-question-dialog
-      v-if="currentQuestion"
-      v-model="questionDialog"
-      :question="currentQuestion"
-      v-on:close-show-question-dialog="onCloseShowQuestionDialog"
+    <show-student-question-dialog
+      v-if="currentStudentQuestion"
+      v-model="studentQuestionDialog"
+      :studentQuestion="currentStudentQuestion"
+      v-on:close-show-student-question-dialog="onCloseShowQuestionDialog"
     />
   </v-card>
-</template> -->
+</template>
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
-// import RemoteServices from '@/services/RemoteServices';
-// import { convertMarkDownNoFigure } from '@/services/ConvertMarkdownService';
-import Question from '@/models/management/Question';
+import RemoteServices from '@/services/RemoteServices';
+import { convertMarkDownNoFigure } from '@/services/ConvertMarkdownService';
+import StudentQuestion from '@/models/management/StudentQuestion';
 import Image from '@/models/management/Image';
 import Topic from '@/models/management/Topic';
-// import QuestionsView from '../teacher/questions/QuestionsView.vue';
-// import ShowQuestionDialog from '@/views/teacher/questions/ShowQuestionDialog.vue';
-// import EditQuestionDialog from '@/views/teacher/questions/EditQuestionDialog.vue';
-// import EditQuestionTopics from '@/views/teacher/questions/EditQuestionTopics.vue';
+import ShowStudentQuestionDialog from '@/views/student/ShowStudentQuestionDialog.vue';
+import EditStudentQuestionDialog from '@/views/student/EditStudentQuestionDialog.vue';
 
-@Component /*({
+@Component({
   components: {
-    'show-question-dialog': ShowQuestionDialog,
-    'edit-question-dialog': EditQuestionDialog,
-    'edit-question-topics': EditQuestionTopics
+    'show-student-question-dialog': ShowStudentQuestionDialog,
+    'edit-student-question-dialog': EditStudentQuestionDialog
   }
-})*/
-/*export default class StudentQuestionView extends QuestionsView {
+})
+/*export default class StudentQuestionView extends Vue {
   questions: Question[] = [];
   topics: Topic[] = [];
-  currentQuestion: Question | null = null;
-  editQuestionDialog: boolean = false;
+  currentStudentQuestion: Question | null = null;
+  editStudentQuestionDialog: boolean = false;
   questionDialog: boolean = false;
   search: string = '';
   statusList = ['DISABLED', 'AVAILABLE', 'REMOVED'];
@@ -213,10 +204,10 @@ import Topic from '@/models/management/Topic';
     }
   ];
 
-  @Watch('editQuestionDialog')
+  @Watch('editStudentQuestionDialog')
   closeError() {
-    if (!this.editQuestionDialog) {
-      this.currentQuestion = null;
+    if (!this.editStudentQuestionDialog) {
+      this.currentStudentQuestion = null;
     }
   }
 
@@ -297,7 +288,7 @@ import Topic from '@/models/management/Topic';
   }
 
   showQuestionDialog(question: Question) {
-    this.currentQuestion = question;
+    this.currentStudentQuestion = question;
     this.questionDialog = true;
   }
 
@@ -306,26 +297,26 @@ import Topic from '@/models/management/Topic';
   }
 
   newQuestion() {
-    this.currentQuestion = new Question();
-    this.editQuestionDialog = true;
+    this.currentStudentQuestion = new Question();
+    this.editStudentQuestionDialog = true;
   }
 
   editQuestion(question: Question) {
-    this.currentQuestion = question;
-    this.editQuestionDialog = true;
+    this.currentStudentQuestion = question;
+    this.editStudentQuestionDialog = true;
   }
 
   duplicateQuestion(question: Question) {
-    this.currentQuestion = new Question(question);
-    this.currentQuestion.id = null;
-    this.editQuestionDialog = true;
+    this.currentStudentQuestion = new Question(question);
+    this.currentStudentQuestion.id = null;
+    this.editStudentQuestionDialog = true;
   }
 
   async onSaveQuestion(question: Question) {
     this.questions = this.questions.filter(q => q.id !== question.id);
     this.questions.unshift(question);
-    this.editQuestionDialog = false;
-    this.currentQuestion = null;
+    this.editStudentQuestionDialog = false;
+    this.currentStudentQuestion = null;
   }
 
   async exportCourseQuestions() {
@@ -359,7 +350,29 @@ import Topic from '@/models/management/Topic';
     }
   }
 }*/
-export default class StudentQuestionView extends Vue {}
+export default class StudentQuestionView extends Vue {
+  studentQuestions: StudentQuestion[] = [];
+  topics: Topic[] = [];
+  currentStudentQuestion: StudentQuestion | null = null;
+  editStudentQuestionDialog: boolean = false;
+  studentQuestionDialog: boolean = false;
+  search: string = '';
+
+  newStudentQuestion() {
+    this.currentStudentQuestion = new StudentQuestion();
+    this.editStudentQuestionDialog = true;
+  }
+
+  async created() {
+    await this.$store.dispatch('loading');
+    try {
+      [this.topics] = await Promise.all([RemoteServices.getTopics()]);
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
+    await this.$store.dispatch('clearLoading');
+  }
+}
 </script>
 
 <style lang="scss" scoped>
