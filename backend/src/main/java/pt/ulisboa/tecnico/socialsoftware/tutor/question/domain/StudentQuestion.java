@@ -81,6 +81,19 @@ public class StudentQuestion extends Question {
     }
 
     @Override
+    public void remove() {
+        canRemoveStudentQuestion();
+        getUser().getStudentQuestions().remove(this);
+        super.remove();
+    }
+
+    public void canRemoveStudentQuestion() {
+        if(getSubmittedStatus() != SubmittedStatus.WAITING_FOR_APPROVAL) {
+            throw new TutorException(QUESTION_ALREADY_READ, getId());
+        }
+    }
+
+    @Override
     public String toString() {
         return "StudentQuestion{" +
                 "id=" + getId() +
