@@ -341,6 +341,27 @@
             <v-list-item-content>Solved Quizzes</v-list-item-content>
           </v-list-item>
 
+          <v-list-item to="">
+            <v-list-item-action>
+              <v-icon>assignment</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>My Questions</v-list-item-content>
+          </v-list-item>
+
+          <v-list-item to="">
+            <v-list-item-action>
+              <v-icon>fas fa-question</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>My Clarifications</v-list-item-content>
+          </v-list-item>
+
+          <v-list-item to="">
+            <v-list-item-action>
+              <v-icon>fas fa-trophy</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>My Tournaments</v-list-item-content>
+          </v-list-item>
+
           <v-list-item to="/student/stats">
             <v-list-item-action>
               <v-icon>fas fa-user</v-icon>
