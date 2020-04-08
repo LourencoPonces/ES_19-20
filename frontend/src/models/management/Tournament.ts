@@ -28,7 +28,7 @@ export class Tournament {
       this.runningDate = jsonObj.runningDate;
       this.conclusionDate = jsonObj.conclusionDate;
       this.isCancelled = jsonObj.isCancelled;
-      this.creator = jsonObj.creator;
+      this.creator = new User(jsonObj.creator);
 
       if (jsonObj.participants) {
         this.participants = jsonObj.participants.map(
