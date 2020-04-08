@@ -1,7 +1,7 @@
 import User from '@/models/user/User';
 import Topic from '@/models/management/Topic';
 
-export class Tournament {
+export default class Tournament {
   id: number | null = null;
   number!: number; // TODO: Does this correspond to the key?
   title!: string;
