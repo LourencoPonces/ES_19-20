@@ -13,7 +13,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
