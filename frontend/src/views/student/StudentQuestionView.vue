@@ -358,6 +358,49 @@ export default class StudentQuestionView extends Vue {
   studentQuestionDialog: boolean = false;
   search: string = '';
 
+  submittedStatusList = ['WAITING_FOR_APPROVAL', 'ACCEPTED', 'REJECTED'];
+
+  headers: object = [
+    { text: 'Title', value: 'title', align: 'center' },
+    { text: 'Question', value: 'content', align: 'left' },
+    {
+      text: 'Topics',
+      value: 'topics',
+      align: 'center',
+      sortable: false
+    },
+    { text: 'Difficulty', value: 'difficulty', align: 'center' },
+    { text: 'Answers', value: 'numberOfAnswers', align: 'center' },
+    {
+      text: 'Nº of generated quizzes',
+      value: 'numberOfGeneratedQuizzes',
+      align: 'center'
+    },
+    {
+      text: 'Nº of non generated quizzes',
+      value: 'numberOfNonGeneratedQuizzes',
+      align: 'center'
+    },
+    { text: 'Status', value: 'status', align: 'center' },
+    {
+      text: 'Creation Date',
+      value: 'creationDate',
+      align: 'center'
+    },
+    {
+      text: 'Image',
+      value: 'image',
+      align: 'center',
+      sortable: false
+    },
+    {
+      text: 'Actions',
+      value: 'action',
+      align: 'center',
+      sortable: false
+    }
+  ];
+
   newStudentQuestion() {
     this.currentStudentQuestion = new StudentQuestion();
     this.editStudentQuestionDialog = true;
@@ -371,6 +414,19 @@ export default class StudentQuestionView extends Vue {
       await this.$store.dispatch('error', error);
     }
     await this.$store.dispatch('clearLoading');
+  }
+
+  async onSaveQuestion(studentQuestion: StudentQuestion) {
+    this.studentQuestions = this.studentQuestions.filter(
+      studentQuestion => studentQuestion.id !== studentQuestion.id
+    );
+    this.studentQuestions.unshift(studentQuestion);
+    this.editStudentQuestionDialog = false;
+    this.currentStudentQuestion = null;
+  }
+
+  onCloseShowQuestionDialog() {
+    this.studentQuestionDialog = false;
   }
 }
 </script>

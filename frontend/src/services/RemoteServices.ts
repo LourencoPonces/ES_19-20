@@ -227,7 +227,23 @@ export default class RemoteServices {
   ): Promise<StudentQuestion> {
     return httpClient
       .post(
-        `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/`,
+        `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions`,
+        studentQuestion
+      )
+      .then(response => {
+        return new StudentQuestion(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static updateStudentQuestion(
+    studentQuestion: StudentQuestion
+  ): Promise<StudentQuestion> {
+    return httpClient
+      .put(
+        `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${studentQuestion.id}`,
         studentQuestion
       )
       .then(response => {

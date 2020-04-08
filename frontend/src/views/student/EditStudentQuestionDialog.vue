@@ -105,7 +105,7 @@ import RemoteServices from '@/services/RemoteServices';
 export default class EditStudentQuestionDialog extends Vue {
   @Model('dialog', Boolean) dialog!: boolean;
   @Prop({ type: StudentQuestion, required: true })
-  readonly studentQuestion!: StudentQuestion;
+  studentQuestion!: StudentQuestion;
   @Prop({ type: Array, required: true }) readonly topics!: Topic[];
 
   studentQuestionTopics: Topic[] = JSON.parse(
@@ -123,7 +123,7 @@ export default class EditStudentQuestionDialog extends Vue {
       this.editStudentQuestion &&
       (!this.editStudentQuestion.title ||
         !this.editStudentQuestion.content ||
-        !this.topics)
+        !this.studentQuestionTopics)
     ) {
       await this.$store.dispatch(
         'error',
@@ -131,10 +131,11 @@ export default class EditStudentQuestionDialog extends Vue {
       );
       return;
     }
+    this.editStudentQuestion.topics = this.studentQuestionTopics;
 
     if (this.editStudentQuestion && this.editStudentQuestion.id != null) {
       try {
-        const result = await RemoteServices.updateQuestion(
+        const result = await RemoteServices.updateStudentQuestion(
           this.editStudentQuestion
         );
         this.$emit('save-student-question', result);
@@ -153,14 +154,10 @@ export default class EditStudentQuestionDialog extends Vue {
     }
   }
 
-  addTopics(topic: Topic) {
-    this.studentQuestionTopics.push(topic);
-  }
-
   removeTopic(topic: Topic) {
-    this.studentQuestionTopics = [
-      ...this.studentQuestionTopics.filter(element => element.id != topic.id)
-    ];
+    this.studentQuestionTopics = this.studentQuestionTopics.filter(
+      element => element.id != topic.id
+    );
   }
 }
 </script>
