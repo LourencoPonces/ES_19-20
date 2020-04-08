@@ -7,6 +7,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 
+@Component
 export default class TournamentsView extends Vue {}
 </script>
 
