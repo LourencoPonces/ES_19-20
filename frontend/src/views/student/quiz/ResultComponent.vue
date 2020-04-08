@@ -63,11 +63,18 @@
     <v-card :max-height="270" style="margin-top: 30px;" outlined>
       <v-card-title>
         Clarification Requests
-         <v-btn class="add-button" dark color="primary">New Request</v-btn>
+         <v-btn v-if="!creatingRequest" class="add-button" dark color="primary" @click="newRequestButton()">New Request</v-btn>
       </v-card-title>
      
       <v-divider></v-divider>
-      <v-card-text>
+
+      <v-card-text v-if="creatingRequest">
+        <v-text-field v-model="requestContent" label="Your request goes here."></v-text-field>
+        <v-btn dark color="red" style="margin: 5px;" @click="cancelCreateRequest()">Cancel</v-btn>
+        <v-btn dark color="primary" style="margin: 5px;" @click="submitRequest()">Submit</v-btn>
+      </v-card-text>
+
+      <v-card-text v-else-if="hasRequests">
         <v-expansion-panels focusable>
           <v-expansion-panel>
             <v-expansion-panel-header>Clarification Request 1</v-expansion-panel-header>
@@ -77,6 +84,8 @@
           </v-expansion-panel>
         </v-expansion-panels>
       </v-card-text>
+
+       <v-card-text v-else>No requests available.</v-card-text>
       
     </v-card>
   </div>
@@ -90,6 +99,8 @@ import StatementAnswer from '@/models/statement/StatementAnswer';
 import StatementCorrectAnswer from '@/models/statement/StatementCorrectAnswer';
 import Image from '@/models/management/Image';
 
+import ClarificationRequest from '@/models/clarification/ClarificationRequest';
+
 @Component
 export default class ResultComponent extends Vue {
   @Model('questionOrder', Number) questionOrder: number | undefined;
@@ -99,6 +110,9 @@ export default class ResultComponent extends Vue {
   @Prop() readonly questionNumber!: number;
   hover: boolean = false;
   optionLetters: string[] = ['A', 'B', 'C', 'D'];
+  hasRequests: boolean = true;
+  creatingRequest: boolean = false;
+  requestContent="";
 
   @Emit()
   increaseOrder() {
@@ -112,6 +126,22 @@ export default class ResultComponent extends Vue {
 
   convertMarkDown(text: string, image: Image | null = null): string {
     return convertMarkDown(text, image);
+  }
+
+  newRequestButton() {
+    this.creatingRequest = true;
+  }
+
+  cancelCreateRequest() {
+    this.creatingRequest = false;
+    this.requestContent = "";
+    
+  }
+
+  submitRequest() {
+    this.creatingRequest = false;
+    console.log(this.requestContent);
+    this.requestContent = "";
   }
 }
 </script>
