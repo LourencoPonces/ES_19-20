@@ -47,7 +47,7 @@
       @increase-order="increaseOrder"
       @decrease-order="decreaseOrder"
     />
-    <discussion-component />
+ <!--   <discussion-component /> -->
   </div>
 </template>
 
@@ -59,8 +59,8 @@ import DiscussionComponent from '@/views/student/quiz/DiscussionComponent.vue';
 
 @Component({
   components: {
-    'result-component': ResultComponent,
-    'discussion-component': DiscussionComponent
+    'result-component': ResultComponent
+  //  'discussion-component': DiscussionComponent
   }
 })
 export default class ResultsView extends Vue {

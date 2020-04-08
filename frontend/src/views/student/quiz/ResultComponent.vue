@@ -60,6 +60,25 @@
         />
       </li>
     </ul>
+    <v-card :max-height="270" style="margin-top: 30px;" outlined>
+      <v-card-title>
+        Clarification Requests
+         <v-btn class="add-button" dark color="primary">New Request</v-btn>
+      </v-card-title>
+     
+      <v-divider></v-divider>
+      <v-card-text>
+        <v-expansion-panels focusable>
+          <v-expansion-panel>
+            <v-expansion-panel-header>Clarification Request 1</v-expansion-panel-header>
+            <v-expansion-panel-content>
+              Bla bla bla...?
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </v-card-text>
+      
+    </v-card>
   </div>
 </template>
 
@@ -169,5 +188,10 @@ export default class ResultComponent extends Vue {
       color: rgb(255, 255, 255) !important;
     }
   }
+}
+
+.add-button {
+  position: relative;
+  right: -638px;
 }
 </style>
