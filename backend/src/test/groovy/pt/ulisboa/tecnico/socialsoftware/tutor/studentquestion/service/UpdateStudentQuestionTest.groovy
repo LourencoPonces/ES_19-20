@@ -44,7 +44,6 @@ class UpdateStudentQuestionTest extends Specification{
 
 
     public static final String USER_NAME = "ist199999"
-    public static final String BAD_USER_NAME = "ist100000"
 
     @Autowired
     StudentSubmitQuestionService studentSubmitQuestionService
@@ -215,18 +214,21 @@ class UpdateStudentQuestionTest extends Specification{
         resOptionTwo.getCorrect()
     }
 
-    def "update a student question with missing data"() {
+    def "update a student question with bad data"() {
         given: "Missing data"
         def studentQuestionDto =  new StudentQuestionDTO()
         studentQuestionDto.setId(studentQuestion.getId())
         studentQuestionDto.setTitle(NEW_QUESTION_TITLE)
         studentQuestionDto.setContent(NEW_QUESTION_CONTENT)
-        studentQuestionDto.setUser(userName)
+        studentQuestionDto.setUser(USER_NAME)
         studentQuestionDto.setStatus(Question.Status.DISABLED.name())
-        studentQuestionDto.setSubmittedStatus(status)
         def list = new ArrayList<TopicDto>()
         addTopic(toAdd, list)
-        studentQuestionDto.setTopics(list);
+        studentQuestionDto.setTopics(list)
+
+        and: "User (student or not)"
+        def user = userRepository.findByUsername(USER_NAME)
+        user.setRole(role)
 
         when:
         studentSubmitQuestionService.updateStudentQuestion(studentQuestionDto.getId(), studentQuestionDto, course.getId())
@@ -236,10 +238,9 @@ class UpdateStudentQuestionTest extends Specification{
         error.getErrorMessage() == errorMessage
 
         where:
-        status                                               | toAdd            |           userName          || errorMessage
-        StudentQuestion.SubmittedStatus.APPROVED             |  true            |             USER_NAME       || ErrorMessage.DIFFERENT_STATUS
-        StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL |  false           |             USER_NAME       || ErrorMessage.NO_TOPICS
-        StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL |  true            |            BAD_USER_NAME    || ErrorMessage.ACCESS_DENIED
+        status                                               | toAdd            |           role                      || errorMessage
+        StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL |  false           |            User.Role.STUDENT        || ErrorMessage.NO_TOPICS
+        StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL |  true            |            User.Role.TEACHER        || ErrorMessage.ACCESS_DENIED
     }
 
     def addTopic(toAdd, list) {

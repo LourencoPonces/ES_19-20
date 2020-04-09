@@ -74,12 +74,8 @@ public class StudentQuestion extends Question {
             throw new TutorException(NO_TOPICS);
         }
 
-        if(user.getRole() != User.Role.STUDENT || !user.getUsername().equals(questionDto.getUser())) {
+        if(user.getRole() != User.Role.STUDENT ) {
             throw new TutorException(ACCESS_DENIED);
-        }
-
-        if(questionDto.getSubmittedStatus() != getSubmittedStatus()) {
-            throw new TutorException(DIFFERENT_STATUS);
         }
     }
 
