@@ -112,7 +112,7 @@ export default class ResultComponent extends Vue {
   optionLetters: string[] = ['A', 'B', 'C', 'D'];
   hasRequests: boolean = true;
   creatingRequest: boolean = false;
-  requestContent="";
+  requestContent = '';
 
   @Emit()
   increaseOrder() {
@@ -134,14 +134,17 @@ export default class ResultComponent extends Vue {
 
   cancelCreateRequest() {
     this.creatingRequest = false;
-    this.requestContent = "";
+    this.requestContent = '';
     
   }
 
+  @Emit()
   submitRequest() {
     this.creatingRequest = false;
-    console.log(this.requestContent);
-    this.requestContent = "";
+    let content = this.requestContent;
+    this.requestContent = '';
+    console.log(this.question.questionId);
+    return content;
   }
 }
 </script>

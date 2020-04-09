@@ -46,4 +46,12 @@ export default class StatementManager {
   isEmpty(): boolean {
     return this.statementQuiz == null;
   }
+
+  getQuizId() {
+    return this.statementQuiz?.getQuizId();
+  }
+
+  getQuestionId(index : number) {
+    return this.statementQuiz?.getQuestionId(index);
+  }
 }

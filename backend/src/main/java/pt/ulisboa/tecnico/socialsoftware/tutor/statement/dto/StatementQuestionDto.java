@@ -13,8 +13,10 @@ public class StatementQuestionDto implements Serializable {
     private List<StatementOptionDto> options;
     private ImageDto image;
     private Integer sequence;
+    private Integer questionId;
 
     public StatementQuestionDto(QuestionAnswer questionAnswer) {
+        this.questionId = questionAnswer.getQuizQuestion().getQuestion().getId();
         this.content = questionAnswer.getQuizQuestion().getQuestion().getContent();
         if (questionAnswer.getQuizQuestion().getQuestion().getImage() != null) {
             this.image = new ImageDto(questionAnswer.getQuizQuestion().getQuestion().getImage());

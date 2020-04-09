@@ -41,4 +41,12 @@ export default class StatementQuiz {
       }
     }
   }
+
+  async getQuizId() {
+    return this.id;
+  }
+
+  async getQuestionId(index : number) {
+    return this.questions[index].getQuestionId();
+  }
 }

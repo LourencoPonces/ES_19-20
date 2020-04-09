@@ -46,6 +46,8 @@
       :questionNumber="statementManager.statementQuiz.questions.length"
       @increase-order="increaseOrder"
       @decrease-order="decreaseOrder"
+      @submit-request="submitRequest"
+
     />
  <!--   <discussion-component /> -->
   </div>
@@ -56,6 +58,9 @@ import { Component, Vue } from 'vue-property-decorator';
 import StatementManager from '@/models/statement/StatementManager';
 import ResultComponent from '@/views/student/quiz/ResultComponent.vue';
 import DiscussionComponent from '@/views/student/quiz/DiscussionComponent.vue';
+import ClarificationRequest from '../../../models/clarification/ClarificationRequest';
+import RemoteServices from '../../../services/RemoteServices';
+import StatementQuiz from '../../../models/statement/StatementQuiz';
 
 @Component({
   components: {
@@ -79,7 +84,7 @@ export default class ResultsView extends Vue {
       await this.$store.dispatch('clearLoading');
     }
   }
-
+ 
   increaseOrder(): void {
     if (
       this.questionOrder + 1 <
@@ -99,6 +104,14 @@ export default class ResultsView extends Vue {
     if (n >= 0 && n < +this.statementManager.statementQuiz!.questions.length) {
       this.questionOrder = n;
     }
+  }
+
+  submitRequest(content: string) : void {
+      console.log('parent received: ' + content);
+      console.log(this.statementManager.getQuizStatement());
+      
+      var questionId = this.statementManager.getQuestionId(this.questionOrder);
+      console.log('questionId: ' + questionId);
   }
 }
 </script>
