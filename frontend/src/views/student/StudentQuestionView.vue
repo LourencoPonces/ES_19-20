@@ -127,13 +127,13 @@
       v-model="editStudentQuestionDialog"
       :studentQuestion="currentStudentQuestion"
       :topics="topics"
-      v-on:save-question="onSaveQuestion"
+      v-on:save-student-question="onSaveStudentQuestion"
     />
     <show-student-question-dialog
       v-if="currentStudentQuestion"
       v-model="studentQuestionDialog"
       :studentQuestion="currentStudentQuestion"
-      v-on:close-show-student-question-dialog="onCloseShowQuestionDialog"
+      v-on:close-show-student-question-dialog="onCloseShowStudentQuestionDialog"
     />
   </v-card>
 </template>
@@ -154,202 +154,6 @@ import EditStudentQuestionDialog from '@/views/student/EditStudentQuestionDialog
     'edit-student-question-dialog': EditStudentQuestionDialog
   }
 })
-/*export default class StudentQuestionView extends Vue {
-  questions: Question[] = [];
-  topics: Topic[] = [];
-  currentStudentQuestion: Question | null = null;
-  editStudentQuestionDialog: boolean = false;
-  questionDialog: boolean = false;
-  search: string = '';
-  statusList = ['DISABLED', 'AVAILABLE', 'REMOVED'];
-
-  headers: object = [
-    { text: 'Title', value: 'title', align: 'center' },
-    { text: 'Question', value: 'content', align: 'left' },
-    {
-      text: 'Topics',
-      value: 'topics',
-      align: 'center',
-      sortable: false
-    },
-    { text: 'Difficulty', value: 'difficulty', align: 'center' },
-    { text: 'Answers', value: 'numberOfAnswers', align: 'center' },
-    {
-      text: 'Nº of generated quizzes',
-      value: 'numberOfGeneratedQuizzes',
-      align: 'center'
-    },
-    {
-      text: 'Nº of non generated quizzes',
-      value: 'numberOfNonGeneratedQuizzes',
-      align: 'center'
-    },
-    { text: 'Status', value: 'status', align: 'center' },
-    {
-      text: 'Creation Date',
-      value: 'creationDate',
-      align: 'center'
-    },
-    {
-      text: 'Image',
-      value: 'image',
-      align: 'center',
-      sortable: false
-    },
-    {
-      text: 'Actions',
-      value: 'action',
-      align: 'center',
-      sortable: false
-    }
-  ];
-
-  @Watch('editStudentQuestionDialog')
-  closeError() {
-    if (!this.editStudentQuestionDialog) {
-      this.currentStudentQuestion = null;
-    }
-  }
-
-  async created() {
-    await this.$store.dispatch('loading');
-    try {
-      [this.topics, this.questions] = await Promise.all([
-        RemoteServices.getTopics(),
-        RemoteServices.getQuestions()
-      ]);
-    } catch (error) {
-      await this.$store.dispatch('error', error);
-    }
-    await this.$store.dispatch('clearLoading');
-  }
-
-  customFilter(value: string, search: string, question: Question) {
-    // noinspection SuspiciousTypeOfGuard,SuspiciousTypeOfGuard
-    return (
-      search != null &&
-      JSON.stringify(question)
-        .toLowerCase()
-        .indexOf(search.toLowerCase()) !== -1
-    );
-  }
-
-  convertMarkDownNoFigure(text: string, image: Image | null = null): string {
-    return convertMarkDownNoFigure(text, image);
-  }
-
-  onQuestionChangedTopics(questionId: Number, changedTopics: Topic[]) {
-    let question = this.questions.find(
-      (question: Question) => question.id == questionId
-    );
-    if (question) {
-      question.topics = changedTopics;
-    }
-  }
-
-  getDifficultyColor(difficulty: number) {
-    if (difficulty < 25) return 'green';
-    else if (difficulty < 50) return 'lime';
-    else if (difficulty < 75) return 'orange';
-    else return 'red';
-  }
-
-  async setStatus(questionId: number, status: string) {
-    try {
-      await RemoteServices.setQuestionStatus(questionId, status);
-      let question = this.questions.find(
-        question => question.id === questionId
-      );
-      if (question) {
-        question.status = status;
-      }
-    } catch (error) {
-      await this.$store.dispatch('error', error);
-    }
-  }
-
-  getStatusColor(status: string) {
-    if (status === 'REMOVED') return 'red';
-    else if (status === 'DISABLED') return 'orange';
-    else return 'green';
-  }
-
-  async handleFileUpload(event: File, question: Question) {
-    if (question.id) {
-      try {
-        const imageURL = await RemoteServices.uploadImage(event, question.id);
-        question.image = new Image();
-        question.image.url = imageURL;
-        confirm('Image ' + imageURL + ' was uploaded!');
-      } catch (error) {
-        await this.$store.dispatch('error', error);
-      }
-    }
-  }
-
-  showQuestionDialog(question: Question) {
-    this.currentStudentQuestion = question;
-    this.questionDialog = true;
-  }
-
-  onCloseShowQuestionDialog() {
-    this.questionDialog = false;
-  }
-
-  newQuestion() {
-    this.currentStudentQuestion = new Question();
-    this.editStudentQuestionDialog = true;
-  }
-
-  editQuestion(question: Question) {
-    this.currentStudentQuestion = question;
-    this.editStudentQuestionDialog = true;
-  }
-
-  duplicateQuestion(question: Question) {
-    this.currentStudentQuestion = new Question(question);
-    this.currentStudentQuestion.id = null;
-    this.editStudentQuestionDialog = true;
-  }
-
-  async onSaveQuestion(question: Question) {
-    this.questions = this.questions.filter(q => q.id !== question.id);
-    this.questions.unshift(question);
-    this.editStudentQuestionDialog = false;
-    this.currentStudentQuestion = null;
-  }
-
-  async exportCourseQuestions() {
-    let fileName = this.$store.getters.getCurrentCourse.name + '-Questions.zip';
-    try {
-      let result = await RemoteServices.exportCourseQuestions();
-      const url = window.URL.createObjectURL(result);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', fileName);
-      document.body.appendChild(link);
-      link.click();
-    } catch (error) {
-      await this.$store.dispatch('error', error);
-    }
-  }
-
-  async deleteQuestion(toDeletequestion: Question) {
-    if (
-      toDeletequestion.id &&
-      confirm('Are you sure you want to delete this question?')
-    ) {
-      try {
-        await RemoteServices.deleteQuestion(toDeletequestion.id);
-        this.questions = this.questions.filter(
-          question => question.id != toDeletequestion.id
-        );
-      } catch (error) {
-        await this.$store.dispatch('error', error);
-      }
-    }
-  }
-}*/
 export default class StudentQuestionView extends Vue {
   studentQuestions: StudentQuestion[] = [];
   topics: Topic[] = [];
@@ -369,19 +173,7 @@ export default class StudentQuestionView extends Vue {
       align: 'center',
       sortable: false
     },
-    { text: 'Difficulty', value: 'difficulty', align: 'center' },
-    { text: 'Answers', value: 'numberOfAnswers', align: 'center' },
-    {
-      text: 'Nº of generated quizzes',
-      value: 'numberOfGeneratedQuizzes',
-      align: 'center'
-    },
-    {
-      text: 'Nº of non generated quizzes',
-      value: 'numberOfNonGeneratedQuizzes',
-      align: 'center'
-    },
-    { text: 'Status', value: 'status', align: 'center' },
+    { text: 'Submitted Status', value: 'status', align: 'center' },
     {
       text: 'Creation Date',
       value: 'creationDate',
@@ -416,36 +208,53 @@ export default class StudentQuestionView extends Vue {
     await this.$store.dispatch('clearLoading');
   }
 
-  async onSaveQuestion(studentQuestion: StudentQuestion) {
+  async onSaveStudentQuestion(studentQuestion: StudentQuestion) {
     this.studentQuestions = this.studentQuestions.filter(
       studentQuestion => studentQuestion.id !== studentQuestion.id
     );
     this.studentQuestions.unshift(studentQuestion);
     this.editStudentQuestionDialog = false;
     this.currentStudentQuestion = null;
+    confirm('Student Question successfully submitted');
   }
 
-  onCloseShowQuestionDialog() {
+  onCloseShowStudentQuestionDialog() {
     this.studentQuestionDialog = false;
+  }
+
+  async handleFileUpload(event: File, studentQuestion: StudentQuestion) {
+    if (studentQuestion.id) {
+      try {
+        const imageURL = await RemoteServices.uploadImage(
+          event,
+          studentQuestion.id
+        );
+        studentQuestion.image = new Image();
+        studentQuestion.image.url = imageURL;
+        confirm('Image ' + imageURL + ' was uploaded!');
+      } catch (error) {
+        await this.$store.dispatch('error', error);
+      }
+    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-// .question-textarea {
-//   text-align: left;
+.question-textarea {
+  text-align: left;
 
-//   .CodeMirror,
-//   .CodeMirror-scroll {
-//     min-height: 200px !important;
-//   }
-// }
-// .option-textarea {
-//   text-align: left;
+  .CodeMirror,
+  .CodeMirror-scroll {
+    min-height: 200px !important;
+  }
+}
+.option-textarea {
+  text-align: left;
 
-//   .CodeMirror,
-//   .CodeMirror-scroll {
-//     min-height: 100px !important;
-//   }
-// }
+  .CodeMirror,
+  .CodeMirror-scroll {
+    min-height: 100px !important;
+  }
+}
 </style>
