@@ -57,7 +57,7 @@ public class StudentQuestionController {
      * F1: Student check suggested question status
      * ===========================================
      */
-    @PostMapping("courses/{courseId}/studentQuestions")
+    @PostMapping("/courses/{courseId}/studentQuestions")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#courseId, 'COURSE.ACCESS')")
     public StudentQuestionDTO createStudentQuestion(@PathVariable int courseId, @Valid @RequestBody StudentQuestionDTO studentQuestion, Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
@@ -65,8 +65,15 @@ public class StudentQuestionController {
         if(user == null){
             throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
         }
+        studentQuestion.setUser(user.getUsername());
         studentQuestion.setSubmittedStatus(StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL); // ensure it is pending
         return studentSubmitQuestionService.studentSubmitQuestion(courseId, studentQuestion, user.getId());
+    }
+
+    @PutMapping("/courses/{courseId}/studentQuestions/{studentQuestionId}")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#studentQuestionId, 'QUESTION_ACCESS')")
+    public StudentQuestionDTO updateStudentQuestion(@PathVariable Integer studentQuestionId, @PathVariable Integer courseId, @Valid @RequestBody StudentQuestionDTO studentQuestion) {
+        return studentSubmitQuestionService.updateStudentQuestion(studentQuestionId, studentQuestion, courseId);
     }
 
     /* ===========================================

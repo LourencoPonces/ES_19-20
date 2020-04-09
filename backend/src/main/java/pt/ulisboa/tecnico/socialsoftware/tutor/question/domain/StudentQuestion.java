@@ -5,7 +5,6 @@ import javax.persistence.*;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 
@@ -75,9 +74,21 @@ public class StudentQuestion extends Question {
             throw new TutorException(NO_TOPICS);
         }
 
-        if(user.getRole() != User.Role.STUDENT) {
+        if(user.getRole() != User.Role.STUDENT || !user.getUsername().equals(questionDto.getUser())) {
             throw new TutorException(ACCESS_DENIED);
         }
+
+        if(questionDto.getSubmittedStatus() != getSubmittedStatus()) {
+            throw new TutorException(DIFFERENT_STATUS);
+        }
+    }
+
+    public void update(StudentQuestionDTO studentQuestionDTO) {
+        checkStudentQuestionConsistency(studentQuestionDTO, user);
+        super.update(studentQuestionDTO);
+        setJustification(studentQuestionDTO.getJustification());
+        setStudentQuestionKey(studentQuestionDTO.getStudentQuestionKey());
+
     }
 
     @Override
