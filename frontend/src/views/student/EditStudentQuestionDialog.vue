@@ -77,7 +77,7 @@
                 auto-grow
                 rows="1"
                 v-model="editStudentQuestion.options[index - 1].content"
-                label="Content"
+                :label="optionName(index)"
               ></v-textarea>
             </v-flex>
           </v-layout>
@@ -158,6 +158,10 @@ export default class EditStudentQuestionDialog extends Vue {
     this.studentQuestionTopics = this.studentQuestionTopics.filter(
       element => element.id != topic.id
     );
+  }
+
+  optionName(index: Number): String {
+    return 'Option ' + index;
   }
 }
 </script>
