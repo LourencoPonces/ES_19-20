@@ -55,6 +55,7 @@ class StudentSubmitQuestionTest extends Specification {
     StudentSubmitQuestionService studentSubmitQuestionService
 
     def user
+
     def course
     def courseExecution
 
@@ -73,6 +74,7 @@ class StudentSubmitQuestionTest extends Specification {
 
     }
      @Unroll
+     // JFF: #topic should be #isTopic, etc.
     def "invalid arguments where isTopic is #topic, isOption is #option, isCorrect is #correct and errorMessage is #errorMessage"() {
         given: "a questionDTO"
         def questionDTO = new StudentQuestionDTO();

@@ -31,7 +31,8 @@ import spock.lang.Specification
 
 
 @DataJpaTest
-class CheckClarificationRequestAnswerSpockTest extends Specification {
+// JFF: Class name from file name
+class CheckClarificationRequestAnswerServiceSpockTest extends Specification {
     static final String COURSE_NAME = "Software Architecture"
     static final String ACRONYM = "AS1"
     static final String ACADEMIC_TERM = "1 SEM"

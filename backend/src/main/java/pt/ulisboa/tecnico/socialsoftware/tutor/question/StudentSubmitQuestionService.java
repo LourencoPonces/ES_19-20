@@ -48,6 +48,7 @@ public class StudentSubmitQuestionService {
     public StudentQuestionDTO studentSubmitQuestion(int courseId, StudentQuestionDTO studentQuestionDTO, int studentId) {
         Course course = courseRepository.findById(courseId).orElseThrow(() -> new TutorException(COURSE_NOT_FOUND, courseId));
 
+        // JFF: The code here could have been refactored into shorter methods (see the videos on Fénix)
         if (studentQuestionDTO.getStudentQuestionKey() == null) {
             int maxStudentQuestionNumber = studentQuestionRepository.getMaxQuestionNumber() != null ?
                     studentQuestionRepository.getMaxQuestionNumber() : 0;

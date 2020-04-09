@@ -150,6 +150,7 @@ public class ClarificationService {
     }
 
     private Question tryGetAnsweredQuestion(int questionId, int userId) {
+        // JFF: This is not the most efficient way...
         boolean answered = false;
         Question question = questionRepository.findById(questionId).orElseThrow(() -> new TutorException(ErrorMessage.QUESTION_NOT_FOUND, questionId));
         Set<QuizQuestion> quizQuestions = question.getQuizQuestions();
