@@ -49,7 +49,10 @@
               </v-autocomplete>
             </v-form>
             <v-flex xs24 sm12 md8>
-              <v-text-field v-model="editStudentQuestion.title" label="Title" />
+              <v-text-field
+                v-model="editStudentQuestion.title"
+                label="Question Title"
+              />
             </v-flex>
             <v-flex xs24 sm12 md8>
               <v-textarea
@@ -57,7 +60,7 @@
                 auto-grow
                 rows="1"
                 v-model="editStudentQuestion.content"
-                label="Content"
+                label="Question"
               ></v-textarea>
             </v-flex>
             <v-flex
