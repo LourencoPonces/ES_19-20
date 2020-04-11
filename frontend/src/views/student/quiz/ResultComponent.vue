@@ -74,18 +74,24 @@
         <v-btn dark color="primary" style="margin: 5px;" @click="submitRequest()">Submit</v-btn>
       </v-card-text>
 
-      <v-card-text v-else-if="hasRequests">
+      <v-card-text v-else-if="hasClarificationRequests()">
         <v-expansion-panels focusable>
-          <v-expansion-panel>
-            <v-expansion-panel-header>Clarification Request 1</v-expansion-panel-header>
-            <v-expansion-panel-content>
-              Bla bla bla...?
+          <v-expansion-panel
+            v-for="(request,i) in clarifications.length"
+            :key="i"
+          >
+            <v-expansion-panel-header>{{clarifications[i].content}}</v-expansion-panel-header>
+            <v-expansion-panel-content v-if="clarifications[i].hasAnswer()">
+              {{clarifications[i].answer}}
+            </v-expansion-panel-content>
+            <v-expansion-panel-content v-else>
+              No answer available.
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
       </v-card-text>
 
-       <v-card-text v-else>No requests available.</v-card-text>
+      <v-card-text v-else>No requests available.</v-card-text>
       
     </v-card>
   </div>
@@ -104,15 +110,18 @@ import ClarificationRequest from '@/models/clarification/ClarificationRequest';
 @Component
 export default class ResultComponent extends Vue {
   @Model('questionOrder', Number) questionOrder: number | undefined;
-  @Prop(StatementQuestion) readonly question!: StatementQuestion;
+  @Prop(StatementQuestion) question!: StatementQuestion;
   @Prop(StatementCorrectAnswer) readonly correctAnswer!: StatementCorrectAnswer;
   @Prop(StatementAnswer) readonly answer!: StatementAnswer;
   @Prop() readonly questionNumber!: number;
+  @Prop({type: Array}) readonly clarifications!: ClarificationRequest[]
+
+
   hover: boolean = false;
   optionLetters: string[] = ['A', 'B', 'C', 'D'];
-  hasRequests: boolean = true;
   creatingRequest: boolean = false;
   requestContent = '';
+  nRequests!: number;
 
   @Emit()
   increaseOrder() {
@@ -135,16 +144,20 @@ export default class ResultComponent extends Vue {
   cancelCreateRequest() {
     this.creatingRequest = false;
     this.requestContent = '';
-    
+  }
+
+  hasClarificationRequests() {
+    return this.clarifications.length > 0
   }
 
   @Emit()
   submitRequest() {
+    
     this.creatingRequest = false;
     let content = this.requestContent;
     this.requestContent = '';
-    console.log(this.question.questionId);
-    return content;
+
+    return [content, this.question.questionId.toString()];
   }
 }
 </script>

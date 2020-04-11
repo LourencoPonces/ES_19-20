@@ -1,5 +1,6 @@
 import StatementQuestion from '@/models/statement/StatementQuestion';
 import StatementAnswer from '@/models/statement/StatementAnswer';
+import ClarificationRequest from '@/models/clarification/ClarificationRequest';
 
 export default class StatementQuiz {
   id!: number;
@@ -48,5 +49,13 @@ export default class StatementQuiz {
 
   async getQuestionId(index : number) {
     return this.questions[index].getQuestionId();
+  }
+
+  async addClarificationRequest(index : number, request : ClarificationRequest) {
+    this.questions[index].addClarificationRequest(request);
+  }
+
+  async getClarificationRequests(index : number) {
+    this.questions[index].getClarificationRequests();
   }
 }

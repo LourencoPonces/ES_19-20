@@ -41,4 +41,12 @@ export default class StatementQuestion {
   async getQuestionId() {
     return this.questionId;
   }
+
+  async addClarificationRequest(request : ClarificationRequest) {
+    this.clarifications.push(request);
+  }
+
+  async getClarificationRequests() {
+    return this.clarifications;
+  }
 }
