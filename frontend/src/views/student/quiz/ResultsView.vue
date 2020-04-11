@@ -44,6 +44,7 @@
       :correctAnswer="statementManager.correctAnswers[questionOrder]"
       :question="statementManager.statementQuiz.questions[questionOrder]"
       :questionNumber="statementManager.statementQuiz.questions.length"
+      :clarifications="statementManager.statementQuiz.questions[questionOrder].clarifications"
       @increase-order="increaseOrder"
       @decrease-order="decreaseOrder"
       @submit-request="submitRequest"
@@ -106,12 +107,22 @@ export default class ResultsView extends Vue {
     }
   }
 
-  submitRequest(content: string) : void {
-      console.log('parent received: ' + content);
-      console.log(this.statementManager.getQuizStatement());
-      
-      var questionId = this.statementManager.getQuestionId(this.questionOrder);
-      console.log('questionId: ' + questionId);
+  async submitRequest(info : string[]) {   
+    try {
+      let req = this.createRequest(info[0], this.$store.getters.getUserId, parseInt(info[1]));
+      this.statementManager.addClarificationRequest(this.questionOrder, await RemoteServices.submitClarificationRequest(req));
+    } 
+    catch (error) {
+      await this.$store.dispatch('error', error);
+    }
+  }
+
+    createRequest(content: string, owner: number, question: number) : ClarificationRequest {
+    var req = new ClarificationRequest();
+    req.setQuestionId(question);
+    req.setOwnerId(owner)
+    req.setContent(content);
+    return req;
   }
 }
 </script>
