@@ -44,6 +44,7 @@
       :correctAnswer="statementManager.correctAnswers[questionOrder]"
       :question="statementManager.statementQuiz.questions[questionOrder]"
       :questionNumber="statementManager.statementQuiz.questions.length"
+      :clarifications="statementManager.statementQuiz.questions[questionOrder].clarifications"
       @increase-order="increaseOrder"
       @decrease-order="decreaseOrder"
     />

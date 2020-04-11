@@ -71,8 +71,6 @@ import StatementAnswer from '@/models/statement/StatementAnswer';
 import StatementCorrectAnswer from '@/models/statement/StatementCorrectAnswer';
 import Image from '@/models/management/Image';
 
-import ClarificationRequest from '@/models/clarification/ClarificationRequest';
-
 @Component
 export default class ResultComponent extends Vue {
   @Model('questionOrder', Number) questionOrder: number | undefined;
