@@ -13,6 +13,7 @@ import Assessment from '@/models/management/Assessment';
 import AuthDto from '@/models/user/AuthDto';
 import StatementAnswer from '@/models/statement/StatementAnswer';
 import { QuizAnswers } from '@/models/management/QuizAnswers';
+import StudentQuestion from '@/models/management/StudentQuestion';
 
 const httpClient = axios.create();
 httpClient.defaults.timeout = 10000;
@@ -215,8 +216,45 @@ export default class RemoteServices {
         throw Error(await this.errorMessage(error));
       });
   }
+  
 
-  static async getAvailableQuizzes(): Promise<StatementQuiz[]> {
+  /*
+   * Student Questions
+   */
+
+  static createStudentQuestion(
+    studentQuestion: StudentQuestion
+  ): Promise<StudentQuestion> {
+    return httpClient
+      .post(
+        `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions`,
+        studentQuestion
+      )
+      .then(response => {
+        return new StudentQuestion(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static updateStudentQuestion(
+    studentQuestion: StudentQuestion
+  ): Promise<StudentQuestion> {
+    return httpClient
+      .put(
+        `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${studentQuestion.id}`,
+        studentQuestion
+      )
+      .then(response => {
+        return new StudentQuestion(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static getAvailableQuizzes(): Promise<StatementQuiz[]> {
     return httpClient
       .get(
         `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/quizzes/available`
