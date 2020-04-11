@@ -44,13 +44,15 @@
       :correctAnswer="statementManager.correctAnswers[questionOrder]"
       :question="statementManager.statementQuiz.questions[questionOrder]"
       :questionNumber="statementManager.statementQuiz.questions.length"
-      :clarifications="statementManager.statementQuiz.questions[questionOrder].clarifications"
       @increase-order="increaseOrder"
       @decrease-order="decreaseOrder"
-      @submit-request="submitRequest"
-
     />
- <!--   <discussion-component /> -->
+
+    <discussion-component 
+      :question="statementManager.statementQuiz.questions[questionOrder]"
+      :clarifications="statementManager.statementQuiz.questions[questionOrder].clarifications"
+      @submit-request="submitRequest"
+    /> 
   </div>
 </template>
 
@@ -65,8 +67,8 @@ import StatementQuiz from '../../../models/statement/StatementQuiz';
 
 @Component({
   components: {
-    'result-component': ResultComponent
-  //  'discussion-component': DiscussionComponent
+    'result-component': ResultComponent,
+    'discussion-component': DiscussionComponent
   }
 })
 export default class ResultsView extends Vue {

@@ -60,40 +60,6 @@
         />
       </li>
     </ul>
-    <v-card :max-height="270" style="margin-top: 30px;" outlined>
-      <v-card-title>
-        Clarification Requests
-         <v-btn v-if="!creatingRequest" class="add-button" dark color="primary" @click="newRequestButton()">New Request</v-btn>
-      </v-card-title>
-     
-      <v-divider></v-divider>
-
-      <v-card-text v-if="creatingRequest">
-        <v-text-field v-model="requestContent" label="Your request goes here."></v-text-field>
-        <v-btn dark color="red" style="margin: 5px;" @click="cancelCreateRequest()">Cancel</v-btn>
-        <v-btn dark color="primary" style="margin: 5px;" @click="submitRequest()">Submit</v-btn>
-      </v-card-text>
-
-      <v-card-text v-else-if="hasClarificationRequests()">
-        <v-expansion-panels focusable>
-          <v-expansion-panel
-            v-for="(request,i) in clarifications.length"
-            :key="i"
-          >
-            <v-expansion-panel-header>{{clarifications[i].content}}</v-expansion-panel-header>
-            <v-expansion-panel-content v-if="clarifications[i].hasAnswer()">
-              {{clarifications[i].answer}}
-            </v-expansion-panel-content>
-            <v-expansion-panel-content v-else>
-              No answer available.
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
-      </v-card-text>
-
-      <v-card-text v-else>No requests available.</v-card-text>
-      
-    </v-card>
   </div>
 </template>
 
@@ -114,8 +80,6 @@ export default class ResultComponent extends Vue {
   @Prop(StatementCorrectAnswer) readonly correctAnswer!: StatementCorrectAnswer;
   @Prop(StatementAnswer) readonly answer!: StatementAnswer;
   @Prop() readonly questionNumber!: number;
-  @Prop({type: Array}) readonly clarifications!: ClarificationRequest[]
-
 
   hover: boolean = false;
   optionLetters: string[] = ['A', 'B', 'C', 'D'];
@@ -135,29 +99,6 @@ export default class ResultComponent extends Vue {
 
   convertMarkDown(text: string, image: Image | null = null): string {
     return convertMarkDown(text, image);
-  }
-
-  newRequestButton() {
-    this.creatingRequest = true;
-  }
-
-  cancelCreateRequest() {
-    this.creatingRequest = false;
-    this.requestContent = '';
-  }
-
-  hasClarificationRequests() {
-    return this.clarifications.length > 0
-  }
-
-  @Emit()
-  submitRequest() {
-    
-    this.creatingRequest = false;
-    let content = this.requestContent;
-    this.requestContent = '';
-
-    return [content, this.question.questionId.toString()];
   }
 }
 </script>
@@ -234,10 +175,5 @@ export default class ResultComponent extends Vue {
       color: rgb(255, 255, 255) !important;
     }
   }
-}
-
-.add-button {
-  position: relative;
-  right: -638px;
 }
 </style>
