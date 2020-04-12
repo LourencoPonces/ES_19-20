@@ -663,4 +663,15 @@ export default class RemoteServices {
       throw Error(await this.errorMessage(error));
     });
   }
+
+  static async editClarificationRequest(request : ClarificationRequest) : Promise<ClarificationRequest> {
+    return httpClient
+    .put('/student/clarifications', request)
+    .then(response => {
+      return new ClarificationRequest(response.data);
+    })
+    .catch(async error => {
+      throw Error(await this.errorMessage(error));
+    });
+  }
 }

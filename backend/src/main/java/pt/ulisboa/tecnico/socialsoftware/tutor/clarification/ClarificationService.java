@@ -121,6 +121,23 @@ public class ClarificationService {
             value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public ClarificationRequestDto updateClarificationRequest(ClarificationRequestDto clarificationRequestDto) {
+        ClarificationRequest req = clarificationRequestRepository.findById(clarificationRequestDto.getId())
+                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, clarificationRequestDto.getId()));
+
+        if (clarificationRequestDto.getContent().isEmpty()) {
+            throw new TutorException((ErrorMessage.CLARIFICATION_REQUEST_MISSING_CONTENT));
+        }
+        req.setContent(clarificationRequestDto.getContent());
+        entityManager.persist(req);
+
+        return new ClarificationRequestDto(req);
+    }
+
+    @Retryable(
+            value = {SQLException.class},
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public ClarificationRequestDto submitClarificationRequest(int questionId, int userId, ClarificationRequestDto clarificationRequestDto) {
         User user = getStudent(userId);
 

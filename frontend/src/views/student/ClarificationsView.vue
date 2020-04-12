@@ -30,7 +30,7 @@
       <template v-slot:item.action="{ item }">
         <v-tooltip bottom v-if="!item.hasAnswer()">
           <template v-slot:activator="{ on }">
-            <v-icon small class="mr-2" v-on="on" @click="editRequest(item)"
+            <v-icon small class="mr-2" v-on="on" @click="startEditRequest(item)"
               >edit</v-icon
             >
           </template>
@@ -51,6 +51,24 @@
         </v-tooltip>
       </template>     
     </v-data-table>
+    
+    <template>
+      <v-row justify="center">
+        <v-dialog tile v-model="dialog" persistent max-width="60%">
+          <v-card>
+            <v-card-title class="headline">Edit Clarification Request</v-card-title>
+            <v-card-text>
+              <v-text-field v-model="newContent" label="Your request goes here."></v-text-field>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="green darken-1" text @click="dialog = false; stopEditRequest()">Cancel</v-btn>
+              <v-btn color="green darken-1" text @click="dialog = false; editRequest()">Edit</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-row>
+    </template>
   </v-card>
 </template>
 
@@ -64,6 +82,9 @@ export default class ClarificationsView extends Vue {
 
   requests: ClarificationRequest[] = [];
   search: string = '';
+  newContent: string = '';
+  editingItem: ClarificationRequest | null = null;
+  dialog: boolean = false;
 
   headers: object = [
     { text: 'Request', value: 'content', align: 'center', sortable: false},
@@ -99,9 +120,34 @@ export default class ClarificationsView extends Vue {
         await this.$store.dispatch('error', error);
       }
       await this.$store.dispatch('clearLoading');
+    }
+
+    startEditRequest(request : ClarificationRequest) : void {
+      this.editingItem = request; 
+      this.dialog = true;
+    }
+
+    stopEditRequest() : void {
+      this.editingItem = null;
+      this.newContent = '';
+    }
+
+    async editRequest() {
+      await this.$store.dispatch('loading');
+      if (this.editingItem) {
+        this.editingItem.setContent(this.newContent);
+      
+        try {
+          this.editingItem = await RemoteServices.editClarificationRequest(this.editingItem)
+          this.stopEditRequest();
+       } catch (error) {
+          await this.$store.dispatch('error', error);
+        }
+        await this.$store.dispatch('clearLoading');
+      }
+    }
 
     
-    }
 }
 </script>
 
