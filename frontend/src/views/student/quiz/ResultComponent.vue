@@ -78,6 +78,7 @@ export default class ResultComponent extends Vue {
   @Prop(StatementCorrectAnswer) readonly correctAnswer!: StatementCorrectAnswer;
   @Prop(StatementAnswer) readonly answer!: StatementAnswer;
   @Prop() readonly questionNumber!: number;
+
   hover: boolean = false;
   optionLetters: string[] = ['A', 'B', 'C', 'D'];
 

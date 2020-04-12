@@ -44,10 +44,16 @@
       :correctAnswer="statementManager.correctAnswers[questionOrder]"
       :question="statementManager.statementQuiz.questions[questionOrder]"
       :questionNumber="statementManager.statementQuiz.questions.length"
+      :clarifications="statementManager.statementQuiz.questions[questionOrder].clarifications"
       @increase-order="increaseOrder"
       @decrease-order="decreaseOrder"
     />
-    <discussion-component />
+
+    <discussion-component 
+      :question="statementManager.statementQuiz.questions[questionOrder]"
+      :clarifications="statementManager.statementQuiz.questions[questionOrder].clarifications"
+      @submit-request="submitRequest"
+    /> 
   </div>
 </template>
 
@@ -56,6 +62,9 @@ import { Component, Vue } from 'vue-property-decorator';
 import StatementManager from '@/models/statement/StatementManager';
 import ResultComponent from '@/views/student/quiz/ResultComponent.vue';
 import DiscussionComponent from '@/views/student/quiz/DiscussionComponent.vue';
+import ClarificationRequest from '../../../models/clarification/ClarificationRequest';
+import RemoteServices from '../../../services/RemoteServices';
+import StatementQuiz from '../../../models/statement/StatementQuiz';
 
 @Component({
   components: {
@@ -79,7 +88,7 @@ export default class ResultsView extends Vue {
       await this.$store.dispatch('clearLoading');
     }
   }
-
+ 
   increaseOrder(): void {
     if (
       this.questionOrder + 1 <
@@ -99,6 +108,24 @@ export default class ResultsView extends Vue {
     if (n >= 0 && n < +this.statementManager.statementQuiz!.questions.length) {
       this.questionOrder = n;
     }
+  }
+
+  async submitRequest(info : string[]) {   
+    try {
+      const req = this.createRequest(info[0], this.$store.getters.getUserId, parseInt(info[1]));
+      this.statementManager.addClarificationRequest(this.questionOrder, await RemoteServices.submitClarificationRequest(req));
+    } 
+    catch (error) {
+      await this.$store.dispatch('error', error);
+    }
+  }
+
+  createRequest(content: string, owner: number, question: number) : ClarificationRequest {
+    const req = new ClarificationRequest();
+    req.setQuestionId(question);
+    req.setOwnerId(owner)
+    req.setContent(content);
+    return req;
   }
 }
 </script>
