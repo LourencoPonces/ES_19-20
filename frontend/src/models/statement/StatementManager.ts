@@ -48,7 +48,7 @@ export default class StatementManager {
     this.statementQuiz?.addClarificationRequest(index, request);
   }
 
-  getClarificationRequests(index : number) {
-    this.statementQuiz?.getClarificationRequests(index);
+  getClarificationRequests(index : number) : ClarificationRequest[] | undefined {
+    return this.statementQuiz?.getClarificationRequests(index);
   }
 }

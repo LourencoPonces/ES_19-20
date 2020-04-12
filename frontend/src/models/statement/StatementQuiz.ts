@@ -47,7 +47,7 @@ export default class StatementQuiz {
     this.questions[index].addClarificationRequest(request);
   }
 
-  getClarificationRequests(index : number) : void {
-    this.questions[index].getClarificationRequests();
+  getClarificationRequests(index : number) : ClarificationRequest[] {
+    return this.questions[index].getClarificationRequests();
   }
 }

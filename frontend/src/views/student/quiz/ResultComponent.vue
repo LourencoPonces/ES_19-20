@@ -81,7 +81,6 @@ export default class ResultComponent extends Vue {
 
   hover: boolean = false;
   optionLetters: string[] = ['A', 'B', 'C', 'D'];
-  creatingRequest: boolean = false;
 
   @Emit()
   increaseOrder() {

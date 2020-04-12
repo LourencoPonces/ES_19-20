@@ -121,7 +121,7 @@ export default class ResultsView extends Vue {
   }
 
   createRequest(content: string, owner: number, question: number) : ClarificationRequest {
-    let req = new ClarificationRequest();
+    const req = new ClarificationRequest();
     req.setQuestionId(question);
     req.setOwnerId(owner)
     req.setContent(content);
