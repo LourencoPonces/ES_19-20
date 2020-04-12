@@ -44,15 +44,7 @@ export default class StatementManager {
     return this.statementQuiz == null;
   }
 
-  getQuizId() {
-    return this.statementQuiz?.getQuizId();
-  }
-
-  getQuestionId(index : number) {
-    return this.statementQuiz?.getQuestionId(index);
-  }
-
-  addClarificationRequest(index : number, request : ClarificationRequest) {
+  addClarificationRequest(index : number, request : ClarificationRequest) : void {
     this.statementQuiz?.addClarificationRequest(index, request);
   }
 

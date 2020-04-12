@@ -18,15 +18,15 @@ export default class ClarificationRequest {
       */ }
   }
 
-  hasAnswer() { return this.answer != null; }
+  hasAnswer() : boolean { return this.answer != null; }
 
-  setQuestionId(id : number) { this.questionId = id; }
+  setQuestionId(id : number) : void { this.questionId = id; }
 
-  getQuestionId() { return this.questionId; }
+  getQuestionId() : number { return this.questionId; }
 
-  setOwnerId(id : number) { this.owner = id; }
+  setOwnerId(id : number) : void { this.owner = id; }
 
-  setContent(c : string) { this.content = c; }
+  setContent(c : string) : void { this.content = c; }
 
   
 }

@@ -74,7 +74,7 @@ import Image from '@/models/management/Image';
 @Component
 export default class ResultComponent extends Vue {
   @Model('questionOrder', Number) questionOrder: number | undefined;
-  @Prop(StatementQuestion) question!: StatementQuestion;
+  @Prop(StatementQuestion) readonly question!: StatementQuestion;
   @Prop(StatementCorrectAnswer) readonly correctAnswer!: StatementCorrectAnswer;
   @Prop(StatementAnswer) readonly answer!: StatementAnswer;
   @Prop() readonly questionNumber!: number;
@@ -82,8 +82,6 @@ export default class ResultComponent extends Vue {
   hover: boolean = false;
   optionLetters: string[] = ['A', 'B', 'C', 'D'];
   creatingRequest: boolean = false;
-  requestContent = '';
-  nRequests!: number;
 
   @Emit()
   increaseOrder() {

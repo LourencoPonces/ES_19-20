@@ -112,7 +112,7 @@ export default class ResultsView extends Vue {
 
   async submitRequest(info : string[]) {   
     try {
-      let req = this.createRequest(info[0], this.$store.getters.getUserId, parseInt(info[1]));
+      const req = this.createRequest(info[0], this.$store.getters.getUserId, parseInt(info[1]));
       this.statementManager.addClarificationRequest(this.questionOrder, await RemoteServices.submitClarificationRequest(req));
     } 
     catch (error) {
@@ -120,8 +120,8 @@ export default class ResultsView extends Vue {
     }
   }
 
-    createRequest(content: string, owner: number, question: number) : ClarificationRequest {
-    var req = new ClarificationRequest();
+  createRequest(content: string, owner: number, question: number) : ClarificationRequest {
+    let req = new ClarificationRequest();
     req.setQuestionId(question);
     req.setOwnerId(owner)
     req.setContent(content);

@@ -43,19 +43,11 @@ export default class StatementQuiz {
     }
   }
 
-  async getQuizId() {
-    return this.id;
-  }
-
-  async getQuestionId(index : number) {
-    return this.questions[index].getQuestionId();
-  }
-
-  async addClarificationRequest(index : number, request : ClarificationRequest) {
+  addClarificationRequest(index : number, request : ClarificationRequest) : void {
     this.questions[index].addClarificationRequest(request);
   }
 
-  async getClarificationRequests(index : number) {
+  getClarificationRequests(index : number) : void {
     this.questions[index].getClarificationRequests();
   }
 }

@@ -630,7 +630,7 @@ export default class RemoteServices {
     }
   }
 
-  static async submitClarificationRequest(clarificationRequest : ClarificationRequest) {
+  static async submitClarificationRequest(clarificationRequest : ClarificationRequest) : Promise<ClarificationRequest> {
     return httpClient
     .post(`/student/results/questions/${clarificationRequest.getQuestionId()}/clarifications`,
     clarificationRequest

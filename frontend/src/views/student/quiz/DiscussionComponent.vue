@@ -1,6 +1,6 @@
 <template>
   <v-card class="discussion" :max-height="270" style="margin-top: 30px;" outlined>
-      <v-card-title>
+      <v-card-title class="title">
         Clarification Requests
          <v-btn v-if="!creatingRequest" class="add-button" dark color="primary" @click="newRequestButton()">New Request</v-btn>
       </v-card-title>
@@ -16,12 +16,12 @@
       <v-card-text v-else-if="hasClarificationRequests()">
         <v-expansion-panels focusable>
           <v-expansion-panel
-            v-for="(request,i) in clarifications.length"
-            :key="i"
+            v-for="request in clarifications"
+            :key="request.content"
           >
-            <v-expansion-panel-header>{{clarifications[i].content}}</v-expansion-panel-header>
-            <v-expansion-panel-content v-if="clarifications[i].hasAnswer()">
-              {{clarifications[i].answer}}
+            <v-expansion-panel-header>{{request.content}}</v-expansion-panel-header>
+            <v-expansion-panel-content v-if="request.hasAnswer()">
+              {{request.answer}}
             </v-expansion-panel-content>
             <v-expansion-panel-content v-else>
               No answer available.
@@ -42,28 +42,28 @@ import ClarificationRequest from '@/models/clarification/ClarificationRequest';
 
 @Component
 export default class DiscussionComponent extends Vue {
-  @Prop(StatementQuestion) question!: StatementQuestion;
+  @Prop(StatementQuestion) readonly question!: StatementQuestion;
   @Prop({type: Array}) readonly clarifications!: ClarificationRequest[]
 
   creatingRequest: boolean = false;
   requestContent = '';
   nRequests!: number;
 
-  newRequestButton() {
+  newRequestButton() : void {
     this.creatingRequest = true;
   }
 
-  cancelCreateRequest() {
+  cancelCreateRequest() : void {
     this.creatingRequest = false;
     this.requestContent = '';
   }
 
-  hasClarificationRequests() {
+  hasClarificationRequests() : boolean {
     return this.clarifications.length > 0
   }
 
   @Emit()
-  submitRequest() {
+  submitRequest() : string[] {
     
     this.creatingRequest = false;
     let content = this.requestContent;
@@ -76,14 +76,27 @@ export default class DiscussionComponent extends Vue {
 
 <style lang="scss" scoped>
 .discussion {
-  margin: 17.5%;
-  width: 65%;
-  top: -15%;
-  align-self: center;
+  max-width: 1024px;
+  perspective-origin: 512px 356.5px;
+  transform-origin: 512px 356.5px;
+  border: 0 none rgb(51, 51, 51);
+  margin: 50px auto 150px;
+  outline: rgb(51, 51, 51) none 0;
+  overflow: hidden;
+  top: -100px;
+  letter-spacing: 0 !important;
+  vertical-align: middle;
 
   .add-button {
     position: relative;
     right: -638px;
+  }
+
+  .title {
+    height: 70px;
+    text-align: left;
+    text-decoration: none solid rgb(51, 51, 51);
+    text-size-adjust: 100%;
   }
 }
 </style>

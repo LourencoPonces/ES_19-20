@@ -34,19 +34,15 @@ export default class StatementQuestion {
     }
   }
 
-  async getId() {
-    return this.quizQuestionId;
-  }
-
-  async getQuestionId() {
+  getQuestionId() : number {
     return this.questionId;
   }
 
-  async addClarificationRequest(request : ClarificationRequest) {
+  addClarificationRequest(request : ClarificationRequest) : void {
     this.clarifications.push(request);
   }
 
-  async getClarificationRequests() {
+  getClarificationRequests() : ClarificationRequest[] {
     return this.clarifications;
   }
 }
