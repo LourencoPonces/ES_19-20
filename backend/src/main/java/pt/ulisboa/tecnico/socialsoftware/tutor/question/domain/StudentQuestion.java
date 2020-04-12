@@ -8,6 +8,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 
+import java.util.Set;
+
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
 @Entity
@@ -79,11 +81,12 @@ public class StudentQuestion extends Question {
         }
     }
 
-    public void update(StudentQuestionDTO studentQuestionDTO) {
+    public void update(StudentQuestionDTO studentQuestionDTO, Set<Topic> newTopics) {
         checkStudentQuestionConsistency(studentQuestionDTO, user);
         super.update(studentQuestionDTO);
         setJustification(studentQuestionDTO.getJustification());
         setStudentQuestionKey(studentQuestionDTO.getStudentQuestionKey());
+        this.updateTopics(newTopics);
 
     }
 
