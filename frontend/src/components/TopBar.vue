@@ -61,6 +61,14 @@
                 <v-list-item-title>Questions</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
+            <v-list-item to="/management/clarifications/unanswered">
+              <v-list-item-action>
+                <v-icon>fas fa-question</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Clarifications</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
             <v-list-item to="/management/topics">
               <v-list-item-action>
                 <v-icon>category</v-icon>
@@ -256,6 +264,14 @@
             </v-list-item-action>
             <v-list-item-content>
               <v-list-item-title>Questions</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item to="/management/clarifications/unanswered">
+            <v-list-item-action>
+              <v-icon>fas fa-question</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>Clarifications</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
           <v-list-item to="/management/topics">
