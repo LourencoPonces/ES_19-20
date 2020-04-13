@@ -35,19 +35,14 @@
         </v-chip-group>
       </template>
 
-      <template v-slot:item.status="{ item }">
-        <v-select
-          v-model="item.submittedStatus"
-          :items="statusList"
-          dense
-          @change="evaluate(item, item.submittedStatus)"
+      <template v-slot:item.submittedStatus="{ item }">
+        <v-chip
+          :color="getEvaluationColor(item.submittedStatus)"
+          small
+          @click="showEvaluateStudentQuestionDialog(item)"
         >
-          <template v-slot:selection="{ item }">
-            <v-chip :color="getEvaluationColor(item)" small>
-              <span>{{ item }}</span>
-            </v-chip>
-          </template>
-        </v-select>
+          <span>{{ item.submittedStatus }}</span>
+        </v-chip>
       </template>
 
       <template v-slot:item.image="{ item }">
@@ -83,9 +78,10 @@
     />
     <evaluate-question-dialog
       v-if="currentQuestion"
-      v-model="editQuestionDialog"
+      v-model="evaluateQuestion"
       :studentQuestion="currentQuestion"
-      v-on:close-evaluate-question-dialog="onCloseEditStudentQuestionDialog"
+      v-on:evaluated-question="onEvaluatedQuestion"
+      v-on:cancel-evaluate="onCancelEvaluation"
     />
   </v-card>
 </template>
@@ -108,14 +104,12 @@ import StudentQuestion from '@/models/management/StudentQuestion';
   }
 })
 export default class StudentQuestionsView extends Vue {
-  studentQuestions: Question[] = [];
+  studentQuestions: StudentQuestion[] = [];
   topics: Topic[] = [];
   currentQuestion: StudentQuestion | null = null;
-  editQuestionDialog: boolean = false;
   evaluateQuestion: boolean = false;
   questionDialog: boolean = false;
   search: string = '';
-  statusList = ['Rejected', 'Approved', 'Waiting for Approval'];
 
   headers: object = [
     { text: 'Title', value: 'title', align: 'center' },
@@ -126,7 +120,8 @@ export default class StudentQuestionsView extends Vue {
       align: 'center',
       sortable: false
     },
-    { text: 'Submitted Status', value: 'status', align: 'center' },
+    { text: 'Submitted Status', value: 'submittedStatus', align: 'center' },
+    { text: 'Justification', value: 'justification', align: 'center' },
     {
       text: 'Creation Date',
       value: 'creationDate',
@@ -146,9 +141,9 @@ export default class StudentQuestionsView extends Vue {
     }
   ];
 
-  @Watch('editQuestionDialog')
+  @Watch('evaluateQuestion')
   closeError() {
-    if (!this.editQuestionDialog) {
+    if (!this.evaluateQuestion) {
       this.currentQuestion = null;
     }
   }
@@ -180,23 +175,6 @@ export default class StudentQuestionsView extends Vue {
     return convertMarkDownNoFigure(text, image);
   }
 
-  async evaluate(question: StudentQuestion, status: string) {
-    this.currentQuestion = question;
-    this.evaluateQuestion = true;
-    return;
-    // try {
-    //   await RemoteServices.setQuestionStatus(questionId, status);
-    //   let question = this.studentQuestions.find(
-    //     question => question.id === questionId
-    //   );
-    //   if (question) {
-    //     question.status = status;
-    //   }
-    // } catch (error) {
-    //   await this.$store.dispatch('error', error);
-    // }
-  }
-
   getEvaluationColor(status: string) {
     if (status === 'Rejected') return 'red';
     else if (status === 'Waiting for Approval') return 'orange';
@@ -225,8 +203,26 @@ export default class StudentQuestionsView extends Vue {
     this.questionDialog = false;
   }
 
-  onCloseEditStudentQuestionDialog() {
+  async showEvaluateStudentQuestionDialog(sq: StudentQuestion) {
+    this.currentQuestion = sq;
+    this.evaluateQuestion = true;
+    return;
+  }
+
+  onCancelEvaluation() {
     this.evaluateQuestion = false;
+  }
+
+  onEvaluatedQuestion(studentQuestion: StudentQuestion) {
+    // update evaluated question
+    this.studentQuestions.forEach(sq => {
+      if (sq.id === studentQuestion.id) {
+        sq.justification = studentQuestion.justification;
+        sq.submittedStatus = studentQuestion.submittedStatus;
+      }
+    });
+    this.evaluateQuestion = false;
+    this.currentQuestion = null;
   }
 }
 </script>
