@@ -22,4 +22,18 @@ export default class StudentQuestion extends Question {
     if (submittedStatus === 'REJECTED') return 'Rejected';
     return 'Waiting for Approval';
   }
+
+  static toRequest(sq: StudentQuestion) {
+    let req = new StudentQuestion(sq);
+    req.submittedStatus = this.getServerStatusFormat(sq.submittedStatus);
+    return req;
+  }
+
+  static getServerStatusFormat(status: string): string {
+    console.log('Translating');
+    if (status === 'Waiting for Approval') return 'WAITING_FOR_APPROVAL';
+    if (status === 'Rejected') return 'REJECTED';
+    if (status === 'Approved') return 'APPROVED';
+    return '';
+  }
 }

@@ -221,13 +221,6 @@ export default class RemoteServices {
    * Student Questions
    */
 
-  static getServerStatusFormat(status: string): string {
-    if (status === 'Waiting for Approval') return 'WAITING_FOR_APPROVAL';
-    if (status === 'Rejected') return 'REJECTED';
-    if (status === 'Approved') return 'APPROVED';
-    return '';
-  }
-
   static async getStudentQuestionsStatus(): Promise<StudentQuestion[]> {
     return httpClient
       .get(
@@ -252,7 +245,7 @@ export default class RemoteServices {
       .post(
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${questionId}/evaluate`,
         {
-          evaluation: this.getServerStatusFormat(status),
+          evaluation: StudentQuestion.getServerStatusFormat(status),
           justification: justification
         }
       )
@@ -282,14 +275,10 @@ export default class RemoteServices {
   static async createStudentQuestion(
     studentQuestion: StudentQuestion
   ): Promise<StudentQuestion> {
-    studentQuestion.submittedStatus = this.getServerStatusFormat(
-      studentQuestion.submittedStatus
-    );
-    console.log(studentQuestion);
     return httpClient
       .post(
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions`,
-        studentQuestion
+        StudentQuestion.toRequest(studentQuestion)
       )
       .then(response => {
         return new StudentQuestion(response.data);
@@ -305,7 +294,7 @@ export default class RemoteServices {
     return httpClient
       .put(
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${studentQuestion.id}`,
-        studentQuestion
+        StudentQuestion.toRequest(studentQuestion)
       )
       .then(response => {
         return new StudentQuestion(response.data);
