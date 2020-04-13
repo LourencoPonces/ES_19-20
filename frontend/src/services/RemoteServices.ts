@@ -221,10 +221,53 @@ export default class RemoteServices {
    * Student Questions
    */
 
-  static async getStudentQuestions(): Promise<StudentQuestion[]> {
+  static getServerStatusFormat(status: string): string {
+    if (status === 'Waiting for Approval') return 'WAITING_FOR_APPROVAL';
+    if (status === 'Rejected') return 'REJECTED';
+    if (status === 'Approved') return 'APPROVED';
+    return '';
+  }
+
+  static async getStudentQuestionsStatus(): Promise<StudentQuestion[]> {
     return httpClient
       .get(
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/checkStatus`
+      )
+      .then(response => {
+        return response.data.map((studentQuestion: any) => {
+          return new StudentQuestion(studentQuestion);
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async evaluateStudentQuestion(
+    questionId: number,
+    status: string,
+    justification: String
+  ): Promise<StudentQuestion> {
+    return httpClient
+      .post(
+        `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${questionId}/evaluate`,
+        {
+          evaluation: this.getServerStatusFormat(status),
+          justification: justification
+        }
+      )
+      .then(response => {
+        return new StudentQuestion(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async getSubmittedStudentQuestions(): Promise<StudentQuestion[]> {
+    return httpClient
+      .get(
+        `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions`
       )
       .then(response => {
         return response.data.map((studentQuestion: any) => {
