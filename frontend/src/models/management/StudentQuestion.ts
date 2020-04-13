@@ -9,6 +9,7 @@ export default class StudentQuestion extends Question {
     super(jsonObj);
     this.status = 'DISABLED';
     if (jsonObj) {
+      // in the frontend use lower letter format. when passing to the backend, capitalize
       this.submittedStatus = this.getSubmittedStatus(jsonObj.submittedStatus);
       this.justification = jsonObj.justification;
       this.username = jsonObj.username;
