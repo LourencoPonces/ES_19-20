@@ -221,10 +221,46 @@ export default class RemoteServices {
    * Student Questions
    */
 
-  static async getStudentQuestions(): Promise<StudentQuestion[]> {
+  static async getStudentQuestionsStatus(): Promise<StudentQuestion[]> {
     return httpClient
       .get(
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/checkStatus`
+      )
+      .then(response => {
+        return response.data.map((studentQuestion: any) => {
+          return new StudentQuestion(studentQuestion);
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async evaluateStudentQuestion(
+    questionId: number,
+    status: string,
+    justification: String
+  ): Promise<StudentQuestion> {
+    return httpClient
+      .post(
+        `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${questionId}/evaluate`,
+        {
+          evaluation: StudentQuestion.getServerStatusFormat(status),
+          justification: justification
+        }
+      )
+      .then(response => {
+        return new StudentQuestion(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async getSubmittedStudentQuestions(): Promise<StudentQuestion[]> {
+    return httpClient
+      .get(
+        `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions`
       )
       .then(response => {
         return response.data.map((studentQuestion: any) => {
@@ -242,7 +278,7 @@ export default class RemoteServices {
     return httpClient
       .post(
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions`,
-        studentQuestion
+        StudentQuestion.toRequest(studentQuestion)
       )
       .then(response => {
         return new StudentQuestion(response.data);
@@ -258,7 +294,7 @@ export default class RemoteServices {
     return httpClient
       .put(
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${studentQuestion.id}`,
-        studentQuestion
+        StudentQuestion.toRequest(studentQuestion)
       )
       .then(response => {
         return new StudentQuestion(response.data);

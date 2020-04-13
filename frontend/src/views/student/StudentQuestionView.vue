@@ -175,8 +175,6 @@ export default class StudentQuestionView extends Vue {
   studentQuestionJustification: boolean = false;
   search: string = '';
 
-  submittedStatusList = ['WAITING_FOR_APPROVAL', 'ACCEPTED', 'REJECTED'];
-
   headers: object = [
     { text: 'Title', value: 'title', align: 'center' },
     { text: 'Question', value: 'content', align: 'left' },
@@ -234,7 +232,7 @@ export default class StudentQuestionView extends Vue {
     try {
       [this.topics, this.studentQuestions] = await Promise.all([
         RemoteServices.getTopics(),
-        RemoteServices.getStudentQuestions()
+        RemoteServices.getStudentQuestionsStatus()
       ]);
     } catch (error) {
       await this.$store.dispatch('error', error);
@@ -269,9 +267,9 @@ export default class StudentQuestionView extends Vue {
   }
 
   getSubmittedStatusColor(submittedStatus: string) {
-    if (submittedStatus === 'REJECTED') return 'red';
-    else if (submittedStatus === 'WAITING_FOR_APPROVAL') return 'orange';
-    else return 'green';
+    if (submittedStatus === 'Approved') return 'green';
+    else if (submittedStatus === 'Waiting for Approval') return 'orange';
+    else return 'red';
   }
 
   onCloseShowStudentQuestionDialog() {
