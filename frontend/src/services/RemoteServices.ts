@@ -216,13 +216,27 @@ export default class RemoteServices {
         throw Error(await this.errorMessage(error));
       });
   }
-  
 
   /*
    * Student Questions
    */
 
-  static createStudentQuestion(
+  static async getStudentQuestions(): Promise<StudentQuestion[]> {
+    return httpClient
+      .get(
+        `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/checkStatus`
+      )
+      .then(response => {
+        return response.data.map((studentQuestion: any) => {
+          return new StudentQuestion(studentQuestion);
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async createStudentQuestion(
     studentQuestion: StudentQuestion
   ): Promise<StudentQuestion> {
     return httpClient
@@ -238,7 +252,7 @@ export default class RemoteServices {
       });
   }
 
-  static updateStudentQuestion(
+  static async updateStudentQuestion(
     studentQuestion: StudentQuestion
   ): Promise<StudentQuestion> {
     return httpClient
@@ -249,6 +263,16 @@ export default class RemoteServices {
       .then(response => {
         return new StudentQuestion(response.data);
       })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async deleteStudentQuestion(studentQuestionId: number) {
+    return httpClient
+      .delete(
+        `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${studentQuestionId}`
+      )
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
