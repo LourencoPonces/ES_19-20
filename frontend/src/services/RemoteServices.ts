@@ -282,6 +282,9 @@ export default class RemoteServices {
   static async createStudentQuestion(
     studentQuestion: StudentQuestion
   ): Promise<StudentQuestion> {
+    studentQuestion.submittedStatus = this.getServerStatusFormat(
+      studentQuestion.submittedStatus
+    );
     return httpClient
       .post(
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions`,
