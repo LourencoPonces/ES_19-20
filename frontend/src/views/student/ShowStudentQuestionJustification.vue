@@ -11,9 +11,8 @@
       </v-card-title>
 
       <v-card-text class="text-left">
-        <show-student-question :studentQuestion="studentQuestion" />
+        <show-justification :studentQuestion="studentQuestion" />
       </v-card-text>
-
       <v-card-actions>
         <v-spacer />
         <v-btn dark color="blue darken-1" @click="$emit('dialog')">close</v-btn>
@@ -25,14 +24,14 @@
 <script lang="ts">
 import { Component, Vue, Prop, Model } from 'vue-property-decorator';
 import StudentQuestion from '@/models/management/StudentQuestion';
-import ShowStudentQuestion from '@/views/student/ShowStudentQuestion.vue';
+import ShowJustification from '@/views/student/ShowJustification.vue';
 
 @Component({
   components: {
-    'show-student-question': ShowStudentQuestion
+    'show-justification': ShowJustification
   }
 })
-export default class ShowStudentQuestionDialog extends Vue {
+export default class ShowStudentQuestionJustification extends Vue {
   @Model('dialog', Boolean) dialog!: boolean;
   @Prop({ type: StudentQuestion, required: true })
   readonly studentQuestion!: StudentQuestion;

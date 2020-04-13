@@ -3,7 +3,7 @@
     <v-data-table
       :headers="headers"
       :custom-filter="customFilter"
-      :items="questions"
+      :items="studentQuestions"
       :search="search"
       multi-sort
       :mobile-breakpoint="0"
@@ -29,39 +29,21 @@
       <template v-slot:item.content="{ item }">
         <p
           v-html="convertMarkDownNoFigure(item.content, null)"
-          @click="showQuestionDialog(item)"
+          @click="showStudentQuestionDialog(item)"
       /></template>
 
       <template v-slot:item.topics="{ item }">
-        <edit-question-topics
-          :question="item"
-          :topics="topics"
-          v-on:question-changed-topics="onQuestionChangedTopics"
-        />
+        <v-chip-group>
+          <v-chip v-for="topic in item.topics" :key="topic.name">
+            {{ topic.name }}
+          </v-chip>
+        </v-chip-group>
       </template>
 
-      <template v-slot:item.difficulty="{ item }">
-        <v-chip
-          v-if="item.difficulty"
-          :color="getDifficultyColor(item.difficulty)"
-          dark
-          >{{ item.difficulty + '%' }}</v-chip
-        >
-      </template>
-
-      <template v-slot:item.status="{ item }">
-        <v-select
-          v-model="item.status"
-          :items="statusList"
-          dense
-          @change="setStatus(item.id, item.status)"
-        >
-          <template v-slot:selection="{ item }">
-            <v-chip :color="getStatusColor(item)" small>
-              <span>{{ item }}</span>
-            </v-chip>
-          </template>
-        </v-select>
+      <template v-slot:item.submittedStatus="{ item }">
+        <v-chip :color="getSubmittedStatusColor(item.submittedStatus)" small>
+          <span>{{ item.submittedStatus }}</span>
+        </v-chip>
       </template>
 
       <template v-slot:item.image="{ item }">
@@ -81,7 +63,7 @@
               small
               class="mr-2"
               v-on="on"
-              @click="showQuestionDialog(item)"
+              @click="showStudentQuestionDialog(item)"
               >visibility</v-icon
             >
           </template>
@@ -89,7 +71,11 @@
         </v-tooltip>
         <v-tooltip bottom v-if="item.numberOfAnswers === 0">
           <template v-slot:activator="{ on }">
-            <v-icon small class="mr-2" v-on="on" @click="editQuestion(item)"
+            <v-icon
+              small
+              class="mr-2"
+              v-on="on"
+              @click="editStudentQuestion(item)"
               >edit</v-icon
             >
           </template>
@@ -101,7 +87,7 @@
               small
               class="mr-2"
               v-on="on"
-              @click="duplicateQuestion(item)"
+              @click="duplicateStudentQuestion(item)"
               >cached</v-icon
             >
           </template>
@@ -113,12 +99,24 @@
               small
               class="mr-2"
               v-on="on"
-              @click="deleteQuestion(item)"
+              @click="deleteStudentQuestion(item)"
               color="red"
               >delete</v-icon
             >
           </template>
           <span>Delete Question</span>
+        </v-tooltip>
+        <v-tooltip bottom v-if="item.justification">
+          <template v-slot:activator="{ on }">
+            <v-icon
+              small
+              class="mr-2"
+              v-on="on"
+              @click="showJustification(item)"
+              >question_answer</v-icon
+            >
+          </template>
+          <span>Justification</span>
         </v-tooltip>
       </template>
     </v-data-table>
@@ -135,6 +133,14 @@
       :studentQuestion="currentStudentQuestion"
       v-on:close-show-student-question-dialog="onCloseShowStudentQuestionDialog"
     />
+    <show-student-question-justification
+      v-if="currentStudentQuestion"
+      v-model="studentQuestionJustification"
+      :studentQuestion="currentStudentQuestion"
+      v-on:close-show-student-question-justification="
+        onCloseShowStudentQuestionJustification
+      "
+    />
   </v-card>
 </template>
 
@@ -147,11 +153,13 @@ import Image from '@/models/management/Image';
 import Topic from '@/models/management/Topic';
 import ShowStudentQuestionDialog from '@/views/student/ShowStudentQuestionDialog.vue';
 import EditStudentQuestionDialog from '@/views/student/EditStudentQuestionDialog.vue';
+import ShowStudentQuestionJustification from '@/views/student/ShowStudentQuestionJustification.vue';
 
 @Component({
   components: {
     'show-student-question-dialog': ShowStudentQuestionDialog,
-    'edit-student-question-dialog': EditStudentQuestionDialog
+    'edit-student-question-dialog': EditStudentQuestionDialog,
+    'show-student-question-justification': ShowStudentQuestionJustification
   }
 })
 export default class StudentQuestionView extends Vue {
@@ -160,6 +168,7 @@ export default class StudentQuestionView extends Vue {
   currentStudentQuestion: StudentQuestion | null = null;
   editStudentQuestionDialog: boolean = false;
   studentQuestionDialog: boolean = false;
+  studentQuestionJustification: boolean = false;
   search: string = '';
 
   submittedStatusList = ['WAITING_FOR_APPROVAL', 'ACCEPTED', 'REJECTED'];
@@ -173,7 +182,7 @@ export default class StudentQuestionView extends Vue {
       align: 'center',
       sortable: false
     },
-    { text: 'Submitted Status', value: 'status', align: 'center' },
+    { text: 'Submitted Status', value: 'submittedStatus', align: 'center' },
     {
       text: 'Creation Date',
       value: 'creationDate',
@@ -193,33 +202,80 @@ export default class StudentQuestionView extends Vue {
     }
   ];
 
+  @Watch('editStudentQuestionDialog')
+  closeError() {
+    if (!this.editStudentQuestionDialog) {
+      this.currentStudentQuestion = null;
+    }
+  }
+
   newStudentQuestion() {
     this.currentStudentQuestion = new StudentQuestion();
+    this.editStudentQuestionDialog = true;
+  }
+
+  editStudentQuestion(studentQuestion: StudentQuestion) {
+    this.currentStudentQuestion = studentQuestion;
+    this.editStudentQuestionDialog = true;
+  }
+
+  duplicateStudentQuestion(studentQuestion: StudentQuestion) {
+    this.currentStudentQuestion = new StudentQuestion(studentQuestion);
+    this.currentStudentQuestion.id = null;
     this.editStudentQuestionDialog = true;
   }
 
   async created() {
     await this.$store.dispatch('loading');
     try {
-      [this.topics] = await Promise.all([RemoteServices.getTopics()]);
+      [this.topics, this.studentQuestions] = await Promise.all([
+        RemoteServices.getTopics(),
+        RemoteServices.getStudentQuestions()
+      ]);
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
     await this.$store.dispatch('clearLoading');
   }
 
+  customFilter(
+    value: string,
+    search: string,
+    studentQuestion: StudentQuestion
+  ) {
+    return (
+      search != null &&
+      JSON.stringify(studentQuestion)
+        .toLowerCase()
+        .indexOf(search.toLowerCase()) !== -1
+    );
+  }
+
+  convertMarkDownNoFigure(text: string, image: Image | null = null): string {
+    return convertMarkDownNoFigure(text, image);
+  }
+
   async onSaveStudentQuestion(studentQuestion: StudentQuestion) {
     this.studentQuestions = this.studentQuestions.filter(
-      studentQuestion => studentQuestion.id !== studentQuestion.id
+      sQ => sQ.id !== studentQuestion.id
     );
     this.studentQuestions.unshift(studentQuestion);
     this.editStudentQuestionDialog = false;
     this.currentStudentQuestion = null;
-    confirm('Student Question successfully submitted');
+  }
+
+  getSubmittedStatusColor(submittedStatus: string) {
+    if (submittedStatus === 'REJECTED') return 'red';
+    else if (submittedStatus === 'WAITING_FOR_APPROVAL') return 'orange';
+    else return 'green';
   }
 
   onCloseShowStudentQuestionDialog() {
     this.studentQuestionDialog = false;
+  }
+
+  onCloseShowStudentQuestionJustification() {
+    this.studentQuestionJustification = false;
   }
 
   async handleFileUpload(event: File, studentQuestion: StudentQuestion) {
@@ -236,6 +292,32 @@ export default class StudentQuestionView extends Vue {
         await this.$store.dispatch('error', error);
       }
     }
+  }
+
+  async deleteStudentQuestion(toDeleteStudentquestion: StudentQuestion) {
+    if (
+      toDeleteStudentquestion.id &&
+      confirm('Are you sure you want to delete this question?')
+    ) {
+      try {
+        await RemoteServices.deleteStudentQuestion(toDeleteStudentquestion.id);
+        this.studentQuestions = this.studentQuestions.filter(
+          question => question.id != toDeleteStudentquestion.id
+        );
+      } catch (error) {
+        await this.$store.dispatch('error', error);
+      }
+    }
+  }
+
+  showStudentQuestionDialog(studentQuestion: StudentQuestion) {
+    this.currentStudentQuestion = studentQuestion;
+    this.studentQuestionDialog = true;
+  }
+
+  showJustification(studentQuestion: StudentQuestion) {
+    this.currentStudentQuestion = studentQuestion;
+    this.studentQuestionJustification = true;
   }
 }
 </script>
