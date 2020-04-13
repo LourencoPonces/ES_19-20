@@ -20,7 +20,12 @@
           />
 
           <v-spacer />
-          <v-btn color="primary" dark @click="newStudentQuestion">
+          <v-btn
+            color="primary"
+            dark
+            @click="newStudentQuestion"
+            data-cy="NewQuestion"
+          >
             New Question
           </v-btn>
         </v-card-title>

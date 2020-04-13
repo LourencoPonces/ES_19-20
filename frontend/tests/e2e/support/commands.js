@@ -31,6 +31,11 @@ Cypress.Commands.add('demoAdminLogin', () => {
   cy.contains('Manage Courses').click();
 });
 
+Cypress.Commands.add('demoStudentLogin', () => {
+  cy.visit('/');
+  cy.get('[data-cy="studentButton"]').click();
+});
+
 Cypress.Commands.add('createCourseExecution', (name, acronym, academicTerm) => {
   cy.get('[data-cy="createButton"]').click();
   cy.get('[data-cy="Name"]').type(name);
@@ -69,5 +74,37 @@ Cypress.Commands.add(
     cy.get('[data-cy="Acronym"]').type(acronym);
     cy.get('[data-cy="AcademicTerm"]').type(academicTerm);
     cy.get('[data-cy="saveButton"]').click();
+  }
+);
+
+/* STUDENT QUESTION TESTS */
+
+Cypress.Commands.add(
+  'createStudentQuestion',
+  (title, content, topics, options, correctOption) => {
+    cy.get('[data-cy="NewQuestion"]').click();
+    cy.wait(10);
+    for (topic in topics) {
+      cy.get('[data-cy="Topics"]')
+        .children()
+        .find('form')
+        .click();
+      cy.get('[data-cy="topicList"]')
+        .children()
+        .contains('GitHub')
+        .click();
+    }
+    cy.get('[data-cy="Topics"]')
+      .find('i')
+      .click();
+    cy.get('[data-cy="StudentQuestionTitle"]').type(title);
+    cy.get('[data-cy="StudentQuestionContent"]').type(content);
+    cy.get(`[data-cy="CorrectOption${correctOption}"]`)
+      .parent()
+      .click();
+    for (let i = 1; i < options.length + 1; i++) {
+      cy.get(`[data-cy  =Option${i}]`).type(options[i - 1]);
+    }
+    cy.get('[data-cy="SaveStudentQuestion"]').click();
   }
 );

@@ -5,6 +5,7 @@
     @keydown.esc="$emit('dialog', false)"
     max-width="75%"
     max-height="95%"
+    scrollable
   >
     <v-card>
       <v-card-title>
@@ -17,7 +18,11 @@
         </span>
       </v-card-title>
 
-      <v-card-text class="text-left" v-if="editStudentQuestion">
+      <v-card-text
+        class="text-left"
+        v-if="editStudentQuestion"
+        data-cy="Topics"
+      >
         <v-container grid-list-md fluid>
           <v-layout column wrap>
             <v-form>
@@ -42,7 +47,7 @@
                   </v-chip>
                 </template>
                 <template v-slot:item="data">
-                  <v-list-item-content>
+                  <v-list-item-content data-cy="topicList">
                     <v-list-item-title v-html="data.item.name" />
                   </v-list-item-content>
                 </template>
@@ -52,6 +57,7 @@
               <v-text-field
                 v-model="editStudentQuestion.title"
                 label="Question Title"
+                data-cy="StudentQuestionTitle"
               />
             </v-flex>
             <v-flex xs24 sm12 md8>
@@ -61,6 +67,7 @@
                 rows="1"
                 v-model="editStudentQuestion.content"
                 label="Question"
+                data-cy="StudentQuestionContent"
               ></v-textarea>
             </v-flex>
             <v-flex
@@ -74,6 +81,7 @@
                 v-model="editStudentQuestion.options[index - 1].correct"
                 class="ma-4"
                 label="Correct"
+                :data-cy="`CorrectOption${index}`"
               />
               <v-textarea
                 outline
@@ -81,6 +89,7 @@
                 rows="1"
                 v-model="editStudentQuestion.options[index - 1].content"
                 :label="`Option ${index}`"
+                :data-cy="`Option${index}`"
               ></v-textarea>
             </v-flex>
           </v-layout>
@@ -92,7 +101,13 @@
         <v-btn color="blue darken-1" @click="$emit('dialog', false)"
           >Cancel</v-btn
         >
-        <v-btn color="blue darken-1" @click="saveStudentQuestion">Save</v-btn>
+        <v-btn
+          color="blue darken-1"
+          @click="saveStudentQuestion"
+          data-cy="SaveStudentQuestion"
+        >
+          Save
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
