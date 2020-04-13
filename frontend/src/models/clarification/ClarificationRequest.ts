@@ -1,17 +1,22 @@
-import { _ } from 'vue-underscore';
+import ClarificationRequestAnswer from './ClarificationRequestAnswer';
 
 export default class ClarificationRequest {
   id!: number;
   questionId!: number;
   owner!: number;
   content!: string;
+<<<<<<< HEAD
   creationDate!: string;
   answer:/* ClarificationRequestAnswer | */null = null;
   
+=======
+  answer: ClarificationRequestAnswer | null = null;
+>>>>>>> 5d584bce... Expose clarification answers to frontend
 
   constructor(jsonObj?: ClarificationRequest) {
     if (jsonObj) {
       this.id = jsonObj.id;
+<<<<<<< HEAD
         this.questionId = jsonObj.questionId;
         this.content = jsonObj.content;
         this.owner = jsonObj.owner;
@@ -21,18 +26,43 @@ export default class ClarificationRequest {
           this.answer = jsonObj.answer;
         }
       */ }
+=======
+      this.questionId = jsonObj.questionId;
+      this.content = jsonObj.content;
+      this.owner = jsonObj.owner;
+
+      /*
+      if (jsonObj.answer) {     // TODO complete when answer is done
+        this.answer = jsonObj.answer;
+      }
+      */
+    }
+>>>>>>> 5d584bce... Expose clarification answers to frontend
   }
 
-  hasAnswer() : boolean { return this.answer != null; }
+  newAnswer(): ClarificationRequestAnswer {
+    const answer = new ClarificationRequestAnswer();
+    answer.setRequestId(this.id);
+    return answer;
+  }
 
-  setQuestionId(id : number) : void { this.questionId = id; }
+  hasAnswer(): boolean {
+    return this.answer != null;
+  }
 
-  getQuestionId() : number { return this.questionId; }
+  setQuestionId(id: number): void {
+    this.questionId = id;
+  }
 
-  setOwnerId(id : number) : void { this.owner = id; }
+  getQuestionId(): number {
+    return this.questionId;
+  }
 
-  setContent(c : string) : void { this.content = c; }
+  setOwnerId(id: number): void {
+    this.owner = id;
+  }
 
+<<<<<<< HEAD
   getAnswerContent() : string {
     if (this.answer) {
    //   return this.answer.content;
@@ -44,3 +74,9 @@ export default class ClarificationRequest {
 
   
 }
+=======
+  setContent(c: string): void {
+    this.content = c;
+  }
+}
+>>>>>>> 5d584bce... Expose clarification answers to frontend
