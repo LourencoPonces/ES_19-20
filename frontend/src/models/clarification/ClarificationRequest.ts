@@ -14,11 +14,9 @@ export default class ClarificationRequest {
       this.content = jsonObj.content;
       this.owner = jsonObj.owner;
 
-      /*
-      if (jsonObj.answer) {     // TODO complete when answer is done
-        this.answer = jsonObj.answer;
+      if (jsonObj.answer) {
+        this.answer = new ClarificationRequestAnswer(jsonObj.answer);
       }
-      */
     }
   }
 
