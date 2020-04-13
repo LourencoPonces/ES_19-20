@@ -285,6 +285,7 @@ export default class RemoteServices {
     studentQuestion.submittedStatus = this.getServerStatusFormat(
       studentQuestion.submittedStatus
     );
+    console.log(studentQuestion);
     return httpClient
       .post(
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions`,

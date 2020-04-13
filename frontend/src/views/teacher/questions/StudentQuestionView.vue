@@ -45,6 +45,10 @@
         </v-chip>
       </template>
 
+      <template v-slot:item.justification="{ item }">
+        <span margin="5%">{{ item.justification }}</span>
+      </template>
+
       <template v-slot:item.image="{ item }">
         <v-file-input
           show-size
