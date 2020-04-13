@@ -13,6 +13,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
+import java.util.stream.Stream;
 
 @RestController
 public class ClarificationController {
@@ -41,6 +42,18 @@ public class ClarificationController {
         }
 
         return clarificationService.getStudentClarificationRequests(user.getId());
+    }
+
+    @GetMapping("/clarifications/unanswered/")
+    @PreAuthorize("hasRole('ROLE_TEACHER')")
+    public Stream<ClarificationRequestDto> getUnansweredClarificationRequests(Principal principal) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        if (user == null) {
+            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
+        }
+
+        return clarificationService.getUnansweredClarificationRequests();
     }
 
     @PutMapping("/clarifications/{requestId}/answer")

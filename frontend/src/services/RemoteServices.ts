@@ -654,16 +654,31 @@ export default class RemoteServices {
     }
   }
 
-  static async submitClarificationRequest(clarificationRequest : ClarificationRequest) : Promise<ClarificationRequest> {
+  static async submitClarificationRequest(
+    clarificationRequest: ClarificationRequest
+  ): Promise<ClarificationRequest> {
     return httpClient
-    .post(`/student/results/questions/${clarificationRequest.getQuestionId()}/clarifications`,
-    clarificationRequest
-    )
-    .then(response => {
-      return new ClarificationRequest(response.data);
-    })
-    .catch(async error => {
-      throw Error(await this.errorMessage(error));
-    });
+      .post(
+        `/student/results/questions/${clarificationRequest.getQuestionId()}/clarifications`,
+        clarificationRequest
+      )
+      .then(response => {
+        return new ClarificationRequest(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async getUnansweredClarificationRequests(): Promise<ClarificationRequest[]> {
+    try {
+      const response = await httpClient.get(`/clarifications/unanswered`);
+
+      return response.data.map(
+        (req: ClarificationRequest) => new ClarificationRequest(req)
+      );
+    } catch (err) {
+      throw Error(await this.errorMessage(err));
+    }
   }
 }
