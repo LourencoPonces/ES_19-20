@@ -12,6 +12,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository;
 
 import java.sql.SQLException;
@@ -24,6 +25,9 @@ public class RemoveStudentQuestionService {
     @Autowired
     private StudentQuestionRepository studentQuestionRepository;
 
+    @Autowired
+    private QuestionRepository questionRepository;
+
     @Retryable(
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
@@ -32,6 +36,7 @@ public class RemoveStudentQuestionService {
         StudentQuestion studentQuestion = studentQuestionRepository.findById(studentQuestionId).orElseThrow(()->new TutorException(ErrorMessage.STUDENT_QUESTION_NOT_FOUND, studentQuestionId));
         studentQuestion.remove();
         studentQuestionRepository.delete(studentQuestion);
+        questionRepository.delete(studentQuestion);
     }
     
     @Retryable(

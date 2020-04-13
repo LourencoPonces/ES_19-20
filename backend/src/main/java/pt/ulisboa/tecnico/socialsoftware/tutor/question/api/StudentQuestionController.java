@@ -71,7 +71,7 @@ public class StudentQuestionController {
     }
 
     @PutMapping("/courses/{courseId}/studentQuestions/{studentQuestionId}")
-    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#studentQuestionId, 'QUESTION_ACCESS')")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#studentQuestionId, 'QUESTION.ACCESS')")
     public StudentQuestionDTO updateStudentQuestion(@PathVariable Integer studentQuestionId, @PathVariable Integer courseId, @Valid @RequestBody StudentQuestionDTO studentQuestion) {
         return studentSubmitQuestionService.updateStudentQuestion(studentQuestionId, studentQuestion, courseId);
     }

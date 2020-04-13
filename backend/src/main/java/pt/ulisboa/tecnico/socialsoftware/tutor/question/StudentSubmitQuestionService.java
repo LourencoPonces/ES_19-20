@@ -22,6 +22,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
@@ -72,6 +75,7 @@ public class StudentSubmitQuestionService {
                 throw new TutorException(TOPIC_NOT_FOUND, topicDto.getName());
             } else {
                 studentQuestion.addTopic(t);
+                t.getQuestions().add(studentQuestion);
             }
         }
         student.addStudentQuestion(studentQuestion);
@@ -86,16 +90,9 @@ public class StudentSubmitQuestionService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public StudentQuestionDTO updateStudentQuestion(Integer studentQuestionId, StudentQuestionDTO studentQuestionDTO, Integer courseId) {
         StudentQuestion studentQuestion = studentQuestionRepository.findById(studentQuestionId).orElseThrow(() -> new TutorException(STUDENT_QUESTION_NOT_FOUND, studentQuestionId));
-        studentQuestion.update(studentQuestionDTO);
-        studentQuestion.getTopics().clear();
-        for(TopicDto topicDto: studentQuestionDTO.getTopics()) {
-            Topic t = topicRepository.findTopicByName(courseId, topicDto.getName());
-            if (t == null) {
-                throw new TutorException(TOPIC_NOT_FOUND, topicDto.getName());
-            } else {
-                studentQuestion.addTopic(t);
-            }
-        }
+        TopicDto[] topicArray = new TopicDto[studentQuestionDTO.getTopics().size()];
+        Set<Topic> newTopics = Arrays.stream(studentQuestionDTO.getTopics().toArray(topicArray)).map(topicDto -> topicRepository.findTopicByName(courseId, topicDto.getName())).collect(Collectors.toSet());
+        studentQuestion.update(studentQuestionDTO, newTopics);
         return new StudentQuestionDTO(studentQuestion);
     }
 }
