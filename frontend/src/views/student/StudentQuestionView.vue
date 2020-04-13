@@ -33,7 +33,7 @@
       /></template>
 
       <template v-slot:item.topics="{ item }">
-        <v-chip-group>
+        <v-chip-group data-cy="questionTopics">
           <v-chip v-for="topic in item.topics" :key="topic.name">
             {{ topic.name }}
           </v-chip>
@@ -42,7 +42,7 @@
 
       <template v-slot:item.submittedStatus="{ item }">
         <v-chip :color="getSubmittedStatusColor(item.submittedStatus)" small>
-          <span>{{ item.submittedStatus }}</span>
+          <span data-cy="showStatus">{{ item.submittedStatus }}</span>
         </v-chip>
       </template>
 
@@ -64,6 +64,7 @@
               class="mr-2"
               v-on="on"
               @click="showStudentQuestionDialog(item)"
+              data-cy="showStudentQuestion"
               >visibility</v-icon
             >
           </template>
@@ -76,6 +77,7 @@
               class="mr-2"
               v-on="on"
               @click="editStudentQuestion(item)"
+              data-cy="editStudentQuestion"
               >edit</v-icon
             >
           </template>
@@ -88,6 +90,7 @@
               class="mr-2"
               v-on="on"
               @click="duplicateStudentQuestion(item)"
+              data-cy="duplicateStudentQuestion"
               >cached</v-icon
             >
           </template>
@@ -100,6 +103,7 @@
               class="mr-2"
               v-on="on"
               @click="deleteStudentQuestion(item)"
+              data-cy="deleteStudentQuestion"
               color="red"
               >delete</v-icon
             >
