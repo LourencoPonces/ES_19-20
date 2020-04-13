@@ -9,10 +9,16 @@ export default class StudentQuestion extends Question {
     super(jsonObj);
     this.status = 'DISABLED';
     if (jsonObj) {
-      this.submittedStatus = jsonObj.submittedStatus;
+      this.submittedStatus = this.getSubmittedStatus(jsonObj.submittedStatus);
       this.justification = jsonObj.justification;
       this.username = jsonObj.username;
       this.status = jsonObj.status;
     }
+  }
+
+  getSubmittedStatus(submittedStatus: string): string {
+    if (submittedStatus === 'APPROVED') return 'Approved';
+    if (submittedStatus === 'REJECTED') return 'Rejected';
+    return 'Waiting for Approval';
   }
 }
