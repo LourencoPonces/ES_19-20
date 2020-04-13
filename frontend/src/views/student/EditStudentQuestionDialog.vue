@@ -122,7 +122,6 @@ export default class EditStudentQuestionDialog extends Vue {
   }
 
   async saveStudentQuestion() {
-    console.log(this.editStudentQuestion);
     if (
       this.editStudentQuestion &&
       (!this.editStudentQuestion.title ||
@@ -144,7 +143,6 @@ export default class EditStudentQuestionDialog extends Vue {
         );
         this.$emit('save-student-question', result);
       } catch (error) {
-        console.log('Error 1' + error);
         await this.$store.dispatch('error', error);
       }
     } else if (this.editStudentQuestion) {
@@ -154,7 +152,6 @@ export default class EditStudentQuestionDialog extends Vue {
         );
         this.$emit('save-student-question', result);
       } catch (error) {
-        console.log('Error 2' + error);
         await this.$store.dispatch('error', error);
       }
     }
