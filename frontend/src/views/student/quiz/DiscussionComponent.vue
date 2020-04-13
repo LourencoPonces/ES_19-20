@@ -1,25 +1,42 @@
 <template>
-  <v-card class="discussion" :max-height="270" style="margin-top: 30px;" outlined>
+  <v-card 
+    class="discussion"
+    :max-height="270"
+    style="margin-top: 30px;"
+    outlined
+    
+  >
       <v-card-title class="title">
         Clarification Requests
-         <v-btn v-if="!creatingRequest" class="add-button" dark color="primary" @click="newRequestButton()">New Request</v-btn>
+         <v-btn 
+          v-if="!creatingRequest" 
+          class="add-button" 
+          dark 
+          color="primary" 
+          @click="newRequestButton()"
+          data-cy="newRequest"
+        >New Request</v-btn>
       </v-card-title>
      
       <v-divider></v-divider>
 
       <v-card-text v-if="creatingRequest">
-        <v-text-field v-model="requestContent" label="Your request goes here."></v-text-field>
+        <v-text-field 
+          v-model="requestContent" 
+          label="Your request goes here." 
+          data-cy="inputRequest"
+        ></v-text-field>
         <v-btn dark color="red" style="margin: 5px;" @click="cancelCreateRequest()">Cancel</v-btn>
         <v-btn dark color="primary" style="margin: 5px;" @click="submitRequest()">Submit</v-btn>
       </v-card-text>
 
       <v-card-text v-else-if="hasClarificationRequests()">
-        <v-expansion-panels focusable>
+        <v-expansion-panels focusable data-cy="questionRequests">
           <v-expansion-panel
             v-for="request in clarifications"
             :key="request.content"
           >
-            <v-expansion-panel-header>{{request.content}}</v-expansion-panel-header>
+            <v-expansion-panel-header data-cy="requestHeader">{{request.content}}</v-expansion-panel-header>
             <v-expansion-panel-content v-if="request.hasAnswer()">
               {{request.answer}}
             </v-expansion-panel-content>

@@ -46,7 +46,7 @@
         </v-btn-toggle>
       </v-container>
       <v-container>
-        <v-btn @click="createQuiz" depressed color="primary">
+        <v-btn @click="createQuiz" depressed color="primary" data-cy="generate">
           Create quiz
         </v-btn>
       </v-container>
