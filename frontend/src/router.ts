@@ -199,7 +199,7 @@ let router = new Router({
           }
         },
         {
-          path: 'studentQuestions',
+          path: 'student-questions',
           name: 'student-questions',
           component: StudentQuestionView,
           meta: {
