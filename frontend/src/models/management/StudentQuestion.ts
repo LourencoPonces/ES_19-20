@@ -32,7 +32,6 @@ export default class StudentQuestion extends Question {
   }
 
   static getServerStatusFormat(status: string): string {
-    console.log('Translating');
     if (status === 'Waiting for Approval') return 'WAITING_FOR_APPROVAL';
     if (status === 'Rejected') return 'REJECTED';
     if (status === 'Approved') return 'APPROVED';
