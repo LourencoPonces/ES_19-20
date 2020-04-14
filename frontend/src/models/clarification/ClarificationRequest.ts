@@ -42,6 +42,10 @@ export default class ClarificationRequest {
     this.owner = id;
   }
 
+  getOwnerId(): number {
+    return this.owner;
+  }
+
   setContent(c: string): void {
     this.content = c;
   }
