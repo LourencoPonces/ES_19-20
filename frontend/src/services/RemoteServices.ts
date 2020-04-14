@@ -222,7 +222,7 @@ export default class RemoteServices {
    * Student Questions
    */
 
-  static async getStudentQuestionsStatus(): Promise<StudentQuestion[]> {
+  static async getStudentQuestionStatuses(): Promise<StudentQuestion[]> {
     return httpClient
       .get(
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/checkStatus`
