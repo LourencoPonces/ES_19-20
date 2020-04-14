@@ -28,21 +28,22 @@ export default class StatementQuestion {
       }
       if (jsonObj.clarifications) {
         this.clarifications = jsonObj.clarifications.map(
-            (clarification: ClarificationRequest) => new ClarificationRequest(clarification)
+          (clarification: ClarificationRequest) =>
+            new ClarificationRequest(clarification)
         );
       }
     }
   }
 
-  getQuestionId() : number {
+  getQuestionId(): number {
     return this.questionId;
   }
 
-  addClarificationRequest(request : ClarificationRequest) : void {
+  addClarificationRequest(request: ClarificationRequest): void {
     this.clarifications.push(request);
   }
 
-  getClarificationRequests() : ClarificationRequest[] {
+  getClarificationRequests(): ClarificationRequest[] {
     return this.clarifications;
   }
 }

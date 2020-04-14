@@ -690,16 +690,19 @@ export default class RemoteServices {
     }
   }
 
-  static async submitClarificationRequest(clarificationRequest : ClarificationRequest) : Promise<ClarificationRequest> {
+  static async submitClarificationRequest(
+    clarificationRequest: ClarificationRequest
+  ): Promise<ClarificationRequest> {
     return httpClient
-    .post(`/student/results/questions/${clarificationRequest.getQuestionId()}/clarifications`,
-    clarificationRequest
-    )
-    .then(response => {
-      return new ClarificationRequest(response.data);
-    })
-    .catch(async error => {
-      throw Error(await this.errorMessage(error));
-    });
+      .post(
+        `/student/results/questions/${clarificationRequest.getQuestionId()}/clarifications`,
+        clarificationRequest
+      )
+      .then(response => {
+        return new ClarificationRequest(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
   }
 }
