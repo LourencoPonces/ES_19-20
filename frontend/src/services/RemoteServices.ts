@@ -672,7 +672,7 @@ export default class RemoteServices {
 
   static async getUnansweredClarificationRequests(): Promise<ClarificationRequest[]> {
     try {
-      const response = await httpClient.get(`/clarifications/unanswered`);
+      const response = await httpClient.get(`/clarifications/unanswered/`);
 
       return response.data.map(
         (req: ClarificationRequest) => new ClarificationRequest(req)
