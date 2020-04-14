@@ -19,6 +19,7 @@ import QuizView from './views/student/quiz/QuizView.vue';
 import ResultsView from './views/student/quiz/ResultsView.vue';
 import StatsView from './views/student/StatsView.vue';
 import ScanView from './views/student/ScanView.vue';
+import ClarificationsView from './views/student/ClarificationsView.vue';
 import StudentQuestionView from './views/student/StudentQuestionView.vue';
 
 import AdminManagementView from '@/views/admin/AdminManagementView.vue';
@@ -199,7 +200,16 @@ let router = new Router({
           }
         },
         {
-          path: 'student-questions',
+          path: 'clarifications',
+          name: 'clarification-requests',
+          component: ClarificationsView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - Clarification Requests',
+            requiredAuth: 'Student'
+          }
+        },
+        {
+          path: 'studentQuestions',
           name: 'student-questions',
           component: StudentQuestionView,
           meta: {

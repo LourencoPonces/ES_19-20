@@ -14,6 +14,7 @@ import AuthDto from '@/models/user/AuthDto';
 import StatementAnswer from '@/models/statement/StatementAnswer';
 import { QuizAnswers } from '@/models/management/QuizAnswers';
 import StudentQuestion from '@/models/management/StudentQuestion';
+import ClarificationRequest from '@/models/clarification/ClarificationRequest';
 
 const httpClient = axios.create();
 httpClient.defaults.timeout = 10000;
@@ -687,5 +688,18 @@ export default class RemoteServices {
       console.log(error);
       return 'Unknown Error - Contact admin';
     }
+  }
+
+  static async submitClarificationRequest(clarificationRequest : ClarificationRequest) : Promise<ClarificationRequest> {
+    return httpClient
+    .post(`/student/results/questions/${clarificationRequest.getQuestionId()}/clarifications`,
+    clarificationRequest
+    )
+    .then(response => {
+      return new ClarificationRequest(response.data);
+    })
+    .catch(async error => {
+      throw Error(await this.errorMessage(error));
+    });
   }
 }
