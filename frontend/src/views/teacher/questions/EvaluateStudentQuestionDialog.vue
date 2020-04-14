@@ -23,7 +23,7 @@
               :label="`Status`"
             >
               <template v-slot:selection="{ item }">
-                <v-chip :color="getEvaluationColor(item)" small>
+                <v-chip :color="evalQuestion.getEvaluationColor()" small>
                   <span>{{ item }}</span>
                 </v-chip>
               </template>
@@ -53,6 +53,7 @@
 import { Component, Model, Prop, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import StudentQuestion from '@/models/management/StudentQuestion';
+import internalStatuses from '@/models/management/StudentQuestion';
 
 @Component
 export default class EvaluateQuestionDialog extends Vue {
@@ -96,12 +97,6 @@ export default class EvaluateQuestionDialog extends Vue {
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
-  }
-
-  getEvaluationColor(status: string) {
-    if (status === 'Rejected') return 'red';
-    else if (status === 'Waiting for Approval') return 'orange';
-    else return 'green';
   }
 }
 </script>

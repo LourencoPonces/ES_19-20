@@ -37,7 +37,7 @@
 
       <template v-slot:item.submittedStatus="{ item }">
         <v-chip
-          :color="getEvaluationColor(item.submittedStatus)"
+          :color="item.getEvaluationColor()"
           small
           @click="showEvaluateStudentQuestionDialog(item)"
         >
@@ -177,12 +177,6 @@ export default class StudentQuestionsView extends Vue {
 
   convertMarkDownNoFigure(text: string, image: Image | null = null): string {
     return convertMarkDownNoFigure(text, image);
-  }
-
-  getEvaluationColor(status: string) {
-    if (status === 'Rejected') return 'red';
-    else if (status === 'Waiting for Approval') return 'orange';
-    else return 'green';
   }
 
   async handleFileUpload(event: File, question: Question) {

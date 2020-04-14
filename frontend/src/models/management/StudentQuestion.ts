@@ -61,7 +61,20 @@ export default class StudentQuestion extends Question {
       case externalStatuses.REJECTED:
         return status;
       default:
-        return '';
+        throw new Error('Invalid status');
+    }
+  }
+
+  getEvaluationColor(): string {
+    switch (this.submittedStatus) {
+      case internalStatuses.WAITING_FOR_APPROVAL:
+        return 'orange';
+      case internalStatuses.APPROVED:
+        return 'green';
+      case internalStatuses.REJECTED:
+        return 'red';
+      default:
+        throw new Error('Invalid status');
     }
   }
 
