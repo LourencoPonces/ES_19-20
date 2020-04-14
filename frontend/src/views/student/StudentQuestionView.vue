@@ -9,6 +9,7 @@
       :mobile-breakpoint="0"
       :items-per-page="15"
       :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
+      data-cy="studentQuestionTable"
     >
       <template v-slot:top>
         <v-card-title>
@@ -20,7 +21,12 @@
           />
 
           <v-spacer />
-          <v-btn color="primary" dark @click="newStudentQuestion">
+          <v-btn
+            color="primary"
+            dark
+            @click="newStudentQuestion"
+            data-cy="NewQuestion"
+          >
             New Question
           </v-btn>
         </v-card-title>
@@ -33,7 +39,7 @@
       /></template>
 
       <template v-slot:item.topics="{ item }">
-        <v-chip-group>
+        <v-chip-group data-cy="questionTopics">
           <v-chip v-for="topic in item.topics" :key="topic.name">
             {{ topic.name }}
           </v-chip>
@@ -42,7 +48,7 @@
 
       <template v-slot:item.submittedStatus="{ item }">
         <v-chip :color="item.getEvaluationColor()" small>
-          <span>{{ item.submittedStatus }}</span>
+          <span data-cy="showStatus">{{ item.submittedStatus }}</span>
         </v-chip>
       </template>
 
@@ -64,18 +70,23 @@
               class="mr-2"
               v-on="on"
               @click="showStudentQuestionDialog(item)"
+              data-cy="showStudentQuestion"
               >visibility</v-icon
             >
           </template>
           <span>Show Question</span>
         </v-tooltip>
-        <v-tooltip bottom v-if="item.numberOfAnswers === 0">
+        <v-tooltip
+          bottom
+          v-if="item.numberOfAnswers === 0 && item.checkIfChangeable()"
+        >
           <template v-slot:activator="{ on }">
             <v-icon
               small
               class="mr-2"
               v-on="on"
               @click="editStudentQuestion(item)"
+              data-cy="editStudentQuestion"
               >edit</v-icon
             >
           </template>
@@ -88,18 +99,20 @@
               class="mr-2"
               v-on="on"
               @click="duplicateStudentQuestion(item)"
+              data-cy="duplicateStudentQuestion"
               >cached</v-icon
             >
           </template>
           <span>Duplicate Question</span>
         </v-tooltip>
-        <v-tooltip bottom>
+        <v-tooltip bottom v-if="item.checkIfChangeable()">
           <template v-slot:activator="{ on }">
             <v-icon
               small
               class="mr-2"
               v-on="on"
               @click="deleteStudentQuestion(item)"
+              data-cy="deleteStudentQuestion"
               color="red"
               >delete</v-icon
             >

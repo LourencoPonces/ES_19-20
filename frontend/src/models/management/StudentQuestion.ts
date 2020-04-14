@@ -87,4 +87,8 @@ export default class StudentQuestion extends Question {
     req.submittedStatus = this.getServerStatusFormat(sq.submittedStatus);
     return req;
   }
+
+  checkIfChangeable(): boolean {
+    return this.submittedStatus === internalStatuses.WAITING_FOR_APPROVAL;
+  }
 }
