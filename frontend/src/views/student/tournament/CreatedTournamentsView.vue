@@ -1,5 +1,5 @@
 <template>
-    <!-- Remove -->
+
     <h1>Created Tournaments</h1>
 </template>
 
