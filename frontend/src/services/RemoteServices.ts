@@ -257,18 +257,16 @@ export default class RemoteServices {
   }
 
   static async getSubmittedStudentQuestions(): Promise<StudentQuestion[]> {
-    return httpClient
-      .get(
+    try {
+      const response = await httpClient.get(
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions`
-      )
-      .then(response => {
-        return response.data.map((studentQuestion: any) => {
-          return new StudentQuestion(studentQuestion);
-        });
-      })
-      .catch(async error => {
-        throw Error(await this.errorMessage(error));
+      );
+      return response.data.map((studentQuestion: any) => {
+        return new StudentQuestion(studentQuestion);
       });
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
   }
 
   static async createStudentQuestion(

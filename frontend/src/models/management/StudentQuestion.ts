@@ -31,18 +31,20 @@ export default class StudentQuestion extends Question {
     }
   }
 
-  static getFrontendStatusFormat(submittedStatus: string): string {
-    switch (submittedStatus) {
+  static getFrontendStatusFormat(status: string): string {
+    switch (status) {
       case externalStatuses.WAITING_FOR_APPROVAL:
         return internalStatuses.WAITING_FOR_APPROVAL;
       case externalStatuses.APPROVED:
         return internalStatuses.APPROVED;
       case externalStatuses.REJECTED:
         return internalStatuses.REJECTED;
+
+      // case already internal
       case internalStatuses.WAITING_FOR_APPROVAL:
       case internalStatuses.APPROVED:
       case internalStatuses.REJECTED:
-        return submittedStatus;
+        return status;
       default:
         throw new Error('Invalid status');
     }
@@ -56,6 +58,8 @@ export default class StudentQuestion extends Question {
         return externalStatuses.APPROVED;
       case internalStatuses.REJECTED:
         return externalStatuses.REJECTED;
+
+      // case already external
       case externalStatuses.WAITING_FOR_APPROVAL:
       case externalStatuses.APPROVED:
       case externalStatuses.REJECTED:
