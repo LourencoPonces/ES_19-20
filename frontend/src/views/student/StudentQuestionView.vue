@@ -261,7 +261,6 @@ export default class StudentQuestionView extends Vue {
     this.editStudentQuestionDialog = false;
     this.currentStudentQuestion = null;
   }
-  
 
   onCloseShowStudentQuestionDialog() {
     this.studentQuestionDialog = false;
