@@ -415,6 +415,8 @@ public class User implements UserDetails, DomainEntity {
 
     public void addStudentQuestion (StudentQuestion studentQuestion) {this.studentQuestions.add(studentQuestion); }
 
+    public Set<StudentQuestion> getStudentQuestions() {return this.studentQuestions;}
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> list = new ArrayList<>();
