@@ -10,11 +10,11 @@
 
     <div class="demo-buttons" v-if="!isLoggedIn">
       <v-btn
-        data-cy="studentButton"
         depressed
         small
         color="primary"
         @click="demoStudent"
+        data-cy="studentButton"
       >
         <i class="fa fa-graduation-cap" />Demo as student
       </v-btn>
