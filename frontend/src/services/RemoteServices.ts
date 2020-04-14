@@ -242,20 +242,18 @@ export default class RemoteServices {
     status: string,
     justification: String
   ): Promise<StudentQuestion> {
-    return httpClient
-      .post(
+    try {
+      const response = await httpClient.post(
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${questionId}/evaluate`,
         {
           evaluation: StudentQuestion.getServerStatusFormat(status),
           justification: justification
         }
-      )
-      .then(response => {
-        return new StudentQuestion(response.data);
-      })
-      .catch(async error => {
-        throw Error(await this.errorMessage(error));
-      });
+      );
+      return new StudentQuestion(response.data);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
   }
 
   static async getSubmittedStudentQuestions(): Promise<StudentQuestion[]> {
