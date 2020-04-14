@@ -182,7 +182,7 @@
             </v-btn>
           </template>
           <v-list dense>
-            <v-list-item to="">
+            <v-list-item to="/student/studentQuestions">
               <v-list-item-action>
                 <v-icon>assignment</v-icon>
               </v-list-item-action>
@@ -360,7 +360,10 @@
             <v-list-item-content>Solved Quizzes</v-list-item-content>
           </v-list-item>
 
-          <v-list-item to="">
+          <v-list-item
+            to="/student/studentQuestions"
+            v-if="isStudent && currentCourse"
+          >
             <v-list-item-action>
               <v-icon>assignment</v-icon>
             </v-list-item-action>
