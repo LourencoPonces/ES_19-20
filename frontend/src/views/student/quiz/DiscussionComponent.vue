@@ -1,10 +1,10 @@
 <template>
   <v-card class="discussion" style="margin-top: 30px;" outlined>
     <v-card-title class="title">
-      Clarification Requests
+      <span>Clarification Requests</span>
+      <v-spacer />
       <v-btn
         v-if="!creatingRequest"
-        class="add-button"
         dark
         color="primary"
         @click="newRequestButton()"
@@ -110,13 +110,10 @@ export default class DiscussionComponent extends Vue {
   letter-spacing: 0 !important;
   vertical-align: middle;
 
-  .add-button {
-    position: relative;
-    right: -638px;
-  }
-
-  .title {
-    height: 70px;
+  v-card-title {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
     text-align: left;
     text-decoration: none solid rgb(51, 51, 51);
     text-size-adjust: 100%;
