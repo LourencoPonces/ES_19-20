@@ -86,36 +86,6 @@ Cypress.Commands.add(
 
 /* STUDENT QUESTION TESTS */
 
-Cypress.Commands.add(
-  'createStudentQuestion',
-  (title, content, topics, options, correctOption) => {
-    cy.get('[data-cy="NewQuestion"]').click();
-    cy.wait(10);
-    for (topic in topics) {
-      cy.get('[data-cy="Topics"]')
-        .children()
-        .find('form')
-        .click();
-      cy.get('[data-cy="topicList"]')
-        .children()
-        .contains('GitHub')
-        .click();
-    }
-    cy.get('[data-cy="Topics"]')
-      .find('i')
-      .click();
-    cy.get('[data-cy="StudentQuestionTitle"]').type(title);
-    cy.get('[data-cy="StudentQuestionContent"]').type(content);
-    cy.get(`[data-cy="CorrectOption${correctOption}"]`)
-      .parent()
-      .click();
-    for (let i = 1; i < options.length + 1; i++) {
-      cy.get(`[data-cy  =Option${i}]`).type(options[i - 1]);
-    }
-    cy.get('[data-cy="SaveStudentQuestion"]').click();
-  }
-);
-
 Cypress.Commands.add('generateAndAnswerQuiz', () => {
   cy.get('[data-cy="quizzes"]').click()
   cy.contains('Create').click()
@@ -136,7 +106,7 @@ Cypress.Commands.add('generateAndAnswerQuiz', () => {
       .click()
   cy.get('[data-cy="endQuiz"]').click()
   cy.get('[data-cy="sure"]').click()
-})
+});
 
 Cypress.Commands.add('submitClarificationRequest', (content, n) => {
   if (n > 0) {
@@ -152,4 +122,84 @@ Cypress.Commands.add('submitClarificationRequest', (content, n) => {
           cy.get('[data-cy="nextQuestion"]').click()
       }
   }
-})
+});
+
+Cypress.Commands.add(
+  'createStudentQuestion',
+  (title, content, topics, options, correctOption) => {
+    cy.get('[data-cy="NewQuestion"]').click();
+    cy.wait(10);
+    cy.get('[data-cy="Topics"]')
+      .children()
+      .find('form')
+      .click();
+    for (topic in topics) {
+      cy.get('[data-cy="topicList"]')
+        .children()
+        .contains(`${topic}`)
+        .click();
+    }
+    cy.get('[data-cy="Topics"]')
+      .find('i')
+      .click();
+    cy.get('[data-cy="StudentQuestionTitle"]').type(title);
+    cy.get('[data-cy="StudentQuestionContent"]').type(content);
+    cy.get(`[data-cy="CorrectOption${correctOption}"]`)
+      .parent()
+      .click();
+    for (let i = 1; i < options.length + 1; i++) {
+      cy.get(`[data-cy  =Option${i}]`).type(options[i - 1]);
+    }
+    cy.get('[data-cy="SaveStudentQuestion"]').click();
+  }
+);
+
+Cypress.Commands.add('errorMessageClose', message => {
+  cy.contains(`${message}`)
+    .parent()
+    .find('button')
+    .click();
+});
+
+Cypress.Commands.add(
+  'createNoTitleStudentQuestion',
+  (content, topic, options, correctOption) => {
+    cy.createStudentQuestion('', content, topic, options, correctOption);
+    cy.errorMessageClose(
+      'Question must have title, content, and at least one topic'
+    );
+    cy.contains('Cancel').click();
+  }
+);
+
+Cypress.Commands.add(
+  'createNoContentStudentQuestion',
+  (title, topic, options, correctOption) => {
+    cy.createStudentQuestion(title, '', topic, options, correctOption);
+    cy.errorMessageClose(
+      'Question must have title, content, and at least one topic'
+    );
+    cy.contains('Cancel').click();
+  }
+);
+
+Cypress.Commands.add(
+  'createNoTopicsStudentQuestion',
+  (title, content, options, correctOption) => {
+    cy.createStudentQuestion(title, content, [], options, correctOption);
+    cy.errorMessageClose(
+      'Question must have title, content, and at least one topic'
+    );
+    cy.contains('Cancel').click();
+  }
+);
+
+Cypress.Commands.add(
+  'createNoOptionsStudentQuestion',
+  (title, content, topic, correctOption) => {
+    cy.createStudentQuestion(title, content, topic, [], correctOption);
+    cy.errorMessageClose(
+      
+    )
+  }
+)
