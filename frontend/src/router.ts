@@ -73,7 +73,6 @@ let router = new Router({
             requiredAuth: 'Teacher'
           }
         },
-
         {
           path: 'student-questions',
           name: 'student-questions-management',
