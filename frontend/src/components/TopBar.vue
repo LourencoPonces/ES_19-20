@@ -358,7 +358,7 @@
             <v-list-item-content>My Clarifications</v-list-item-content>
           </v-list-item>
 
-          <v-list-item to="">
+          <v-list-item to="/student/tournaments">
             <v-list-item-action>
               <v-icon>fas fa-trophy</v-icon>
             </v-list-item-action>
