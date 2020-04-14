@@ -1,10 +1,5 @@
 <template>
-  <v-card
-    class="discussion"
-    :max-height="270"
-    style="margin-top: 30px;"
-    outlined
-  >
+  <v-card class="discussion" style="margin-top: 30px;" outlined>
     <v-card-title class="title">
       Clarification Requests
       <v-btn
@@ -20,11 +15,11 @@
     </v-card-title>
     <v-divider></v-divider>
     <v-card-text v-if="creatingRequest">
-      <v-text-field
+      <v-textarea
         v-model="requestContent"
         label="Your request goes here."
         data-cy="inputRequest"
-      ></v-text-field>
+      ></v-textarea>
       <v-btn
         dark
         color="red"
@@ -44,8 +39,10 @@
           v-for="request in clarifications"
           :key="request.content"
         >
-          <v-expansion-panel-header data-cy="requestHeader">
-            {{ request.content }}
+          <v-expansion-panel-header>
+            <span style="white-space: pre;" data-cy="requestHeader">{{
+              request.content
+            }}</span>
           </v-expansion-panel-header>
           <v-expansion-panel-content v-if="request.hasAnswer()">
             {{ request.answer }}
