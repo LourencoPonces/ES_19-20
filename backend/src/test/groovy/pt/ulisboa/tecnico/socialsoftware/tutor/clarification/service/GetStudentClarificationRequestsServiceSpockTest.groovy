@@ -152,7 +152,7 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
         req.questionId == question.getId()
     }
 
-    def "student submitted 2 clarification request2"() {
+    def "student submitted 2 clarification requests"() {
         given: "a clarification request for one question"
         clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent("some request")

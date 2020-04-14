@@ -62,9 +62,9 @@ import { Component, Vue } from 'vue-property-decorator';
 import StatementManager from '@/models/statement/StatementManager';
 import ResultComponent from '@/views/student/quiz/ResultComponent.vue';
 import DiscussionComponent from '@/views/student/quiz/DiscussionComponent.vue';
-import ClarificationRequest from '../../../models/clarification/ClarificationRequest';
-import RemoteServices from '../../../services/RemoteServices';
-import StatementQuiz from '../../../models/statement/StatementQuiz';
+import ClarificationRequest from '@/models/clarification/ClarificationRequest';
+import RemoteServices from '@/services/RemoteServices';
+import StatementQuiz from '@/models/statement/StatementQuiz';
 
 @Component({
   components: {
