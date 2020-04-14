@@ -30,6 +30,8 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
     static final String COURSE_NAME = "Software Architecture"
     static final String ACRONYM = "AS1"
     static final String ACADEMIC_TERM = "1 SEM"
+    static final String CONTENT = "Test Content"
+    static final String CONTENT_2 = "Test content 2"
 
     @Autowired
     CourseRepository courseRepository
@@ -137,7 +139,7 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
     def "student submitted 1 clarification request"() {
         given:
         clarificationRequestDto = new ClarificationRequestDto()
-        clarificationRequestDto.setContent("some request")
+        clarificationRequestDto.setContent(CONTENT)
         clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
 
         when:
@@ -148,14 +150,14 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
         result.size() == 1
         ClarificationRequestDto req = result[0]
         req.owner == studentId
-        req.content == "some request"
+        req.content == CONTENT
         req.questionId == question.getId()
     }
 
-    def "student submitted 2 clarification request2"() {
+    def "student submitted 2 clarification requests"() {
         given: "a clarification request for one question"
         clarificationRequestDto = new ClarificationRequestDto()
-        clarificationRequestDto.setContent("some request")
+        clarificationRequestDto.setContent(CONTENT)
         clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
 
         and: "another answered question"
@@ -170,7 +172,7 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
 
         and: "a clarification request to this question"
         def cr = new ClarificationRequestDto();
-        cr.setContent("another request")
+        cr.setContent(CONTENT_2)
         clarificationService.submitClarificationRequest(q.getId(), studentId, cr)
 
         when:
@@ -181,11 +183,11 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
         result.size() == 2
         ClarificationRequestDto req1 = result[0]
         req1.owner == studentId
-        req1.content == "some request"
+        req1.content == CONTENT
         req1.questionId == question.getId()
         ClarificationRequestDto req2 = result[1]
         req2.owner == studentId
-        req2.content == "another request"
+        req2.content == CONTENT_2
         req2.questionId == q.getId()
     }
 
