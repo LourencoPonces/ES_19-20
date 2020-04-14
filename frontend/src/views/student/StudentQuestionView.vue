@@ -41,7 +41,7 @@
       </template>
 
       <template v-slot:item.submittedStatus="{ item }">
-        <v-chip :color="getSubmittedStatusColor(item.submittedStatus)" small>
+        <v-chip :color="item.getEvaluationColor()" small>
           <span>{{ item.submittedStatus }}</span>
         </v-chip>
       </template>
@@ -261,12 +261,7 @@ export default class StudentQuestionView extends Vue {
     this.editStudentQuestionDialog = false;
     this.currentStudentQuestion = null;
   }
-
-  getSubmittedStatusColor(submittedStatus: string) {
-    if (submittedStatus === 'Approved') return 'green';
-    else if (submittedStatus === 'Waiting for Approval') return 'orange';
-    else return 'red';
-  }
+  
 
   onCloseShowStudentQuestionDialog() {
     this.studentQuestionDialog = false;
