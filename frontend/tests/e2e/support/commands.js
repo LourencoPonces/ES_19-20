@@ -97,7 +97,7 @@ Cypress.Commands.add('generateAndAnswerQuiz', () => {
       .click()
   cy.get('[data-cy="endQuiz"]').click()
   cy.get('[data-cy="sure"]').click()
-})
+});
 
 Cypress.Commands.add('submitClarificationRequest', (content, n) => {
   if (n > 0) {
@@ -109,8 +109,34 @@ Cypress.Commands.add('submitClarificationRequest', (content, n) => {
                             .children()
           requests.should('have.length', 1)
           requests.first()
-                  .should('have.text', content)
+                  .should('contain.text', content)
           cy.get('[data-cy="nextQuestion"]').click()
       }
   }
-})
+});
+
+Cypress.Commands.add('goToMyClarifications',  () => {
+  cy.contains('My Area').click()
+  cy.contains('Clarifications').click()
+});
+
+Cypress.Commands.add('deleteAllRequests', (n, content) => {
+  if (n > 0) {
+    for (i = 0; i < n; i++) {
+      cy.wait(500)
+      cy.get('[data-cy="table"]')
+        .find('tbody')
+        .children()
+        .should('have.length', n-i)
+        .first()
+        .should('contain.text', content)
+
+        cy.get('[data-cy="delete"]')
+          .first()
+          .click()
+    }
+    
+  }
+});
+
+

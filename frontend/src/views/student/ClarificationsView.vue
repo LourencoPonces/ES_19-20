@@ -1,6 +1,6 @@
 <template>
    <v-card class="table">
-    <v-data-table
+    <v-data-table 
       :headers="headers"
       :items="requests"
       :search="search"
@@ -8,6 +8,7 @@
       :mobile-breakpoint="0"
       :items-per-page="15"
       :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
+      data-cy="table"
     >
       <template v-slot:top>
         <v-card-title>
@@ -30,9 +31,14 @@
       <template v-slot:item.action="{ item }">
         <v-tooltip bottom v-if="!item.hasAnswer()">
           <template v-slot:activator="{ on }">
-            <v-icon small class="mr-2" v-on="on" @click="startEditRequest(item)"
-              >edit</v-icon
-            >
+            <v-icon
+              small
+              class="mr-2"
+              v-on="on"
+              @click="startEditRequest(item)"
+              data-cy="edit"
+            >edit</v-icon
+          >
           </template>
           <span>Edit Request</span>
         </v-tooltip>
@@ -44,6 +50,7 @@
               v-on="on"
               @click="deleteRequest(item)"
               color="red"
+              data-cy="delete"
               >delete</v-icon
             >
           </template>

@@ -1,4 +1,6 @@
 describe('Clarification Request', () => {
+  let content = 'Test clarification content.' 
+
   beforeEach(() => {
     cy.demoStudentLogin()
     
@@ -11,10 +13,14 @@ describe('Clarification Request', () => {
 
   it('login submits a clarification request', () => {
     cy.contains('Clarification Requests')
-    cy.submitClarificationRequest('Test clarification content.', 1)
+    cy.submitClarificationRequest(content, 1)
+    cy.goToMyClarifications()
+    cy.deleteAllRequests(1, content)
   });
 
   it('login submits two clarification requests', () => {
-    cy.submitClarificationRequest('Test clarification content.', 2)
+    cy.submitClarificationRequest(content, 2)
+    cy.goToMyClarifications()
+    cy.deleteAllRequests(2, content)
   });
 });
