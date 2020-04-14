@@ -222,7 +222,7 @@ export default class RemoteServices {
    * Student Questions
    */
 
-  static async getStudentQuestionsStatus(): Promise<StudentQuestion[]> {
+  static async getStudentQuestionStatuses(): Promise<StudentQuestion[]> {
     return httpClient
       .get(
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/checkStatus`
@@ -242,20 +242,18 @@ export default class RemoteServices {
     status: string,
     justification: String
   ): Promise<StudentQuestion> {
-    return httpClient
-      .post(
+    try {
+      const response = await httpClient.post(
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${questionId}/evaluate`,
         {
           evaluation: StudentQuestion.getServerStatusFormat(status),
           justification: justification
         }
-      )
-      .then(response => {
-        return new StudentQuestion(response.data);
-      })
-      .catch(async error => {
-        throw Error(await this.errorMessage(error));
-      });
+      );
+      return new StudentQuestion(response.data);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
   }
 
   static async getSubmittedStudentQuestions(): Promise<StudentQuestion[]> {
@@ -690,16 +688,19 @@ export default class RemoteServices {
     }
   }
 
-  static async submitClarificationRequest(clarificationRequest : ClarificationRequest) : Promise<ClarificationRequest> {
+  static async submitClarificationRequest(
+    clarificationRequest: ClarificationRequest
+  ): Promise<ClarificationRequest> {
     return httpClient
-    .post(`/student/results/questions/${clarificationRequest.getQuestionId()}/clarifications`,
-    clarificationRequest
-    )
-    .then(response => {
-      return new ClarificationRequest(response.data);
-    })
-    .catch(async error => {
-      throw Error(await this.errorMessage(error));
-    });
+      .post(
+        `/student/results/questions/${clarificationRequest.getQuestionId()}/clarifications`,
+        clarificationRequest
+      )
+      .then(response => {
+        return new ClarificationRequest(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
   }
 }

@@ -131,7 +131,7 @@
               </v-list-item-content>
             </v-list-item>
             <v-list-item to="/student/create">
-              <v-list-item-action >
+              <v-list-item-action>
                 <v-icon>create</v-icon>
               </v-list-item-action>
               <v-list-item-content>

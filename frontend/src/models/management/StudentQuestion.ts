@@ -10,14 +10,16 @@ export default class StudentQuestion extends Question {
     this.status = 'DISABLED';
     if (jsonObj) {
       // in the frontend use lower letter format. when passing to the backend, capitalize
-      this.submittedStatus = this.getSubmittedStatus(jsonObj.submittedStatus);
+      this.submittedStatus = StudentQuestion.getSubmittedStatus(
+        jsonObj.submittedStatus
+      );
       this.justification = jsonObj.justification;
       this.username = jsonObj.username;
       this.status = jsonObj.status;
     }
   }
 
-  getSubmittedStatus(submittedStatus: string): string {
+  static getSubmittedStatus(submittedStatus: string): string {
     if (submittedStatus === 'APPROVED') return 'Approved';
     if (submittedStatus === 'REJECTED') return 'Rejected';
     return 'Waiting for Approval';
@@ -30,7 +32,6 @@ export default class StudentQuestion extends Question {
   }
 
   static getServerStatusFormat(status: string): string {
-    console.log('Translating');
     if (status === 'Waiting for Approval') return 'WAITING_FOR_APPROVAL';
     if (status === 'Rejected') return 'REJECTED';
     if (status === 'Approved') return 'APPROVED';

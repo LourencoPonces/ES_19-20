@@ -247,7 +247,7 @@ export default class StudentQuestionView extends Vue {
     try {
       [this.topics, this.studentQuestions] = await Promise.all([
         RemoteServices.getTopics(),
-        RemoteServices.getStudentQuestionsStatus()
+        RemoteServices.getStudentQuestionStatuses()
       ]);
     } catch (error) {
       await this.$store.dispatch('error', error);
