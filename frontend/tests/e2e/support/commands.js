@@ -31,17 +31,10 @@ Cypress.Commands.add('demoAdminLogin', () => {
   cy.contains('Manage Courses').click();
 });
 
-<<<<<<< HEAD
 Cypress.Commands.add('demoStudentLogin', () => {
   cy.visit('/');
   cy.get('[data-cy="studentButton"]').click();
 });
-=======
-Cypress.Commands.add('demoStudentLogin',  () => {
-  cy.visit('/')
-  cy.get('[data-cy="studentButton"]').click()
-})
->>>>>>> PpA
 
 Cypress.Commands.add('createCourseExecution', (name, acronym, academicTerm) => {
   cy.get('[data-cy="createButton"]').click();
@@ -87,40 +80,38 @@ Cypress.Commands.add(
 /* STUDENT QUESTION TESTS */
 
 Cypress.Commands.add('generateAndAnswerQuiz', () => {
-  cy.get('[data-cy="quizzes"]').click()
-  cy.contains('Create').click()
-  cy.get('[data-cy="generate"]').click()
+  cy.get('[data-cy="quizzes"]').click();
+  cy.contains('Create').click();
+  cy.get('[data-cy="generate"]').click();
   cy.get('[data-cy="options"]')
-      .first()
-      .click()
+    .first()
+    .click();
   cy.get('[data-cy="options"]')
-      .first()
-      .click()
-  cy.get('[data-cy="nextQuestion"]').click()
+    .first()
+    .click();
+  cy.get('[data-cy="nextQuestion"]').click();
   cy.get('[data-cy="options"]')
-      .first()
-      .click()
-  cy.get('[data-cy="nextQuestion"]').click()
+    .first()
+    .click();
+  cy.get('[data-cy="nextQuestion"]').click();
   cy.get('[data-cy="options"]')
-      .first()
-      .click()
-  cy.get('[data-cy="endQuiz"]').click()
-  cy.get('[data-cy="sure"]').click()
+    .first()
+    .click();
+  cy.get('[data-cy="endQuiz"]').click();
+  cy.get('[data-cy="sure"]').click();
 });
 
 Cypress.Commands.add('submitClarificationRequest', (content, n) => {
   if (n > 0) {
-      for (i = 0; i < n; i++) {
-          cy.get('[data-cy="newRequest"]').click()
-          cy.get('[data-cy="inputRequest"]').type(content)
-          cy.contains('Submit').click()
-          let requests = cy.get('[data-cy="questionRequests"]')
-                            .children()
-          requests.should('have.length', 1)
-          requests.first()
-                  .should('have.text', content)
-          cy.get('[data-cy="nextQuestion"]').click()
-      }
+    for (i = 0; i < n; i++) {
+      cy.get('[data-cy="newRequest"]').click();
+      cy.get('[data-cy="inputRequest"]').type(content);
+      cy.contains('Submit').click();
+      let requests = cy.get('[data-cy="questionRequests"]').children();
+      requests.should('have.length', 1);
+      requests.first().should('have.text', content);
+      cy.get('[data-cy="nextQuestion"]').click();
+    }
   }
 });
 
@@ -133,20 +124,22 @@ Cypress.Commands.add(
       .children()
       .find('form')
       .click();
-    for (topic in topics) {
+    console.log(topics);
+    for (let i = 0; i < topics.length; i++) {
       cy.get('[data-cy="topicList"]')
         .children()
-        .contains(`${topic}`)
+        .contains(`${topics[i]}`)
         .click();
     }
     cy.get('[data-cy="Topics"]')
       .find('i')
       .click();
-    cy.get('[data-cy="StudentQuestionTitle"]').type(title);
-    cy.get('[data-cy="StudentQuestionContent"]').type(content);
-    cy.get(`[data-cy="CorrectOption${correctOption}"]`)
-      .parent()
-      .click();
+    if (title) cy.get('[data-cy="StudentQuestionTitle"]').type(title);
+    if (content) cy.get('[data-cy="StudentQuestionContent"]').type(content);
+    if (correctOption > 0 && correctOption < 5)
+      cy.get(`[data-cy="CorrectOption${correctOption}"]`)
+        .parent()
+        .click();
     for (let i = 1; i < options.length + 1; i++) {
       cy.get(`[data-cy  =Option${i}]`).type(options[i - 1]);
     }
@@ -168,7 +161,7 @@ Cypress.Commands.add(
     cy.errorMessageClose(
       'Question must have title, content, and at least one topic'
     );
-    cy.contains('Cancel').click();
+    cy.get('[data-cy="CancelStudentQuestion"]').click();
   }
 );
 
@@ -179,7 +172,7 @@ Cypress.Commands.add(
     cy.errorMessageClose(
       'Question must have title, content, and at least one topic'
     );
-    cy.contains('Cancel').click();
+    cy.get('[data-cy="CancelStudentQuestion"]').click();
   }
 );
 
@@ -187,10 +180,8 @@ Cypress.Commands.add(
   'createNoTopicsStudentQuestion',
   (title, content, options, correctOption) => {
     cy.createStudentQuestion(title, content, [], options, correctOption);
-    cy.errorMessageClose(
-      'Question must have title, content, and at least one topic'
-    );
-    cy.contains('Cancel').click();
+    cy.errorMessageClose('Error: The question has no Topics');
+    cy.get('[data-cy="CancelStudentQuestion"]').click();
   }
 );
 
@@ -198,8 +189,61 @@ Cypress.Commands.add(
   'createNoOptionsStudentQuestion',
   (title, content, topic, correctOption) => {
     cy.createStudentQuestion(title, content, topic, [], correctOption);
-    cy.errorMessageClose(
-      
-    )
+    cy.errorMessageClose('Error: Missing information for question');
+    cy.get('[data-cy="CancelStudentQuestion"]').click();
   }
-)
+);
+
+Cypress.Commands.add(
+  'createNoCorrectOptionStudentQuestion',
+  (title, content, topic, options) => {
+    cy.createStudentQuestion(title, content, topic, options, 0);
+    cy.errorMessageClose(
+      // eslint-disable-next-line prettier/prettier
+      'Error: The question doesn\'t have any correct options'
+    );
+    cy.get('[data-cy="CancelStudentQuestion"]').click();
+  }
+);
+
+Cypress.Commands.add(
+  'editStudentQuestion',
+  (command, newTitle, newContent, oldTopics, newTopics, newOptions) => {
+    if (command === 'edit') cy.get('[data-cy="editStudentQuestion"]').click();
+    else if (command === 'duplicate')
+      cy.get('[data-cy="duplicateStudentQuestion"]').click();
+
+    cy.wait(10);
+    for (let i = 0; i < oldTopics.length; i++) {
+      cy.get(`[data-cy="${oldTopics[i]}"]`)
+        .find('button')
+        .click();
+    }
+    cy.get('[data-cy="Topics"]')
+      .children()
+      .find('form')
+      .click();
+    for (let i = 0; i < newTopics.length; i++) {
+      cy.get('[data-cy="topicList"]')
+        .children()
+        .contains(`${newTopics[i]}`)
+        .click();
+    }
+    cy.get('[data-cy="Topics"]')
+      .find('i')
+      .click();
+    cy.get('[data-cy="StudentQuestionTitle"]')
+      .clear()
+      .type(newTitle);
+    cy.get('[data-cy="StudentQuestionContent"]')
+      .clear()
+      .type(newContent);
+
+    for (let i = 1; i < newOptions.length + 1; i++) {
+      cy.get(`[data-cy=Option${i}]`)
+        .clear()
+        .type(newOptions[i - 1]);
+    }
+    cy.get('[data-cy="SaveStudentQuestion"]').click();
+  }
+);

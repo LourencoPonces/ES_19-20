@@ -42,6 +42,7 @@
                     close
                     @click="data.select"
                     @click:close="removeTopic(data.item)"
+                    :data-cy="`${data.item.name}`"
                   >
                     {{ data.item.name }}
                   </v-chip>
@@ -98,7 +99,10 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn color="blue darken-1" @click="$emit('dialog', false)"
+        <v-btn
+          color="blue darken-1"
+          @click="$emit('dialog', false)"
+          data-cy="CancelStudentQuestion"
           >Cancel</v-btn
         >
         <v-btn

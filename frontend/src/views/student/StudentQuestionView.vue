@@ -9,6 +9,7 @@
       :mobile-breakpoint="0"
       :items-per-page="15"
       :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
+      data-cy="studentQuestionTable"
     >
       <template v-slot:top>
         <v-card-title>
@@ -75,7 +76,13 @@
           </template>
           <span>Show Question</span>
         </v-tooltip>
-        <v-tooltip bottom v-if="item.numberOfAnswers === 0">
+        <v-tooltip
+          bottom
+          v-if="
+            item.numberOfAnswers === 0 ||
+              item.submittedStatus === 'Wainting for Approval'
+          "
+        >
           <template v-slot:activator="{ on }">
             <v-icon
               small
