@@ -79,8 +79,8 @@
         <v-tooltip
           bottom
           v-if="
-            item.numberOfAnswers === 0 ||
-              item.submittedStatus === 'Wainting for Approval'
+            item.numberOfAnswers === 0 &&
+              item.submittedStatus === 'Waiting for Approval'
           "
         >
           <template v-slot:activator="{ on }">
@@ -108,7 +108,10 @@
           </template>
           <span>Duplicate Question</span>
         </v-tooltip>
-        <v-tooltip bottom>
+        <v-tooltip
+          bottom
+          v-if="item.submittedStatus === 'Waiting for Approval'"
+        >
           <template v-slot:activator="{ on }">
             <v-icon
               small
