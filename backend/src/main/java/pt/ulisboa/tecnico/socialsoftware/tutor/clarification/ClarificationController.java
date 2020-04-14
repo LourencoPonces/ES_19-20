@@ -13,7 +13,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
-import java.util.stream.Stream;
 
 @RestController
 public class ClarificationController {
@@ -46,7 +45,7 @@ public class ClarificationController {
 
     @GetMapping("/clarifications/unanswered/")
     @PreAuthorize("hasRole('ROLE_TEACHER')")
-    public Stream<ClarificationRequestDto> getUnansweredClarificationRequests(Principal principal) {
+    public List<ClarificationRequestDto> getUnansweredClarificationRequests(Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
 
         if (user == null) {

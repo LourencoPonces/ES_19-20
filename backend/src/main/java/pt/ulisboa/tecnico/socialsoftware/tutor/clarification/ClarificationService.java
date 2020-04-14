@@ -160,9 +160,10 @@ public class ClarificationService {
             backoff = @Backoff(delay = 5000)
     )
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public Stream<ClarificationRequestDto> getUnansweredClarificationRequests() {
+    public List<ClarificationRequestDto> getUnansweredClarificationRequests() {
         return clarificationRequestRepository.getUnansweredRequests()
-                .map(ClarificationRequestDto::new);
+                .map(ClarificationRequestDto::new)
+                .collect(Collectors.toList());
     }
 
     @Retryable(
