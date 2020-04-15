@@ -65,12 +65,22 @@
           <v-card>
             <v-card-title class="headline">Edit Clarification Request</v-card-title>
             <v-card-text>
-              <v-text-field v-model="newContent" label="Your request goes here."></v-text-field>
+              <v-text-field
+                v-model="newContent"
+                label="Your request goes here."
+                data-cy="inputNewContent"
+              >
+              </v-text-field>
             </v-card-text>
-            <v-card-actions>
+            <v-card-actions data-cy="actions">
               <v-spacer></v-spacer>
               <v-btn color="green darken-1" text @click="dialog = false; stopEditRequest()">Cancel</v-btn>
-              <v-btn color="green darken-1" text @click="dialog = false; editRequest()">Edit</v-btn>
+              <v-btn
+                color="green darken-1"
+                text
+                @click="dialog = false; editRequest()"
+                data_cy="submitEdition"
+              >Edit</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>

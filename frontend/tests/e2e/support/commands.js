@@ -135,8 +135,31 @@ Cypress.Commands.add('deleteAllRequests', (n, content) => {
           .first()
           .click()
     }
-    
   }
+});
+
+Cypress.Commands.add('editClarificationRequest', (content) => {
+  cy.wait(500)
+  cy.get('[data-cy="edit"]')
+    .first()
+    .click()
+
+  cy.get('.v-dialog')
+    .get('[data-cy="inputNewContent"]')
+    .type(content)
+
+  cy.get('.v-dialog')
+    .get('[data-cy="actions"]')
+    .children()
+    .last()
+    .click()
+
+  cy.get('[data-cy="table"]')
+    .find('tbody')
+    .children()
+    .should('have.length', 1)
+    .first()
+    .should('contain.text', content)
 });
 
 
