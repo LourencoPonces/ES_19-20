@@ -1,12 +1,12 @@
 describe('Clarification Request', () => {
   beforeEach(() => {
     cy.demoStudentLogin()
-    
+
     cy.generateAndAnswerQuiz()
   })
 
   afterEach(() => {
-    cy.contains('Logout').click()
+    cy.logout()
   })
 
   it('login submits a clarification request', () => {

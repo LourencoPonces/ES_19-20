@@ -7,7 +7,7 @@ describe('Teacher Clarification Requests', () => {
     cy.generateAndAnswerQuiz()
     cy.submitClarificationRequest(TEST_REQ_1, 1)
     cy.submitClarificationRequest(TEST_REQ_2, 1)
-    // cy.contains('Logout').click() // afterEach runs after before, and does so before any test.
+    cy.logout()
   })
 
   beforeEach(() => {
@@ -15,7 +15,7 @@ describe('Teacher Clarification Requests', () => {
   })
 
   afterEach(() => {
-    cy.contains('Logout').click()
+    cy.logout()
   })
 
   it('can see unanswered clarification requests', () => {

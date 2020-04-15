@@ -41,6 +41,20 @@ Cypress.Commands.add('demoStudentLogin',  () => {
   cy.get('[data-cy="studentButton"]').click()
 })
 
+Cypress.Commands.add('logout', () => {
+  // Work around VMenu bug
+  // this handler runs at most once, and only matches a specific error
+  cy.once('uncaught:exception', (error, _) => {
+    if (error.message == "Cannot read property 'contains' of undefined") {
+      return true;
+    }
+
+    return false;
+  })
+
+  cy.get('[data-cy="logout"]').click();
+});
+
 Cypress.Commands.add('createCourseExecution', (name, acronym, academicTerm) => {
   cy.get('[data-cy="createButton"]').click();
   cy.get('[data-cy="Name"]').type(name);
