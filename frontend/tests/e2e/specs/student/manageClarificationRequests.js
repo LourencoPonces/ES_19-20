@@ -26,10 +26,18 @@ describe('Clarification Request', () => {
   });
 
   it('login submits, edits and deletes a clarification request', () => {
-    cy.contains('Clarification Requests')
     cy.submitClarificationRequest(content, 1)
     cy.goToMyClarifications()
     cy.editClarificationRequest(newContent)
     cy.deleteAllRequests(1, newContent)
   });
+
+  it('login submit request with empty content', () => {
+    cy.get('[data-cy="newRequest"]').click()
+    cy.get('[data-cy="inputRequest"]').type('   ')
+    cy.contains('Submit').click()
+    cy.contains('Error')
+      .should('contain.text', 'Missing content')
+  });
+
 });
