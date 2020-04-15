@@ -27,9 +27,12 @@ describe('Student Question Submission', () => {
     cy.contains('Logout').click();
   });
 
+  // Test 1
   it('login and creates a new Student Question', () => {
-    cy.contains('My Area').click();
-    cy.contains('Questions').click();
+    cy.get('[data-cy="my-area"]').click();
+    cy.get('[data-cy="student-questions"]').click();
+
+    // Create the question
     cy.createStudentQuestion(
       questionTitle,
       questionContent,
@@ -37,18 +40,24 @@ describe('Student Question Submission', () => {
       options,
       1
     );
+
+    // verifications
     cy.contains(questionTitle)
       .parent()
       .children()
       .should('have.length', 7);
-    for (let i = 0; i < topics.length; i++)
+
+    for (topictoAdd of topics)
       cy.get('[data-cy=questionTopics')
         .children()
-        .contains(`${topics[i]}`);
+        .contains(topictoAdd);
+
     cy.get('[data-cy="showStatus"]').should(
       'have.text',
       'Waiting for Approval'
     );
+
+    // delete created question
     cy.contains(questionTitle)
       .parent()
       .within(() => {
@@ -56,18 +65,30 @@ describe('Student Question Submission', () => {
       });
   });
 
+  // Test 2
   it('login and create invalid questions', () => {
-    cy.contains('My Area').click();
-    cy.contains('Questions').click();
+    cy.get('[data-cy="my-area"]').click();
+    cy.get('[data-cy="student-questions"]').click();
+
+    // Creation of bad questions
+    // No Title
     cy.createNoTitleStudentQuestion(questionContent, topic, options, 1);
+
+    // No Content
     cy.createNoContentStudentQuestion(questionTitle, topic, options, 1);
+
+    // No Topics
     cy.createNoTopicsStudentQuestion(
       questionTitle,
       questionContent,
       options,
       1
     );
+
+    // No Options
     cy.createNoOptionsStudentQuestion(questionTitle, questionContent, topic, 1);
+
+    // No Correct Option
     cy.createNoCorrectOptionStudentQuestion(
       questionTitle,
       questionContent,
@@ -76,9 +97,11 @@ describe('Student Question Submission', () => {
     );
   });
 
+  // Test 3
   it('login and edit question', () => {
-    cy.contains('My Area').click();
-    cy.contains('Questions').click();
+    cy.get('[data-cy="my-area"]').click();
+    cy.get('[data-cy="student-questions"]').click();
+
     cy.createStudentQuestion(
       questionTitle,
       questionContent,
@@ -86,6 +109,7 @@ describe('Student Question Submission', () => {
       options,
       1
     );
+
     cy.editStudentQuestion(
       'edit',
       newQuestionTitle,
@@ -94,18 +118,24 @@ describe('Student Question Submission', () => {
       newTopics,
       newOptions
     );
+
+    // verifications
     cy.contains(newQuestionTitle)
       .parent()
       .children()
       .should('have.length', 7);
-    for (let i = 0; i < newTopics.length; i++)
+
+    for (let newTopic of newTopics)
       cy.get('[data-cy=questionTopics')
         .children()
-        .contains(`${newTopics[i]}`);
+        .contains(newTopic);
+
     cy.get('[data-cy="showStatus"]').should(
       'have.text',
       'Waiting for Approval'
     );
+
+    // delete the question
     cy.contains(newQuestionTitle)
       .parent()
       .within(() => {
@@ -113,9 +143,11 @@ describe('Student Question Submission', () => {
       });
   });
 
+  // Test 4
   it('login and duplicate question', () => {
-    cy.contains('My Area').click();
-    cy.contains('Questions').click();
+    cy.get('[data-cy="my-area"]').click();
+    cy.get('[data-cy="student-questions"]').click();
+
     cy.createStudentQuestion(
       questionTitle,
       questionContent,
@@ -123,6 +155,7 @@ describe('Student Question Submission', () => {
       options,
       1
     );
+
     cy.editStudentQuestion(
       'duplicate',
       newQuestionTitle,
@@ -131,6 +164,8 @@ describe('Student Question Submission', () => {
       newTopics,
       newOptions
     );
+
+    // verifications
     cy.get('[data-cy="studentQuestionTable"]')
       .find('tbody')
       .children()
@@ -138,12 +173,18 @@ describe('Student Question Submission', () => {
       .first()
       .get('td')
       .should('have.html', newQuestionTitle);
+
+    // delete the duplicate question
     cy.contains(newQuestionTitle)
       .parent()
       .within(() => {
         cy.get('[data-cy="deleteStudentQuestion"]').click();
       });
+
+    // wait for animation and remote call to be done
     cy.wait(1000);
+
+    // delete the original question
     cy.contains(questionTitle)
       .parent()
       .within(() => {

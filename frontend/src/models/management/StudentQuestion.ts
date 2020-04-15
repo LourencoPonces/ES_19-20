@@ -88,7 +88,7 @@ export default class StudentQuestion extends Question {
     return req;
   }
 
-  checkIfChangeable(): boolean {
+  isChangeable(): boolean {
     return this.submittedStatus === internalStatuses.WAITING_FOR_APPROVAL;
   }
 }

@@ -42,7 +42,7 @@
                     close
                     @click="data.select"
                     @click:close="removeTopic(data.item)"
-                    :data-cy="`${data.item.name}`"
+                    :data-cy="data.item.name"
                   >
                     {{ data.item.name }}
                   </v-chip>

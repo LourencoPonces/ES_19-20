@@ -119,36 +119,44 @@ Cypress.Commands.add(
   'createStudentQuestion',
   (title, content, topics, options, correctOption) => {
     cy.get('[data-cy="NewQuestion"]').click();
+
+    // wait for dialog to open
     cy.wait(10);
+
     cy.get('[data-cy="Topics"]')
       .children()
       .find('form')
       .click();
-    console.log(topics);
-    for (let i = 0; i < topics.length; i++) {
+
+    for (topic of topics) {
       cy.get('[data-cy="topicList"]')
         .children()
-        .contains(`${topics[i]}`)
+        .contains(topic)
         .click();
     }
+
     cy.get('[data-cy="Topics"]')
       .find('i')
       .click();
+
     if (title) cy.get('[data-cy="StudentQuestionTitle"]').type(title);
     if (content) cy.get('[data-cy="StudentQuestionContent"]').type(content);
+
     if (correctOption > 0 && correctOption < 5)
       cy.get(`[data-cy="CorrectOption${correctOption}"]`)
         .parent()
         .click();
+
     for (let i = 1; i < options.length + 1; i++) {
       cy.get(`[data-cy  =Option${i}]`).type(options[i - 1]);
     }
+
     cy.get('[data-cy="SaveStudentQuestion"]').click();
   }
 );
 
 Cypress.Commands.add('errorMessageClose', message => {
-  cy.contains(`${message}`)
+  cy.contains(message)
     .parent()
     .find('button')
     .click();
@@ -158,9 +166,11 @@ Cypress.Commands.add(
   'createNoTitleStudentQuestion',
   (content, topic, options, correctOption) => {
     cy.createStudentQuestion('', content, topic, options, correctOption);
+
     cy.errorMessageClose(
       'Question must have title, content, and at least one topic'
     );
+
     cy.get('[data-cy="CancelStudentQuestion"]').click();
   }
 );
@@ -169,9 +179,11 @@ Cypress.Commands.add(
   'createNoContentStudentQuestion',
   (title, topic, options, correctOption) => {
     cy.createStudentQuestion(title, '', topic, options, correctOption);
+
     cy.errorMessageClose(
       'Question must have title, content, and at least one topic'
     );
+
     cy.get('[data-cy="CancelStudentQuestion"]').click();
   }
 );
@@ -180,7 +192,9 @@ Cypress.Commands.add(
   'createNoTopicsStudentQuestion',
   (title, content, options, correctOption) => {
     cy.createStudentQuestion(title, content, [], options, correctOption);
+
     cy.errorMessageClose('Error: The question has no Topics');
+
     cy.get('[data-cy="CancelStudentQuestion"]').click();
   }
 );
@@ -189,7 +203,9 @@ Cypress.Commands.add(
   'createNoOptionsStudentQuestion',
   (title, content, topic, correctOption) => {
     cy.createStudentQuestion(title, content, topic, [], correctOption);
+
     cy.errorMessageClose('Error: Missing information for question');
+
     cy.get('[data-cy="CancelStudentQuestion"]').click();
   }
 );
@@ -198,10 +214,12 @@ Cypress.Commands.add(
   'createNoCorrectOptionStudentQuestion',
   (title, content, topic, options) => {
     cy.createStudentQuestion(title, content, topic, options, 0);
+
     cy.errorMessageClose(
       // eslint-disable-next-line prettier/prettier
       'Error: The question doesn\'t have any correct options'
     );
+
     cy.get('[data-cy="CancelStudentQuestion"]').click();
   }
 );
@@ -214,27 +232,33 @@ Cypress.Commands.add(
       cy.get('[data-cy="duplicateStudentQuestion"]').click();
 
     cy.wait(10);
-    for (let i = 0; i < oldTopics.length; i++) {
-      cy.get(`[data-cy="${oldTopics[i]}"]`)
+
+    for (oldTopic of oldTopics) {
+      cy.get(`[data-cy="${oldTopic}"]`)
         .find('button')
         .click();
     }
+
     cy.get('[data-cy="Topics"]')
       .children()
       .find('form')
       .click();
-    for (let i = 0; i < newTopics.length; i++) {
+
+    for (newTopic of newTopics) {
       cy.get('[data-cy="topicList"]')
         .children()
-        .contains(`${newTopics[i]}`)
+        .contains(newTopic)
         .click();
     }
+
     cy.get('[data-cy="Topics"]')
       .find('i')
       .click();
+
     cy.get('[data-cy="StudentQuestionTitle"]')
       .clear()
       .type(newTitle);
+
     cy.get('[data-cy="StudentQuestionContent"]')
       .clear()
       .type(newContent);
@@ -244,6 +268,7 @@ Cypress.Commands.add(
         .clear()
         .type(newOptions[i - 1]);
     }
+
     cy.get('[data-cy="SaveStudentQuestion"]').click();
   }
 );

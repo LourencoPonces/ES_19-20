@@ -78,7 +78,7 @@
         </v-tooltip>
         <v-tooltip
           bottom
-          v-if="item.numberOfAnswers === 0 && item.checkIfChangeable()"
+          v-if="item.numberOfAnswers === 0 && item.isChangeable()"
         >
           <template v-slot:activator="{ on }">
             <v-icon
@@ -105,7 +105,7 @@
           </template>
           <span>Duplicate Question</span>
         </v-tooltip>
-        <v-tooltip bottom v-if="item.checkIfChangeable()">
+        <v-tooltip bottom v-if="item.isChangeable()">
           <template v-slot:activator="{ on }">
             <v-icon
               small
