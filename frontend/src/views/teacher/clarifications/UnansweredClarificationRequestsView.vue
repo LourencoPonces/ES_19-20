@@ -30,6 +30,7 @@
               v-on="on"
               text
               @click="openAnswerDialog(item)"
+              :data-cy="'answerClarification-' + item.content.slice(0, 15)"
             >
               <v-icon small class="mr-2">forum</v-icon>
             </v-btn>
@@ -53,13 +54,13 @@
             <span class="multiline">{{ requestBeingAnswered.content }}</span>
           </div>
 
-          <v-textarea v-model="answerInCreation.content" label="Answer" />
+          <v-textarea v-model="answerInCreation.content" label="Answer" data-cy="answerField" />
         </v-card-text>
 
         <v-card-actions>
           <v-spacer />
           <v-btn color="blue darken-1" @click="closeDialogue">Cancel</v-btn>
-          <v-btn color="blue darken-1" @click="submitAnswer"
+          <v-btn color="blue darken-1" @click="submitAnswer" data-cy="answerSubmit"
             >Submit Answer</v-btn
           >
         </v-card-actions>
