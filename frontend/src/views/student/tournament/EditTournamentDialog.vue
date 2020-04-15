@@ -105,6 +105,7 @@
 
 <script lang="ts">
 import { Component, Vue, Model, Prop } from 'vue-property-decorator';
+import Store from '@/store';
 import RemoteServices from '@/services/RemoteServices';
 import Tournament from '@/models/management/Tournament';
 import Topic from '@/models/management/Topic';
@@ -133,8 +134,41 @@ export default class EditTournamentDialog extends Vue {
     this.editTournament.topics = this.tournamentTopics;
   }
 
-  saveTournament() {
-    alert(JSON.stringify(this.editTournament));
+  async saveTournament() {
+    if (
+      this.editTournament &&
+      (!this.editTournament.title ||
+        !this.editTournament.availableDate ||
+        !this.editTournament.runningDate ||
+        !this.editTournament.conclusionDate ||
+        !this.editTournament.numberOfQuestions ||
+        !this.editTournament.topics)
+    ) {
+      await this.$store.dispatch('error', 'Missing fields in tournament!');
+      return;
+    }
+
+    if (this.editTournament.numberOfQuestions < 1) {
+      await this.$store.dispatch('error', 'Invalid number of questions!');
+      return;
+    }
+
+    if (this.editTournament.topics.length == 0) {
+      await this.$store.dispatch('error', 'Missing topics!');
+      return;
+    }
+
+    if (!this.editTournament.id) {
+      this.editTournament.creator = Store.getters.getUser;
+      try {
+        const result = await RemoteServices.createTournament(
+          this.editTournament
+        );
+        this.$emit('saveTournament', result);
+      } catch (error) {
+        await this.$store.dispatch('error', error);
+      }
+    }
   }
 
   created() {

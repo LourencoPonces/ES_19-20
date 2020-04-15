@@ -7,6 +7,7 @@
       v-model="editTournamentDialog"
       :tournament="currentTournament"
       :topics="topics"
+      @saveTournament="createdTournament"
     />
   </v-card>
 </template>
@@ -38,6 +39,10 @@ export default class TournamentsView extends Vue {
     if (!this.editTournamentDialog) {
       this.currentTournament = null;
     }
+  }
+
+  createdTournament(tournament: Tournament) {
+    this.editTournamentDialog = false;
   }
 
   async created() {
