@@ -26,7 +26,11 @@
       <template v-slot:item.actions="{ item }">
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
-            <v-btn v-on="on" text @click="openAnswerDialog(item)">
+            <v-btn
+              v-on="on"
+              text
+              @click="openAnswerDialog(item)"
+            >
               <v-icon small class="mr-2">forum</v-icon>
             </v-btn>
           </template>
@@ -40,17 +44,13 @@
           <span class="headline">Answer Question</span>
         </v-card-title>
 
-        <v-card-text v-if="editedTopic">
-          <v-container grid-list-md fluid>
-            <v-layout column wrap>
-              <v-flex xs24 sm12 md8>
-                <v-text-field
-                  v-model="answerInCreation.content"
-                  label="Answer"
-                />
-              </v-flex>
-            </v-layout>
-          </v-container>
+        <v-card-text width="100%">
+          <div>
+            <h2>Clarification Request:</h2>
+            <span class="multiline">{{ requestBeingAnswered.content }}</span>
+          </div>
+
+          <v-text-field v-model="answerInCreation.content" label="Answer" />
         </v-card-text>
 
         <v-card-actions>
@@ -78,8 +78,8 @@ export default class UnansweredClarificationsView extends Vue {
   clarifications: ClarificationRequest[] = [];
   expand: boolean = false;
   answerDialog: boolean = false;
-  requestBeingAnswered: ClarificationRequest | undefined = undefined;
-  answerInCreation: ClarificationRequestAnswer | undefined = undefined;
+  requestBeingAnswered: ClarificationRequest = new ClarificationRequest();
+  answerInCreation: ClarificationRequestAnswer = new ClarificationRequestAnswer();
   questionCache: Record<number, Question> = {};
   userCache: Record<number, User> = {};
   search: string = '';
@@ -105,8 +105,9 @@ export default class UnansweredClarificationsView extends Vue {
       this.clarifications = await RemoteServices.getUnansweredClarificationRequests();
     } catch (error) {
       await this.$store.dispatch('error', error);
+    } finally {
+      await this.$store.dispatch('clearLoading');
     }
-    await this.$store.dispatch('clearLoading');
   }
 
   customFilter(value: string, search: string): boolean {
@@ -126,12 +127,39 @@ export default class UnansweredClarificationsView extends Vue {
 
   closeDialogue(): void {
     this.answerDialog = false;
-    this.answerInCreation = undefined;
-    this.requestBeingAnswered = undefined;
   }
 
-  async submitAnswer(): Promise<void> {}
+  async submitAnswer(): Promise<void> {
+    const answerInCreation = this
+      .answerInCreation as ClarificationRequestAnswer;
+
+    await this.$store.dispatch('loading');
+    try {
+      await RemoteServices.submitClarificationRequestAnswer(answerInCreation);
+
+      // remove answered request
+      this.clarifications = this.clarifications.filter(
+        c => c != this.requestBeingAnswered
+      );
+
+      this.closeDialogue();
+    } catch (err) {
+      await this.$store.dispatch('error', err);
+    } finally {
+      await this.$store.dispatch('clearLoading');
+    }
+  }
 }
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+.answer-context {
+  text-align: left;
+  margin-bottom: 20px;
+
+  h2 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+}
+</style>
