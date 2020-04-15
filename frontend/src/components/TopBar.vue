@@ -47,7 +47,7 @@
 
         <v-menu offset-y v-if="isTeacher && currentCourse" open-on-hover>
           <template v-slot:activator="{ on }">
-            <v-btn v-on="on" text dark>
+            <v-btn v-on="on" text dark data-cy="management">
               Management
               <v-icon>fas fa-file-alt</v-icon>
             </v-btn>
@@ -59,6 +59,25 @@
               </v-list-item-action>
               <v-list-item-content>
                 <v-list-item-title>Questions</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item
+              to="/management/clarifications/unanswered"
+              data-cy="teacherUnansweredClarifications"
+            >
+              <v-list-item-action>
+                <v-icon>fas fa-question</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Clarifications</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item to="/management/student-questions">
+              <v-list-item-action>
+                <v-icon>question_answer</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Student Questions</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
             <v-list-item to="/management/topics">
@@ -121,7 +140,7 @@
               </v-list-item-content>
             </v-list-item>
             <v-list-item to="/student/create">
-              <v-list-item-action >
+              <v-list-item-action>
                 <v-icon>create</v-icon>
               </v-list-item-action>
               <v-list-item-content>
@@ -155,12 +174,12 @@
             </v-btn>
           </template>
           <v-list dense>
-            <v-list-item to="/student/studentQuestions">
+            <v-list-item to="/student/student-questions">
               <v-list-item-action>
                 <v-icon>assignment</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>Questions</v-list-item-title>
+                <v-list-item-title>Student Questions</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
             <v-list-item to="/student/clarifications">
@@ -258,6 +277,14 @@
               <v-list-item-title>Questions</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
+          <v-list-item to="/management/clarifications/unanswered">
+            <v-list-item-action>
+              <v-icon>fas fa-question</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>Clarifications</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
           <v-list-item to="/management/topics">
             <v-list-item-action>
               <v-icon>category</v-icon>
@@ -342,7 +369,7 @@
           </v-list-item>
 
           <v-list-item
-            to="/student/studentQuestions"
+            to="/student/student-questions"
             v-if="isStudent && currentCourse"
           >
             <v-list-item-action>

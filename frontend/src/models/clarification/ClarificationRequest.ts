@@ -1,32 +1,54 @@
-import { _ } from 'vue-underscore';
+import ClarificationRequestAnswer from './ClarificationRequestAnswer';
 
 export default class ClarificationRequest {
+  id!: number;
   questionId!: number;
   owner!: number;
+  creationDate!: string;
   content!: string;
-  answer:/* ClarificationRequestAnswer | */null = null;
+  answer: ClarificationRequestAnswer | null = null;
 
   constructor(jsonObj?: ClarificationRequest) {
     if (jsonObj) {
-        this.questionId = jsonObj.questionId;
-        this.content = jsonObj.content;
-        this.owner = jsonObj.owner;
+      this.id = jsonObj.id;
+      this.questionId = jsonObj.questionId;
+      this.content = jsonObj.content;
+      this.owner = jsonObj.owner;
+      this.creationDate = jsonObj.creationDate;
 
-  /*      if (jsonObj.answer) {     // TODO complete when answer is done
-          this.answer = jsonObj.answer;
-        }
-      */ }
+      if (jsonObj.answer) {
+        this.answer = new ClarificationRequestAnswer(jsonObj.answer);
+      }
+    }
   }
 
-  hasAnswer() : boolean { return this.answer != null; }
+  newAnswer(): ClarificationRequestAnswer {
+    const answer = new ClarificationRequestAnswer();
+    answer.setRequestId(this.id);
+    return answer;
+  }
 
-  setQuestionId(id : number) : void { this.questionId = id; }
+  hasAnswer(): boolean {
+    return this.answer != null;
+  }
 
-  getQuestionId() : number { return this.questionId; }
+  setQuestionId(id: number): void {
+    this.questionId = id;
+  }
 
-  setOwnerId(id : number) : void { this.owner = id; }
+  getQuestionId(): number {
+    return this.questionId;
+  }
 
-  setContent(c : string) : void { this.content = c; }
+  setOwnerId(id: number): void {
+    this.owner = id;
+  }
 
-  
+  getOwnerId(): number {
+    return this.owner;
+  }
+
+  setContent(c: string): void {
+    this.content = c;
+  }
 }

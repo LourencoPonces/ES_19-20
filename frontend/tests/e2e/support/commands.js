@@ -31,6 +31,11 @@ Cypress.Commands.add('demoAdminLogin', () => {
   cy.contains('Manage Courses').click();
 });
 
+Cypress.Commands.add('demoTeacherLogin',  () => {
+  cy.visit('/')
+  cy.get('[data-cy="teacherButton"]').click()
+})
+
 Cypress.Commands.add('demoStudentLogin',  () => {
   cy.visit('/')
   cy.get('[data-cy="studentButton"]').click()
