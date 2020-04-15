@@ -55,7 +55,7 @@ public class ClarificationController {
         return clarificationService.updateClarificationRequest(clarificationRequestDto);
     }
 
-    @GetMapping("/student/clarifications/")
+    @GetMapping("/student/clarifications")
     @PreAuthorize("hasRole('ROLE_STUDENT')")
     public List<ClarificationRequestDto> getStudentClarificationRequests(Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();

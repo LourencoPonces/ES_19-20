@@ -1,3 +1,4 @@
+ls
 import axios from 'axios';
 import Store from '@/store';
 import Question from '@/models/management/Question';
@@ -669,7 +670,7 @@ export default class RemoteServices {
 
   static async getStudentClarificationRequests() : Promise<ClarificationRequest[]> {
     return httpClient
-    .get('/student/clarifications/')
+    .get('/student/clarifications')
     .then(response => {
       return response.data.map((request: any) => {
         return new ClarificationRequest(request);
