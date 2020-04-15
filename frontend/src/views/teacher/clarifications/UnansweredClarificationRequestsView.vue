@@ -21,7 +21,7 @@
         </v-card-title>
       </template>
       <template v-slot:item.content="{ item }">
-        <span style="white-space: pre;">{{item.content}}</span>
+        <span style="white-space: pre;">{{ item.content }}</span>
       </template>
       <template v-slot:item.actions="{ item }">
         <v-tooltip bottom>
@@ -44,7 +44,10 @@
           <v-container grid-list-md fluid>
             <v-layout column wrap>
               <v-flex xs24 sm12 md8>
-                <v-text-field v-model="answerInCreation.content" label="Answer" />
+                <v-text-field
+                  v-model="answerInCreation.content"
+                  label="Answer"
+                />
               </v-flex>
             </v-layout>
           </v-container>
@@ -53,7 +56,9 @@
         <v-card-actions>
           <v-spacer />
           <v-btn color="blue darken-1" @click="closeDialogue">Cancel</v-btn>
-          <v-btn color="blue darken-1" @click="submitAnswer">Submit Answer</v-btn>
+          <v-btn color="blue darken-1" @click="submitAnswer"
+            >Submit Answer</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -125,8 +130,7 @@ export default class UnansweredClarificationsView extends Vue {
     this.requestBeingAnswered = undefined;
   }
 
-  async submitAnswer(): Promise<void> {
-  }
+  async submitAnswer(): Promise<void> {}
 }
 </script>
 
