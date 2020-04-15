@@ -40,12 +40,12 @@
           :key="request.content"
         >
           <v-expansion-panel-header>
-            <span style="white-space: pre;" data-cy="requestHeader">{{
+            <span class="multiline" data-cy="requestHeader">{{
               request.content
             }}</span>
           </v-expansion-panel-header>
           <v-expansion-panel-content v-if="request.hasAnswer()">
-            {{ request.answer }}
+            <span class="multiline">{{ request.answer }}</span>
           </v-expansion-panel-content>
           <v-expansion-panel-content v-else>
             No answer available.
@@ -118,5 +118,9 @@ export default class DiscussionComponent extends Vue {
     text-decoration: none solid rgb(51, 51, 51);
     text-size-adjust: 100%;
   }
+}
+
+.multiline {
+  white-space: pre;
 }
 </style>
