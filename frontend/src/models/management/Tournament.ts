@@ -15,9 +15,9 @@ export default class Tournament {
   isCancelled: boolean = false;
   creator!: User;
   participants: User[] = [];
-  topics!: Topic[];
+  topics: Topic[] = [];
 
-  constructor(jsonObj: Tournament) {
+  constructor(jsonObj?: Tournament) {
     if (jsonObj) {
       this.id = jsonObj.id;
       this.number = jsonObj.number;
