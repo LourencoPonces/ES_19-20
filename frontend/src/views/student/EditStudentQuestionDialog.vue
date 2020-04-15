@@ -42,7 +42,7 @@
                   </v-chip>
                 </template>
                 <template v-slot:item="data">
-                  <v-list-item-content @click="addTopic(data.item)">
+                  <v-list-item-content>
                     <v-list-item-title v-html="data.item.name" />
                   </v-list-item-content>
                 </template>

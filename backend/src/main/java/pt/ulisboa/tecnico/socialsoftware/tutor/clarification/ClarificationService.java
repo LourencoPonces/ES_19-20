@@ -17,6 +17,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 
@@ -24,7 +25,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -124,6 +127,15 @@ public class ClarificationService {
         entityManager.persist(question);
 
         return new ClarificationRequestDto(clarificationRequest);
+    }
+
+    @Retryable(
+            value = {SQLException.class},
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<ClarificationRequestDto> getStudentClarificationRequests(int userId) {
+        User user = getStudent(userId);
+        return user.getClarificationRequests().stream().map(ClarificationRequestDto::new).collect(Collectors.toList());
     }
 
     @Retryable(

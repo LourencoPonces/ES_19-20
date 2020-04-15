@@ -15,7 +15,7 @@
         class="question-content"
         v-html="convertMarkDown(question.content, question.image)"
       ></div>
-      <div class="square" @click="increaseOrder">
+      <div class="square" @click="increaseOrder" data-cy="nextQuestion">
         <i
           v-if="questionOrder !== questionNumber - 1"
           class="fas fa-chevron-right"
@@ -31,6 +31,7 @@
           optionId === question.options[index].optionId ? 'selected' : ''
         ]"
         @click="selectOption(question.options[index].optionId)"
+        data-cy="options"
       >
         <span class="option-letter">{{ optionLetters[index] }}</span>
         <span

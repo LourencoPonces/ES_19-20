@@ -14,6 +14,8 @@ import AuthDto from '@/models/user/AuthDto';
 import StatementAnswer from '@/models/statement/StatementAnswer';
 import { QuizAnswers } from '@/models/management/QuizAnswers';
 import StudentQuestion from '@/models/management/StudentQuestion';
+import Tournament from '@/models/management/Tournament';
+import ClarificationRequest from '@/models/clarification/ClarificationRequest';
 
 const httpClient = axios.create();
 httpClient.defaults.timeout = 10000;
@@ -221,7 +223,7 @@ export default class RemoteServices {
    * Student Questions
    */
 
-  static async getStudentQuestions(): Promise<StudentQuestion[]> {
+  static async getStudentQuestionStatuses(): Promise<StudentQuestion[]> {
     return httpClient
       .get(
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/checkStatus`
@@ -236,13 +238,45 @@ export default class RemoteServices {
       });
   }
 
+  static async evaluateStudentQuestion(
+    questionId: number,
+    status: string,
+    justification: String
+  ): Promise<StudentQuestion> {
+    try {
+      const response = await httpClient.post(
+        `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${questionId}/evaluate`,
+        {
+          evaluation: StudentQuestion.getServerStatusFormat(status),
+          justification: justification
+        }
+      );
+      return new StudentQuestion(response.data);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
+  static async getSubmittedStudentQuestions(): Promise<StudentQuestion[]> {
+    try {
+      const response = await httpClient.get(
+        `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions`
+      );
+      return response.data.map((studentQuestion: any) => {
+        return new StudentQuestion(studentQuestion);
+      });
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
   static async createStudentQuestion(
     studentQuestion: StudentQuestion
   ): Promise<StudentQuestion> {
     return httpClient
       .post(
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions`,
-        studentQuestion
+        StudentQuestion.toRequest(studentQuestion)
       )
       .then(response => {
         return new StudentQuestion(response.data);
@@ -258,7 +292,7 @@ export default class RemoteServices {
     return httpClient
       .put(
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${studentQuestion.id}`,
-        studentQuestion
+        StudentQuestion.toRequest(studentQuestion)
       )
       .then(response => {
         return new StudentQuestion(response.data);
@@ -273,6 +307,20 @@ export default class RemoteServices {
       .delete(
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${studentQuestionId}`
       )
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async createTournament(tournament: Tournament): Promise<Tournament> {
+    return httpClient
+      .post(
+        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments`,
+        tournament
+      )
+      .then(response => {
+        return new Tournament(response.data);
+      })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
@@ -651,5 +699,21 @@ export default class RemoteServices {
       console.log(error);
       return 'Unknown Error - Contact admin';
     }
+  }
+
+  static async submitClarificationRequest(
+    clarificationRequest: ClarificationRequest
+  ): Promise<ClarificationRequest> {
+    return httpClient
+      .post(
+        `/student/results/questions/${clarificationRequest.getQuestionId()}/clarifications`,
+        clarificationRequest
+      )
+      .then(response => {
+        return new ClarificationRequest(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
   }
 }
