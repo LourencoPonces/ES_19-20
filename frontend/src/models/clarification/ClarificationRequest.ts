@@ -4,6 +4,7 @@ export default class ClarificationRequest {
   id!: number;
   questionId!: number;
   owner!: number;
+  creationDate!: string;
   content!: string;
   answer: ClarificationRequestAnswer | null = null;
 
@@ -13,6 +14,7 @@ export default class ClarificationRequest {
       this.questionId = jsonObj.questionId;
       this.content = jsonObj.content;
       this.owner = jsonObj.owner;
+      this.creationDate = jsonObj.creationDate;
 
       if (jsonObj.answer) {
         this.answer = new ClarificationRequestAnswer(jsonObj.answer);

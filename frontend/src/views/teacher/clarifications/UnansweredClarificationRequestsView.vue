@@ -81,6 +81,11 @@ export default class UnansweredClarificationsView extends Vue {
   headers: object = [
     { text: 'Clarification Request', value: 'content', align: 'left' },
     {
+      text: 'Creation Date',
+      value: 'creationDate',
+      align: 'center'
+    },
+    {
       text: 'Actions',
       value: 'actions',
       align: 'center',
