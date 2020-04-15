@@ -110,11 +110,15 @@ public class ClarificationService {
             value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void deleteClarificationRequest(int reqId) {
+    public void deleteClarificationRequest(int userId, int reqId) {
+        User student = getStudent(userId);
         ClarificationRequest req = clarificationRequestRepository.findById(reqId)
                 .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, reqId));
 
-        entityManager.remove(req);
+        student.removeClarificationRequest(req.getId());
+        clarificationRequestRepository.deleteById(req.getId());
+
+
     }
 
     @Retryable(

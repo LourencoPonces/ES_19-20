@@ -40,7 +40,7 @@ public class ClarificationController {
             throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
         }
 
-        clarificationService.deleteClarificationRequest(requestId);
+        clarificationService.deleteClarificationRequest(user.getId(), requestId);
     }
 
     @PutMapping("/student/clarifications")
