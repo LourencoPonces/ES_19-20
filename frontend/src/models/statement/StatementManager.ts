@@ -44,11 +44,11 @@ export default class StatementManager {
     return this.statementQuiz == null;
   }
 
-  addClarificationRequest(index : number, request : ClarificationRequest) : void {
+  addClarificationRequest(index: number, request: ClarificationRequest): void {
     this.statementQuiz?.addClarificationRequest(index, request);
   }
 
-  getClarificationRequests(index : number) : ClarificationRequest[] | undefined {
+  getClarificationRequests(index: number): ClarificationRequest[] | undefined {
     return this.statementQuiz?.getClarificationRequests(index);
   }
 }

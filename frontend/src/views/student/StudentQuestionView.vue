@@ -41,7 +41,7 @@
       </template>
 
       <template v-slot:item.submittedStatus="{ item }">
-        <v-chip :color="getSubmittedStatusColor(item.submittedStatus)" small>
+        <v-chip :color="item.getEvaluationColor()" small>
           <span>{{ item.submittedStatus }}</span>
         </v-chip>
       </template>
@@ -171,8 +171,6 @@ export default class StudentQuestionView extends Vue {
   studentQuestionJustification: boolean = false;
   search: string = '';
 
-  submittedStatusList = ['WAITING_FOR_APPROVAL', 'ACCEPTED', 'REJECTED'];
-
   headers: object = [
     { text: 'Title', value: 'title', align: 'center' },
     { text: 'Question', value: 'content', align: 'left' },
@@ -230,7 +228,7 @@ export default class StudentQuestionView extends Vue {
     try {
       [this.topics, this.studentQuestions] = await Promise.all([
         RemoteServices.getTopics(),
-        RemoteServices.getStudentQuestions()
+        RemoteServices.getStudentQuestionStatuses()
       ]);
     } catch (error) {
       await this.$store.dispatch('error', error);
@@ -263,12 +261,7 @@ export default class StudentQuestionView extends Vue {
     this.editStudentQuestionDialog = false;
     this.currentStudentQuestion = null;
   }
-
-  getSubmittedStatusColor(submittedStatus: string) {
-    if (submittedStatus === 'REJECTED') return 'red';
-    else if (submittedStatus === 'WAITING_FOR_APPROVAL') return 'orange';
-    else return 'green';
-  }
+  
 
   onCloseShowStudentQuestionDialog() {
     this.studentQuestionDialog = false;

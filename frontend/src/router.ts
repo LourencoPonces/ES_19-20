@@ -9,6 +9,7 @@ import HomeView from '@/views/HomeView.vue';
 import ManagementView from '@/views/teacher/ManagementView.vue';
 import QuestionsView from '@/views/teacher/questions/QuestionsView.vue';
 import UnansweredClarificationRequestsView from './views/teacher/clarifications/UnansweredClarificationRequestsView.vue';
+import StudentQuestionsView from '@/views/teacher/questions/StudentQuestionView.vue';
 import TopicsView from '@/views/teacher/TopicsView.vue';
 import QuizzesView from '@/views/teacher/quizzes/QuizzesView.vue';
 import StudentsView from '@/views/teacher/students/StudentsView.vue';
@@ -80,6 +81,15 @@ let router = new Router({
           meta: {
             title:
               process.env.VUE_APP_NAME + ' - Unanswered Clarification Requests',
+            requiredAuth: 'Teacher'
+          }
+        },
+        {
+          path: 'student-questions',
+          name: 'student-questions-management',
+          component: StudentQuestionsView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - Student Questions',
             requiredAuth: 'Teacher'
           }
         },
@@ -208,7 +218,7 @@ let router = new Router({
           }
         },
         {
-          path: 'studentQuestions',
+          path: 'student-questions',
           name: 'student-questions',
           component: StudentQuestionView,
           meta: {
