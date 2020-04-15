@@ -107,6 +107,16 @@ export default class RemoteServices {
       });
   }
 
+  static async getQuestionById(id: number): Promise<Question> {
+    try {
+      const response = await httpClient.get(`/questions/${id}`);
+
+      return new Question(response.data);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
   static async exportCourseQuestions(): Promise<Blob> {
     return httpClient
       .get(

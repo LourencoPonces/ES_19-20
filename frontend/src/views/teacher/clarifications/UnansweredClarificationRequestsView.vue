@@ -45,12 +45,15 @@
         </v-card-title>
 
         <v-card-text width="100%">
-          <div>
+          <div v-if="answerDialog" class="answer-context">
+            <h2>Question:</h2>
+            <show-question :question="questionForRequestBeingAnswered" />
+
             <h2>Clarification Request:</h2>
             <span class="multiline">{{ requestBeingAnswered.content }}</span>
           </div>
 
-          <v-text-field v-model="answerInCreation.content" label="Answer" />
+          <v-textarea v-model="answerInCreation.content" label="Answer" />
         </v-card-text>
 
         <v-card-actions>
@@ -70,15 +73,19 @@ import { Component, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import ClarificationRequest from '@/models/clarification/ClarificationRequest';
 import ClarificationRequestAnswer from '@/models/clarification/ClarificationRequestAnswer';
+import ShowQuestion from '../questions/ShowQuestion.vue';
 import Question from '../../../models/management/Question';
 import User from '../../../models/user/User';
 
-@Component
+@Component({
+  components: { 'show-question': ShowQuestion }
+})
 export default class UnansweredClarificationsView extends Vue {
   clarifications: ClarificationRequest[] = [];
   expand: boolean = false;
   answerDialog: boolean = false;
   requestBeingAnswered: ClarificationRequest = new ClarificationRequest();
+  questionForRequestBeingAnswered: Question = new Question();
   answerInCreation: ClarificationRequestAnswer = new ClarificationRequestAnswer();
   questionCache: Record<number, Question> = {};
   userCache: Record<number, User> = {};
@@ -119,7 +126,16 @@ export default class UnansweredClarificationsView extends Vue {
     );
   }
 
-  openAnswerDialog(req: ClarificationRequest): void {
+  async openAnswerDialog(req: ClarificationRequest): Promise<void> {
+    try {
+      this.questionForRequestBeingAnswered = await RemoteServices.getQuestionById(
+        req.getQuestionId()
+      );
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+      return;
+    }
+
     this.answerInCreation = req.newAnswer();
     this.requestBeingAnswered = req;
     this.answerDialog = true;
