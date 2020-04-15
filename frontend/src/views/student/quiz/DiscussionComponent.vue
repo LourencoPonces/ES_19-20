@@ -44,8 +44,8 @@
           v-for="request in clarifications"
           :key="request.content"
         >
-          <v-expansion-panel-header data-cy="requestHeader">
-            {{ request.content }}
+          <v-expansion-panel-header>
+            <span data-cy="requestHeader">{{ request.content }}</span>
           </v-expansion-panel-header>
           <v-expansion-panel-content v-if="request.hasAnswer()">
             {{ request.answer }}

@@ -701,4 +701,18 @@ export default class RemoteServices {
         throw Error(await this.errorMessage(error));
       });
   }
+
+  static async getUnansweredClarificationRequests(): Promise<
+    ClarificationRequest[]
+  > {
+    try {
+      const response = await httpClient.get('/clarifications/unanswered/');
+
+      return response.data.map(
+        (req: ClarificationRequest) => new ClarificationRequest(req)
+      );
+    } catch (err) {
+      throw Error(await this.errorMessage(err));
+    }
+  }
 }
