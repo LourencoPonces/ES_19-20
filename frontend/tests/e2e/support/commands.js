@@ -31,15 +31,15 @@ Cypress.Commands.add('demoAdminLogin', () => {
   cy.contains('Manage Courses').click();
 });
 
-Cypress.Commands.add('demoTeacherLogin',  () => {
-  cy.visit('/')
-  cy.get('[data-cy="teacherButton"]').click()
-})
+Cypress.Commands.add('demoTeacherLogin', () => {
+  cy.visit('/');
+  cy.get('[data-cy="teacherButton"]').click();
+});
 
-Cypress.Commands.add('demoStudentLogin',  () => {
-  cy.visit('/')
-  cy.get('[data-cy="studentButton"]').click()
-})
+Cypress.Commands.add('demoStudentLogin', () => {
+  cy.visit('/');
+  cy.get('[data-cy="studentButton"]').click();
+});
 
 Cypress.Commands.add('logout', () => {
   // Work around VMenu bug
@@ -50,7 +50,7 @@ Cypress.Commands.add('logout', () => {
     }
 
     return false;
-  })
+  });
 
   cy.get('[data-cy="logout"]').click();
 });
@@ -97,39 +97,37 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add('generateAndAnswerQuiz', () => {
-  cy.get('[data-cy="quizzes"]').click()
-  cy.contains('Create').click()
-  cy.get('[data-cy="generate"]').click()
+  cy.get('[data-cy="quizzes"]').click();
+  cy.contains('Create').click();
+  cy.get('[data-cy="generate"]').click();
   cy.get('[data-cy="options"]')
-      .first()
-      .click()
+    .first()
+    .click();
   cy.get('[data-cy="options"]')
-      .first()
-      .click()
-  cy.get('[data-cy="nextQuestion"]').click()
+    .first()
+    .click();
+  cy.get('[data-cy="nextQuestion"]').click();
   cy.get('[data-cy="options"]')
-      .first()
-      .click()
-  cy.get('[data-cy="nextQuestion"]').click()
+    .first()
+    .click();
+  cy.get('[data-cy="nextQuestion"]').click();
   cy.get('[data-cy="options"]')
-      .first()
-      .click()
-  cy.get('[data-cy="endQuiz"]').click()
-  cy.get('[data-cy="sure"]').click()
-})
+    .first()
+    .click();
+  cy.get('[data-cy="endQuiz"]').click();
+  cy.get('[data-cy="sure"]').click();
+});
 
 Cypress.Commands.add('submitClarificationRequest', (content, n) => {
   if (n > 0) {
-      for (i = 0; i < n; i++) {
-          cy.get('[data-cy="newRequest"]').click()
-          cy.get('[data-cy="inputRequest"]').type(content)
-          cy.contains('Submit').click()
-          let requests = cy.get('[data-cy="questionRequests"]')
-                            .children()
-          requests.should('have.length', 1)
-          requests.first()
-                  .should('have.text', content)
-          cy.get('[data-cy="nextQuestion"]').click()
-      }
+    for (i = 0; i < n; i++) {
+      cy.get('[data-cy="newRequest"]').click();
+      cy.get('[data-cy="inputRequest"]').type(content);
+      cy.contains('Submit').click();
+      let requests = cy.get('[data-cy="questionRequests"]').children();
+      requests.should('have.length', 1);
+      requests.first().should('have.text', content);
+      cy.get('[data-cy="nextQuestion"]').click();
+    }
   }
-})
+});
