@@ -148,6 +148,16 @@ Cypress.Commands.add(
   }
 );
 
+Cypress.Commands.add('deleteClarificationRequestAnswer', requestText => {
+  cy.get('[data-cy="management"]').click();
+  cy.get('[data-cy="teacherClarifications"]').click();
+  cy.get(
+    `[data-cy^="answerClarification-${requestText.slice(0, 15)}"]`
+  ).click();
+
+  cy.get('[data-cy="answerDelete"]').click();
+})
+
 Cypress.Commands.add(
   'createStudentQuestion',
   (title, content, topics, options, correctOption) => {
