@@ -20,24 +20,20 @@ describe('Teacher Clarification Requests', () => {
     cy.logout();
   });
 
-  it('can see unanswered clarification requests', () => {
+  it('can see clarification requests', () => {
     cy.get('[data-cy="management"]').click();
-    cy.get('[data-cy="teacherUnansweredClarifications"]').click();
+    cy.get('[data-cy="teacherClarifications"]').click();
     cy.contains(TEST_REQ_1);
     cy.contains(TEST_REQ_2);
   });
 
   it('can answer requests', () => {
     cy.get('[data-cy="management"]').click();
-    cy.get('[data-cy="teacherUnansweredClarifications"]').click();
+    cy.get('[data-cy="teacherClarifications"]').click();
     cy.contains(TEST_REQ_1);
     cy.contains(TEST_REQ_2);
     cy.contains(TEST_REQ_3);
 
     cy.answerClarificationRequest(TEST_REQ_3, '10/10 best request ever');
-
-    cy.contains(TEST_REQ_1);
-    cy.contains(TEST_REQ_2);
-    cy.contains(TEST_REQ_3).should('not.exist');
   });
 });

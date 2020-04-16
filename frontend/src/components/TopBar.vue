@@ -62,8 +62,8 @@
               </v-list-item-content>
             </v-list-item>
             <v-list-item
-              to="/management/clarifications/unanswered"
-              data-cy="teacherUnansweredClarifications"
+              to="/management/clarifications"
+              data-cy="teacherClarifications"
             >
               <v-list-item-action>
                 <v-icon>fas fa-question</v-icon>
@@ -279,7 +279,7 @@
               <v-list-item-title>Questions</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
-          <v-list-item to="/management/clarifications/unanswered">
+          <v-list-item to="/management/clarifications">
             <v-list-item-action>
               <v-icon>fas fa-question</v-icon>
             </v-list-item-action>

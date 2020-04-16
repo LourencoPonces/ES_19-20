@@ -5,6 +5,7 @@
       :custom-filter="customFilter"
       :items="clarifications"
       :search="search"
+      group-by="hasAnswer"
       :mobile-breakpoint="0"
       :items-per-page="50"
       :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
@@ -22,6 +23,15 @@
       </template>
       <template v-slot:item.content="{ item }">
         <span style="white-space: pre;">{{ item.content }}</span>
+      </template>
+      <template v-slot:item.hasAnswer="{ item }">
+        <v-checkbox
+          :value="item.hasAnswer"
+          readonly
+          ripple="false"
+          :aria-label="item.hasAnswer"
+          aria-disabled
+        />
       </template>
       <template v-slot:item.actions="{ item }">
         <v-tooltip bottom>
@@ -54,13 +64,27 @@
             <span class="multiline">{{ requestBeingAnswered.content }}</span>
           </div>
 
-          <v-textarea v-model="answerInCreation.content" label="Answer" data-cy="answerField" />
+          <v-textarea
+            v-model="answerInCreation.content"
+            label="Answer"
+            data-cy="answerField"
+          />
         </v-card-text>
 
         <v-card-actions>
           <v-spacer />
           <v-btn color="blue darken-1" @click="closeDialogue">Cancel</v-btn>
-          <v-btn color="blue darken-1" @click="submitAnswer" data-cy="answerSubmit"
+          <v-btn
+            color="red darken-1"
+            @click="deleteAnswer"
+            v-if="!isNewAnswer"
+            data-cy="answerDelete"
+            >Delete Answer</v-btn
+          >
+          <v-btn
+            color="blue darken-1"
+            @click="submitAnswer"
+            data-cy="answerSubmit"
             >Submit Answer</v-btn
           >
         </v-card-actions>
@@ -81,18 +105,24 @@ import User from '../../../models/user/User';
 @Component({
   components: { 'show-question': ShowQuestion }
 })
-export default class UnansweredClarificationsView extends Vue {
+export default class ClarificationRequestsView extends Vue {
   clarifications: ClarificationRequest[] = [];
   expand: boolean = false;
   answerDialog: boolean = false;
   requestBeingAnswered: ClarificationRequest = new ClarificationRequest();
   questionForRequestBeingAnswered: Question = new Question();
   answerInCreation: ClarificationRequestAnswer = new ClarificationRequestAnswer();
+  isNewAnswer: boolean = false;
   questionCache: Record<number, Question> = {};
   userCache: Record<number, User> = {};
   search: string = '';
   headers: object = [
     { text: 'Clarification Request', value: 'content', align: 'left' },
+    {
+      text: 'Answered',
+      value: 'hasAnswer',
+      align: 'center'
+    },
     {
       text: 'Creation Date',
       value: 'creationDate',
@@ -110,7 +140,7 @@ export default class UnansweredClarificationsView extends Vue {
   async created(): Promise<void> {
     await this.$store.dispatch('loading');
     try {
-      this.clarifications = await RemoteServices.getUnansweredClarificationRequests();
+      this.clarifications = await RemoteServices.getClarificationRequests();
     } catch (error) {
       await this.$store.dispatch('error', error);
     } finally {
@@ -137,7 +167,13 @@ export default class UnansweredClarificationsView extends Vue {
       return;
     }
 
-    this.answerInCreation = req.newAnswer();
+    if (req.hasAnswer) {
+      this.answerInCreation = req.getAnswer();
+      this.isNewAnswer = false;
+    } else {
+      this.answerInCreation = req.newAnswer();
+      this.isNewAnswer = true;
+    }
     this.requestBeingAnswered = req;
     this.answerDialog = true;
   }
@@ -152,12 +188,33 @@ export default class UnansweredClarificationsView extends Vue {
 
     await this.$store.dispatch('loading');
     try {
-      await RemoteServices.submitClarificationRequestAnswer(answerInCreation);
-
-      // remove answered request
-      this.clarifications = this.clarifications.filter(
-        c => c != this.requestBeingAnswered
+      // publish answer
+      const ans = await RemoteServices.submitClarificationRequestAnswer(
+        answerInCreation
       );
+
+      // save change locally
+      this.requestBeingAnswered.setAnswer(ans);
+
+      this.closeDialogue();
+    } catch (err) {
+      await this.$store.dispatch('error', err);
+    } finally {
+      await this.$store.dispatch('clearLoading');
+    }
+  }
+
+  async deleteAnswer(): Promise<void> {
+    const answerInCreation = this
+      .answerInCreation as ClarificationRequestAnswer;
+
+    await this.$store.dispatch('loading');
+    try {
+      // publish answer
+      await RemoteServices.deleteClarificationRequestAnswer(answerInCreation);
+
+      // save change locally
+      this.requestBeingAnswered.setAnswer(null);
 
       this.closeDialogue();
     } catch (err) {
