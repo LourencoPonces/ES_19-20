@@ -4,6 +4,7 @@
 
     <v-data-table
             :headers="headers"
+            :custom-filter="customFilter"
             :items="availableTournaments"
             :search="search"
             multi-sort
@@ -26,23 +27,35 @@
         </v-card-title>
       </template>
 
-    </v-data-table>
+      <template v-slot:item.topics="{ item }">
+        <v-chip-group>
+          <v-chip v-for="topic in item.topics" :key="topic.name">
+            {{ topic.name }}
+          </v-chip>
+        </v-chip-group>
+      </template>
 
+
+      <template v-slot:item.creator="{ item }">
+             <span>{{item.creator.username}}</span>
+      </template>
+    </v-data-table>
 
   </v-card>
 </template>
 
 <script lang="ts">
-  import { Component, Vue, Prop } from 'vue-property-decorator';
-  import Tournament from "@/models/management/Tournament";
-  import Topic from '@/models/management/Topic';
+  import { Component, Vue} from 'vue-property-decorator';
+  import Tournament from '@/models/management/Tournament';
+  import RemoteServices from '@/services/RemoteServices';
 
   @Component({
   })
 
   export default class AvailableTournamentsView extends Vue {
-    availableTournaments: Tournament[];
+    availableTournaments: Tournament[] = [];
     search: string = '';
+
     headers: object = [
       { text: 'Title',
         value: 'title',
@@ -50,48 +63,60 @@
         width: '20%'
       },
       {
-        text: 'Topic',
-        value: '',
+        text: 'Topics',
+        value: 'topics',
         align: 'center',
-        width: '20%'
+        width: '20%',
+        sortable: false
       },
       {
         text: 'Nº of Questions',
-        value: '',
+        value: 'numberOfQuestions',
         align: 'center',
         width: '10%'
       },
       {
         text: 'Available Date',
-        value: '',
+        value: 'availableDate',
+        align: 'center',
+        width: '10%'
+      },
+      {
+        text: 'Running Date',
+        value: 'runningDate',
         align: 'center',
         width: '10%'
       },
       {
         text: 'Conclusion Date',
-        value: '',
-        align: 'center',
-        width: '10%'
-      },
-      {
-        text: 'Status',
-        value: '',
+        value: 'conclusionDate',
         align: 'center',
         width: '10%'
       },
       {
         text: 'Creator',
-        value: '',
+        value: 'creator',
         align: 'center',
-        width: '10%'
-      },
-      {
-        text: 'Actions',
-        value: '',
-        align: 'center',
-        width: '10%'
+        width: '10%',
+        sortable: false
       },
     ];
+
+    async created() {
+      await this.$store.dispatch('loading');
+      try {
+        this.availableTournaments = await RemoteServices.getAvailableTournaments();
+      } catch (error) {
+        await this.$store.dispatch('error', error);
+      }
+      await this.$store.dispatch('clearLoading');
+    }
+
+    customFilter(
+    ) {
+
+    }
+
   }
 </script>
 

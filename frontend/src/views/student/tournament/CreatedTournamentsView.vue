@@ -25,7 +25,14 @@
                     />
 
                     <v-spacer />
-                    <v-btn color="primary" dark @click="$emit('')">New Tournament</v-btn>
+                    <v-btn color="primary" dark @click="newTournament">New Tournament</v-btn>
+                    <edit-tournament-dialog
+                            v-if="currentTournament"
+                            v-model="editTournamentDialog"
+                            :tournament="currentTournament"
+                            :topics="topics"
+                            @saveTournament="createdTournament"
+                    />
                 </v-card-title>
             </template>
 
@@ -35,7 +42,7 @@
 </template>
 
 <script lang="ts">
-    import { Component, Vue, Prop } from 'vue-property-decorator';
+    import { Component, Vue, Watch } from 'vue-property-decorator';
     import Tournament from "@/models/management/Tournament";
     import RemoteServices from '@/services/RemoteServices';
     import Topic from '@/models/management/Topic';
@@ -52,12 +59,46 @@
         editTournamentDialog: boolean = false;
         topics!: Topic[];
 
+        headers: object = [
+            { text: 'Title',
+                value: 'title',
+                align: 'center',
+                width: '20%'
+            },
+            {
+                text: 'Topics',
+                value: 'topics',
+                align: 'center',
+                width: '20%',
+                sortable: false
+            },
+            {
+                text: 'Nº of Questions',
+                value: 'numberOfQuestions',
+                align: 'center',
+                width: '10%'
+            },
+            {
+                text: 'Status',
+                value: 'status',
+                align: 'center',
+                width: '10%',
+            },
+            {
+                text: 'Actions',
+                value: 'actions',
+                align: 'center',
+                width: '10%',
+                sortable: false
+            },
+        ];
+
         newTournament() {
             this.currentTournament = new Tournament();
             this.editTournamentDialog = true;
         }
 
-        //@Watch('editTournamentDialog')
+        @Watch('editTournamentDialog')
         closeError() {
             if (!this.editTournamentDialog) {
                 this.currentTournament = null;
