@@ -35,11 +35,15 @@
         </v-chip-group>
       </template>
 
-      <template v-slot:item.submittedStatus="{ item }">
+      <template
+        v-slot:item.submittedStatus="{ item }"
+        data-cy="submitted-status"
+      >
         <v-chip
           :color="item.getEvaluationColor()"
           small
           @click="showEvaluateStudentQuestionDialog(item)"
+          data-cy="evaluate"
         >
           <span>{{ item.submittedStatus }}</span>
         </v-chip>

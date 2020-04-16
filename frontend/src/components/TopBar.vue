@@ -47,7 +47,7 @@
 
         <v-menu offset-y v-if="isTeacher && currentCourse" open-on-hover>
           <template v-slot:activator="{ on }">
-            <v-btn v-on="on" text dark>
+            <v-btn data-cy="management" v-on="on" text dark>
               Management
               <v-icon>fas fa-file-alt</v-icon>
             </v-btn>
@@ -67,7 +67,9 @@
                 <v-icon>question_answer</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>Student Questions</v-list-item-title>
+                <v-list-item-title data-cy="student-questions"
+                  >Student Questions</v-list-item-title
+                >
               </v-list-item-content>
             </v-list-item>
 

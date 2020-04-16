@@ -36,6 +36,11 @@ Cypress.Commands.add('demoStudentLogin', () => {
   cy.get('[data-cy="studentButton"]').click();
 });
 
+Cypress.Commands.add('demoTeacherLogin', () => {
+  cy.visit('/');
+  cy.get('[data-cy="teacherButton"]').click();
+});
+
 Cypress.Commands.add('createCourseExecution', (name, acronym, academicTerm) => {
   cy.get('[data-cy="createButton"]').click();
   cy.get('[data-cy="Name"]').type(name);
@@ -155,6 +160,35 @@ Cypress.Commands.add(
   }
 );
 
+Cypress.Commands.add(
+  'evaluateStudentQuestion',
+  (title, status, justification) => {
+    // select evaluate question
+    cy.contains(title)
+      .parent()
+      .contains('Waiting for Approval')
+      .click();
+
+    // select drop down
+    cy.get('.layout')
+      .contains('Waiting for Approval')
+      .click();
+
+    // select evaluation status
+    cy.get('.v-list-item__content')
+      .contains(status)
+      .click();
+
+    if (justification != null) {
+    }
+
+    // select evaluate button
+    cy.get('button')
+      .contains('Evaluate')
+      .click();
+  }
+);
+
 Cypress.Commands.add('errorMessageClose', message => {
   cy.contains(message)
     .parent()
@@ -217,7 +251,7 @@ Cypress.Commands.add(
 
     cy.errorMessageClose(
       // eslint-disable-next-line prettier/prettier
-      'Error: The question doesn\'t have any correct options'
+      "Error: The question doesn't have any correct options"
     );
 
     cy.get('[data-cy="CancelStudentQuestion"]').click();
