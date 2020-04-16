@@ -141,8 +141,7 @@ export default class EditTournamentDialog extends Vue {
         !this.editTournament.availableDate ||
         !this.editTournament.runningDate ||
         !this.editTournament.conclusionDate ||
-        !this.editTournament.numberOfQuestions ||
-        !this.editTournament.topics)
+        !this.editTournament.numberOfQuestions)
     ) {
       await this.$store.dispatch('error', 'Missing fields in tournament!');
       return;

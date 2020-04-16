@@ -1,5 +1,4 @@
 <template>
-  <!-- Remove -->
   <v-card class="table">
     <v-btn color="primary" dark @click="newTournament">New Tournament</v-btn>
     <edit-tournament-dialog
