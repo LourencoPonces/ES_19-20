@@ -5,7 +5,6 @@
       :custom-filter="customFilter"
       :items="clarifications"
       :search="search"
-      group-by="hasAnswer"
       :mobile-breakpoint="0"
       :items-per-page="50"
       :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
@@ -25,12 +24,10 @@
         <span style="white-space: pre;">{{ item.content }}</span>
       </template>
       <template v-slot:item.hasAnswer="{ item }">
-        <v-checkbox
+        <v-simple-checkbox
           :value="item.hasAnswer"
           readonly
-          ripple="false"
           :aria-label="item.hasAnswer"
-          aria-disabled
         />
       </template>
       <template v-slot:item.actions="{ item }">
@@ -45,7 +42,7 @@
               <v-icon small class="mr-2">forum</v-icon>
             </v-btn>
           </template>
-          <span>Answer Request</span>
+          <span>Manage Answer</span>
         </v-tooltip>
       </template>
     </v-data-table>
@@ -73,19 +70,28 @@
 
         <v-card-actions>
           <v-spacer />
-          <v-btn color="blue darken-1" @click="closeDialogue">Cancel</v-btn>
+          <v-btn @click="closeDialogue">Cancel</v-btn>
           <v-btn
-            color="red darken-1"
+            color="red"
             @click="deleteAnswer"
             v-if="!isNewAnswer"
             data-cy="answerDelete"
             >Delete Answer</v-btn
           >
+
           <v-btn
             color="blue darken-1"
             @click="submitAnswer"
+            v-if="isNewAnswer"
             data-cy="answerSubmit"
             >Submit Answer</v-btn
+          >
+          <v-btn
+            color="blue darken-1"
+            @click="submitAnswer"
+            v-else
+            data-cy="answerSubmit"
+            >Update Answer</v-btn
           >
         </v-card-actions>
       </v-card>
@@ -121,12 +127,13 @@ export default class ClarificationRequestsView extends Vue {
     {
       text: 'Answered',
       value: 'hasAnswer',
-      align: 'center'
+      width: '33px'
     },
     {
       text: 'Creation Date',
       value: 'creationDate',
-      align: 'center'
+      align: 'center',
+      width: '150px'
     },
     {
       text: 'Actions',
