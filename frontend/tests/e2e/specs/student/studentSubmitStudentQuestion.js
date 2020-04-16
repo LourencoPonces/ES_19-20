@@ -24,7 +24,7 @@ describe('Student Question Submission', () => {
   });
 
   afterEach(() => {
-    cy.contains('Logout').click();
+    cy.logout();
   });
 
   // Test 1
