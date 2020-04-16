@@ -1,27 +1,43 @@
 describe('Teacher Clarification Requests', () => {
-  const TEST_REQ_1 = 'TEST_REQ_1'
-  const TEST_REQ_2 = 'TEST_REQ_2'
+  const TEST_REQ_1 = 'TEST_REQ_1';
+  const TEST_REQ_2 = 'TEST_REQ_2';
+  const TEST_REQ_3 = 'TEST_REQ_3';
 
   before(() => {
-    cy.demoStudentLogin()
-    cy.generateAndAnswerQuiz()
-    cy.submitClarificationRequest(TEST_REQ_1, 1)
-    cy.submitClarificationRequest(TEST_REQ_2, 1)
-    // cy.contains('Logout').click() // afterEach runs after before, and does so before any test.
-  })
+    cy.demoStudentLogin();
+    cy.generateAndAnswerQuiz();
+    cy.submitClarificationRequest(TEST_REQ_1, 1);
+    cy.submitClarificationRequest(TEST_REQ_2, 1);
+    cy.submitClarificationRequest(TEST_REQ_3, 1);
+    cy.logout();
+  });
 
   beforeEach(() => {
-    cy.demoTeacherLogin()
-  })
+    cy.demoTeacherLogin();
+  });
 
   afterEach(() => {
-    cy.contains('Logout').click()
-  })
+    cy.logout();
+  });
 
   it('can see unanswered clarification requests', () => {
-    cy.get('[data-cy="management"]').click()
-    cy.get('[data-cy="teacherUnansweredClarifications"]').click()
-    cy.contains(TEST_REQ_1)
-    cy.contains(TEST_REQ_2)
+    cy.get('[data-cy="management"]').click();
+    cy.get('[data-cy="teacherUnansweredClarifications"]').click();
+    cy.contains(TEST_REQ_1);
+    cy.contains(TEST_REQ_2);
+  });
+
+  it('can answer requests', () => {
+    cy.get('[data-cy="management"]').click();
+    cy.get('[data-cy="teacherUnansweredClarifications"]').click();
+    cy.contains(TEST_REQ_1);
+    cy.contains(TEST_REQ_2);
+    cy.contains(TEST_REQ_3);
+
+    cy.answerClarificationRequest(TEST_REQ_3, '10/10 best request ever');
+
+    cy.contains(TEST_REQ_1);
+    cy.contains(TEST_REQ_2);
+    cy.contains(TEST_REQ_3).should('not.exist');
   });
 });

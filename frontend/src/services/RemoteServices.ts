@@ -15,6 +15,7 @@ import StatementAnswer from '@/models/statement/StatementAnswer';
 import { QuizAnswers } from '@/models/management/QuizAnswers';
 import StudentQuestion from '@/models/management/StudentQuestion';
 import ClarificationRequest from '@/models/clarification/ClarificationRequest';
+import ClarificationRequestAnswer from '@/models/clarification/ClarificationRequestAnswer';
 
 const httpClient = axios.create();
 httpClient.defaults.timeout = 10000;
@@ -104,6 +105,16 @@ export default class RemoteServices {
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
+  }
+
+  static async getQuestionById(id: number): Promise<Question> {
+    try {
+      const response = await httpClient.get(`/questions/${id}`);
+
+      return new Question(response.data);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
   }
 
   static async exportCourseQuestions(): Promise<Blob> {
@@ -711,6 +722,26 @@ export default class RemoteServices {
       return response.data.map(
         (req: ClarificationRequest) => new ClarificationRequest(req)
       );
+    } catch (err) {
+      throw Error(await this.errorMessage(err));
+    }
+  }
+
+  static async submitClarificationRequestAnswer(
+    ans: ClarificationRequestAnswer
+  ): Promise<ClarificationRequestAnswer> {
+    if (ans.getContent().trim() == '') {
+      // eslint-disable-next-line
+      throw Error('Answer can\'t be empty');
+    }
+
+    try {
+      const response = await httpClient.put(
+        `/clarifications/${ans.getRequestId()}/answer`,
+        ans.getContent()
+      );
+
+      return new ClarificationRequestAnswer(response.data);
     } catch (err) {
       throw Error(await this.errorMessage(err));
     }

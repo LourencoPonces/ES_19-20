@@ -87,4 +87,12 @@ public class ClarificationRequestDto {
         }
         return LocalDateTime.parse(getCreationDate(), formatter);
     }
+
+    public void setAnswer(ClarificationRequestAnswerDto answer) {
+        this.answer = answer;
+    }
+
+    public ClarificationRequestAnswerDto getAnswer() {
+        return answer;
+    }
 }

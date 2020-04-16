@@ -26,7 +26,12 @@
       <template v-slot:item.actions="{ item }">
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
-            <v-btn v-on="on" text @click="openAnswerDialog(item)">
+            <v-btn
+              v-on="on"
+              text
+              @click="openAnswerDialog(item)"
+              :data-cy="'answerClarification-' + item.content.slice(0, 15)"
+            >
               <v-icon small class="mr-2">forum</v-icon>
             </v-btn>
           </template>
@@ -40,23 +45,22 @@
           <span class="headline">Answer Question</span>
         </v-card-title>
 
-        <v-card-text v-if="editedTopic">
-          <v-container grid-list-md fluid>
-            <v-layout column wrap>
-              <v-flex xs24 sm12 md8>
-                <v-text-field
-                  v-model="answerInCreation.content"
-                  label="Answer"
-                />
-              </v-flex>
-            </v-layout>
-          </v-container>
+        <v-card-text width="100%">
+          <div v-if="answerDialog" class="answer-context">
+            <h2>Question:</h2>
+            <show-question :question="questionForRequestBeingAnswered" />
+
+            <h2>Clarification Request:</h2>
+            <span class="multiline">{{ requestBeingAnswered.content }}</span>
+          </div>
+
+          <v-textarea v-model="answerInCreation.content" label="Answer" data-cy="answerField" />
         </v-card-text>
 
         <v-card-actions>
           <v-spacer />
           <v-btn color="blue darken-1" @click="closeDialogue">Cancel</v-btn>
-          <v-btn color="blue darken-1" @click="submitAnswer"
+          <v-btn color="blue darken-1" @click="submitAnswer" data-cy="answerSubmit"
             >Submit Answer</v-btn
           >
         </v-card-actions>
@@ -70,16 +74,20 @@ import { Component, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import ClarificationRequest from '@/models/clarification/ClarificationRequest';
 import ClarificationRequestAnswer from '@/models/clarification/ClarificationRequestAnswer';
+import ShowQuestion from '../questions/ShowQuestion.vue';
 import Question from '../../../models/management/Question';
 import User from '../../../models/user/User';
 
-@Component
+@Component({
+  components: { 'show-question': ShowQuestion }
+})
 export default class UnansweredClarificationsView extends Vue {
   clarifications: ClarificationRequest[] = [];
   expand: boolean = false;
   answerDialog: boolean = false;
-  requestBeingAnswered: ClarificationRequest | undefined = undefined;
-  answerInCreation: ClarificationRequestAnswer | undefined = undefined;
+  requestBeingAnswered: ClarificationRequest = new ClarificationRequest();
+  questionForRequestBeingAnswered: Question = new Question();
+  answerInCreation: ClarificationRequestAnswer = new ClarificationRequestAnswer();
   questionCache: Record<number, Question> = {};
   userCache: Record<number, User> = {};
   search: string = '';
@@ -105,8 +113,9 @@ export default class UnansweredClarificationsView extends Vue {
       this.clarifications = await RemoteServices.getUnansweredClarificationRequests();
     } catch (error) {
       await this.$store.dispatch('error', error);
+    } finally {
+      await this.$store.dispatch('clearLoading');
     }
-    await this.$store.dispatch('clearLoading');
   }
 
   customFilter(value: string, search: string): boolean {
@@ -118,7 +127,16 @@ export default class UnansweredClarificationsView extends Vue {
     );
   }
 
-  openAnswerDialog(req: ClarificationRequest): void {
+  async openAnswerDialog(req: ClarificationRequest): Promise<void> {
+    try {
+      this.questionForRequestBeingAnswered = await RemoteServices.getQuestionById(
+        req.getQuestionId()
+      );
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+      return;
+    }
+
     this.answerInCreation = req.newAnswer();
     this.requestBeingAnswered = req;
     this.answerDialog = true;
@@ -126,12 +144,39 @@ export default class UnansweredClarificationsView extends Vue {
 
   closeDialogue(): void {
     this.answerDialog = false;
-    this.answerInCreation = undefined;
-    this.requestBeingAnswered = undefined;
   }
 
-  async submitAnswer(): Promise<void> {}
+  async submitAnswer(): Promise<void> {
+    const answerInCreation = this
+      .answerInCreation as ClarificationRequestAnswer;
+
+    await this.$store.dispatch('loading');
+    try {
+      await RemoteServices.submitClarificationRequestAnswer(answerInCreation);
+
+      // remove answered request
+      this.clarifications = this.clarifications.filter(
+        c => c != this.requestBeingAnswered
+      );
+
+      this.closeDialogue();
+    } catch (err) {
+      await this.$store.dispatch('error', err);
+    } finally {
+      await this.$store.dispatch('clearLoading');
+    }
+  }
 }
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+.answer-context {
+  text-align: left;
+  margin-bottom: 20px;
+
+  h2 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+}
+</style>
