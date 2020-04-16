@@ -8,13 +8,7 @@
   >
     <v-card>
       <v-card-title>
-        <span class="headline">
-          {{
-            editTournament && editTournament.id === null
-              ? 'New Tournament'
-              : 'Edit Tournament'
-          }}
-        </span>
+        <span class="headline">New Tournament</span>
       </v-card-title>
       <v-card-text>
         <v-row>
