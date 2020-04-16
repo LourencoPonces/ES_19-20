@@ -44,7 +44,7 @@
               request.content
             }}</span>
           </v-expansion-panel-header>
-          <v-expansion-panel-content v-if="request.hasAnswer()">
+          <v-expansion-panel-content v-if="request.hasAnswer">
             <span class="multiline">{{ request.answer }}</span>
           </v-expansion-panel-content>
           <v-expansion-panel-content v-else>
