@@ -16,6 +16,7 @@ import StatementAnswer from '@/models/statement/StatementAnswer';
 import { QuizAnswers } from '@/models/management/QuizAnswers';
 import StudentQuestion from '@/models/management/StudentQuestion';
 import ClarificationRequest from '@/models/clarification/ClarificationRequest';
+import ClarificationRequestAnswer from '@/models/clarification/ClarificationRequestAnswer';
 
 const httpClient = axios.create();
 httpClient.defaults.timeout = 10000;
@@ -105,6 +106,16 @@ export default class RemoteServices {
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
+  }
+
+  static async getQuestionById(id: number): Promise<Question> {
+    try {
+      const response = await httpClient.get(`/questions/${id}`);
+
+      return new Question(response.data);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
   }
 
   static async exportCourseQuestions(): Promise<Blob> {
@@ -223,7 +234,7 @@ export default class RemoteServices {
    * Student Questions
    */
 
-  static async getStudentQuestions(): Promise<StudentQuestion[]> {
+  static async getStudentQuestionStatuses(): Promise<StudentQuestion[]> {
     return httpClient
       .get(
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/checkStatus`
@@ -238,13 +249,45 @@ export default class RemoteServices {
       });
   }
 
+  static async evaluateStudentQuestion(
+    questionId: number,
+    status: string,
+    justification: String
+  ): Promise<StudentQuestion> {
+    try {
+      const response = await httpClient.post(
+        `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${questionId}/evaluate`,
+        {
+          evaluation: StudentQuestion.getServerStatusFormat(status),
+          justification: justification
+        }
+      );
+      return new StudentQuestion(response.data);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
+  static async getSubmittedStudentQuestions(): Promise<StudentQuestion[]> {
+    try {
+      const response = await httpClient.get(
+        `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions`
+      );
+      return response.data.map((studentQuestion: any) => {
+        return new StudentQuestion(studentQuestion);
+      });
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
   static async createStudentQuestion(
     studentQuestion: StudentQuestion
   ): Promise<StudentQuestion> {
     return httpClient
       .post(
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions`,
-        studentQuestion
+        StudentQuestion.toRequest(studentQuestion)
       )
       .then(response => {
         return new StudentQuestion(response.data);
@@ -260,7 +303,7 @@ export default class RemoteServices {
     return httpClient
       .put(
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${studentQuestion.id}`,
-        studentQuestion
+        StudentQuestion.toRequest(studentQuestion)
       )
       .then(response => {
         return new StudentQuestion(response.data);
@@ -655,17 +698,54 @@ export default class RemoteServices {
     }
   }
 
-  static async submitClarificationRequest(clarificationRequest : ClarificationRequest) : Promise<ClarificationRequest> {
+  static async submitClarificationRequest(
+    clarificationRequest: ClarificationRequest
+  ): Promise<ClarificationRequest> {
     return httpClient
-    .post(`/student/results/questions/${clarificationRequest.getQuestionId()}/clarifications`,
-    clarificationRequest
-    )
-    .then(response => {
-      return new ClarificationRequest(response.data);
-    })
-    .catch(async error => {
-      throw Error(await this.errorMessage(error));
-    });
+      .post(
+        `/student/results/questions/${clarificationRequest.getQuestionId()}/clarifications`,
+        clarificationRequest
+      )
+      .then(response => {
+        return new ClarificationRequest(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async getUnansweredClarificationRequests(): Promise<
+    ClarificationRequest[]
+  > {
+    try {
+      const response = await httpClient.get('/clarifications/unanswered/');
+
+      return response.data.map(
+        (req: ClarificationRequest) => new ClarificationRequest(req)
+      );
+    } catch (err) {
+      throw Error(await this.errorMessage(err));
+    }
+  }
+
+  static async submitClarificationRequestAnswer(
+    ans: ClarificationRequestAnswer
+  ): Promise<ClarificationRequestAnswer> {
+    if (ans.getContent().trim() == '') {
+      // eslint-disable-next-line
+      throw Error('Answer can\'t be empty');
+    }
+
+    try {
+      const response = await httpClient.put(
+        `/clarifications/${ans.getRequestId()}/answer`,
+        ans.getContent()
+      );
+
+      return new ClarificationRequestAnswer(response.data);
+    } catch (err) {
+      throw Error(await this.errorMessage(err));
+    }
   }
 
   static async getStudentClarificationRequests() : Promise<ClarificationRequest[]> {

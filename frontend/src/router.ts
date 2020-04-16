@@ -8,6 +8,8 @@ import CourseSelectionView from '@/views/CourseSelectionView.vue';
 import HomeView from '@/views/HomeView.vue';
 import ManagementView from '@/views/teacher/ManagementView.vue';
 import QuestionsView from '@/views/teacher/questions/QuestionsView.vue';
+import UnansweredClarificationRequestsView from './views/teacher/clarifications/UnansweredClarificationRequestsView.vue';
+import StudentQuestionsView from '@/views/teacher/questions/StudentQuestionView.vue';
 import TopicsView from '@/views/teacher/TopicsView.vue';
 import QuizzesView from '@/views/teacher/quizzes/QuizzesView.vue';
 import StudentsView from '@/views/teacher/students/StudentsView.vue';
@@ -18,7 +20,7 @@ import QuizView from './views/student/quiz/QuizView.vue';
 import ResultsView from './views/student/quiz/ResultsView.vue';
 import StatsView from './views/student/StatsView.vue';
 import ScanView from './views/student/ScanView.vue';
-import ClarificationsView from './views/student/ClarificationsView.vue';
+import ClarificationsStudentView from './views/student/ClarificationsView.vue';
 import StudentQuestionView from './views/student/StudentQuestionView.vue';
 
 import AdminManagementView from '@/views/admin/AdminManagementView.vue';
@@ -69,6 +71,25 @@ let router = new Router({
           component: QuestionsView,
           meta: {
             title: process.env.VUE_APP_NAME + ' - Questions',
+            requiredAuth: 'Teacher'
+          }
+        },
+        {
+          path: 'clarifications/unanswered',
+          name: 'clarifications-management',
+          component: UnansweredClarificationRequestsView,
+          meta: {
+            title:
+              process.env.VUE_APP_NAME + ' - Unanswered Clarification Requests',
+            requiredAuth: 'Teacher'
+          }
+        },
+        {
+          path: 'student-questions',
+          name: 'student-questions-management',
+          component: StudentQuestionsView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - Student Questions',
             requiredAuth: 'Teacher'
           }
         },
@@ -190,14 +211,14 @@ let router = new Router({
         {
           path: 'clarifications',
           name: 'clarification-requests',
-          component: ClarificationsView,
+          component: ClarificationsStudentView,
           meta: {
             title: process.env.VUE_APP_NAME + ' - Clarification Requests',
             requiredAuth: 'Student'
           }
         },
         {
-          path: 'studentQuestions',
+          path: 'student-questions',
           name: 'student-questions',
           component: StudentQuestionView,
           meta: {

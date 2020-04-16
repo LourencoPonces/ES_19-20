@@ -4,8 +4,12 @@ export default class ClarificationRequest {
   id!: number;
   questionId!: number;
   owner!: number;
-  content!: string;
   creationDate!: string;
+  content!: string;
+<<<<<<< HEAD
+  creationDate!: string;
+=======
+>>>>>>> DdP
   answer: ClarificationRequestAnswer | null = null;
 
   constructor(jsonObj?: ClarificationRequest) {
@@ -16,10 +20,10 @@ export default class ClarificationRequest {
       this.owner = jsonObj.owner;
       this.creationDate = jsonObj.creationDate;
 
-  /*  if (jsonObj.answer) {     // TODO complete when answer is done
-        this.answer = jsonObj.answer;
+      if (jsonObj.answer) {
+        this.answer = new ClarificationRequestAnswer(jsonObj.answer);
       }
-    */ }
+    }
   }
 
   newAnswer(): ClarificationRequestAnswer {
@@ -44,13 +48,8 @@ export default class ClarificationRequest {
     this.owner = id;
   }
 
-  getAnswerContent(): string {
-    if (this.answer) {
-   //   return this.answer.content;
-      return 'TODO ClarificationRequest, line 34';
-    }
-
-    return 'No answer available.';
+  getOwnerId(): number {
+    return this.owner;
   }
 
   setContent(c: string): void {

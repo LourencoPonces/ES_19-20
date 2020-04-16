@@ -1,15 +1,10 @@
 <template>
-  <v-card
-    class="discussion"
-    :max-height="270"
-    style="margin-top: 30px;"
-    outlined
-  >
+  <v-card class="discussion" style="margin-top: 30px;" outlined>
     <v-card-title class="title">
-      Clarification Requests
+      <span>Clarification Requests</span>
+      <v-spacer />
       <v-btn
         v-if="!creatingRequest"
-        class="add-button"
         dark
         color="primary"
         @click="newRequestButton()"
@@ -20,11 +15,11 @@
     </v-card-title>
     <v-divider></v-divider>
     <v-card-text v-if="creatingRequest">
-      <v-text-field
+      <v-textarea
         v-model="requestContent"
         label="Your request goes here."
         data-cy="inputRequest"
-      ></v-text-field>
+      ></v-textarea>
       <v-btn
         dark
         color="red"
@@ -44,11 +39,13 @@
           v-for="request in clarifications"
           :key="request.content"
         >
-          <v-expansion-panel-header data-cy="requestHeader">
-            {{ request.content }}
+          <v-expansion-panel-header>
+            <span class="multiline" data-cy="requestHeader">{{
+              request.content
+            }}</span>
           </v-expansion-panel-header>
           <v-expansion-panel-content v-if="request.hasAnswer()">
-            {{ request.answer }}
+            <span class="multiline">{{ request.answer }}</span>
           </v-expansion-panel-content>
           <v-expansion-panel-content v-else>
             No answer available.
@@ -113,16 +110,17 @@ export default class DiscussionComponent extends Vue {
   letter-spacing: 0 !important;
   vertical-align: middle;
 
-  .add-button {
-    position: relative;
-    right: -638px;
-  }
-
-  .title {
-    height: 70px;
+  v-card-title {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
     text-align: left;
     text-decoration: none solid rgb(51, 51, 51);
     text-size-adjust: 100%;
   }
+}
+
+.multiline {
+  white-space: pre;
 }
 </style>

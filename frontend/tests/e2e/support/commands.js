@@ -31,10 +31,29 @@ Cypress.Commands.add('demoAdminLogin', () => {
   cy.contains('Manage Courses').click();
 });
 
-Cypress.Commands.add('demoStudentLogin',  () => {
-  cy.visit('/')
-  cy.get('[data-cy="studentButton"]').click()
-})
+Cypress.Commands.add('demoTeacherLogin', () => {
+  cy.visit('/');
+  cy.get('[data-cy="teacherButton"]').click();
+});
+
+Cypress.Commands.add('demoStudentLogin', () => {
+  cy.visit('/');
+  cy.get('[data-cy="studentButton"]').click();
+});
+
+Cypress.Commands.add('logout', () => {
+  // Work around VMenu bug
+  // this handler runs at most once, and only matches a specific error
+  cy.once('uncaught:exception', (error, _) => {
+    if (error.message == "Cannot read property 'contains' of undefined") {
+      return true;
+    }
+
+    return false;
+  });
+
+  cy.get('[data-cy="logout"]').click();
+});
 
 Cypress.Commands.add('createCourseExecution', (name, acronym, academicTerm) => {
   cy.get('[data-cy="createButton"]').click();
@@ -78,88 +97,51 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add('generateAndAnswerQuiz', () => {
-  cy.get('[data-cy="quizzes"]').click()
-  cy.contains('Create').click()
-  cy.get('[data-cy="generate"]').click()
+  cy.get('[data-cy="quizzes"]').click();
+  cy.contains('Create').click();
+  cy.get('[data-cy="generate"]').click();
   cy.get('[data-cy="options"]')
-      .first()
-      .click()
+    .first()
+    .click();
   cy.get('[data-cy="options"]')
-      .first()
-      .click()
-  cy.get('[data-cy="nextQuestion"]').click()
+    .first()
+    .click();
+  cy.get('[data-cy="nextQuestion"]').click();
   cy.get('[data-cy="options"]')
-      .first()
-      .click()
-  cy.get('[data-cy="nextQuestion"]').click()
+    .first()
+    .click();
+  cy.get('[data-cy="nextQuestion"]').click();
   cy.get('[data-cy="options"]')
-      .first()
-      .click()
-  cy.get('[data-cy="endQuiz"]').click()
-  cy.get('[data-cy="sure"]').click()
+    .first()
+    .click();
+  cy.get('[data-cy="endQuiz"]').click();
+  cy.get('[data-cy="sure"]').click();
 });
 
 Cypress.Commands.add('submitClarificationRequest', (content, n) => {
   if (n > 0) {
-      for (i = 0; i < n; i++) {
-          cy.get('[data-cy="newRequest"]').click()
-          cy.get('[data-cy="inputRequest"]').type(content)
-          cy.contains('Submit').click()
-          let requests = cy.get('[data-cy="questionRequests"]')
-                            .children()
-          requests.should('have.length', 1)
-          requests.first()
-                  .should('contain.text', content)
-          cy.get('[data-cy="nextQuestion"]').click()
-      }
-  }
-});
-
-Cypress.Commands.add('goToMyClarifications',  () => {
-  cy.contains('My Area').click()
-  cy.contains('Clarifications').click()
-});
-
-Cypress.Commands.add('deleteAllRequests', (n, content) => {
-  if (n > 0) {
     for (i = 0; i < n; i++) {
-      cy.wait(500)
-      cy.get('[data-cy="table"]')
-        .find('tbody')
-        .children()
-        .should('have.length', n-i)
-        .first()
-        .should('contain.text', content)
-
-        cy.get('[data-cy="delete"]')
-          .first()
-          .click()
+      cy.get('[data-cy="newRequest"]').click();
+      cy.get('[data-cy="inputRequest"]').type(content);
+      cy.contains('Submit').click();
+      let requests = cy.get('[data-cy="questionRequests"]').children();
+      requests.should('have.length', 1);
+      requests.first().should('have.text', content);
+      cy.get('[data-cy="nextQuestion"]').click();
     }
   }
 });
 
-Cypress.Commands.add('editClarificationRequest', (content) => {
-  cy.wait(500)
-  cy.get('[data-cy="edit"]')
-    .first()
-    .click()
+Cypress.Commands.add(
+  'answerClarificationRequest',
+  (requestText, answerText) => {
+    cy.get('[data-cy="management"]').click();
+    cy.get('[data-cy="teacherUnansweredClarifications"]').click();
+    cy.get(
+      `[data-cy="answerClarification-${requestText.slice(0, 15)}"]`
+    ).click();
 
-  cy.get('.v-dialog')
-    .get('[data-cy="inputNewContent"]')
-    .type(content)
-
-  cy.get('.v-dialog')
-    .get('[data-cy="actions"]')
-    .children()
-    .last()
-    .click()
-
-  cy.get('[data-cy="table"]')
-    .find('tbody')
-    .children()
-    .should('have.length', 1)
-    .first()
-    .should('contain.text', content)
-});
-
-
+    cy.get('[data-cy="answerField"]').type(answerText);
+    cy.get('[data-cy="answerSubmit"]').click();
+  }
+);
