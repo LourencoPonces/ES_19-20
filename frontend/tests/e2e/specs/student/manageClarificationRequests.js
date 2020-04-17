@@ -60,7 +60,7 @@ describe('Clarification Request', () => {
     cy.logout();
 
     cy.demoTeacherLogin();
-    cy.deleteClarificationRequestAnswer(answer);
+    cy.deleteClarificationRequestAnswer(content);
     cy.logout();
     
     cy.demoStudentLogin();

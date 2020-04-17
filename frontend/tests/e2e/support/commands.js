@@ -191,7 +191,6 @@ Cypress.Commands.add(
     cy.get(
       `[data-cy^="answerClarification-${requestText.slice(0, 15)}"]`
     ).click();
-
     cy.get('[data-cy="answerField"]').type(answerText);
     cy.get('[data-cy="answerSubmit"]').click();
   }
