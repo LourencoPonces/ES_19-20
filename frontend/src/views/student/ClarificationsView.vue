@@ -43,7 +43,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              v-if="!item.hasAnswer()"
+              v-if="!item.hasAnswer"
               small
               class="mr-2"
               v-on="on"
@@ -67,7 +67,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              v-if="!item.hasAnswer()"
+              v-if="!item.hasAnswer"
               small
               class="mr-2"
               v-on="on"
