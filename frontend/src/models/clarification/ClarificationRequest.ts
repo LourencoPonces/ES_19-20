@@ -28,7 +28,7 @@ export default class ClarificationRequest {
     return answer;
   }
 
-  get hasAnswer(): boolean {
+  hasAnswer(): boolean {
     return this.answer != null;
   }
 
