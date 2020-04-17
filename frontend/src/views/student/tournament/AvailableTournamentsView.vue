@@ -56,7 +56,7 @@
   import Tournament from '@/models/management/Tournament';
   import RemoteServices from '@/services/RemoteServices';
   import Topic from '@/models/management/Topic';
-  import EditTournamentDialog from '@/views/student/tournament/EditTournamentDialog.vue';
+  import EditTournamentDialog from './EditTournamentDialog.vue';
 
   @Component({
     components: {
@@ -124,7 +124,6 @@
       } catch (error) {
         await this.$store.dispatch('error', error);
       }
-      await this.$store.dispatch('clearLoading');
       try {
         this.availableTournaments = await RemoteServices.getAvailableTournaments();
       } catch (error) {
