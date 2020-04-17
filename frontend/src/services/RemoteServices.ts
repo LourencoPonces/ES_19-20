@@ -331,7 +331,7 @@ export default class RemoteServices {
 
     try {
       const response = await httpClient.post(
-        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments/create`,
+        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments`,
         tournament
       );
       return new Tournament(response.data);

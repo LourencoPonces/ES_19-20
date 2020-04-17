@@ -120,8 +120,13 @@
     async created() {
       await this.$store.dispatch('loading');
       try {
-        this.availableTournaments = await RemoteServices.getAvailableTournaments();
         this.topics = await RemoteServices.getTopics();
+      } catch (error) {
+        await this.$store.dispatch('error', error);
+      }
+      await this.$store.dispatch('clearLoading');
+      try {
+        this.availableTournaments = await RemoteServices.getAvailableTournaments();
       } catch (error) {
         await this.$store.dispatch('error', error);
       }
