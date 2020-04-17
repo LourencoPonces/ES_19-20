@@ -1,6 +1,12 @@
 <template>
   <v-card class="table">
-    <v-btn color="primary" dark @click="newTournament">New Tournament</v-btn>
+    <v-btn
+      color="primary"
+      dark
+      @click="newTournament"
+      data-cy="newTournament"
+      >New Tournament</v-btn
+    >
     <edit-tournament-dialog
       v-if="currentTournament"
       v-model="editTournamentDialog"
