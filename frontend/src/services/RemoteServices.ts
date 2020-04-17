@@ -713,9 +713,7 @@ export default class RemoteServices {
       });
   }
 
-  static async getClarificationRequests(): Promise<
-    ClarificationRequest[]
-  > {
+  static async getClarificationRequests(): Promise<ClarificationRequest[]> {
     try {
       const response = await httpClient.get('/clarifications');
 
@@ -732,7 +730,7 @@ export default class RemoteServices {
   ): Promise<ClarificationRequestAnswer> {
     if (ans.getContent().trim() == '') {
       // eslint-disable-next-line
-      throw Error('Answer can\'t be empty');
+      throw Error("Answer can't be empty");
     }
 
     try {
@@ -751,9 +749,7 @@ export default class RemoteServices {
     ans: ClarificationRequestAnswer
   ): Promise<void> {
     try {
-      await httpClient.delete(
-        `/clarifications/${ans.getRequestId()}/answer`
-      );
+      await httpClient.delete(`/clarifications/${ans.getRequestId()}/answer`);
     } catch (err) {
       throw Error(await this.errorMessage(err));
     }

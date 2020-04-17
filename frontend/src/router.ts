@@ -79,8 +79,7 @@ let router = new Router({
           name: 'clarifications-management',
           component: ClarificationRequestsView,
           meta: {
-            title:
-              process.env.VUE_APP_NAME + ' - Clarification Requests',
+            title: process.env.VUE_APP_NAME + ' - Clarification Requests',
             requiredAuth: 'Teacher'
           }
         },
