@@ -24,6 +24,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -167,7 +168,11 @@ public class ClarificationService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public List<ClarificationRequestDto> getStudentClarificationRequests(int userId) {
         User user = getStudent(userId);
-        return user.getClarificationRequests().stream().map(ClarificationRequestDto::new).collect(Collectors.toList());
+        return user.getClarificationRequests()
+                .stream()
+                .map(ClarificationRequestDto::new)
+                .sorted(Comparator.comparing(ClarificationRequestDto::getId).reversed())
+                .collect(Collectors.toList());
     }
 
     @Retryable(
@@ -192,8 +197,8 @@ public class ClarificationService {
             backoff = @Backoff(delay = 5000)
     )
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public List<ClarificationRequestDto> getUnansweredClarificationRequests() {
-        return clarificationRequestRepository.getUnansweredRequests()
+    public List<ClarificationRequestDto> getTeacherClarificationRequests(int teacherId) {
+        return clarificationRequestRepository.getTeacherRequests(teacherId)
                 .map(ClarificationRequestDto::new)
                 .collect(Collectors.toList());
     }

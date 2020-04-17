@@ -8,7 +8,7 @@ import CourseSelectionView from '@/views/CourseSelectionView.vue';
 import HomeView from '@/views/HomeView.vue';
 import ManagementView from '@/views/teacher/ManagementView.vue';
 import QuestionsView from '@/views/teacher/questions/QuestionsView.vue';
-import UnansweredClarificationRequestsView from './views/teacher/clarifications/UnansweredClarificationRequestsView.vue';
+import ClarificationRequestsView from './views/teacher/clarifications/ClarificationRequestsView.vue';
 import StudentQuestionsView from '@/views/teacher/questions/StudentQuestionView.vue';
 import TopicsView from '@/views/teacher/TopicsView.vue';
 import QuizzesView from '@/views/teacher/quizzes/QuizzesView.vue';
@@ -75,12 +75,11 @@ let router = new Router({
           }
         },
         {
-          path: 'clarifications/unanswered',
+          path: 'clarifications',
           name: 'clarifications-management',
-          component: UnansweredClarificationRequestsView,
+          component: ClarificationRequestsView,
           meta: {
-            title:
-              process.env.VUE_APP_NAME + ' - Unanswered Clarification Requests',
+            title: process.env.VUE_APP_NAME + ' - Clarification Requests',
             requiredAuth: 'Teacher'
           }
         },

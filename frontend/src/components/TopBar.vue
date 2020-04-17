@@ -62,8 +62,8 @@
               </v-list-item-content>
             </v-list-item>
             <v-list-item
-              to="/management/clarifications/unanswered"
-              data-cy="teacherUnansweredClarifications"
+              to="/management/clarifications"
+              data-cy="teacherClarifications"
             >
               <v-list-item-action>
                 <v-icon>fas fa-question</v-icon>
@@ -168,7 +168,7 @@
         <!-- test My Area-->
         <v-menu offset-y v-if="isStudent && currentCourse" open-on-hover>
           <template v-slot:activator="{ on }">
-            <v-btn v-on="on" text dark>
+            <v-btn v-on="on" text dark data-cy="my-area">
               My Area
               <v-icon>fas fa-file-alt</v-icon>
             </v-btn>
@@ -179,7 +179,9 @@
                 <v-icon>assignment</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>Student Questions</v-list-item-title>
+                <v-list-item-title data-cy="student-questions"
+                  >Student Questions</v-list-item-title
+                >
               </v-list-item-content>
             </v-list-item>
             <v-list-item to="/student/clarifications">
@@ -277,7 +279,7 @@
               <v-list-item-title>Questions</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
-          <v-list-item to="/management/clarifications/unanswered">
+          <v-list-item to="/management/clarifications">
             <v-list-item-action>
               <v-icon>fas fa-question</v-icon>
             </v-list-item-action>

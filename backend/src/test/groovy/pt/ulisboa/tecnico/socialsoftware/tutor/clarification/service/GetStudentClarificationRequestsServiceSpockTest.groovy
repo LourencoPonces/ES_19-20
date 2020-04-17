@@ -178,17 +178,15 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
         when:
         def result = clarificationService.getStudentClarificationRequests(studentId)
 
-        then:
+        then: "returns list ordered by request Id DSC"
         result != null
         result.size() == 2
-        ClarificationRequestDto req1 = result[0]
-        req1.owner == studentId
-        req1.content == CONTENT
-        req1.questionId == question.getId()
-        ClarificationRequestDto req2 = result[1]
-        req2.owner == studentId
-        req2.content == CONTENT_2
-        req2.questionId == q.getId()
+        result[1].owner == studentId
+        result[1].content == CONTENT
+        result[1].questionId == question.getId()
+        result[0].owner == studentId
+        result[0].content == CONTENT_2
+        result[0].questionId == q.getId()
     }
 
     def "student didn't submit clarification requests"() {
