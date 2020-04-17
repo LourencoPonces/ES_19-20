@@ -70,8 +70,9 @@
 
         <v-card-actions>
           <v-spacer />
-          <v-btn @click="closeDialogue">Cancel</v-btn>
+          <v-btn color="secondary" @click="closeDialogue">Cancel</v-btn>
           <v-btn
+            id="delete-btn"
             color="red"
             @click="deleteAnswer"
             v-if="!isNewAnswer"
@@ -80,14 +81,14 @@
           >
 
           <v-btn
-            color="blue darken-1"
+            color="primary"
             @click="submitAnswer"
             v-if="isNewAnswer"
             data-cy="answerSubmit"
             >Submit Answer</v-btn
           >
           <v-btn
-            color="blue darken-1"
+            color="primary"
             @click="submitAnswer"
             v-else
             data-cy="answerSubmit"
@@ -242,5 +243,9 @@ export default class ClarificationRequestsView extends Vue {
     margin-top: 10px;
     margin-bottom: 10px;
   }
+}
+
+#delete-btn {
+  color: #ffffff;
 }
 </style>
