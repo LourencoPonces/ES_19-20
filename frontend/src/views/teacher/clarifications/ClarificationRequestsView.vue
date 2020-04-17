@@ -128,7 +128,7 @@ export default class ClarificationRequestsView extends Vue {
     {
       text: 'Answered',
       value: 'hasAnswer',
-      width: '33px'
+      width: '114px'
     },
     {
       text: 'Creation Date',
