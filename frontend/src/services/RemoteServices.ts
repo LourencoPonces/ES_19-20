@@ -757,7 +757,7 @@ export default class RemoteServices {
       throw Error(await this.errorMessage(error));
     });
   }
-  
+
   static async deleteClarificationRequest(id : number) {
     return httpClient
     .delete(`student/clarifications/${id}`)
