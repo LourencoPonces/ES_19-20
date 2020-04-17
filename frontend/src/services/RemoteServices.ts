@@ -312,10 +312,25 @@ export default class RemoteServices {
       });
   }
 
+  static async getAvailableTournaments(): Promise<Tournament[]> {
+    return httpClient
+        .get(
+            `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments/available`
+        )
+        .then(response => {
+          return response.data.map((tournament: any) => {
+            return new Tournament(tournament);
+          });
+        })
+        .catch(async error => {
+          throw Error(await this.errorMessage(error));
+        });
+  }
+
   static async createTournament(tournament: Tournament): Promise<Tournament> {
     return httpClient
       .post(
-        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments`,
+        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments/create`,
         tournament
       )
       .then(response => {
