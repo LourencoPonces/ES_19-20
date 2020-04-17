@@ -162,16 +162,16 @@ Cypress.Commands.add(
 
 Cypress.Commands.add(
   'evaluateStudentQuestion',
-  (title, status, justification) => {
+  (title, prevStatus, status, justification) => {
     // select evaluate question
     cy.contains(title)
       .parent()
-      .contains('Waiting for Approval')
+      .contains(prevStatus)
       .click();
 
     // select drop down
     cy.get('.layout')
-      .contains('Waiting for Approval')
+      .contains(prevStatus)
       .click();
 
     // select evaluation status
@@ -179,13 +179,34 @@ Cypress.Commands.add(
       .contains(status)
       .click();
 
+    // write justification
     if (justification != null) {
+      cy.get('.v-textarea').type(justification);
     }
 
     // select evaluate button
     cy.get('button')
       .contains('Evaluate')
       .click();
+  }
+);
+
+Cypress.Commands.add(
+  'assertStudentQuestionEvaluation',
+  (questionTitle, status, justification) => {
+    // assert status
+    cy.contains(questionTitle)
+      .parent()
+      .children()
+      .eq(3)
+      .should('have.text', status);
+
+    // assert justification
+    cy.contains(questionTitle)
+      .parent()
+      .children()
+      .eq(4)
+      .should('have.text', justification);
   }
 );
 
