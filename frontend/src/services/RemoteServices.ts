@@ -328,17 +328,16 @@ export default class RemoteServices {
   }
 
   static async createTournament(tournament: Tournament): Promise<Tournament> {
-    return httpClient
-      .post(
+
+    try {
+      const response = await httpClient.post(
         `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments/create`,
         tournament
-      )
-      .then(response => {
-        return new Tournament(response.data);
-      })
-      .catch(async error => {
-        throw Error(await this.errorMessage(error));
-      });
+      );
+      return new Tournament(response.data);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
   }
 
   static getAvailableQuizzes(): Promise<StatementQuiz[]> {
