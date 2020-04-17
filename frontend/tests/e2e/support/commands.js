@@ -180,7 +180,7 @@ Cypress.Commands.add(
       .click();
 
     // write justification
-    if (justification != null) {
+    if (justification != null && justification != '') {
       cy.get('.v-textarea').type(justification);
     }
 
