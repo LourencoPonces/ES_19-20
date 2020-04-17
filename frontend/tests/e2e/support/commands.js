@@ -138,15 +138,25 @@ Cypress.Commands.add(
   'answerClarificationRequest',
   (requestText, answerText) => {
     cy.get('[data-cy="management"]').click();
-    cy.get('[data-cy="teacherUnansweredClarifications"]').click();
+    cy.get('[data-cy="teacherClarifications"]').click();
     cy.get(
-      `[data-cy="answerClarification-${requestText.slice(0, 15)}"]`
+      `[data-cy^="answerClarification-${requestText.slice(0, 15)}"]`
     ).click();
 
     cy.get('[data-cy="answerField"]').type(answerText);
     cy.get('[data-cy="answerSubmit"]').click();
   }
 );
+
+Cypress.Commands.add('deleteClarificationRequestAnswer', requestText => {
+  cy.get('[data-cy="management"]').click();
+  cy.get('[data-cy="teacherClarifications"]').click();
+  cy.get(
+    `[data-cy^="answerClarification-${requestText.slice(0, 15)}"]`
+  ).click();
+
+  cy.get('[data-cy="answerDelete"]').click();
+})
 
 Cypress.Commands.add(
   'createStudentQuestion',

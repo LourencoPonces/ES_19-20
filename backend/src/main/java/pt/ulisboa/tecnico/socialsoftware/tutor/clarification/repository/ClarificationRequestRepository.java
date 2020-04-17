@@ -18,6 +18,6 @@ public interface ClarificationRequestRepository extends JpaRepository<Clarificat
     @Query(value = "SELECT * FROM clarification_requests cr WHERE cr.user_id = :sId AND cr.question_id = :qId", nativeQuery = true)
     Optional<ClarificationRequest> getByStudentQuestion(int sId, int qId);
 
-    @Query(value = "SELECT * from clarification_requests cr LEFT JOIN clarification_request_answers ca ON cr.id = ca.request_id WHERE ca.request_id IS NULL", nativeQuery = true)
-    Stream<ClarificationRequest> getUnansweredRequests();
+    @Query(value = "SELECT DISTINCT cr.* from clarification_requests cr JOIN users_course_executions uce ON uce.users_id = cr.user_id WHERE uce.course_executions_id IN (SELECT uce2.course_executions_id FROM users_course_executions uce2 WHERE uce2.users_id = :tId)", nativeQuery = true)
+    Stream<ClarificationRequest> getTeacherRequests(int tId);
 }

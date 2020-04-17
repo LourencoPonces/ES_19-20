@@ -160,8 +160,8 @@ public class ClarificationService {
             backoff = @Backoff(delay = 5000)
     )
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public List<ClarificationRequestDto> getUnansweredClarificationRequests() {
-        return clarificationRequestRepository.getUnansweredRequests()
+    public List<ClarificationRequestDto> getTeacherClarificationRequests(int teacherId) {
+        return clarificationRequestRepository.getTeacherRequests(teacherId)
                 .map(ClarificationRequestDto::new)
                 .collect(Collectors.toList());
     }

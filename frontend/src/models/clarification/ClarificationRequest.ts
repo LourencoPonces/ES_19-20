@@ -28,8 +28,17 @@ export default class ClarificationRequest {
     return answer;
   }
 
-  hasAnswer(): boolean {
+  get hasAnswer(): boolean {
     return this.answer != null;
+  }
+
+  getAnswer(): ClarificationRequestAnswer {
+    if (!this.answer) throw Error('answer unavailable');
+    return this.answer as ClarificationRequestAnswer;
+  }
+
+  setAnswer(answer: ClarificationRequestAnswer | null) {
+    this.answer = answer;
   }
 
   setQuestionId(id: number): void {
