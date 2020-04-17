@@ -10,6 +10,14 @@ describe('Teacher Clarification Requests', () => {
     cy.logout();
   });
 
+  after(() => {
+    cy.demoStudentLogin();
+    cy.deleteAllRequests(1, TEST_REQ_1);
+    cy.deleteAllRequests(1, TEST_REQ_2);
+    cy.logout();
+  });
+
+
   beforeEach(() => {
     cy.demoTeacherLogin();
   });

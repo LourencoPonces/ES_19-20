@@ -1,6 +1,6 @@
 <template>
-   <v-card class="table">
-    <v-data-table 
+  <v-card class="table">
+    <v-data-table
       :headers="headers"
       :items="requests"
       :search="search"
@@ -20,12 +20,11 @@
           />
 
           <v-spacer />
-
         </v-card-title>
       </template>
 
       <template v-slot:item.answer="{ item }">
-        {{showAnswer(item)}}    
+        {{ showAnswer(item) }}
       </template>
 
       <template v-slot:item.action="{ item }">
@@ -43,28 +42,32 @@
         </v-tooltip>
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
-            <v-icon v-if="!item.hasAnswer()"
+            <v-icon
+              v-if="!item.hasAnswer()"
               small
               class="mr-2"
               v-on="on"
               @click="startEditRequest(item)"
               data-cy="edit"
-            >edit</v-icon>
-            <v-icon v-else
+              >edit</v-icon
+            >
+            <v-icon
+              v-else
               disabled
               small
               class="mr-2"
               v-on="on"
               @click="startEditRequest(item)"
               data-cy="edit"
-            >edit</v-icon
-          >
+              >edit</v-icon
+            >
           </template>
           <span>Edit Request</span>
         </v-tooltip>
-        <v-tooltip bottom >
+        <v-tooltip bottom>
           <template v-slot:activator="{ on }">
-            <v-icon v-if="!item.hasAnswer()"
+            <v-icon
+              v-if="!item.hasAnswer()"
               small
               class="mr-2"
               v-on="on"
@@ -73,7 +76,8 @@
               data-cy="delete"
               >delete</v-icon
             >
-            <v-icon v-else
+            <v-icon
+              v-else
               disabled
               small
               class="mr-2"
@@ -86,14 +90,16 @@
           </template>
           <span>Delete Request</span>
         </v-tooltip>
-      </template>     
+      </template>
     </v-data-table>
-    
+
     <template>
       <v-row justify="center">
         <v-dialog tile v-model="dialog" persistent max-width="60%">
           <v-card>
-            <v-card-title class="headline">Edit Clarification Request</v-card-title>
+            <v-card-title class="headline">
+              Edit Clarification Request
+            </v-card-title>
             <v-card-text>
               <v-text-field
                 v-model="newContent"
@@ -104,13 +110,27 @@
             </v-card-text>
             <v-card-actions data-cy="actions">
               <v-spacer></v-spacer>
-              <v-btn color="green darken-1" text @click="dialog = false; stopEditRequest()">Cancel</v-btn>
               <v-btn
                 color="green darken-1"
                 text
-                @click="dialog = false; editRequest()"
+                @click="
+                  dialog = false;
+                  stopEditRequest();
+                "
+              >
+                Cancel
+              </v-btn>
+              <v-btn
+                color="green darken-1"
+                text
+                @click="
+                  dialog = false;
+                  editRequest();
+                "
                 data_cy="submitEdition"
-              >Edit</v-btn>
+              >
+                Edit
+              </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -143,7 +163,6 @@ import ShowQuestion from '@/views/teacher/questions/ShowQuestion.vue';
   components: { 'show-question': ShowQuestion }
 })
 export default class ClarificationsView extends Vue {
-
   requests: ClarificationRequest[] = [];
   search: string = '';
   newContent: string = '';
@@ -153,80 +172,80 @@ export default class ClarificationsView extends Vue {
   openQuestion: Question | null = null;
 
   headers: object = [
-    { text: 'Request', value: 'content', align: 'center', sortable: false},
+    { text: 'Request', value: 'content', align: 'center', sortable: false },
     { text: 'Answer', value: 'answer', align: 'center', sortable: false },
-    { text: 'Submission Date', value: 'creationDate', align: 'center'},
+    { text: 'Submission Date', value: 'creationDate', align: 'center' },
     { text: 'Actions', value: 'action', align: 'center', sortable: false }
-
   ];
 
-    async created() {
-      await this.$store.dispatch('loading');
-      try {
-        this.requests = await RemoteServices.getStudentClarificationRequests();
-      } catch (error) {
-        await this.$store.dispatch('error', error);
-      }
-      await this.$store.dispatch('clearLoading');
+  async created() {
+    await this.$store.dispatch('loading');
+    try {
+      this.requests = await RemoteServices.getStudentClarificationRequests();
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
+    await this.$store.dispatch('clearLoading');
+  }
+
+  showAnswer(request: ClarificationRequest): string | void {
+    return request.getAnswerContent();
+  }
+
+  async showQuestionDialog(req: ClarificationRequest): Promise<void> {
+    try {
+      this.openQuestion = await RemoteServices.getQuestionById(
+        req.getQuestionId()
+      );
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+      return;
     }
 
-    showAnswer(request : ClarificationRequest) : string | void {
-        return request.getAnswerContent();
-    }
+    this.questionDialog = true;
+  }
 
-    async showQuestionDialog(req: ClarificationRequest): Promise<void> {
+  async deleteRequest(req: ClarificationRequest) {
+    if (
+      !confirm('Are you sure you want to delete this clarification request?')
+    ) {
+      return;
+    }
+    await this.$store.dispatch('loading');
+    try {
+      await RemoteServices.deleteClarificationRequest(req.id);
+      this.requests.splice(this.requests.indexOf(req), 1);
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
+    await this.$store.dispatch('clearLoading');
+  }
+
+  startEditRequest(request: ClarificationRequest): void {
+    this.editingItem = request;
+    this.dialog = true;
+  }
+
+  stopEditRequest(): void {
+    this.editingItem = null;
+    this.newContent = '';
+  }
+
+  async editRequest() {
+    await this.$store.dispatch('loading');
+    if (this.editingItem) {
+      this.editingItem.setContent(this.newContent);
       try {
-        this.openQuestion = await RemoteServices.getQuestionById(
-          req.getQuestionId()
+        this.editingItem = await RemoteServices.editClarificationRequest(
+          this.editingItem
         );
-      } catch (error) {
-        await this.$store.dispatch('error', error);
-        return;
-      }
-
-      this.questionDialog= true;
-    }
-
-    async deleteRequest(req : ClarificationRequest) {
-      if (!confirm('Are you sure you want to delete this clarification request?')) {
-        return ;
-      }
-      await this.$store.dispatch('loading');
-      try {
-        await RemoteServices.deleteClarificationRequest(req.id);
-        this.requests.splice(this.requests.indexOf(req), 1);
+        this.stopEditRequest();
       } catch (error) {
         await this.$store.dispatch('error', error);
       }
       await this.$store.dispatch('clearLoading');
     }
-
-    startEditRequest(request : ClarificationRequest) : void {
-      this.editingItem = request; 
-      this.dialog = true;
-    }
-
-    stopEditRequest() : void {
-      this.editingItem = null;
-      this.newContent = '';
-    }
-
-    async editRequest() {
-      await this.$store.dispatch('loading');
-      if (this.editingItem) {
-        this.editingItem.setContent(this.newContent);
-      
-        try {
-          this.editingItem = await RemoteServices.editClarificationRequest(this.editingItem)
-          this.stopEditRequest();
-       } catch (error) {
-          await this.$store.dispatch('error', error);
-        }
-        await this.$store.dispatch('clearLoading');
-      }
-    }
-
-    
+  }
 }
 </script>
 

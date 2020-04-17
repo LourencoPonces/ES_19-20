@@ -1,6 +1,7 @@
 describe('Clarification Request', () => {
-  let content = 'Test clarification content.' 
-  let newContent = 'Edited request'
+  let content = 'Test clarification content.';
+  let newContent = 'Edited request';
+  let answer = '10/10 best request ever';
 
   beforeEach(() => {
     cy.demoStudentLogin();
@@ -45,7 +46,7 @@ describe('Clarification Request', () => {
     cy.logout();
 
     cy.demoTeacherLogin();
-    cy.answerClarificationRequest(content, '10/10 best request ever');
+    cy.answerClarificationRequest(content, answer);
     cy.logout();
 
     cy.demoStudentLogin();
@@ -58,13 +59,13 @@ describe('Clarification Request', () => {
       .should('be.disabled');
     cy.logout();
 
-    //cy.demoTeacherLogin();
-    //cy.deleteAnswer();
-    //cy.logout();
+    cy.demoTeacherLogin();
+    cy.deleteClarificationRequestAnswer(answer);
+    cy.logout();
     
-    //cy.demoStudentLogin();
-    //cy.goToMyClarifications();
-    //cy.deleteAllRequests(content, 1);
+    cy.demoStudentLogin();
+    cy.goToMyClarifications();
+    cy.deleteAllRequests(content, 1);
     
   });
 

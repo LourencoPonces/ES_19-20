@@ -126,7 +126,8 @@ Cypress.Commands.add('submitClarificationRequest', (content, n) => {
       cy.get('[data-cy="newRequest"]').click();
       cy.get('[data-cy="inputRequest"]').type(content);
       cy.contains('Submit').click();
-      let requests = cy.get('[data-cy="questionRequests"]').children();
+      let requests = cy.get('[data-cy="questionRequests"]')
+                       .children().first().children();
       requests.should('have.length', 1);
       requests.first().should('have.text', content);
       cy.get('[data-cy="nextQuestion"]').click();
