@@ -4,7 +4,6 @@ describe('Clarification Request', () => {
 
   beforeEach(() => {
     cy.demoStudentLogin();
-
     cy.generateAndAnswerQuiz();
   });
 
@@ -12,13 +11,61 @@ describe('Clarification Request', () => {
     cy.logout();
   });
 
-  it('login submits a clarification request', () => {
+  it('login submits and deletes a clarification request', () => {
     cy.contains('Clarification Requests');
-    cy.submitClarificationRequest('Test clarification content.', 1);
+    cy.submitClarificationRequest(content, 1);
+    cy.goToMyClarifications();
+    cy.deleteAllRequests(1, content);
   });
 
-  it('login submits two clarification requests', () => {
-    cy.submitClarificationRequest('Test clarification content.', 2);
+  it('login submits and deletes two clarification requests', () => {
+    cy.submitClarificationRequest(content, 2);
+    cy.goToMyClarifications();
+    cy.deleteAllRequests(2, content);
+  });
+
+
+  it('login submits, edits and deletes a clarification request', () => {
+    cy.submitClarificationRequest(content, 1);
+    cy.goToMyClarifications();
+    cy.editClarificationRequest(newContent);
+    cy.deleteAllRequests(1, newContent);
+  });
+
+  it('login submit request with empty content', () => {
+    cy.get('[data-cy="newRequest"]').click();
+    cy.get('[data-cy="inputRequest"]').type('   ');
+    cy.contains('Submit').click();
+    cy.contains('Error')
+      .should('contain.text', 'Missing content');
+  });
+
+  it('login and try to edit and delete answered request', () => {
+    cy.submitClarificationRequest(content, 1);
+    cy.logout();
+
+    cy.demoTeacherLogin();
+    cy.answerClarificationRequest(content, '10/10 best request ever');
+    cy.logout();
+
+    cy.demoStudentLogin();
+    cy.goToMyClarifications();
+    cy.get('[data-cy="edit"]')
+      .first()
+      .should('be.disabled');
+    cy.get('[data-cy="delete"]')
+      .first()
+      .should('be.disabled');
+    cy.logout();
+
+    //cy.demoTeacherLogin();
+    //cy.deleteAnswer();
+    //cy.logout();
+    
+    //cy.demoStudentLogin();
+    //cy.goToMyClarifications();
+    //cy.deleteAllRequests(content, 1);
+    
   });
 
 });

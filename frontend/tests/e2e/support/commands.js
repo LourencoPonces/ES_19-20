@@ -132,6 +132,54 @@ Cypress.Commands.add('submitClarificationRequest', (content, n) => {
   }
 });
 
+Cypress.Commands.add('goToMyClarifications',  () => {
+  cy.contains('My Area').click();
+  cy.contains('Clarifications').click();
+});
+
+Cypress.Commands.add('deleteAllRequests', (n, content) => {
+  if (n > 0) {
+    for (i = 0; i < n; i++) {
+      cy.wait(500);
+      cy.get('[data-cy="table"]')
+        .find('tbody')
+        .children()
+        .should('have.length', n-i)
+        .first()
+        .should('contain.text', content);
+
+        cy.get('[data-cy="delete"]')
+          .first()
+          .click();
+    }
+  }
+});
+
+Cypress.Commands.add('editClarificationRequest', (content) => {
+  cy.wait(500);
+  cy.get('[data-cy="edit"]')
+    .first()
+    .click();
+
+  cy.get('.v-dialog')
+    .get('[data-cy="inputNewContent"]')
+    .type(content);
+
+  cy.get('.v-dialog')
+    .get('[data-cy="actions"]')
+    .children()
+    .last()
+    .click();
+
+  cy.get('[data-cy="table"]')
+    .find('tbody')
+    .children()
+    .should('have.length', 1)
+    .first()
+    .should('contain.text', content);
+});
+
+
 Cypress.Commands.add(
   'answerClarificationRequest',
   (requestText, answerText) => {

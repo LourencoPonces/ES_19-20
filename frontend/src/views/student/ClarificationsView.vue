@@ -29,9 +29,29 @@
       </template>
 
       <template v-slot:item.action="{ item }">
-        <v-tooltip bottom v-if="!item.hasAnswer()">
+        <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
+              small
+              class="mr-2"
+              v-on="on"
+              @click="showQuestionDialog(item)"
+              >visibility</v-icon
+            >
+          </template>
+          <span>Show Question</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-icon v-if="!item.hasAnswer()"
+              small
+              class="mr-2"
+              v-on="on"
+              @click="startEditRequest(item)"
+              data-cy="edit"
+            >edit</v-icon>
+            <v-icon v-else
+              disabled
               small
               class="mr-2"
               v-on="on"
@@ -42,9 +62,19 @@
           </template>
           <span>Edit Request</span>
         </v-tooltip>
-        <v-tooltip bottom v-if="!item.hasAnswer()">
+        <v-tooltip bottom >
           <template v-slot:activator="{ on }">
-            <v-icon
+            <v-icon v-if="!item.hasAnswer()"
+              small
+              class="mr-2"
+              v-on="on"
+              @click="deleteRequest(item)"
+              color="red"
+              data-cy="delete"
+              >delete</v-icon
+            >
+            <v-icon v-else
+              disabled
               small
               class="mr-2"
               v-on="on"
@@ -86,15 +116,32 @@
         </v-dialog>
       </v-row>
     </template>
+    <v-dialog v-model="questionDialog" max-width="75%">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Question</span>
+        </v-card-title>
+
+        <v-card-text width="100%">
+          <div v-if="questionDialog" class="question-context">
+            <show-question :question="openQuestion" />
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
-import ClarificationRequest from '../../models/clarification/ClarificationRequest';
+import ClarificationRequest from '@/models/clarification/ClarificationRequest';
+import Question from '@/models/management/Question';
+import ShowQuestion from '@/views/teacher/questions/ShowQuestion.vue';
 
-@Component
+@Component({
+  components: { 'show-question': ShowQuestion }
+})
 export default class ClarificationsView extends Vue {
 
   requests: ClarificationRequest[] = [];
@@ -102,6 +149,8 @@ export default class ClarificationsView extends Vue {
   newContent: string = '';
   editingItem: ClarificationRequest | null = null;
   dialog: boolean = false;
+  questionDialog: boolean = false;
+  openQuestion: Question | null = null;
 
   headers: object = [
     { text: 'Request', value: 'content', align: 'center', sortable: false},
@@ -121,8 +170,21 @@ export default class ClarificationsView extends Vue {
       await this.$store.dispatch('clearLoading');
     }
 
-    showAnswer(request : ClarificationRequest) : string {
+    showAnswer(request : ClarificationRequest) : string | void {
         return request.getAnswerContent();
+    }
+
+    async showQuestionDialog(req: ClarificationRequest): Promise<void> {
+      try {
+        this.openQuestion = await RemoteServices.getQuestionById(
+          req.getQuestionId()
+        );
+      } catch (error) {
+        await this.$store.dispatch('error', error);
+        return;
+      }
+
+      this.questionDialog= true;
     }
 
     async deleteRequest(req : ClarificationRequest) {
@@ -168,4 +230,9 @@ export default class ClarificationsView extends Vue {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.question-context {
+  text-align: left;
+  margin-bottom: 20px;
+}
+</style>

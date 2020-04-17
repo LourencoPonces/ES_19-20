@@ -1,4 +1,3 @@
-ls
 import axios from 'axios';
 import Store from '@/store';
 import Question from '@/models/management/Question';

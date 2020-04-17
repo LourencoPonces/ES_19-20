@@ -6,10 +6,6 @@ export default class ClarificationRequest {
   owner!: number;
   creationDate!: string;
   content!: string;
-<<<<<<< HEAD
-  creationDate!: string;
-=======
->>>>>>> DdP
   answer: ClarificationRequestAnswer | null = null;
 
   constructor(jsonObj?: ClarificationRequest) {
@@ -54,5 +50,9 @@ export default class ClarificationRequest {
 
   setContent(c: string): void {
     this.content = c;
+  }
+
+  getAnswerContent(): string | void {
+    return this.answer?.getContent();
   }
 }
