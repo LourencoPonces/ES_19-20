@@ -36,6 +36,11 @@ Cypress.Commands.add('demoStudentLogin', () => {
   cy.get('[data-cy="studentButton"]').click();
 });
 
+Cypress.Commands.add('demoTeacherLogin', () => {
+  cy.visit('/');
+  cy.get('[data-cy="teacherButton"]').click();
+});
+
 Cypress.Commands.add('createCourseExecution', (name, acronym, academicTerm) => {
   cy.get('[data-cy="createButton"]').click();
   cy.get('[data-cy="Name"]').type(name);
@@ -155,6 +160,56 @@ Cypress.Commands.add(
   }
 );
 
+Cypress.Commands.add(
+  'evaluateStudentQuestion',
+  (title, prevStatus, status, justification) => {
+    // select evaluate question
+    cy.contains(title)
+      .parent()
+      .contains(prevStatus)
+      .click();
+
+    // select drop down
+    cy.get('.layout')
+      .contains(prevStatus)
+      .click();
+
+    // select evaluation status
+    cy.get('.v-list-item__content')
+      .contains(status)
+      .click();
+
+    // write justification
+    if (justification != null && justification != '') {
+      cy.get('.v-textarea').type(justification);
+    }
+
+    // select evaluate button
+    cy.get('button')
+      .contains('Evaluate')
+      .click();
+  }
+);
+
+Cypress.Commands.add(
+  'assertStudentQuestionEvaluation',
+  (questionTitle, status, justification) => {
+    // assert status
+    cy.contains(questionTitle)
+      .parent()
+      .children()
+      .eq(3)
+      .should('have.text', status);
+
+    // assert justification
+    cy.contains(questionTitle)
+      .parent()
+      .children()
+      .eq(4)
+      .should('have.text', justification);
+  }
+);
+
 Cypress.Commands.add('errorMessageClose', message => {
   cy.contains(message)
     .parent()
@@ -217,7 +272,7 @@ Cypress.Commands.add(
 
     cy.errorMessageClose(
       // eslint-disable-next-line prettier/prettier
-      'Error: The question doesn\'t have any correct options'
+      "Error: The question doesn't have any correct options"
     );
 
     cy.get('[data-cy="CancelStudentQuestion"]').click();
