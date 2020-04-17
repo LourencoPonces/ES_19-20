@@ -23,8 +23,6 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "users")
 public class User implements UserDetails, DomainEntity {
-    private static final long serialVersionUID = -6865297541036537650L;
-
     public enum Role {STUDENT, TEACHER, ADMIN, DEMO_ADMIN}
 
     @Id
