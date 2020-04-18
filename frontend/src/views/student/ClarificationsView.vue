@@ -31,18 +31,6 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              small
-              class="mr-2"
-              v-on="on"
-              @click="showQuestionDialog(item)"
-              >visibility</v-icon
-            >
-          </template>
-          <span>Show Question</span>
-        </v-tooltip>
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
-            <v-icon
               v-if="!item.hasAnswer"
               small
               class="mr-2"
@@ -136,19 +124,6 @@
         </v-dialog>
       </v-row>
     </template>
-    <v-dialog v-model="questionDialog" max-width="75%">
-      <v-card>
-        <v-card-title>
-          <span class="headline">Question</span>
-        </v-card-title>
-
-        <v-card-text width="100%">
-          <div v-if="questionDialog" class="question-context">
-            <show-question :question="openQuestion" />
-          </div>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
   </v-card>
 </template>
 
@@ -157,19 +132,14 @@ import { Component, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import ClarificationRequest from '@/models/clarification/ClarificationRequest';
 import Question from '@/models/management/Question';
-import ShowQuestion from '@/views/teacher/questions/ShowQuestion.vue';
 
-@Component({
-  components: { 'show-question': ShowQuestion }
-})
+@Component
 export default class ClarificationsView extends Vue {
   requests: ClarificationRequest[] = [];
   search: string = '';
   newContent: string = '';
   editingItem: ClarificationRequest | null = null;
   dialog: boolean = false;
-  questionDialog: boolean = false;
-  openQuestion: Question | null = null;
 
   headers: object = [
     { text: 'Request', value: 'content', align: 'center', sortable: false },
@@ -190,19 +160,6 @@ export default class ClarificationsView extends Vue {
 
   showAnswer(request: ClarificationRequest): string | void {
     return request.getAnswerContent();
-  }
-
-  async showQuestionDialog(req: ClarificationRequest): Promise<void> {
-    try {
-      this.openQuestion = await RemoteServices.getQuestionById(
-        req.getQuestionId()
-      );
-    } catch (error) {
-      await this.$store.dispatch('error', error);
-      return;
-    }
-
-    this.questionDialog = true;
   }
 
   async deleteRequest(req: ClarificationRequest) {
