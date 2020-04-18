@@ -21,7 +21,7 @@ describe('Student Question Evaluation', () => {
       questionContent,
       topics,
       options,
-      1
+      [1]
     );
 
     // logout
