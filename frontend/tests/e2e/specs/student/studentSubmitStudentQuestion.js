@@ -61,10 +61,10 @@ describe('Student Question Submission', () => {
         .contains(topictoAdd);
 
     cy.contains(questionTitle)
-        .parent()
-        .children()
-        .eq(3)
-        .should('have.text', WAITING_FOR_APPROVAL);
+      .parent()
+      .children()
+      .eq(3)
+      .should('have.text', WAITING_FOR_APPROVAL);
 
     // delete created question
     cy.contains(questionTitle)
