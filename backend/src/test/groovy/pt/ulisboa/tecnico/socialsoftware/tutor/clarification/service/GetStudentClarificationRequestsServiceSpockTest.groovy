@@ -31,7 +31,7 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
     static final String ACRONYM = "AS1"
     static final String ACADEMIC_TERM = "1 SEM"
     static final String CONTENT = "Test Content"
-    static final String CONTENT_2 = "Test content 2"
+    static final String CONTENT_2 = "Test Content 2"
 
     @Autowired
     CourseRepository courseRepository
