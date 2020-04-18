@@ -178,30 +178,17 @@ describe('Student Question Submission', () => {
       newOptions
     );
 
-    // verifications
-    cy.get('[data-cy="studentQuestionTable"]')
-      .find('tbody')
-      .children()
-      .should('have.length', 2)
-      .first()
-      .get('td')
-      .should('have.html', newQuestionTitle);
-
-    // delete the duplicate question
-    cy.contains(newQuestionTitle)
-      .parent()
-      .within(() => {
-        cy.get('[data-cy="deleteStudentQuestion"]').click();
-      });
-
-    // wait for animation and remote call to be done
-    cy.wait(1000);
-
-    // delete the original question
+    // verification and deletion
     cy.contains(questionTitle)
       .parent()
-      .within(() => {
-        cy.get('[data-cy="deleteStudentQuestion"]').click();
-      });
+      .children()
+      .contains('delete')
+      .click();
+
+    cy.contains(newQuestionTitle)
+      .parent()
+      .children()
+      .contains('delete')
+      .click();
   });
 });
