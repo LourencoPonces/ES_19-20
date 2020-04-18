@@ -168,9 +168,6 @@ Cypress.Commands.add(
   (title, content, topics, options, correctOption) => {
     cy.get('[data-cy="NewQuestion"]').click();
 
-    // wait for dialog to open
-    cy.wait(10);
-
     cy.get('[data-cy="Topics"]')
       .children()
       .find('form')
@@ -346,8 +343,6 @@ Cypress.Commands.add(
             .contains('cached')
             .click();
     }
-
-    cy.wait(10);
 
     for (oldTopic of oldTopics) {
       cy.get(`[data-cy="${oldTopic}"]`)
