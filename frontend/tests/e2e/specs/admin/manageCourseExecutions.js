@@ -4,7 +4,7 @@ describe('Administration walkthrough', () => {
   });
 
   afterEach(() => {
-    cy.contains('Logout').click();
+    cy.logout();
   });
 
   it('login creates and deletes a course execution', () => {

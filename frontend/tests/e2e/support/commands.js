@@ -31,6 +31,11 @@ Cypress.Commands.add('demoAdminLogin', () => {
   cy.contains('Manage Courses').click();
 });
 
+Cypress.Commands.add('demoTeacherLogin', () => {
+  cy.visit('/');
+  cy.get('[data-cy="teacherButton"]').click();
+});
+
 Cypress.Commands.add('demoStudentLogin', () => {
   cy.visit('/');
   cy.get('[data-cy="studentButton"]').click();
@@ -39,6 +44,20 @@ Cypress.Commands.add('demoStudentLogin', () => {
 Cypress.Commands.add('demoTeacherLogin', () => {
   cy.visit('/');
   cy.get('[data-cy="teacherButton"]').click();
+});
+
+Cypress.Commands.add('logout', () => {
+  // Work around VMenu bug
+  // this handler runs at most once, and only matches a specific error
+  cy.once('uncaught:exception', (error, _) => {
+    if (error.message == "Cannot read property 'contains' of undefined") {
+      return true;
+    }
+
+    return false;
+  });
+
+  cy.get('[data-cy="logout"]').click();
 });
 
 Cypress.Commands.add('createCourseExecution', (name, acronym, academicTerm) => {
@@ -119,6 +138,30 @@ Cypress.Commands.add('submitClarificationRequest', (content, n) => {
     }
   }
 });
+
+Cypress.Commands.add(
+  'answerClarificationRequest',
+  (requestText, answerText) => {
+    cy.get('[data-cy="management"]').click();
+    cy.get('[data-cy="teacherClarifications"]').click();
+    cy.get(
+      `[data-cy^="answerClarification-${requestText.slice(0, 15)}"]`
+    ).click();
+
+    cy.get('[data-cy="answerField"]').type(answerText);
+    cy.get('[data-cy="answerSubmit"]').click();
+  }
+);
+
+Cypress.Commands.add('deleteClarificationRequestAnswer', requestText => {
+  cy.get('[data-cy="management"]').click();
+  cy.get('[data-cy="teacherClarifications"]').click();
+  cy.get(
+    `[data-cy^="answerClarification-${requestText.slice(0, 15)}"]`
+  ).click();
+
+  cy.get('[data-cy="answerDelete"]').click();
+})
 
 Cypress.Commands.add(
   'createStudentQuestion',

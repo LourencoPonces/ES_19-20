@@ -14,8 +14,6 @@ import java.util.stream.Collectors;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CLARIFICATION_REQUEST_MISSING_CONTENT;
 
-
-
 @Entity
 @Table(name = "clarification_requests")
 public class ClarificationRequest {

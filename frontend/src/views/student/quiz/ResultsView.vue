@@ -92,6 +92,7 @@ export default class ResultsView extends Vue {
       await this.$store.dispatch('clearLoading');
     }
   }
+
   increaseOrder(): void {
     if (
       this.questionOrder + 1 <
