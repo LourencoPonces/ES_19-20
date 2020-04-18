@@ -20,6 +20,7 @@ describe('Student Question Submission', () => {
   ];
 
   beforeEach(() => {
+    questionTitle = 'Question #' + Date.now().toString();
     cy.demoStudentLogin();
   });
 
