@@ -273,61 +273,87 @@ Cypress.Commands.add(
   }
 );
 
-Cypress.Commands.add('createTournament', () => {
-  cy.get('[data-cy="newTournament"]').click({ force: true });
+Cypress.Commands.add(
+  'createTournament',
+  (title, numberOfQuestions, includeAvailable, dateOrder) => {
+    let availableNr = 1;
+    let runningNr = 2;
+    let conclusionNr = 3;
 
-  // wait for dialog to open
-  cy.wait(500);
+    if (dateOrder) {
+      let nr = 0;
+      dateOrder.forEach(date => {
+        nr++;
+        switch (date) {
+          case 'available':
+            availableNr = nr;
+            break;
+          case 'running':
+            runningNr = nr;
+            break;
+          case 'conclusion':
+            conclusionNr = nr;
+            break;
+        }
+      });
+    }
 
-  cy.get('[data-cy="title"]').type('Yeet');
+    cy.get('[data-cy="newTournament"]').click({ force: true });
 
-  cy.get('[data-cy="numberOfQuestions"').type('12');
+    // wait for dialog to open
+    cy.wait(500);
 
-  cy.contains('.v-label', 'Available Date').click({ force: true });
-  // Always click for the next month. The chosen days are guaranteed to work
-  // and won't collide with the current day.
-  cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
-  // select day
-  cy.get(
-    '.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(1) > .v-btn'
-  ).click({ multiple: true, force: true });
-  cy.contains('OK').click();
+    cy.get('[data-cy="title"]').type(title);
 
-  cy.contains('.v-label', 'Running Date').click({ force: true });
-  cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
-  // select day + 1
-  // The previously opened date pickers still exist, even though they aren't visible.
-  // The most recently opened one is the last in the list.
-  cy.get(
-    '.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(2) > .v-btn'
-  )
-    .last()
-    .click({ force: true });
-  // click ok, contains('OK') doesn't work...
-  cy.get('.v-card__actions > .green--text > .v-btn__content').click({
-    multiple: true,
-    force: true
+    cy.get('[data-cy="numberOfQuestions"').type('12');
+
+    if (includeAvailable) {
+      cy.contains('.v-label', 'Available Date').click({ force: true });
+      // Always click for the next month. The chosen days are guaranteed to work
+      // and won't collide with the current day.
+      cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
+      // select day
+      cy.get(
+        `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${availableNr}) > .v-btn`
+      ).click({ multiple: true, force: true });
+      cy.contains('OK').click();
+    }
+
+    cy.contains('.v-label', 'Running Date').click({ force: true });
+    cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
+    // select day + 1
+    // The previously opened date pickers still exist, even though they aren't visible.
+    // The most recently opened one is the last in the list.
+    cy.get(
+      `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${runningNr}) > .v-btn`
+    )
+      .last()
+      .click({ force: true });
+    // click ok, contains('OK') doesn't work...
+    cy.get('.v-card__actions > .green--text > .v-btn__content').click({
+      multiple: true,
+      force: true
+    });
+
+    cy.contains('.v-label', 'Conclusion Date').click({ force: true });
+    cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
+    // select day + 2
+    cy.get(
+      `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${conclusionNr}) > .v-btn`
+    )
+      .last()
+      .click({ force: true });
+    // click ok
+    cy.get('.v-card__actions > .green--text > .v-btn__content').click({
+      multiple: true,
+      force: true
+    });
+
+    cy.get('[data-cy="topics"').click();
+    cy.get('[role=listbox]')
+      .children()
+      .first()
+      .click({ force: true });
+
+    cy.get('[data-cy="saveTournament"]').click();
   });
-
-  cy.contains('.v-label', 'Conclusion Date').click({ force: true });
-  cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
-  // select day + 2
-  cy.get(
-    '.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(3) > .v-btn'
-  )
-    .last()
-    .click({ force: true });
-  // click ok
-  cy.get('.v-card__actions > .green--text > .v-btn__content').click({
-    multiple: true,
-    force: true
-  });
-
-  cy.get('[data-cy="topics"').click();
-  cy.get('[role=listbox]')
-    .children()
-    .first()
-    .click({ force: true });
-
-  cy.get('[data-cy="saveTournament"]').click();
-});
