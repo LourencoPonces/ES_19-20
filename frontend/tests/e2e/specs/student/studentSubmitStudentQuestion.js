@@ -3,6 +3,7 @@ let REJECTED = 'Rejected';
 let WAITING_FOR_APPROVAL = 'Waiting for Approval';
 
 describe('Student Question Submission', () => {
+  let ts;
   let questionTitle = 'Test Question Title';
   let newQuestionTitle = 'New Test Question Title';
   let questionContent = 'Test Question Content';
@@ -24,8 +25,9 @@ describe('Student Question Submission', () => {
   ];
 
   beforeEach(() => {
-    questionTitle = 'Question #' + Date.now().toString();
-    newQuestionTitle = 'New Question #' + Date.now().toString();
+    ts = Date.now().toString();
+    questionTitle = 'Question #' + ts;
+    newQuestionTitle = 'New Question #' + ts;
     cy.demoStudentLogin();
   });
 
