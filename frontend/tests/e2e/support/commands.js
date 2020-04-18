@@ -277,23 +277,23 @@ Cypress.Commands.add('createTournament', () => {
   cy.get('[data-cy="newTournament"]').click({ force: true });
 
   // wait for dialog to open
-  cy.wait(5);
+  cy.wait(500);
 
   cy.get('[data-cy="title"]').type('Yeet');
 
   cy.get('[data-cy="numberOfQuestions"').type('12');
 
-  cy.contains('Available Date').click({ force: true });
+  cy.contains('.v-label', 'Available Date').click({ force: true });
   // Always click for the next month. The chosen days are guaranteed to work
   // and won't collide with the current day.
-  cy.get('.mdi-chevron-right').click();
+  cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
   // select day
   cy.get(
     '.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(1) > .v-btn'
   ).click({ multiple: true, force: true });
   cy.contains('OK').click();
 
-  cy.contains('Running Date').click({ force: true });
+  cy.contains('.v-label', 'Running Date').click({ force: true });
   cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
   // select day + 1
   // The previously opened date pickers still exist, even though they aren't visible.
@@ -309,7 +309,7 @@ Cypress.Commands.add('createTournament', () => {
     force: true
   });
 
-  cy.contains('Conclusion Date').click({ force: true });
+  cy.contains('.v-label', 'Conclusion Date').click({ force: true });
   cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
   // select day + 2
   cy.get(
