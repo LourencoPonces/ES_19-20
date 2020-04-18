@@ -127,7 +127,7 @@ Cypress.Commands.add('submitClarificationRequest', (content, n) => {
       cy.get('[data-cy="inputRequest"]').type(content);
       cy.contains('Submit').click();
       let requests = cy.get('[data-cy="questionRequests"]')
-                       .children().first().children();
+                       .children();
       requests.should('have.length', 1);
       requests.first().should('have.text', content);
       cy.get('[data-cy="nextQuestion"]').click();
@@ -136,11 +136,11 @@ Cypress.Commands.add('submitClarificationRequest', (content, n) => {
 });
 
 Cypress.Commands.add('goToMyClarifications',  () => {
-  cy.contains('My Area').click();
-  cy.contains('Clarifications').click();
+  cy.get('[data-cy="my-area"]').click();
+  cy.get('[data-cy="clarifications"]').click();
 });
 
-Cypress.Commands.add('deleteAllRequests', (n, content) => {
+Cypress.Commands.add('deleteAllRequests', (n) => {
   if (n > 0) {
     for (i = 0; i < n; i++) {
       cy.wait(500);
@@ -148,8 +148,7 @@ Cypress.Commands.add('deleteAllRequests', (n, content) => {
         .find('tbody')
         .children()
         .should('have.length', n-i)
-        .first()
-        .should('contain.text', content);
+        .first();
 
         cy.get('[data-cy="delete"]')
           .first()

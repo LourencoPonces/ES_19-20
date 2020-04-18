@@ -43,7 +43,7 @@ public class ClarificationController {
         clarificationService.deleteClarificationRequest(user.getId(), requestId);
     }
 
-    @PutMapping("/student/clarifications")
+    @PostMapping("/student/clarifications")
     @PreAuthorize("hasRole('ROLE_STUDENT')")
     public ClarificationRequestDto updateClarificationRequest(Principal principal, @Valid @RequestBody ClarificationRequestDto clarificationRequestDto) {
         User user = (User) ((Authentication) principal).getPrincipal();

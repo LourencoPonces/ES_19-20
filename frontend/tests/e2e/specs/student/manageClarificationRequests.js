@@ -16,13 +16,13 @@ describe('Clarification Request', () => {
     cy.contains('Clarification Requests');
     cy.submitClarificationRequest(content, 1);
     cy.goToMyClarifications();
-    cy.deleteAllRequests(1, content);
+    cy.deleteAllRequests(1);
   });
 
   it('login submits and deletes two clarification requests', () => {
     cy.submitClarificationRequest(content, 2);
     cy.goToMyClarifications();
-    cy.deleteAllRequests(2, content);
+    cy.deleteAllRequests(2);
   });
 
 
@@ -30,7 +30,7 @@ describe('Clarification Request', () => {
     cy.submitClarificationRequest(content, 1);
     cy.goToMyClarifications();
     cy.editClarificationRequest(newContent);
-    cy.deleteAllRequests(1, newContent);
+    cy.deleteAllRequests(1);
   });
 
   it('login submit request with empty content', () => {
@@ -65,7 +65,7 @@ describe('Clarification Request', () => {
     
     cy.demoStudentLogin();
     cy.goToMyClarifications();
-    cy.deleteAllRequests(content, 1);
+    cy.deleteAllRequests(1);
     
   });
 

@@ -12,8 +12,8 @@ describe('Teacher Clarification Requests', () => {
 
   after(() => {
     cy.demoStudentLogin();
-    cy.deleteAllRequests(1, TEST_REQ_1);
-    cy.deleteAllRequests(1, TEST_REQ_2);
+    cy.goToMyClarifications();
+    cy.deleteAllRequests(2);
     cy.logout();
   });
 

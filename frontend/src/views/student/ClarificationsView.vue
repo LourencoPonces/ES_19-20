@@ -101,18 +101,18 @@
               Edit Clarification Request
             </v-card-title>
             <v-card-text>
-              <v-text-field
+              <v-textarea
                 v-model="newContent"
                 label="Your request goes here."
                 data-cy="inputNewContent"
               >
-              </v-text-field>
+              </v-textarea>
             </v-card-text>
             <v-card-actions data-cy="actions">
               <v-spacer></v-spacer>
               <v-btn
-                color="green darken-1"
-                text
+                dark
+                color="red"
                 @click="
                   dialog = false;
                   stopEditRequest();
@@ -121,8 +121,8 @@
                 Cancel
               </v-btn>
               <v-btn
-                color="green darken-1"
-                text
+                dark
+                color="primary"
                 @click="
                   dialog = false;
                   editRequest();
