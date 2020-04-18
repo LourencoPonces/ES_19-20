@@ -1,6 +1,6 @@
-let APPROVED = 'Approved'
-let REJECTED = 'Rejected'
-let WAITING_FOR_APPROVAL = 'Waiting for Approval'
+let APPROVED = 'Approved';
+let REJECTED = 'Rejected';
+let WAITING_FOR_APPROVAL = 'Waiting for Approval';
 
 describe('Student Question Submission', () => {
   let questionTitle = 'Test Question Title';
