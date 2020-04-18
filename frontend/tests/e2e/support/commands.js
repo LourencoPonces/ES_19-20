@@ -126,13 +126,61 @@ Cypress.Commands.add('submitClarificationRequest', (content, n) => {
       cy.get('[data-cy="newRequest"]').click();
       cy.get('[data-cy="inputRequest"]').type(content);
       cy.contains('Submit').click();
-      let requests = cy.get('[data-cy="questionRequests"]').children();
+      let requests = cy.get('[data-cy="questionRequests"]')
+                       .children();
       requests.should('have.length', 1);
       requests.first().should('have.text', content);
       cy.get('[data-cy="nextQuestion"]').click();
     }
   }
 });
+
+Cypress.Commands.add('goToMyClarifications',  () => {
+  cy.get('[data-cy="my-area"]').click();
+  cy.get('[data-cy="clarifications"]').click();
+});
+
+Cypress.Commands.add('deleteAllRequests', (n) => {
+  if (n > 0) {
+    for (i = 0; i < n; i++) {
+      cy.wait(500);
+      cy.get('[data-cy="table"]')
+        .find('tbody')
+        .children()
+        .should('have.length', n-i)
+        .first();
+
+        cy.get('[data-cy="delete"]')
+          .first()
+          .click();
+    }
+  }
+});
+
+Cypress.Commands.add('editClarificationRequest', (content) => {
+  cy.wait(500);
+  cy.get('[data-cy="edit"]')
+    .first()
+    .click();
+
+  cy.get('.v-dialog')
+    .get('[data-cy="inputNewContent"]')
+    .type(content);
+
+  cy.get('.v-dialog')
+    .get('[data-cy="actions"]')
+    .children()
+    .last()
+    .click();
+
+  cy.get('[data-cy="table"]')
+    .find('tbody')
+    .children()
+    .should('have.length', 1)
+    .first()
+    .should('contain.text', content);
+});
+
 
 Cypress.Commands.add(
   'answerClarificationRequest',
@@ -142,7 +190,6 @@ Cypress.Commands.add(
     cy.get(
       `[data-cy^="answerClarification-${requestText.slice(0, 15)}"]`
     ).click();
-
     cy.get('[data-cy="answerField"]').type(answerText);
     cy.get('[data-cy="answerSubmit"]').click();
   }

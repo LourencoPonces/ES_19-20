@@ -745,6 +745,42 @@ export default class RemoteServices {
     }
   }
 
+  static async getStudentClarificationRequests(): Promise<
+    ClarificationRequest[]
+  > {
+    return httpClient
+      .get('/student/clarifications')
+      .then(response => {
+        return response.data.map((request: any) => {
+          return new ClarificationRequest(request);
+        });
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async deleteClarificationRequest(id: number) {
+    return httpClient
+      .delete(`student/clarifications/${id}`)
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async editClarificationRequest(
+    request: ClarificationRequest
+  ): Promise<ClarificationRequest> {
+    return httpClient
+      .post('/student/clarifications', request)
+      .then(response => {
+        return new ClarificationRequest(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
   static async deleteClarificationRequestAnswer(
     ans: ClarificationRequestAnswer
   ): Promise<void> {

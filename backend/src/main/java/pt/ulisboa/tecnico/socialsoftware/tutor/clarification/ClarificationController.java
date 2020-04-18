@@ -31,7 +31,31 @@ public class ClarificationController {
         return clarificationService.submitClarificationRequest(questionId, user.getId(), clarificationRequestDto);
     }
 
-    @GetMapping("/student/clarifications/")
+    @DeleteMapping("/student/clarifications/{requestId}")
+    @PreAuthorize("hasRole('ROLE_STUDENT')")
+    public void deleteClarificationRequest(Principal principal, @PathVariable int requestId) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        if (user == null) {
+            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
+        }
+
+        clarificationService.deleteClarificationRequest(user.getId(), requestId);
+    }
+
+    @PostMapping("/student/clarifications")
+    @PreAuthorize("hasRole('ROLE_STUDENT')")
+    public ClarificationRequestDto updateClarificationRequest(Principal principal, @Valid @RequestBody ClarificationRequestDto clarificationRequestDto) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        if (user == null) {
+            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
+        }
+
+        return clarificationService.updateClarificationRequest(clarificationRequestDto);
+    }
+
+    @GetMapping("/student/clarifications")
     @PreAuthorize("hasRole('ROLE_STUDENT')")
     public List<ClarificationRequestDto> getStudentClarificationRequests(Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();

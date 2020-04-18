@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
@@ -15,6 +14,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
@@ -26,12 +27,13 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
 @DataJpaTest
-class getStudentClarificationRequestsServiceSpockTest extends Specification {
+class UpdateClarificationRequestServiceSpockTest extends Specification {
     static final String COURSE_NAME = "Software Architecture"
     static final String ACRONYM = "AS1"
     static final String ACADEMIC_TERM = "1 SEM"
     static final String CONTENT = "Test Content"
-    static final String CONTENT_2 = "Test content 2"
+    static final String NEW_CONTENT = "Edited Content"
+    static final int NONEXISTENT_ID = 5000
 
     @Autowired
     CourseRepository courseRepository
@@ -73,8 +75,7 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
     ClarificationRequestDto clarificationRequestDto
     int studentId
     int questionId
-
-
+    
     def setup() {
         course = createCourse(COURSE_NAME)
         courseExecution = createCourseExecution(course, ACRONYM, ACADEMIC_TERM)
@@ -136,66 +137,31 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
         return course
     }
 
-    def "student submitted 1 clarification request"() {
+    def "student updates submitted clarification request"() {
         given:
         clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent(CONTENT)
-        clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
+        clarificationRequestDto = clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
+        clarificationRequestDto.setContent(NEW_CONTENT)
 
         when:
+        clarificationService.updateClarificationRequest(clarificationRequestDto)
         def result = clarificationService.getStudentClarificationRequests(studentId)
 
         then:
         result != null
         result.size() == 1
-        ClarificationRequestDto req = result[0]
-        req.owner == studentId
-        req.content == CONTENT
-        req.questionId == question.getId()
+        result[0].getContent() == NEW_CONTENT
     }
 
-    def "student submitted 2 clarification requests"() {
-        given: "a clarification request for one question"
-        clarificationRequestDto = new ClarificationRequestDto()
-        clarificationRequestDto.setContent(CONTENT)
-        clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
 
-        and: "another answered question"
-        def q = createQuestion(2, course)
-        def qq = new QuizQuestion(quiz, q, 2)
-        def qa = new QuizAnswer(student, quiz)
-        quizRepository.save(quiz)
-        questionRepository.save(q)
-        quizQuestionRepository.save(qq)
-        quizAnswerRepository.save(qa)
-        userRepository.save(student)
-
-        and: "a clarification request to this question"
-        def cr = new ClarificationRequestDto();
-        cr.setContent(CONTENT_2)
-        clarificationService.submitClarificationRequest(q.getId(), studentId, cr)
-
+    def "clarification request doesn't exist"() {
         when:
-        def result = clarificationService.getStudentClarificationRequests(studentId)
-
-        then: "returns list ordered by request Id DSC"
-        result != null
-        result.size() == 2
-        result[1].owner == studentId
-        result[1].content == CONTENT
-        result[1].questionId == question.getId()
-        result[0].owner == studentId
-        result[0].content == CONTENT_2
-        result[0].questionId == q.getId()
-    }
-
-    def "student didn't submit clarification requests"() {
-        when:
-        def result = clarificationService.getStudentClarificationRequests(studentId)
+        clarificationService.deleteClarificationRequest(studentId, NONEXISTENT_ID)
 
         then:
-        result != null
-        result.size() == 0
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND
     }
 
     @TestConfiguration
