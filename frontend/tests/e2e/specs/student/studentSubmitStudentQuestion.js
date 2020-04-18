@@ -135,10 +135,11 @@ describe('Student Question Submission', () => {
       .children()
       .should('have.length', 7);
 
-    for (let newTopic of newTopics)
+    for (let newTopic of newTopics) {
       cy.get('[data-cy=questionTopics')
         .children()
         .contains(newTopic);
+    }
 
     cy.get('[data-cy="showStatus"]').should(
       'have.text',
