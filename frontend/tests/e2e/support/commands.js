@@ -161,7 +161,7 @@ Cypress.Commands.add('deleteClarificationRequestAnswer', requestText => {
   ).click();
 
   cy.get('[data-cy="answerDelete"]').click();
-})
+});
 
 Cypress.Commands.add(
   'createStudentQuestion',
@@ -250,6 +250,36 @@ Cypress.Commands.add(
       .children()
       .eq(4)
       .should('have.text', justification);
+  }
+);
+
+Cypress.Commands.add(
+  'studentAssertEvaluation',
+  (questionTitle, status, justification) => {
+    // assert status
+    cy.contains(questionTitle)
+      .parent()
+      .children()
+      .eq(3)
+      .should('have.text', status);
+
+    if (justification == null) {
+      // assert no justification
+      cy.contains(questionTitle)
+        .parent()
+        .children()
+        .should('not.have.text', 'Justification');
+    } else {
+      // assert no justification
+      cy.contains(questionTitle)
+        .parent()
+        .children()
+        .eq(6)
+        .contains('question_answer')
+        .click();
+
+      cy.get('.v-card__text').should('have.text', justification);
+    }
   }
 );
 
