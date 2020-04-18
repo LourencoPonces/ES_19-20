@@ -141,10 +141,11 @@ describe('Student Question Submission', () => {
         .contains(newTopic);
     }
 
-    cy.get('[data-cy="showStatus"]').should(
-      'have.text',
-      'Waiting for Approval'
-    );
+    cy.contains(questionTitle)
+      .parent()
+      .children()
+      .eq(3)
+      .should('have.text', WAITING_FOR_APPROVAL);
 
     // delete the question
     cy.contains(newQuestionTitle)
