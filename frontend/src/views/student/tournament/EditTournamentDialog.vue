@@ -29,7 +29,7 @@
         <v-row>
           <v-col cols="12" sm="4">
             <v-datetime-picker
-              label="*Available Date"
+              label="Available Date (default: now)"
               format="yyyy-MM-dd HH:mm"
               v-model="editTournament.availableDate"
               date-format="yyyy-MM-dd"
@@ -132,7 +132,6 @@ export default class EditTournamentDialog extends Vue {
     if (
       this.editTournament &&
       (!this.editTournament.title ||
-        !this.editTournament.availableDate ||
         !this.editTournament.runningDate ||
         !this.editTournament.conclusionDate ||
         !this.editTournament.numberOfQuestions)
