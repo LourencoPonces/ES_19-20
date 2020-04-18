@@ -14,6 +14,7 @@ import AuthDto from '@/models/user/AuthDto';
 import StatementAnswer from '@/models/statement/StatementAnswer';
 import { QuizAnswers } from '@/models/management/QuizAnswers';
 import StudentQuestion from '@/models/management/StudentQuestion';
+import Tournament from '@/models/management/Tournament';
 import ClarificationRequest from '@/models/clarification/ClarificationRequest';
 import ClarificationRequestAnswer from '@/models/clarification/ClarificationRequestAnswer';
 
@@ -320,6 +321,18 @@ export default class RemoteServices {
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
+  }
+
+  static async createTournament(tournament: Tournament): Promise<Tournament> {
+    try {
+      const response = await httpClient.post(
+        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments`,
+        tournament
+      );
+      return new Tournament(response.data);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
   }
 
   static getAvailableQuizzes(): Promise<StatementQuiz[]> {
