@@ -48,7 +48,7 @@ describe('Student Question Submission', () => {
       questionContent,
       topics,
       options,
-      1
+      [1]
     );
 
     // verifications
@@ -76,36 +76,48 @@ describe('Student Question Submission', () => {
       });
   });
 
-  // Test 2
-  it('login and create invalid questions', () => {
+
+  it('Try to create an invalid question', () => {
     cy.get('[data-cy="my-area"]').click();
     cy.get('[data-cy="student-questions"]').click();
 
-    // Creation of bad questions
-    // No Title
-    cy.createNoTitleStudentQuestion(questionContent, topic, options, 1);
-
-    // No Content
-    cy.createNoContentStudentQuestion(questionTitle, topic, options, 1);
-
-    // No Topics
-    cy.createNoTopicsStudentQuestion(
-      questionTitle,
-      questionContent,
-      options,
-      1
+    // No title
+    cy.createStudentQuestion('', questionContent, topic, options, [1]);
+    cy.errorMessageClose(
+      'Question must have title, content, and at least one topic'
     );
+    cy.get('[data-cy="CancelStudentQuestion"]').click();
 
-    // No Options
-    cy.createNoOptionsStudentQuestion(questionTitle, questionContent, topic, 1);
-
-    // No Correct Option
-    cy.createNoCorrectOptionStudentQuestion(
-      questionTitle,
-      questionContent,
-      topic,
-      options
+    // no Content
+    cy.createStudentQuestion(questionTitle, '', topic, options, [1]);
+    cy.errorMessageClose(
+      'Question must have title, content, and at least one topic'
     );
+    cy.get('[data-cy="CancelStudentQuestion"]').click();
+
+    // no topics
+    cy.createStudentQuestion(questionTitle, questionContent, [], options, [1]);
+    cy.errorMessageClose('Error: The question has no Topics');
+    cy.get('[data-cy="CancelStudentQuestion"]').click();
+
+    // no options
+    cy.createStudentQuestion(questionTitle, questionContent, topic, [], [1]);
+    cy.errorMessageClose('Error: Missing information for question');
+    cy.get('[data-cy="CancelStudentQuestion"]').click();
+
+    // no correct option
+    cy.createStudentQuestion(questionTitle, questionContent, topic, options, [0]);
+    cy.errorMessageClose(
+        "Error: The question doesn't have any correct options"
+    );
+    cy.get('[data-cy="CancelStudentQuestion"]').click();
+
+    // several correct options
+    cy.createStudentQuestion(questionTitle, questionContent, topic, options, [1, 3]);
+    cy.errorMessageClose(
+        "Error: Questions can only have 1 correct option"
+    );
+    cy.get('[data-cy="CancelStudentQuestion"]').click();
   });
 
   // Test 3
@@ -118,7 +130,7 @@ describe('Student Question Submission', () => {
       questionContent,
       topics,
       options,
-      1
+      [1]
     );
 
     cy.editStudentQuestion(
@@ -167,7 +179,7 @@ describe('Student Question Submission', () => {
       questionContent,
       topics,
       options,
-      1
+      [1]
     );
 
     cy.editStudentQuestion(
