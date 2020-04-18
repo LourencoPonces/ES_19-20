@@ -170,6 +170,7 @@ describe('Student Question Submission', () => {
 
     cy.editStudentQuestion(
       'duplicate',
+      questionTitle,
       newQuestionTitle,
       newQuestionContent,
       topics,
