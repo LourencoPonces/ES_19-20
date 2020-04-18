@@ -6,6 +6,8 @@
       :items="studentQuestions"
       :search="search"
       multi-sort
+      :sort-by="['creationDate']"
+      :sort-desc="[true]"
       :mobile-breakpoint="0"
       :items-per-page="15"
       :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
@@ -35,11 +37,15 @@
         </v-chip-group>
       </template>
 
-      <template v-slot:item.submittedStatus="{ item }">
+      <template
+        v-slot:item.submittedStatus="{ item }"
+        data-cy="submitted-status"
+      >
         <v-chip
           :color="item.getEvaluationColor()"
           small
           @click="showEvaluateStudentQuestionDialog(item)"
+          data-cy="evaluate"
         >
           <span>{{ item.submittedStatus }}</span>
         </v-chip>

@@ -40,10 +40,13 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn color="blue darken-1" @click="$emit('cancel-evaluate', false)"
+        <v-btn
+          color="primary"
+          @click="$emit('cancel-evaluate', false)"
+          data-cy="CancelEvaluation"
           >Cancel</v-btn
         >
-        <v-btn color="blue darken-1" @click="evaluateQuestion">Evaluate</v-btn>
+        <v-btn color="primary" @click="evaluateQuestion">Evaluate</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
