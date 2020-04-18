@@ -121,6 +121,7 @@ describe('Student Question Submission', () => {
 
     cy.editStudentQuestion(
       'edit',
+      questionTitle,
       newQuestionTitle,
       newQuestionContent,
       topics,

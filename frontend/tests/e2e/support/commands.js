@@ -324,10 +324,28 @@ Cypress.Commands.add(
 
 Cypress.Commands.add(
   'editStudentQuestion',
-  (command, newTitle, newContent, oldTopics, newTopics, newOptions) => {
-    if (command === 'edit') cy.get('[data-cy="editStudentQuestion"]').click();
-    else if (command === 'duplicate')
-      cy.get('[data-cy="duplicateStudentQuestion"]').click();
+  (
+    command,
+    questionTitle,
+    newTitle,
+    newContent,
+    oldTopics,
+    newTopics,
+    newOptions
+  ) => {
+    if (command === 'edit') {
+      cy.contains(questionTitle)
+        .parent()
+        .children()
+        .contains('edit')
+        .click();
+    } else if (command === 'duplicate') {
+        cy.contains(questionTitle)
+            .parent()
+            .children()
+            .contains('cached')
+            .click();
+    }
 
     cy.wait(10);
 
