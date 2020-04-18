@@ -321,7 +321,7 @@ export default class RemoteServices {
         return new Tournament(tournament);
       });
     } catch(error) {
-      throw Error(await this.errorMessage(error));
+      console.log(this.errorMessage((error)));
     }
   }
 
