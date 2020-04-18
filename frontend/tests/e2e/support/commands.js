@@ -202,6 +202,86 @@ Cypress.Commands.add(
   }
 );
 
+Cypress.Commands.add(
+  'evaluateStudentQuestion',
+  (title, prevStatus, status, justification) => {
+    // select evaluate question
+    cy.contains(title)
+      .parent()
+      .contains(prevStatus)
+      .click();
+
+    // select drop down
+    cy.get('.layout')
+      .contains(prevStatus)
+      .click();
+
+    // select evaluation status
+    cy.get('.v-list-item__content')
+      .contains(status)
+      .click();
+
+    // write justification
+    if (justification != null && justification != '') {
+      cy.get('.v-textarea').type(justification);
+    }
+
+    // select evaluate button
+    cy.get('button')
+      .contains('Evaluate')
+      .click();
+  }
+);
+
+Cypress.Commands.add(
+  'assertStudentQuestionEvaluation',
+  (questionTitle, status, justification) => {
+    // assert status
+    cy.contains(questionTitle)
+      .parent()
+      .children()
+      .eq(3)
+      .should('have.text', status);
+
+    // assert justification
+    cy.contains(questionTitle)
+      .parent()
+      .children()
+      .eq(4)
+      .should('have.text', justification);
+  }
+);
+
+Cypress.Commands.add(
+  'studentAssertEvaluation',
+  (questionTitle, status, justification) => {
+    // assert status
+    cy.contains(questionTitle)
+      .parent()
+      .children()
+      .eq(3)
+      .should('have.text', status);
+
+    if (justification == null) {
+      // assert no justification
+      cy.contains(questionTitle)
+        .parent()
+        .children()
+        .should('not.have.text', 'Justification');
+    } else {
+      // assert no justification
+      cy.contains(questionTitle)
+        .parent()
+        .children()
+        .eq(6)
+        .contains('question_answer')
+        .click();
+
+      cy.get('.v-card__text').should('have.text', justification);
+    }
+  }
+);
+
 Cypress.Commands.add('errorMessageClose', message => {
   cy.contains(message)
     .parent()
