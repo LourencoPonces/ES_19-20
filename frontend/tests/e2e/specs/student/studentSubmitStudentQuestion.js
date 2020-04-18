@@ -29,6 +29,8 @@ describe('Student Question Submission', () => {
   });
 
   afterEach(() => {
+    // clean exit
+    cy.contains('Demo Course').click();
     cy.logout();
   });
 
