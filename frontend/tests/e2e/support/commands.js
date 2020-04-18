@@ -161,7 +161,7 @@ Cypress.Commands.add('deleteClarificationRequestAnswer', requestText => {
   ).click();
 
   cy.get('[data-cy="answerDelete"]').click();
-})
+});
 
 Cypress.Commands.add(
   'createStudentQuestion',
