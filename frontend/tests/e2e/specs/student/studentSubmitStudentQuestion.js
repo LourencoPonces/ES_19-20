@@ -25,6 +25,7 @@ describe('Student Question Submission', () => {
 
   beforeEach(() => {
     questionTitle = 'Question #' + Date.now().toString();
+    newQuestionTitle = 'New Question #' + Date.now().toString();
     cy.demoStudentLogin();
   });
 
