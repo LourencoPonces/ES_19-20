@@ -2,6 +2,28 @@ let APPROVED = 'Approved';
 let REJECTED = 'Rejected';
 let WAITING_FOR_APPROVAL = 'Waiting for Approval';
 
+function teacherEvaluates(questionTitle, prevStatus, status, justification) {
+  // approve question (as teacher)
+  cy.demoTeacherLogin();
+
+  cy.get('[data-cy="management"]').click();
+  cy.get('[data-cy="student-questions"]').click();
+
+  cy.evaluateStudentQuestion(
+      questionTitle,
+      prevStatus,
+      status,
+      justification
+  );
+
+  cy.assertStudentQuestionEvaluation(
+      questionTitle,
+      status,
+      justification === null ? '' : justification
+  );
+  cy.contains('Logout').click();
+}
+
 describe('Student Question Evaluation', () => {
   let questionTitle = 'Question #' + Date.now().toString();
   let questionContent = 'To be or not to be?';
@@ -38,25 +60,7 @@ describe('Student Question Evaluation', () => {
     let prevStatus = WAITING_FOR_APPROVAL;
     let status = APPROVED;
 
-    // approve question (as teacher)
-    cy.demoTeacherLogin();
-
-    cy.get('[data-cy="management"]').click();
-    cy.get('[data-cy="student-questions"]').click();
-
-    cy.evaluateStudentQuestion(
-      questionTitle,
-      prevStatus,
-      status,
-      justification
-    );
-
-    cy.assertStudentQuestionEvaluation(
-      questionTitle,
-      status,
-      justification === null ? '' : justification
-    );
-    cy.contains('Logout').click();
+    teacherEvaluates(questionTitle, prevStatus, status, justification);
 
     // Check approved question (as student)
     cy.demoStudentLogin();
@@ -71,25 +75,7 @@ describe('Student Question Evaluation', () => {
     let prevStatus = WAITING_FOR_APPROVAL;
     let status = REJECTED;
 
-    // approve question (as teacher)
-    cy.demoTeacherLogin();
-
-    cy.get('[data-cy="management"]').click();
-    cy.get('[data-cy="student-questions"]').click();
-
-    cy.evaluateStudentQuestion(
-      questionTitle,
-      prevStatus,
-      status,
-      justification
-    );
-
-    cy.assertStudentQuestionEvaluation(
-      questionTitle,
-      status,
-      justification === null ? '' : justification
-    );
-    cy.contains('Logout').click();
+    teacherEvaluates(questionTitle, prevStatus, status, justification);
 
     // Check approved question (as student)
     cy.demoStudentLogin();
