@@ -38,7 +38,7 @@ describe('Student Question Submission', () => {
   });
 
   // Test 1
-  it('login and creates a new Student Question', () => {
+  it('Create a valid Student Question', () => {
     cy.get('[data-cy="my-area"]').click();
     cy.get('[data-cy="student-questions"]').click();
 
