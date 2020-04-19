@@ -77,7 +77,7 @@ describe('Student Question Submission', () => {
   });
 
 
-  it('Try to create an invalid question', () => {
+  it('Fail to create an invalid question', () => {
     cy.get('[data-cy="my-area"]').click();
     cy.get('[data-cy="student-questions"]').click();
 
@@ -121,7 +121,7 @@ describe('Student Question Submission', () => {
   });
 
   // Test 3
-  it('login and edit question', () => {
+  it('Edit an existing student question', () => {
     cy.get('[data-cy="my-area"]').click();
     cy.get('[data-cy="student-questions"]').click();
 
@@ -170,7 +170,7 @@ describe('Student Question Submission', () => {
   });
 
   // Test 4
-  it('login and duplicate question', () => {
+  it('Duplicate an existing student question', () => {
     cy.get('[data-cy="my-area"]').click();
     cy.get('[data-cy="student-questions"]').click();
 
