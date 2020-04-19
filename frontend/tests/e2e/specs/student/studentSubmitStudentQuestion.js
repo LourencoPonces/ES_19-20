@@ -1,4 +1,9 @@
+let APPROVED = 'Approved';
+let REJECTED = 'Rejected';
+let WAITING_FOR_APPROVAL = 'Waiting for Approval';
+
 describe('Student Question Submission', () => {
+  let ts;
   let questionTitle = 'Test Question Title';
   let newQuestionTitle = 'New Test Question Title';
   let questionContent = 'Test Question Content';
@@ -20,15 +25,20 @@ describe('Student Question Submission', () => {
   ];
 
   beforeEach(() => {
+    ts = Date.now().toString();
+    questionTitle = 'Question #' + ts;
+    newQuestionTitle = 'New Question #' + ts;
     cy.demoStudentLogin();
   });
 
   afterEach(() => {
-    cy.contains('Logout').click();
+    // clean exit
+    cy.contains('Demo Course').click();
+    cy.logout();
   });
 
   // Test 1
-  it('login and creates a new Student Question', () => {
+  it('Create a valid Student Question', () => {
     cy.get('[data-cy="my-area"]').click();
     cy.get('[data-cy="student-questions"]').click();
 
@@ -38,7 +48,7 @@ describe('Student Question Submission', () => {
       questionContent,
       topics,
       options,
-      1
+      [1]
     );
 
     // verifications
@@ -52,10 +62,11 @@ describe('Student Question Submission', () => {
         .children()
         .contains(topictoAdd);
 
-    cy.get('[data-cy="showStatus"]').should(
-      'have.text',
-      'Waiting for Approval'
-    );
+    cy.contains(questionTitle)
+      .parent()
+      .children()
+      .eq(3)
+      .should('have.text', WAITING_FOR_APPROVAL);
 
     // delete created question
     cy.contains(questionTitle)
@@ -65,36 +76,48 @@ describe('Student Question Submission', () => {
       });
   });
 
-  // Test 2
-  it('login and create invalid questions', () => {
+
+  it('Try to create an invalid question', () => {
     cy.get('[data-cy="my-area"]').click();
     cy.get('[data-cy="student-questions"]').click();
 
-    // Creation of bad questions
-    // No Title
-    cy.createNoTitleStudentQuestion(questionContent, topic, options, 1);
-
-    // No Content
-    cy.createNoContentStudentQuestion(questionTitle, topic, options, 1);
-
-    // No Topics
-    cy.createNoTopicsStudentQuestion(
-      questionTitle,
-      questionContent,
-      options,
-      1
+    // No title
+    cy.createStudentQuestion('', questionContent, topic, options, [1]);
+    cy.errorMessageClose(
+      'Question must have title, content, and at least one topic'
     );
+    cy.get('[data-cy="CancelStudentQuestion"]').click();
 
-    // No Options
-    cy.createNoOptionsStudentQuestion(questionTitle, questionContent, topic, 1);
-
-    // No Correct Option
-    cy.createNoCorrectOptionStudentQuestion(
-      questionTitle,
-      questionContent,
-      topic,
-      options
+    // no Content
+    cy.createStudentQuestion(questionTitle, '', topic, options, [1]);
+    cy.errorMessageClose(
+      'Question must have title, content, and at least one topic'
     );
+    cy.get('[data-cy="CancelStudentQuestion"]').click();
+
+    // no topics
+    cy.createStudentQuestion(questionTitle, questionContent, [], options, [1]);
+    cy.errorMessageClose('Error: The question has no Topics');
+    cy.get('[data-cy="CancelStudentQuestion"]').click();
+
+    // no options
+    cy.createStudentQuestion(questionTitle, questionContent, topic, [], [1]);
+    cy.errorMessageClose('Error: Missing information for question');
+    cy.get('[data-cy="CancelStudentQuestion"]').click();
+
+    // no correct option
+    cy.createStudentQuestion(questionTitle, questionContent, topic, options, [0]);
+    cy.errorMessageClose(
+        "Error: The question doesn't have any correct options"
+    );
+    cy.get('[data-cy="CancelStudentQuestion"]').click();
+
+    // several correct options
+    cy.createStudentQuestion(questionTitle, questionContent, topic, options, [1, 3]);
+    cy.errorMessageClose(
+        "Error: Questions can only have 1 correct option"
+    );
+    cy.get('[data-cy="CancelStudentQuestion"]').click();
   });
 
   // Test 3
@@ -107,11 +130,12 @@ describe('Student Question Submission', () => {
       questionContent,
       topics,
       options,
-      1
+      [1]
     );
 
     cy.editStudentQuestion(
       'edit',
+      questionTitle,
       newQuestionTitle,
       newQuestionContent,
       topics,
@@ -125,15 +149,17 @@ describe('Student Question Submission', () => {
       .children()
       .should('have.length', 7);
 
-    for (let newTopic of newTopics)
+    for (let newTopic of newTopics) {
       cy.get('[data-cy=questionTopics')
         .children()
         .contains(newTopic);
+    }
 
-    cy.get('[data-cy="showStatus"]').should(
-      'have.text',
-      'Waiting for Approval'
-    );
+    cy.contains(questionTitle)
+      .parent()
+      .children()
+      .eq(3)
+      .should('have.text', WAITING_FOR_APPROVAL);
 
     // delete the question
     cy.contains(newQuestionTitle)
@@ -153,11 +179,12 @@ describe('Student Question Submission', () => {
       questionContent,
       topics,
       options,
-      1
+      [1]
     );
 
     cy.editStudentQuestion(
       'duplicate',
+      questionTitle,
       newQuestionTitle,
       newQuestionContent,
       topics,
@@ -165,30 +192,17 @@ describe('Student Question Submission', () => {
       newOptions
     );
 
-    // verifications
-    cy.get('[data-cy="studentQuestionTable"]')
-      .find('tbody')
-      .children()
-      .should('have.length', 2)
-      .first()
-      .get('td')
-      .should('have.html', newQuestionTitle);
-
-    // delete the duplicate question
-    cy.contains(newQuestionTitle)
-      .parent()
-      .within(() => {
-        cy.get('[data-cy="deleteStudentQuestion"]').click();
-      });
-
-    // wait for animation and remote call to be done
-    cy.wait(1000);
-
-    // delete the original question
+    // verification and deletion
     cy.contains(questionTitle)
       .parent()
-      .within(() => {
-        cy.get('[data-cy="deleteStudentQuestion"]').click();
-      });
+      .children()
+      .contains('delete')
+      .click();
+
+    cy.contains(newQuestionTitle)
+      .parent()
+      .children()
+      .contains('delete')
+      .click();
   });
 });
