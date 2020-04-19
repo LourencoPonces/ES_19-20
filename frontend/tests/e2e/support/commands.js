@@ -202,6 +202,85 @@ Cypress.Commands.add(
   }
 );
 
+Cypress.Commands.add(
+  'evaluateStudentQuestion',
+  (title, prevStatus, status, justification) => {
+    // select evaluate question
+    cy.contains(title)
+      .parent()
+      .contains(prevStatus)
+      .click();
+
+    // select drop down
+    cy.get('[data-cy="status-dropdown"]')
+      .contains(prevStatus)
+      .click();
+
+    // select evaluation status
+    cy.get('[data-cy="status-options"]')
+      .contains(status)
+      .click();
+
+    // write justification
+    if (justification != null && justification != '') {
+      cy.get('[data-cy="justification-input"]').type(justification);
+    }
+
+    // select evaluate button
+    cy.get('[data-cy="do-evaluate"]')
+      .click();
+  }
+);
+
+Cypress.Commands.add(
+  'assertStudentQuestionEvaluation',
+  (questionTitle, status, justification) => {
+    // assert status
+    cy.contains(questionTitle)
+      .parent()
+      .children()
+      .eq(3)
+      .should('have.text', status);
+
+    // assert justification
+    cy.contains(questionTitle)
+      .parent()
+      .children()
+      .eq(4)
+      .should('have.text', justification);
+  }
+);
+
+Cypress.Commands.add(
+  'studentAssertEvaluation',
+  (questionTitle, status, justification) => {
+    // assert status
+    cy.contains(questionTitle)
+      .parent()
+      .children()
+      .eq(3)
+      .should('have.text', status);
+
+    if (justification == null) {
+      // assert no justification
+      cy.contains(questionTitle)
+        .parent()
+        .children()
+        .should('not.have.text', 'Justification');
+    } else {
+      // assert justification
+      cy.contains(questionTitle)
+        .parent()
+        .children()
+        .eq(6)
+        .contains('question_answer')
+        .click();
+
+      cy.get('[data-cy="justification-text"]').should('have.text', justification);
+    }
+  }
+);
+
 Cypress.Commands.add('errorMessageClose', message => {
   cy.contains(message)
     .parent()
@@ -321,5 +400,91 @@ Cypress.Commands.add(
       .children()
       .eq(4)
       .should('have.text', justification);
+  }
+);
+
+Cypress.Commands.add(
+  'createTournament',
+  (title, numberOfQuestions, includeAvailable, dateOrder) => {
+    let availableNr = 1;
+    let runningNr = 2;
+    let conclusionNr = 3;
+
+    if (dateOrder) {
+      let nr = 0;
+      dateOrder.forEach(date => {
+        nr++;
+        switch (date) {
+          case 'available':
+            availableNr = nr;
+            break;
+          case 'running':
+            runningNr = nr;
+            break;
+          case 'conclusion':
+            conclusionNr = nr;
+            break;
+        }
+      });
+    }
+
+    cy.get('[data-cy="newTournament"]').click({ force: true });
+
+    // wait for dialog to open
+    cy.wait(500);
+
+    cy.get('[data-cy="title"]').type(title);
+
+    cy.get('[data-cy="numberOfQuestions"').type('12');
+
+    if (includeAvailable) {
+      cy.contains('.v-label', 'Available Date').click({ force: true });
+      // Always click for the next month. The chosen days are guaranteed to work
+      // and won't collide with the current day.
+      cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
+      // select day
+      cy.get(
+        `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${availableNr}) > .v-btn`
+      ).click({ multiple: true, force: true });
+      cy.contains('OK').click();
+    }
+
+    cy.contains('.v-label', 'Running Date').click({ force: true });
+    cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
+    // select day + 1
+    // The previously opened date pickers still exist, even though they aren't visible.
+    // The most recently opened one is the last in the list.
+    cy.get(
+      `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${runningNr}) > .v-btn`
+    )
+      .last()
+      .click({ force: true });
+    // click ok, contains('OK') doesn't work...
+    cy.get('.v-card__actions > .green--text > .v-btn__content').click({
+      multiple: true,
+      force: true
+    });
+
+    cy.contains('.v-label', 'Conclusion Date').click({ force: true });
+    cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
+    // select day + 2
+    cy.get(
+      `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${conclusionNr}) > .v-btn`
+    )
+      .last()
+      .click({ force: true });
+    // click ok
+    cy.get('.v-card__actions > .green--text > .v-btn__content').click({
+      multiple: true,
+      force: true
+    });
+
+    cy.get('[data-cy="topics"').click();
+    cy.get('[role=listbox]')
+      .children()
+      .first()
+      .click({ force: true });
+
+    cy.get('[data-cy="saveTournament"]').click();
   }
 );

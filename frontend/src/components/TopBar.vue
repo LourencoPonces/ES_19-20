@@ -170,13 +170,16 @@
         <!--Tournaments-->
         <v-menu offset-y v-if="isStudent && currentCourse" open-on-hover>
           <template v-slot:activator="{ on }">
-            <v-btn v-on="on" text dark>
+            <v-btn v-on="on" text dark data-cy="tournaments">
               Tournaments
               <v-icon>fas fa-file-alt</v-icon>
             </v-btn>
           </template>
           <v-list dense>
-            <v-list-item to="/student/tournaments-available">
+            <v-list-item
+              to="/student/tournaments-available"
+              data-cy="tournaments-available"
+            >
               <v-list-item-action>
                 <v-icon>assignment</v-icon>
               </v-list-item-action>

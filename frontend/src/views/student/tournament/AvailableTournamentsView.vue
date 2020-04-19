@@ -22,7 +22,11 @@
             class="mx-2"
           />
           <v-spacer />
-          <v-btn color="primary" dark @click="newTournament"
+          <v-btn
+            color="primary"
+            dark
+            @click="newTournament"
+            data-cy="newTournament"
             >New Tournament</v-btn
           >
           <edit-tournament-dialog
