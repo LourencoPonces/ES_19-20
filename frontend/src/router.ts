@@ -21,7 +21,7 @@ import StatsView from './views/student/StatsView.vue';
 import ScanView from './views/student/ScanView.vue';
 import ClarificationsView from './views/student/ClarificationsView.vue';
 import StudentQuestionView from './views/student/StudentQuestionView.vue';
-import AvailableTournamentsView from "@/views/student/tournament/AvailableTournamentsView.vue";
+import AvailableTournamentsView from '@/views/student/tournament/AvailableTournamentsView.vue';
 
 import AdminManagementView from '@/views/admin/AdminManagementView.vue';
 import NotFoundView from '@/views/NotFoundView.vue';
@@ -29,7 +29,6 @@ import ImpExpView from '@/views/teacher/impexp/ImpExpView.vue';
 import AssessmentsView from '@/views/teacher/assessments/AssessmentsView.vue';
 import CreateQuizzesView from '@/views/student/CreateQuizzesView.vue';
 import CoursesView from '@/views/admin/Courses/CoursesView.vue';
-
 
 Vue.use(Router);
 

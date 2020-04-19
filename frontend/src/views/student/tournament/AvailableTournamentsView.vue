@@ -138,8 +138,15 @@ export default class AvailableTournamentsView extends Vue {
     }
   }
 
-  createdTournament() {
+  async createdTournament() {
     this.editTournamentDialog = false;
+    await this.$store.dispatch('loading');
+    try {
+      this.availableTournaments = await RemoteServices.getAvailableTournaments();
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
+    await this.$store.dispatch('clearLoading');
   }
 }
 </script>

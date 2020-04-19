@@ -315,7 +315,7 @@ export default class RemoteServices {
   static async getAvailableTournaments(): Promise<Tournament[]> {
     return httpClient
       .get(
-          `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments/available`
+        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments/available`
       )
       .then(response => {
         return response.data.map((tournament: any) => {
@@ -323,8 +323,7 @@ export default class RemoteServices {
         });
       })
       .catch(async error => {
-        console.log(this.errorMessage((error)));
-        //throw Error(await this.errorMessage(error));
+        console.log(this.errorMessage(error));
       });
     /*try {
       const response = await httpClient.get(
