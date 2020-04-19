@@ -128,6 +128,7 @@
               class="mr-2"
               v-on="on"
               @click="showJustification(item)"
+              data-cy="checkJustification"
               >question_answer</v-icon
             >
           </template>
