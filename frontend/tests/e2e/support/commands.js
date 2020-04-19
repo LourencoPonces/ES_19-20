@@ -41,11 +41,6 @@ Cypress.Commands.add('demoStudentLogin', () => {
   cy.get('[data-cy="studentButton"]').click();
 });
 
-Cypress.Commands.add('demoTeacherLogin', () => {
-  cy.visit('/');
-  cy.get('[data-cy="teacherButton"]').click();
-});
-
 Cypress.Commands.add('logout', () => {
   // Work around VMenu bug
   // this handler runs at most once, and only matches a specific error
@@ -101,7 +96,7 @@ Cypress.Commands.add(
   }
 );
 
-/* STUDENT QUESTION TESTS */
+/* CLARIFICATION REQUESTS TESTS */
 
 Cypress.Commands.add('generateAndAnswerQuiz', () => {
   cy.get('[data-cy="quizzes"]').click();
@@ -186,7 +181,6 @@ Cypress.Commands.add('editClarificationRequest', (content) => {
     .should('contain.text', content);
 });
 
-
 Cypress.Commands.add(
   'answerClarificationRequest',
   (requestText, answerText) => {
@@ -209,6 +203,8 @@ Cypress.Commands.add('deleteClarificationRequestAnswer', requestText => {
 
   cy.get('[data-cy="answerDelete"]').click();
 });
+
+/* CLARIFICATION REQUESTS TESTS */
 
 Cypress.Commands.add(
   'createStudentQuestion',
