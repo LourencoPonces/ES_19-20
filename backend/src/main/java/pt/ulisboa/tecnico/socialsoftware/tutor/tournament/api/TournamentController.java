@@ -76,9 +76,10 @@ public class TournamentController {
     }
 
     @DeleteMapping("/tournaments/{tournamentId}")
-    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#tournamentId, 'TOURNAMENT.OWNERSHIP')")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#tournamentId, 'TOURNAMENT.ACCESS')")
     public void deleteTournament(Principal principal, @PathVariable int tournamentId) {
-        tournamentService.deleteTournament(tournamentId);
+        User user = (User) ((Authentication) principal).getPrincipal();
+        tournamentService.deleteTournament(user.getUsername(), tournamentId);
     }
 
     private void formatDates(TournamentDto tournament) {

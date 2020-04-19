@@ -177,8 +177,11 @@ public class TournamentService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void deleteTournament(int tournamentId) {
+    public void deleteTournament(String username, int tournamentId) {
         Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow(() -> new TutorException(TOURNAMENT_NOT_FOUND, tournamentId));
+        if (tournament.getCreator().getUsername() != username) {
+            throw new TutorException(MISSING_TOURNAMENT_OWNERSHIP);
+        }
         tournament.delete();
         tournamentRepository.deleteById(tournamentId);
     }

@@ -108,7 +108,7 @@ class DeleteTournamentTest extends Specification {
 
     def "Delete a tournament"() {
         when:
-        tournamentService.deleteTournament(tournament.getId());
+        tournamentService.deleteTournament(creator.getUsername(), tournament.getId());
 
         then:
         tournamentRepository.findById(tournament.getId()).isEmpty()
@@ -121,11 +121,20 @@ class DeleteTournamentTest extends Specification {
         int badId = 1000
 
         when:
-        tournamentService.deleteTournament(badId)
+        tournamentService.deleteTournament(creator.getUsername(), badId)
 
         then:
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_FOUND
+    }
+
+    def "Delete tournament without having created it"() {
+        when:
+        tournamentService.deleteTournament(participant.getUsername(), tournament.getId())
+
+        then:
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.MISSING_TOURNAMENT_OWNERSHIP
     }
 
     @TestConfiguration
