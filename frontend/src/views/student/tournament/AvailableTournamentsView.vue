@@ -52,18 +52,11 @@
       </template>
 
       <template v-slot:item.sign-up-status="{ item }">
-        <v-chip
-                v-if="signedUpTournaments.includes(item)"
-                color="green"
-                dark
-        >{{ 'Signed-Up' }}</v-chip>
-        <v-chip
-                v-else
-                color="red"
-        >{{ 'Not Signed-Up' }}</v-chip>
-
+        <v-chip v-if="signedUpTournaments.includes(item)" color="green" dark>{{
+          'Signed-Up'
+        }}</v-chip>
+        <v-chip v-else color="red" dark>{{ 'Not Signed-Up' }}</v-chip>
       </template>
-
     </v-data-table>
   </v-card>
 </template>
@@ -83,6 +76,7 @@ import EditTournamentDialog from './EditTournamentDialog.vue';
 })
 export default class AvailableTournamentsView extends Vue {
   availableTournaments: Tournament[] = [];
+  signedUpTournaments: Tournament[] = [];
   currentTournament: Tournament | null = null;
   editTournamentDialog: boolean = false;
   topics!: Topic[];
@@ -137,7 +131,13 @@ export default class AvailableTournamentsView extends Vue {
       text: 'Nº of Participants',
       value: 'participants.length',
       align: 'center',
-      width: '10%',
+      width: '10%'
+    },
+    {
+      text: 'Status',
+      value: 'sign-up-status',
+      align: 'center',
+      width: '10%'
     },
     {
       value: 'sign-up-button',
@@ -158,9 +158,10 @@ export default class AvailableTournamentsView extends Vue {
     await this.$store.dispatch('clearLoading');
   }
 
-  async getAvailableTournaments(){
+  async getAvailableTournaments() {
     try {
       this.availableTournaments = await RemoteServices.getAvailableTournaments();
+      this.getSignUpTournaments();
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
@@ -180,18 +181,29 @@ export default class AvailableTournamentsView extends Vue {
 
   async createdTournament(tournament: Tournament) {
     this.editTournamentDialog = false;
-    await this.$store.dispatch('loading');
     await this.getAvailableTournaments();
-    await this.$store.dispatch('clearLoading');
   }
 
   async signUpInTournament(tournament: Tournament) {
     if (tournament.id)
       try {
         await RemoteServices.signUpInTournament(tournament.id);
+        await this.getAvailableTournaments();
       } catch (error) {
         await this.$store.dispatch('error', error);
       }
+  }
+
+  getSignUpTournaments() {
+    for (let i = 0; i < this.availableTournaments.length; i++)
+      for (let j = 0; j < this.availableTournaments[i].participants.length; j++)
+        if (
+          Store.getters.getUser.username ==
+          this.availableTournaments[i].participants[j].username
+        ) {
+          this.signedUpTournaments.push(this.availableTournaments[i]);
+          break;
+        }
   }
 }
 </script>

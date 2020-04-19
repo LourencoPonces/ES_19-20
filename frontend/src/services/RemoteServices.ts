@@ -355,7 +355,7 @@ export default class RemoteServices {
       .post(`/tournaments/${tournamentId}/sign-up`)
       .catch(async error => {
         throw Error(await this.errorMessage(error));
-    });
+      });
   }
 
   static getAvailableQuizzes(): Promise<StatementQuiz[]> {
