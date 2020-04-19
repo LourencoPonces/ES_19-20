@@ -21,7 +21,7 @@ function teacherEvaluates(questionTitle, prevStatus, status, justification) {
       status,
       justification === null ? '' : justification
   );
-  cy.contains('Logout').click();
+  cy.logout();
 }
 
 describe('Student Question Evaluation', () => {
@@ -46,13 +46,11 @@ describe('Student Question Evaluation', () => {
       [1]
     );
 
-    // logout
-    cy.contains('Logout').click();
+    cy.logout();
   });
 
   afterEach(() => {
-    cy.contains('Demo Course').click();
-    cy.contains('Logout').click();
+    cy.logout();
   });
 
   it('Check an approved question', () => {

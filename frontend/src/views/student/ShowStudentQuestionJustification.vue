@@ -10,7 +10,7 @@
         <span class="headline">{{ studentQuestion.title }}</span>
       </v-card-title>
 
-      <v-card-text class="text-left">
+      <v-card-text class="text-left" data-cy="justification-text">
         <show-justification :studentQuestion="studentQuestion" />
       </v-card-text>
       <v-card-actions>

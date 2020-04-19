@@ -212,23 +212,22 @@ Cypress.Commands.add(
       .click();
 
     // select drop down
-    cy.get('.layout')
+    cy.get('[data-cy="status-dropdown"]')
       .contains(prevStatus)
       .click();
 
     // select evaluation status
-    cy.get('.v-list-item__content')
+    cy.get('[data-cy="status-options"]')
       .contains(status)
       .click();
 
     // write justification
     if (justification != null && justification != '') {
-      cy.get('.v-textarea').type(justification);
+      cy.get('[data-cy="justification-input"]').type(justification);
     }
 
     // select evaluate button
-    cy.get('button')
-      .contains('Evaluate')
+    cy.get('[data-cy="do-evaluate"]')
       .click();
   }
 );
@@ -269,7 +268,7 @@ Cypress.Commands.add(
         .children()
         .should('not.have.text', 'Justification');
     } else {
-      // assert no justification
+      // assert justification
       cy.contains(questionTitle)
         .parent()
         .children()
@@ -277,7 +276,7 @@ Cypress.Commands.add(
         .contains('question_answer')
         .click();
 
-      cy.get('.v-card__text').should('have.text', justification);
+      cy.get('[data-cy="justification-text"]').should('have.text', justification);
     }
   }
 );
