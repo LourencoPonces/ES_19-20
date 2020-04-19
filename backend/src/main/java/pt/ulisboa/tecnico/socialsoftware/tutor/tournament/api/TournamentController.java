@@ -75,6 +75,12 @@ public class TournamentController {
         tournamentService.signUpInTournament(tournamentId, username);
     }
 
+    @DeleteMapping("/tournaments/{tournamentId}")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#tournamentId, 'TOURNAMENT.OWNERSHIP')")
+    public void deleteTournament(Principal principal, @PathVariable int tournamentId) {
+        tournamentService.deleteTournament(tournamentId);
+    }
+
     private void formatDates(TournamentDto tournament) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
