@@ -39,7 +39,7 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <v-icon
-                v-if="!item.hasAnswer"
+                :disabled="item.hasAnswer"
                 small
                 class="mr-2"
                 v-on="on"
@@ -47,32 +47,19 @@
                 data-cy="edit"
                 >edit</v-icon
               >
-              <v-icon v-else disabled small class="mr-2" data-cy="editDisabled">
-                edit
-              </v-icon>
             </template>
             <span>Edit Request</span>
           </v-tooltip>
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <v-icon
-                v-if="!item.hasAnswer"
+                :disabled="item.hasAnswer"
                 small
                 class="mr-2"
                 v-on="on"
                 @click="deleteRequest(item)"
                 color="red"
                 data-cy="delete"
-                >delete</v-icon
-              >
-              <v-icon
-                v-else
-                disabled
-                small
-                class="mr-2"
-                v-on="on"
-                color="red"
-                data-cy="deleteDisabled"
                 >delete</v-icon
               >
             </template>

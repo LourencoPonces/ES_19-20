@@ -51,11 +51,9 @@ describe('Clarification Request', () => {
 
     cy.demoStudentLogin();
     cy.goToMyClarifications();
-    cy.get('[data-cy="editDisabled"]')
-      .first()
+    cy.get('[data-cy="edit"]')
       .should('be.disabled');
-    cy.get('[data-cy="deleteDisabled"]')
-      .first()
+    cy.get('[data-cy="delete"]')
       .should('be.disabled');
     cy.logout();
 
