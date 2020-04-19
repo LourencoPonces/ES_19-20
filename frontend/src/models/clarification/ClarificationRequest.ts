@@ -61,6 +61,10 @@ export default class ClarificationRequest {
     this.content = c;
   }
 
+  getContent(): string {
+    return this.content;
+  }
+
   getAnswerContent(): string | void {
     return this.answer?.getContent();
   }
