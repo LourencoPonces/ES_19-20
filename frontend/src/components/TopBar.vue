@@ -184,14 +184,6 @@
                 <v-list-item-title>Available</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item to="/student/tournaments-created">
-              <v-list-item-action>
-                <v-icon>create</v-icon>
-              </v-list-item-action>
-              <v-list-item-content>
-                <v-list-item-title>Created</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
           </v-list>
         </v-menu>
         <!-- test My Area-->
@@ -408,11 +400,11 @@
             <v-list-item-content>My Clarifications</v-list-item-content>
           </v-list-item>
 
-          <v-list-item to="/student/tournaments">
+          <v-list-item to="/student/tournaments-available">
             <v-list-item-action>
               <v-icon>fas fa-trophy</v-icon>
             </v-list-item-action>
-            <v-list-item-content>My Tournaments</v-list-item-content>
+            <v-list-item-content>Available Tournaments</v-list-item-content>
           </v-list-item>
 
           <v-list-item to="/student/stats">
