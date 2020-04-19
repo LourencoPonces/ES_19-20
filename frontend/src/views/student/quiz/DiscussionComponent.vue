@@ -71,7 +71,6 @@ export default class DiscussionComponent extends Vue {
 
   creatingRequest: boolean = false;
   requestContent = '';
-  nRequests!: number;
 
   showAnswer(request: ClarificationRequest): string | void {
     return request.getAnswerContent();

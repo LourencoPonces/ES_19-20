@@ -32,6 +32,10 @@ export default class ClarificationRequest {
     return this.answer != null;
   }
 
+  getId(): number {
+    return this.id;
+  }
+
   getAnswer(): ClarificationRequestAnswer {
     if (!this.answer) throw Error('answer unavailable');
     return this.answer as ClarificationRequestAnswer;
@@ -51,10 +55,6 @@ export default class ClarificationRequest {
 
   setOwnerId(id: number): void {
     this.owner = id;
-  }
-
-  getOwnerId(): number {
-    return this.owner;
   }
 
   setContent(c: string): void {

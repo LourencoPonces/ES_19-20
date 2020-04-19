@@ -17,14 +17,20 @@
             append-icon="search"
             label="Search"
             class="mx-2"
+            single-line
+            hide-details
           />
 
           <v-spacer />
         </v-card-title>
       </template>
 
+      <template v-slot:item.content="{ item }">
+        <span style="white-space: pre;">{{ item.content }}</span>
+      </template>
+
       <template v-slot:item.answer="{ item }">
-        {{ showAnswer(item) }}
+        <span style="white-space: pre;">{{ showAnswer(item) }}</span>
       </template>
 
       <template v-slot:item.action="{ item }">
@@ -39,16 +45,9 @@
               data-cy="edit"
               >edit</v-icon
             >
-            <v-icon
-              v-else
-              disabled
-              small
-              class="mr-2"
-              v-on="on"
-              @click="startEditRequest(item)"
-              data-cy="edit"
-              >edit</v-icon
-            >
+            <v-icon v-else disabled small class="mr-2" data-cy="editDisabled">
+              edit
+            </v-icon>
           </template>
           <span>Edit Request</span>
         </v-tooltip>
@@ -70,9 +69,8 @@
               small
               class="mr-2"
               v-on="on"
-              @click="deleteRequest(item)"
               color="red"
-              data-cy="delete"
+              data-cy="deleteDisabled"
               >delete</v-icon
             >
           </template>

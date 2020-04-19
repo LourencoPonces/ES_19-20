@@ -729,7 +729,6 @@ export default class RemoteServices {
   static async getClarificationRequests(): Promise<ClarificationRequest[]> {
     try {
       const response = await httpClient.get('/clarifications');
-
       return response.data.map(
         (req: ClarificationRequest) => new ClarificationRequest(req)
       );
@@ -761,16 +760,14 @@ export default class RemoteServices {
   static async getStudentClarificationRequests(): Promise<
     ClarificationRequest[]
   > {
-    return httpClient
-      .get('/student/clarifications')
-      .then(response => {
-        return response.data.map((request: any) => {
-          return new ClarificationRequest(request);
-        });
-      })
-      .catch(async error => {
-        throw Error(await this.errorMessage(error));
-      });
+    try {
+      const response = await httpClient.get('/student/clarifications');
+      return response.data.map(
+        (request: any) => new ClarificationRequest(request)
+      );
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
   }
 
   static async deleteClarificationRequest(id: number) {
@@ -785,7 +782,7 @@ export default class RemoteServices {
     request: ClarificationRequest
   ): Promise<ClarificationRequest> {
     return httpClient
-      .post('/student/clarifications', request)
+      .post(`/student/clarifications/${request.getId()}`, request)
       .then(response => {
         return new ClarificationRequest(response.data);
       })

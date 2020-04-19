@@ -115,6 +115,9 @@ public class ClarificationService {
         User student = getStudent(userId);
         ClarificationRequest req = clarificationRequestRepository.findById(reqId)
                 .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, reqId));
+        if (req.hasAnswer()) {
+            throw new TutorException(ErrorMessage.CLARIFICATION_REQUEST_ANSWERED);
+        }
 
         student.removeClarificationRequest(req.getId());
         clarificationRequestRepository.deleteById(req.getId());
@@ -130,9 +133,13 @@ public class ClarificationService {
         ClarificationRequest req = clarificationRequestRepository.findById(clarificationRequestDto.getId())
                 .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, clarificationRequestDto.getId()));
 
-        if (clarificationRequestDto.getContent().isEmpty()) {
+        if  (req.hasAnswer()) {
+            throw new TutorException(ErrorMessage.CLARIFICATION_REQUEST_ANSWERED);
+        }
+        else if (clarificationRequestDto.getContent().isEmpty()) {
             throw new TutorException((ErrorMessage.CLARIFICATION_REQUEST_MISSING_CONTENT));
         }
+
         req.setContent(clarificationRequestDto.getContent());
         entityManager.persist(req);
 

@@ -32,7 +32,7 @@ public class ClarificationController {
     }
 
     @DeleteMapping("/student/clarifications/{requestId}")
-    @PreAuthorize("hasRole('ROLE_STUDENT')")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#requestId, 'CLARIFICATION.ACCESS')")
     public void deleteClarificationRequest(Principal principal, @PathVariable int requestId) {
         User user = (User) ((Authentication) principal).getPrincipal();
 
@@ -43,9 +43,9 @@ public class ClarificationController {
         clarificationService.deleteClarificationRequest(user.getId(), requestId);
     }
 
-    @PostMapping("/student/clarifications")
-    @PreAuthorize("hasRole('ROLE_STUDENT')")
-    public ClarificationRequestDto updateClarificationRequest(Principal principal, @Valid @RequestBody ClarificationRequestDto clarificationRequestDto) {
+    @PostMapping("/student/clarifications/{requestId}")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#requestId, 'CLARIFICATION.ACCESS')")
+    public ClarificationRequestDto updateClarificationRequest(Principal principal,  @PathVariable int requestId, @Valid @RequestBody ClarificationRequestDto clarificationRequestDto) {
         User user = (User) ((Authentication) principal).getPrincipal();
 
         if (user == null) {
