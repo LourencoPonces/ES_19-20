@@ -350,6 +350,14 @@ export default class RemoteServices {
     }
   }
 
+  static async signUpInTournament(tournamentId: number) {
+    return httpClient
+      .post(`/tournaments/${tournamentId}/sign-up`)
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+    });
+  }
+
   static getAvailableQuizzes(): Promise<StatementQuiz[]> {
     return httpClient
       .get(

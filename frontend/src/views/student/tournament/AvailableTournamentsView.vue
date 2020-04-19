@@ -46,12 +46,31 @@
       <template v-slot:item.creator="{ item }">
         <span>{{ item.creator.username }}</span>
       </template>
+
+      <template v-slot:item.sign-up-button="{ item }">
+        <v-btn color="primary" @click="signUpInTournament(item)">Sign-up</v-btn>
+      </template>
+
+      <template v-slot:item.sign-up-status="{ item }">
+        <v-chip
+                v-if="signedUpTournaments.includes(item)"
+                color="green"
+                dark
+        >{{ 'Signed-Up' }}</v-chip>
+        <v-chip
+                v-else
+                color="red"
+        >{{ 'Not Signed-Up' }}</v-chip>
+
+      </template>
+
     </v-data-table>
   </v-card>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
+import Store from '@/store';
 import Tournament from '@/models/management/Tournament';
 import RemoteServices from '@/services/RemoteServices';
 import Topic from '@/models/management/Topic';
@@ -70,12 +89,17 @@ export default class AvailableTournamentsView extends Vue {
   search: string = '';
 
   headers: object = [
-    { text: 'Title', value: 'title', align: 'center', width: '20%' },
+    {
+      text: 'Title',
+      value: 'title',
+      align: 'center',
+      width: '20%'
+    },
     {
       text: 'Topics',
       value: 'topics',
       align: 'center',
-      width: '20%',
+      width: '10%',
       sortable: false
     },
     {
@@ -108,6 +132,18 @@ export default class AvailableTournamentsView extends Vue {
       align: 'center',
       width: '10%',
       sortable: false
+    },
+    {
+      text: 'Nº of Participants',
+      value: 'participants.length',
+      align: 'center',
+      width: '10%',
+    },
+    {
+      value: 'sign-up-button',
+      align: 'center',
+      width: '10%',
+      sortable: false
     }
   ];
 
@@ -118,12 +154,16 @@ export default class AvailableTournamentsView extends Vue {
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
+    await this.getAvailableTournaments();
+    await this.$store.dispatch('clearLoading');
+  }
+
+  async getAvailableTournaments(){
     try {
       this.availableTournaments = await RemoteServices.getAvailableTournaments();
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
-    await this.$store.dispatch('clearLoading');
   }
 
   newTournament() {
@@ -138,15 +178,20 @@ export default class AvailableTournamentsView extends Vue {
     }
   }
 
-  async createdTournament() {
+  async createdTournament(tournament: Tournament) {
     this.editTournamentDialog = false;
     await this.$store.dispatch('loading');
-    try {
-      this.availableTournaments = await RemoteServices.getAvailableTournaments();
-    } catch (error) {
-      await this.$store.dispatch('error', error);
-    }
+    await this.getAvailableTournaments();
     await this.$store.dispatch('clearLoading');
+  }
+
+  async signUpInTournament(tournament: Tournament) {
+    if (tournament.id)
+      try {
+        await RemoteServices.signUpInTournament(tournament.id);
+      } catch (error) {
+        await this.$store.dispatch('error', error);
+      }
   }
 }
 </script>
