@@ -24,15 +24,14 @@ describe('Student Question Evaluation', () => {
       [1]
     );
 
-    // logout
-    cy.contains('Logout').click();
+    cy.logout();
 
     // log in as teacher
     cy.demoTeacherLogin();
   });
 
   afterEach(() => {
-    cy.contains('Logout').click();
+    cy.logout();
   });
 
   it('Approve a student question without justification', () => {
