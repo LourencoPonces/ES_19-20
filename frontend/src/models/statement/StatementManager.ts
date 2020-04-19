@@ -1,6 +1,7 @@
 import StatementCorrectAnswer from '@/models/statement/StatementCorrectAnswer';
 import RemoteServices from '@/services/RemoteServices';
 import StatementQuiz from '@/models/statement/StatementQuiz';
+import ClarificationRequest from '@/models/clarification/ClarificationRequest';
 
 export default class StatementManager {
   assessment!: number;
@@ -41,5 +42,13 @@ export default class StatementManager {
 
   isEmpty(): boolean {
     return this.statementQuiz == null;
+  }
+
+  addClarificationRequest(index: number, request: ClarificationRequest): void {
+    this.statementQuiz?.addClarificationRequest(index, request);
+  }
+
+  getClarificationRequests(index: number): ClarificationRequest[] | undefined {
+    return this.statementQuiz?.getClarificationRequests(index);
   }
 }

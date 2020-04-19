@@ -24,7 +24,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Service
@@ -127,7 +130,16 @@ public class ClarificationService {
     }
 
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<ClarificationRequestDto> getStudentClarificationRequests(int userId) {
+        User user = getStudent(userId);
+        return user.getClarificationRequests().stream().map(ClarificationRequestDto::new).collect(Collectors.toList());
+    }
+
+    @Retryable(
+            value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     private ClarificationRequest createClarificationRequest(User user, Question question, ClarificationRequestDto clarificationRequestDto) {
@@ -144,7 +156,18 @@ public class ClarificationService {
     }
 
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
+            backoff = @Backoff(delay = 5000)
+    )
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<ClarificationRequestDto> getTeacherClarificationRequests(int teacherId) {
+        return clarificationRequestRepository.getTeacherRequests(teacherId)
+                .map(ClarificationRequestDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Retryable(
+            value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     private Question tryGetAnsweredQuestion(int questionId, int userId) {
@@ -174,7 +197,7 @@ public class ClarificationService {
     }
 
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     private User getStudent(int userId) {
