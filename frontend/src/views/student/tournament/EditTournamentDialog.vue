@@ -54,6 +54,7 @@
           <v-col cols="12" sm="4">
             <v-datetime-picker
               label="*Conclusion Date"
+              format="yyyy-MM-dd HH:mm"
               v-model="editTournament.conclusionDate"
               date-format="yyyy-MM-dd"
               time-format="HH:mm"
