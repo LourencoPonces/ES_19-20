@@ -170,7 +170,8 @@ describe('Student Question Submission', () => {
   });
 
   // Test 4
-  it('Duplicate an existing student question', () => {
+  it('Duplicate an existing student question' +
+      '', () => {
     cy.get('[data-cy="my-area"]').click();
     cy.get('[data-cy="student-questions"]').click();
 
