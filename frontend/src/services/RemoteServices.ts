@@ -325,16 +325,6 @@ export default class RemoteServices {
       .catch(async error => {
         console.log(this.errorMessage(error));
       });
-    /*try {
-      const response = await httpClient.get(
-          `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments/available`
-      );
-      return response.data.map((tournament: any) => {
-        return new Tournament(tournament);
-      });
-    } catch(error) {
-      console.log(this.errorMessage((error)));
-    }*/
   }
 
   static async createTournament(tournament: Tournament): Promise<Tournament> {
