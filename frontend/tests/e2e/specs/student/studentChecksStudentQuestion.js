@@ -24,7 +24,7 @@ function teacherEvaluates(questionTitle, prevStatus, status, justification) {
   cy.logout();
 }
 
-describe('Student Question Evaluation', () => {
+describe('Student Question Verification', () => {
   let questionTitle = 'Question #' + Date.now().toString();
   let questionContent = 'To be or not to be?';
   let topics = ['Adventure Builder'];
