@@ -48,7 +48,9 @@
           data-cy="CancelEvaluation"
           >Cancel</v-btn
         >
-        <v-btn color="primary" @click="evaluateQuestion" data-cy="do-evaluate">Evaluate</v-btn>
+        <v-btn color="primary" @click="evaluateQuestion" data-cy="do-evaluate"
+          >Evaluate</v-btn
+        >
       </v-card-actions>
     </v-card>
   </v-dialog>
