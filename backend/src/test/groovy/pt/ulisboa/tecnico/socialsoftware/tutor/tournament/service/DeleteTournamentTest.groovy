@@ -128,15 +128,14 @@ class DeleteTournamentTest extends Specification {
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_FOUND
     }
 
-    // TODO: uncomment after fixing tournamentService.deleteTournament exception throwing
-//    def "Delete tournament without having created it"() {
-//        when:
-//        tournamentService.deleteTournament(participant.getUsername(), tournament.getId())
-//
-//        then:
-//        def exception = thrown(TutorException)
-//        exception.getErrorMessage() == ErrorMessage.MISSING_TOURNAMENT_OWNERSHIP
-//    }
+    def "Delete tournament without having created it"() {
+        when:
+        tournamentService.deleteTournament(participant.getUsername(), tournament.getId())
+
+        then:
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.MISSING_TOURNAMENT_OWNERSHIP
+    }
 
     @TestConfiguration
     static class TournamentServiceImplTestContextConfiguration {

@@ -180,13 +180,9 @@ public class TournamentService {
     public void deleteTournament(String username, int tournamentId) {
         Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow(() -> new TutorException(TOURNAMENT_NOT_FOUND, tournamentId));
 
-        // TODO: This works in spock tests, but to not on a regular run.
-        // Somehow the creator's attributes are all null, even though
-        // it's been verified that the creator exists and is on the
-        // tournament's database record.
-//        if (tournament.getCreator().getUsername() != username) {
-//            throw new TutorException(MISSING_TOURNAMENT_OWNERSHIP);
-//        }
+        if (!tournament.getCreator().getUsername().equals(username)) {
+            throw new TutorException(MISSING_TOURNAMENT_OWNERSHIP);
+        }
         tournament.delete();
         tournamentRepository.deleteById(tournamentId);
     }
