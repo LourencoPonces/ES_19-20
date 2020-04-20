@@ -350,6 +350,14 @@ export default class RemoteServices {
     }
   }
 
+  static async signUpInTournament(tournamentId: number) {
+    try {
+      await httpClient.post(`/tournaments/${tournamentId}/sign-up`);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
   static async deleteTournament(tournament: Tournament) {
     try {
       await httpClient.delete(`/tournaments/${tournament.id}`);

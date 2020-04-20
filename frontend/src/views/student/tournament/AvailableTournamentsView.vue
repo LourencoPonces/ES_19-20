@@ -40,15 +40,30 @@
       </template>
 
       <template v-slot:item.topics="{ item }">
-        <v-chip-group>
+        <v-chip-group data-cy="topics-list">
           <v-chip v-for="topic in item.topics" :key="topic.name">
             {{ topic.name }}
           </v-chip>
         </v-chip-group>
       </template>
 
+      <template v-slot:item.sign-up-button="{ item }">
+        <v-btn color="primary" @click="signUpInTournament(item)">Sign-up</v-btn>
+      </template>
+
       <template v-slot:item.creator="{ item }">
         <span>{{ item.creator.username }}</span>
+      </template>
+
+      <template v-slot:item.sign-up-status="{ item }">
+        <div v-if="signedUpTournaments.includes(item)">
+          <v-chip color="green" dark>{{ 'Signed-Up' }}</v-chip>
+        </div>
+        <div v-else>
+          <v-btn color="primary" @click="signUpInTournament(item)"
+            >Sign-up</v-btn
+          >
+        </div>
       </template>
 
       <template v-slot:item.delete-button="{ item }">
@@ -65,6 +80,7 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
+import Store from '@/store';
 import Tournament from '@/models/management/Tournament';
 import RemoteServices from '@/services/RemoteServices';
 import Topic from '@/models/management/Topic';
@@ -77,13 +93,19 @@ import EditTournamentDialog from './EditTournamentDialog.vue';
 })
 export default class AvailableTournamentsView extends Vue {
   availableTournaments: Tournament[] = [];
+  signedUpTournaments: Tournament[] = [];
   currentTournament: Tournament | null = null;
   editTournamentDialog: boolean = false;
   topics!: Topic[];
   search: string = '';
 
   headers: object = [
-    { text: 'Title', value: 'title', align: 'center', width: '20%' },
+    {
+      text: 'Title',
+      value: 'title',
+      align: 'center',
+      width: '10%'
+    },
     {
       text: 'Topics',
       value: 'topics',
@@ -123,9 +145,21 @@ export default class AvailableTournamentsView extends Vue {
       sortable: false
     },
     {
-      value: 'delete-button',
+      text: 'Participants',
+      value: 'participants.length',
+      align: 'center',
+      width: '10%'
+    },
+    {
+      value: 'sign-up-status',
       align: 'center',
       width: '10%',
+      sortable: false
+    },
+    {
+      value: 'delete-button',
+      align: 'center',
+      width: '5%',
       sortable: false
     }
   ];
@@ -137,11 +171,7 @@ export default class AvailableTournamentsView extends Vue {
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
-    try {
-      this.availableTournaments = await RemoteServices.getAvailableTournaments();
-    } catch (error) {
-      await this.$store.dispatch('error', error);
-    }
+    await this.getAvailableTournaments();
     await this.$store.dispatch('clearLoading');
   }
 
@@ -160,11 +190,20 @@ export default class AvailableTournamentsView extends Vue {
   async createdTournament() {
     this.editTournamentDialog = false;
     await this.$store.dispatch('loading');
-    try {
-      this.availableTournaments = await RemoteServices.getAvailableTournaments();
-    } catch (error) {
-      await this.$store.dispatch('error', error);
-    }
+    await this.getAvailableTournaments();
+    await this.$store.dispatch('clearLoading');
+  }
+
+  async signUpInTournament(tournament: Tournament) {
+    if (tournament.id)
+      try {
+        await RemoteServices.signUpInTournament(tournament.id);
+      } catch (error) {
+        await this.$store.dispatch('error', error);
+      }
+
+    await this.$store.dispatch('loading');
+    await this.getAvailableTournaments();
     await this.$store.dispatch('clearLoading');
   }
 
@@ -176,12 +215,27 @@ export default class AvailableTournamentsView extends Vue {
     }
 
     await this.$store.dispatch('loading');
+    await this.getAvailableTournaments();
+    await this.$store.dispatch('clearLoading');
+  }
+
+  async getAvailableTournaments() {
     try {
       this.availableTournaments = await RemoteServices.getAvailableTournaments();
+      this.getSignUpTournaments();
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
-    await this.$store.dispatch('clearLoading');
+  }
+
+  getSignUpTournaments() {
+    if (this.availableTournaments)
+      for (let tournament of this.availableTournaments)
+        for (let participant of tournament.participants)
+          if (Store.getters.getUser.username == participant.username) {
+            this.signedUpTournaments.push(tournament);
+            break;
+          }
   }
 }
 </script>
