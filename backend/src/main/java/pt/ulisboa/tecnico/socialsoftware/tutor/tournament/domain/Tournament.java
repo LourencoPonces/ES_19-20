@@ -220,16 +220,13 @@ public class Tournament {
     }
 
     private void checkCreationDate(LocalDateTime creationDate) {
-        if (!(creationDate != null
-                && (creationDate.isBefore(getAvailableDate()) || creationDate.isEqual(getAvailableDate())))) {
+        if (creationDate == null) {
             throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Creation date");
         }
     }
 
     private void checkAvailableDate(LocalDateTime availableDate) {
-        if (!(availableDate != null
-                && (availableDate.isEqual(getCreationDate()) || availableDate.isAfter(getCreationDate()))
-                && availableDate.isBefore(getRunningDate()))) {
+        if (!(availableDate != null && availableDate.isBefore(getRunningDate()))) {
             throw new TutorException(TOURNAMENT_NOT_CONSISTENT, "Available date");
         }
     }
