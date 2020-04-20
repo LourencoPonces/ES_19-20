@@ -41,7 +41,7 @@
 
       <template v-slot:item.topics="{ item }">
         <v-chip-group>
-          <v-chip v-for="topic in item.topics" :key="topic.name" data-cy="topics">
+          <v-chip v-for="topic in item.topics" :key="topic.name" data-cy="topics-list">
             {{ topic.name }}
           </v-chip>
         </v-chip-group>

@@ -496,19 +496,51 @@ Cypress.Commands.add('deleteTournament', title => {
 
 Cypress.Commands.add(
     'assertAvailableTournaments',
-    (title) => {
-        // assert number of questions
+    (title, numberOfTournaments) => {
+
+        cy.contains('Available Tournaments')
+            .find('[data-cy="tournaments-list"]')
+            .should('have.length', numberOfTournaments)
+
         cy.contains(title)
             .parent()
             .should('have.length', 1)
             .children()
             .should('have.length', 11)
 
-
         cy.contains(title)
             .parent()
-            .find('[data-cy="topics"]')
+            .find('[data-cy="topics-list"]')
             .should('have.length', 1)
     }
 );
+
+Cypress.Commands.add(
+    'assertAvailableTournaments',
+    (title) => {
+        cy.contains(title)
+            .parent()
+            .should('have.length', 1)
+            .children()
+            .should('have.length', 11)
+
+        cy.contains(title)
+            .parent()
+            .find('[data-cy="topics-list"]')
+            .should('have.length', 1)
+    }
+);
+
+Cypress.Commands.add(
+    'assertNumberOfTournaments',
+    (numberOfTournaments) => {
+
+        cy.contains('Available Tournaments')
+            .find('[data-cy="tournaments-list"]')
+            .should('have.length', numberOfTournaments)
+
+    }
+);
+
+
 

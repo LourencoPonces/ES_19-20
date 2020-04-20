@@ -18,11 +18,12 @@ describe('getAvailableTournaments', () => {
     cy.createTournament(title);
     cy.wait(1000);
     cy.assertAvailableTournaments(title);
+    cy.assertNumberOfTournaments(1);
     cy.wait(1000);
     cy.deleteTournament(title);
   });
 
-  it('login creates 3 tournaments with default available date and checks if they are available and deletes at the end', () => {
+/*  it('login creates 3 tournaments with default available date and checks if they are available and deletes at the end', () => {
     cy.get('[data-cy=tournaments]').click();
     cy.get('[data-cy=tournaments-available]').click();
     // Wait for fetching topics data
@@ -39,14 +40,16 @@ describe('getAvailableTournaments', () => {
     cy.wait(1000);
     cy.createTournament(title3);
     cy.wait(1000);
+    cy.assertAvailableTournaments(title1);
     cy.assertAvailableTournaments(title2);
+    cy.assertAvailableTournaments(title3);
     cy.wait(1000);
     cy.deleteTournament(title1);
     cy.wait(1000);
     cy.deleteTournament(title2);
     cy.wait(1000);
     cy.deleteTournament(title3);
-  });
+  });*/
 
   /*it('login creates a tournament with a chosen available date', () => {
     cy.get('[data-cy=tournaments]').click();
