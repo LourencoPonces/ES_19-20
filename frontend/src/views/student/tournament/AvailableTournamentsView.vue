@@ -68,7 +68,12 @@
       </template>
 
       <template v-slot:item.delete-button="{ item }">
-        <v-btn color="red" @click="deleteTournament(item)">Delete</v-btn>
+        <v-btn
+          color="red"
+          @click="deleteTournament(item)"
+          data-cy="deleteTournament"
+          >Delete</v-btn
+        >
       </template>
     </v-data-table>
   </v-card>

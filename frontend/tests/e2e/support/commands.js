@@ -439,9 +439,7 @@ Cypress.Commands.add(
 
     if (includeAvailable) {
       cy.contains('.v-label', 'Available Date').click({ force: true });
-      // Always click for the next month. The chosen days are guaranteed to work
-      // and won't collide with the current day.
-      cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
+      cy.get('.mdi-chevron-left').click({ multiple: true, force: true });
       // select day
       cy.get(
         `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${availableNr}) > .v-btn`
@@ -489,6 +487,13 @@ Cypress.Commands.add(
   }
 );
 
+Cypress.Commands.add('deleteTournament', title => {
+  cy.contains(title)
+    .parent()
+    .find('[data-cy="deleteTournament"]')
+    .click();
+});
+
 Cypress.Commands.add(
     'assertAvailableTournaments',
     (creator, numberOfTournaments) => {
@@ -500,3 +505,4 @@ Cypress.Commands.add(
             .eq(9)
     }
 );
+
