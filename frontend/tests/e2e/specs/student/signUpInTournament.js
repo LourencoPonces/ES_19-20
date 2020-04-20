@@ -7,7 +7,7 @@ describe('Sign-up in Tournament', () => {
     cy.logout();
   });
 
-  it('login creates a tournament with default available date, checks if it is sign-up and deletes at the end', () => {
+  it('login creates a tournament, checks sign-up status and deletes', () => {
     cy.get('[data-cy=tournaments]').click();
     cy.get('[data-cy=tournaments-available]').click();
     // Wait for fetching topics data
