@@ -31,7 +31,6 @@ describe('getAvailableTournaments', () => {
     let title1 = 'test1'
     let title2 = 'test2'
     let title3 = 'test3'
-    let numberOfQuestions = 10;
 
     cy.createTournament(title1);
     cy.wait(1000);
@@ -49,27 +48,4 @@ describe('getAvailableTournaments', () => {
     cy.wait(1000);
     cy.deleteTournament(title3);
   });
-
-  /*it('login creates a tournament with a chosen available date', () => {
-    cy.get('[data-cy=tournaments]').click();
-    cy.get('[data-cy=tournaments-available]').click();
-    // Wait for fetching topics data
-    cy.wait(1000);
-    cy.createTournament('test' + Date.now().toString(), 10, true);
-  });
-
-  it('login creates a tournament with invalid dates', () => {
-    cy.get('[data-cy=tournaments]').click();
-    cy.get('[data-cy=tournaments-available]').click();
-    // Wait for fetching topics data
-    cy.wait(1000);
-    cy.createTournament('test' + Date.now().toString(), 10, true, [
-      'conclusion',
-      'running',
-      'available'
-    ]);
-    cy.errorMessageClose(
-      'Error: Field Available date of tournament is not consistent'
-    );
-  });*/
 });
