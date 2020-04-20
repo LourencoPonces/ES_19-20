@@ -51,15 +51,9 @@
         <span>{{ item.creator.username }}</span>
       </template>
 
-      <template v-slot:item.sign-up-button="{ item }">
-        <v-btn color="primary" @click="signUpInTournament(item)">Sign-up</v-btn>
-      </template>
 
-      <template v-slot:item.sign-up-status="{ item }">
-        <v-chip v-if="signedUpTournaments.includes(item)" color="green" dark>{{
-          'Signed-Up'
-        }}</v-chip>
-        <v-chip v-else color="red" dark>{{ 'Not Signed-Up' }}</v-chip>
+      <template v-slot:item.delete-button="{ item }">
+        <v-btn color="red" @click="deleteTournament(item)">Delete</v-btn>
       </template>
     </v-data-table>
   </v-card>
@@ -132,19 +126,7 @@ export default class AvailableTournamentsView extends Vue {
       sortable: false
     },
     {
-      text: 'Nº of Participants',
-      value: 'participants.length',
-      align: 'center',
-      width: '10%'
-    },
-    {
-      text: 'Status',
-      value: 'sign-up-status',
-      align: 'center',
-      width: '10%'
-    },
-    {
-      value: 'sign-up-button',
+      value: 'delete-button',
       align: 'center',
       width: '10%',
       sortable: false
@@ -187,17 +169,7 @@ export default class AvailableTournamentsView extends Vue {
     this.editTournamentDialog = false;
     await this.getAvailableTournaments();
   }
-
-  async signUpInTournament(tournament: Tournament) {
-    if (tournament.id)
-      try {
-        await RemoteServices.signUpInTournament(tournament.id);
-        await this.getAvailableTournaments();
-      } catch (error) {
-        await this.$store.dispatch('error', error);
-      }
-  }
-
+  
   getSignUpTournaments() {
     for (let i = 0; i < this.availableTournaments.length; i++)
       for (let j = 0; j < this.availableTournaments[i].participants.length; j++)
@@ -208,6 +180,22 @@ export default class AvailableTournamentsView extends Vue {
           this.signedUpTournaments.push(this.availableTournaments[i]);
           break;
         }
+  }
+
+  async deleteTournament(tournament: Tournament) {
+    try {
+      await RemoteServices.deleteTournament(tournament);
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
+
+    await this.$store.dispatch('loading');
+    try {
+      this.availableTournaments = await RemoteServices.getAvailableTournaments();
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
+    await this.$store.dispatch('clearLoading');
   }
 }
 </script>
