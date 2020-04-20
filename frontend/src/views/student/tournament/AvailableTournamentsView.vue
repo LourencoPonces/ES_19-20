@@ -55,7 +55,7 @@
         <span>{{ item.creator.username }}</span>
       </template>
 
-      <template v-slot:item.sign-up-status="{ item }">
+      <template v-slot:item.sign-up-status="{ item }" data-cy="status">
         <div v-if="signedUpTournaments.includes(item)">
           <v-chip color="green" dark>{{ 'Signed-Up' }}</v-chip>
         </div>
