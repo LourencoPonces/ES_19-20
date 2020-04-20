@@ -4,7 +4,7 @@ describe('Create Tournament', () => {
   });
 
   afterEach(() => {
-    cy.contains('Logout').click();
+    cy.logout();
   });
 
   it('login creates a tournament with default available date', () => {
