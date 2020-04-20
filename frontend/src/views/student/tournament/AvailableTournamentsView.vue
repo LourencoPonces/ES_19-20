@@ -50,6 +50,10 @@
       <template v-slot:item.creator="{ item }">
         <span>{{ item.creator.username }}</span>
       </template>
+
+      <template v-slot:item.delete-button="{ item }">
+        <v-btn color="red" @click="deleteTournament(item)">Delete</v-btn>
+      </template>
     </v-data-table>
   </v-card>
 </template>
@@ -79,7 +83,7 @@ export default class AvailableTournamentsView extends Vue {
       text: 'Topics',
       value: 'topics',
       align: 'center',
-      width: '20%',
+      width: '10%',
       sortable: false
     },
     {
@@ -109,6 +113,12 @@ export default class AvailableTournamentsView extends Vue {
     {
       text: 'Creator',
       value: 'creator',
+      align: 'center',
+      width: '10%',
+      sortable: false
+    },
+    {
+      value: 'delete-button',
       align: 'center',
       width: '10%',
       sortable: false
@@ -144,6 +154,22 @@ export default class AvailableTournamentsView extends Vue {
 
   async createdTournament() {
     this.editTournamentDialog = false;
+    await this.$store.dispatch('loading');
+    try {
+      this.availableTournaments = await RemoteServices.getAvailableTournaments();
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
+    await this.$store.dispatch('clearLoading');
+  }
+
+  async deleteTournament(tournament: Tournament) {
+    try {
+      await RemoteServices.deleteTournament(tournament);
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
+
     await this.$store.dispatch('loading');
     try {
       this.availableTournaments = await RemoteServices.getAvailableTournaments();
