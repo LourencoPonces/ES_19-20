@@ -488,3 +488,15 @@ Cypress.Commands.add(
     cy.get('[data-cy="saveTournament"]').click();
   }
 );
+
+Cypress.Commands.add(
+    'assertAvailableTournaments',
+    (creator, numberOfTournaments) => {
+        // assert number of questions
+        cy.contains(creator)
+            .parent()
+            .should('have.length', numberOfTournaments)
+            .children()
+            .eq(9)
+    }
+);
