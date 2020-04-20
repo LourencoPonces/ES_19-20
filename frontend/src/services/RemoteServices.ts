@@ -352,7 +352,7 @@ export default class RemoteServices {
 
   static async signUpInTournament(tournamentId: number) {
     try {
-      return httpClient.post(`/tournaments/${tournamentId}/sign-up`);
+      await httpClient.post(`/tournaments/${tournamentId}/sign-up`);
     } catch (error) {
       throw Error(await this.errorMessage(error));
     }

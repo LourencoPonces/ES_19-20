@@ -40,12 +40,8 @@
       </template>
 
       <template v-slot:item.topics="{ item }">
-        <v-chip-group>
-          <v-chip
-            v-for="topic in item.topics"
-            :key="topic.name"
-            data-cy="topics-list"
-          >
+        <v-chip-group data-cy="topics-list">
+          <v-chip v-for="topic in item.topics" :key="topic.name">
             {{ topic.name }}
           </v-chip>
         </v-chip-group>
@@ -234,17 +230,10 @@ export default class AvailableTournamentsView extends Vue {
 
   getSignUpTournaments() {
     if (this.availableTournaments)
-      for (let i = 0; i < this.availableTournaments.length; i++)
-        for (
-          let j = 0;
-          j < this.availableTournaments[i].participants.length;
-          j++
-        )
-          if (
-            Store.getters.getUser.username ==
-            this.availableTournaments[i].participants[j].username
-          ) {
-            this.signedUpTournaments.push(this.availableTournaments[i]);
+      for (let tournament of this.availableTournaments)
+        for (let participant of tournament.participants)
+          if (Store.getters.getUser.username == participant.username) {
+            this.signedUpTournaments.push(tournament);
             break;
           }
   }
