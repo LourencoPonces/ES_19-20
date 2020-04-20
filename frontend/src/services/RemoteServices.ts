@@ -351,11 +351,11 @@ export default class RemoteServices {
   }
 
   static async signUpInTournament(tournamentId: number) {
-    return httpClient
-        .post(`/tournaments/${tournamentId}/sign-up`)
-        .catch(async error => {
-          throw Error(await this.errorMessage(error));
-        });
+    try {
+      return httpClient.post(`/tournaments/${tournamentId}/sign-up`);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
   }
 
   static async deleteTournament(tournament: Tournament) {

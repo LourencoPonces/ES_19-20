@@ -522,23 +522,12 @@ Cypress.Commands.add(
             .parent()
             .should('have.length', 1)
             .children()
-            .should('have.length', 11)
+            .should('have.length', 10)
 
         cy.contains(title)
             .parent()
             .find('[data-cy="topics-list"]')
             .should('have.length', 1)
-    }
-);
-
-Cypress.Commands.add(
-    'assertNumberOfTournaments',
-    (numberOfTournaments) => {
-
-        cy.contains('Available Tournaments')
-            .find('[data-cy="tournaments-list"]')
-            .should('have.length', numberOfTournaments)
-
     }
 );
 

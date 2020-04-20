@@ -41,7 +41,11 @@
 
       <template v-slot:item.topics="{ item }">
         <v-chip-group>
-          <v-chip v-for="topic in item.topics" :key="topic.name" data-cy="topics-list">
+          <v-chip
+            v-for="topic in item.topics"
+            :key="topic.name"
+            data-cy="topics-list"
+          >
             {{ topic.name }}
           </v-chip>
         </v-chip-group>
@@ -56,18 +60,14 @@
       </template>
 
       <template v-slot:item.sign-up-status="{ item }">
-
         <div v-if="signedUpTournaments.includes(item)">
-          <v-chip
-                  color="green"
-                  dark
-          >{{ 'Signed-Up' }}</v-chip>
+          <v-chip color="green" dark>{{ 'Signed-Up' }}</v-chip>
         </div>
-
         <div v-else>
-          <v-btn color="primary" @click="signUpInTournament(item)">Sign-up</v-btn>
+          <v-btn color="primary" @click="signUpInTournament(item)"
+            >Sign-up</v-btn
+          >
         </div>
-
       </template>
 
       <template v-slot:item.delete-button="{ item }">
@@ -152,7 +152,7 @@ export default class AvailableTournamentsView extends Vue {
       text: 'Participants',
       value: 'participants.length',
       align: 'center',
-      width: '10%',
+      width: '10%'
     },
     {
       value: 'sign-up-status',
@@ -235,10 +235,14 @@ export default class AvailableTournamentsView extends Vue {
   getSignUpTournaments() {
     if (this.availableTournaments)
       for (let i = 0; i < this.availableTournaments.length; i++)
-        for (let j = 0; j < this.availableTournaments[i].participants.length; j++)
+        for (
+          let j = 0;
+          j < this.availableTournaments[i].participants.length;
+          j++
+        )
           if (
-                  Store.getters.getUser.username ==
-                  this.availableTournaments[i].participants[j].username
+            Store.getters.getUser.username ==
+            this.availableTournaments[i].participants[j].username
           ) {
             this.signedUpTournaments.push(this.availableTournaments[i]);
             break;
