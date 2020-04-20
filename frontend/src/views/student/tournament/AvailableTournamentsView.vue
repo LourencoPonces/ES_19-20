@@ -236,15 +236,16 @@ export default class AvailableTournamentsView extends Vue {
   }
 
   getSignUpTournaments() {
-    for (let i = 0; i < this.availableTournaments.length; i++)
-      for (let j = 0; j < this.availableTournaments[i].participants.length; j++)
-        if (
-                Store.getters.getUser.username ==
-                this.availableTournaments[i].participants[j].username
-        ) {
-          this.signedUpTournaments.push(this.availableTournaments[i]);
-          break;
-        }
+    if (this.availableTournaments)
+      for (let i = 0; i < this.availableTournaments.length; i++)
+        for (let j = 0; j < this.availableTournaments[i].participants.length; j++)
+          if (
+                  Store.getters.getUser.username ==
+                  this.availableTournaments[i].participants[j].username
+          ) {
+            this.signedUpTournaments.push(this.availableTournaments[i]);
+            break;
+          }
   }
 }
 </script>
