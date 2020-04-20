@@ -82,6 +82,7 @@ public enum ErrorMessage {
     CLARIFICATION_REQUEST_NOT_SUBMITTED("Student %s didn't submit a clarification request"),
     CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT("Missing content of clarification request answer"),
     CLARIFICATION_REQUEST_UNANSWERED("The clarification request wasn't answered yet"),
+    CLARIFICATION_REQUEST_ANSWERED("The clarification request was answered already"),
 
     INVALID_STUDENT_QUESTION_EVALUATION("Invalid StudentQuestion Evaluation");
 
