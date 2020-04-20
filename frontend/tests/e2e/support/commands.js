@@ -405,7 +405,7 @@ Cypress.Commands.add(
 
 Cypress.Commands.add(
   'createTournament',
-  (title, numberOfQuestions, includeAvailable, dateOrder) => {
+  (title, includeAvailable, dateOrder) => {
     let availableNr = 1;
     let runningNr = 2;
     let conclusionNr = 3;
@@ -496,13 +496,19 @@ Cypress.Commands.add('deleteTournament', title => {
 
 Cypress.Commands.add(
     'assertAvailableTournaments',
-    (creator, numberOfTournaments) => {
+    (title) => {
         // assert number of questions
         cy.contains(title)
             .parent()
-            .should('have.length', numberOfTournaments)
+            .should('have.length', 1)
             .children()
-            .eq(10)
+            .should('have.length', 11)
+
+
+        cy.contains(title)
+            .parent()
+            .find('[data-cy="topics"]')
+            .should('have.length', 1)
     }
 );
 
