@@ -350,6 +350,14 @@ export default class RemoteServices {
     }
   }
 
+  static async deleteTournament(tournament: Tournament) {
+    try {
+      await httpClient.delete(`/tournaments/${tournament.id}`);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
   static getAvailableQuizzes(): Promise<StatementQuiz[]> {
     return httpClient
       .get(
