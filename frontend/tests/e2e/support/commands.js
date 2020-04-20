@@ -498,11 +498,11 @@ Cypress.Commands.add(
     'assertAvailableTournaments',
     (creator, numberOfTournaments) => {
         // assert number of questions
-        cy.contains(creator)
+        cy.contains(title)
             .parent()
             .should('have.length', numberOfTournaments)
             .children()
-            .eq(9)
+            .eq(10)
     }
 );
 

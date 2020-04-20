@@ -15,13 +15,16 @@ describe('getAvailableTournaments', () => {
 
     let title = 'test' + Date.now().toString();
     let numberOfQuestions = 10;
-    let creator = Store.getters.getUser;
+    //let creator = Store.getters.getUser;
 
     cy.createTournament(title, numberOfQuestions);
-    cy.assertAvailableTournaments(creator, 1);
+    cy.wait(1000);
+    cy.assertAvailableTournaments(title, 1);
+    cy.deleteTournament(title);
+    cy.wait(1000);
   });
 
-  it('login creates a tournament with default available date', () => {
+/*  it('login creates a tournament with default available date', () => {
     cy.get('[data-cy=tournaments]').click();
     cy.get('[data-cy=tournaments-available]').click();
     // Wait for fetching topics data
@@ -37,7 +40,7 @@ describe('getAvailableTournaments', () => {
     cy.createTournament(title, numberOfQuestions);
     cy.createTournament(title, numberOfQuestions);
     cy.assertAvailableTournaments(creator, 5);
-  });
+  });*/
 
   /*it('login creates a tournament with a chosen available date', () => {
     cy.get('[data-cy=tournaments]').click();
