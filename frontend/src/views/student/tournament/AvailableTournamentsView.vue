@@ -47,19 +47,28 @@
         </v-chip-group>
       </template>
 
-      <template v-slot:item.creator="{ item }">
-        <span>{{ item.creator.username }}</span>
-      </template>
-
       <template v-slot:item.sign-up-button="{ item }">
         <v-btn color="primary" @click="signUpInTournament(item)">Sign-up</v-btn>
       </template>
 
+      <template v-slot:item.creator="{ item }">
+        <span>{{ item.creator.username }}</span>
+      </template>
+
       <template v-slot:item.sign-up-status="{ item }">
-        <v-chip v-if="signedUpTournaments.includes(item)" color="green" dark>{{
-          'Signed-Up'
-        }}</v-chip>
-        <v-chip v-else color="red" dark>{{ 'Not Signed-Up' }}</v-chip>
+        <v-chip
+                v-if="signedUpTournaments.includes(item)"
+                color="green"
+                dark
+        >{{ 'Signed-Up' }}</v-chip>
+        <v-chip
+                v-else
+                color="red"
+        >{{ 'Not Signed-Up' }}</v-chip>
+      </template>
+
+      <template v-slot:item.delete-button="{ item }">
+        <v-btn color="red" @click="deleteTournament(item)">Delete</v-btn>
       </template>
     </v-data-table>
   </v-card>
@@ -91,7 +100,7 @@ export default class AvailableTournamentsView extends Vue {
       text: 'Title',
       value: 'title',
       align: 'center',
-      width: '20%'
+      width: '10%'
     },
     {
       text: 'Topics',
@@ -132,21 +141,27 @@ export default class AvailableTournamentsView extends Vue {
       sortable: false
     },
     {
-      text: 'Nº of Participants',
+      text: 'Participants',
       value: 'participants.length',
       align: 'center',
-      width: '10%'
+      width: '10%',
     },
     {
       text: 'Status',
       value: 'sign-up-status',
       align: 'center',
-      width: '10%'
+      width: '10%',
     },
     {
       value: 'sign-up-button',
       align: 'center',
-      width: '10%',
+      width: '5%',
+      sortable: false
+    },
+    {
+      value: 'delete-button',
+      align: 'center',
+      width: '5%',
       sortable: false
     }
   ];
@@ -162,15 +177,6 @@ export default class AvailableTournamentsView extends Vue {
     await this.$store.dispatch('clearLoading');
   }
 
-  async getAvailableTournaments() {
-    try {
-      this.availableTournaments = await RemoteServices.getAvailableTournaments();
-      this.getSignUpTournaments();
-    } catch (error) {
-      await this.$store.dispatch('error', error);
-    }
-  }
-
   newTournament() {
     this.currentTournament = new Tournament();
     this.editTournamentDialog = true;
@@ -183,27 +189,53 @@ export default class AvailableTournamentsView extends Vue {
     }
   }
 
-  async createdTournament(tournament: Tournament) {
+  async createdTournament() {
     this.editTournamentDialog = false;
+    await this.$store.dispatch('loading');
     await this.getAvailableTournaments();
+    await this.$store.dispatch('clearLoading');
   }
 
   async signUpInTournament(tournament: Tournament) {
     if (tournament.id)
       try {
         await RemoteServices.signUpInTournament(tournament.id);
-        await this.getAvailableTournaments();
       } catch (error) {
         await this.$store.dispatch('error', error);
       }
+
+    await this.$store.dispatch('loading');
+    await this.getAvailableTournaments();
+    await this.$store.dispatch('clearLoading');
+  }
+
+  async deleteTournament(tournament: Tournament) {
+    try {
+      await RemoteServices.deleteTournament(tournament);
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
+
+    await this.$store.dispatch('loading');
+    await this.getAvailableTournaments();
+    await this.$store.dispatch('clearLoading');
+  }
+
+  async getAvailableTournaments() {
+    try {
+      this.availableTournaments = await RemoteServices.getAvailableTournaments();
+      this.getSignUpTournaments();
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
   }
 
   getSignUpTournaments() {
     for (let i = 0; i < this.availableTournaments.length; i++)
       for (let j = 0; j < this.availableTournaments[i].participants.length; j++)
         if (
-          Store.getters.getUser.username ==
-          this.availableTournaments[i].participants[j].username
+                Store.getters.getUser.username ==
+                this.availableTournaments[i].participants[j].username
         ) {
           this.signedUpTournaments.push(this.availableTournaments[i]);
           break;
