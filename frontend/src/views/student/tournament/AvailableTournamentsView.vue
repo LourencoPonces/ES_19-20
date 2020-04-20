@@ -177,15 +177,6 @@ export default class AvailableTournamentsView extends Vue {
     await this.$store.dispatch('clearLoading');
   }
 
-  async getAvailableTournaments() {
-    try {
-      this.availableTournaments = await RemoteServices.getAvailableTournaments();
-      this.getSignUpTournaments();
-    } catch (error) {
-      await this.$store.dispatch('error', error);
-    }
-  }
-
   newTournament() {
     this.currentTournament = new Tournament();
     this.editTournamentDialog = true;
@@ -198,9 +189,11 @@ export default class AvailableTournamentsView extends Vue {
     }
   }
 
-  async createdTournament(tournament: Tournament) {
+  async createdTournament() {
     this.editTournamentDialog = false;
+    await this.$store.dispatch('loading');
     await this.getAvailableTournaments();
+    await this.$store.dispatch('clearLoading');
   }
 
   async signUpInTournament(tournament: Tournament) {
@@ -210,18 +203,10 @@ export default class AvailableTournamentsView extends Vue {
       } catch (error) {
         await this.$store.dispatch('error', error);
       }
-  }
 
-  getSignUpTournaments() {
-    for (let i = 0; i < this.availableTournaments.length; i++)
-      for (let j = 0; j < this.availableTournaments[i].participants.length; j++)
-        if (
-          Store.getters.getUser.username ==
-          this.availableTournaments[i].participants[j].username
-        ) {
-          this.signedUpTournaments.push(this.availableTournaments[i]);
-          break;
-        }
+    await this.$store.dispatch('loading');
+    await this.getAvailableTournaments();
+    await this.$store.dispatch('clearLoading');
   }
 
   async deleteTournament(tournament: Tournament) {
@@ -232,12 +217,29 @@ export default class AvailableTournamentsView extends Vue {
     }
 
     await this.$store.dispatch('loading');
+    await this.getAvailableTournaments();
+    await this.$store.dispatch('clearLoading');
+  }
+
+  async getAvailableTournaments() {
     try {
       this.availableTournaments = await RemoteServices.getAvailableTournaments();
+      this.getSignUpTournaments();
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
-    await this.$store.dispatch('clearLoading');
+  }
+
+  getSignUpTournaments() {
+    for (let i = 0; i < this.availableTournaments.length; i++)
+      for (let j = 0; j < this.availableTournaments[i].participants.length; j++)
+        if (
+                Store.getters.getUser.username ==
+                this.availableTournaments[i].participants[j].username
+        ) {
+          this.signedUpTournaments.push(this.availableTournaments[i]);
+          break;
+        }
   }
 }
 </script>
