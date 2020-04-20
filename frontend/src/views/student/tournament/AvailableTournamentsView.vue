@@ -56,15 +56,18 @@
       </template>
 
       <template v-slot:item.sign-up-status="{ item }">
-        <v-chip
-                v-if="signedUpTournaments.includes(item)"
-                color="green"
-                dark
-        >{{ 'Signed-Up' }}</v-chip>
-        <v-chip
-                v-else
-                color="red"
-        >{{ 'Not Signed-Up' }}</v-chip>
+
+        <div v-if="signedUpTournaments.includes(item)">
+          <v-chip
+                  color="green"
+                  dark
+          >{{ 'Signed-Up' }}</v-chip>
+        </div>
+
+        <div v-else>
+          <v-btn color="primary" @click="signUpInTournament(item)">Sign-up</v-btn>
+        </div>
+
       </template>
 
       <template v-slot:item.delete-button="{ item }">
@@ -152,15 +155,9 @@ export default class AvailableTournamentsView extends Vue {
       width: '10%',
     },
     {
-      text: 'Status',
       value: 'sign-up-status',
       align: 'center',
       width: '10%',
-    },
-    {
-      value: 'sign-up-button',
-      align: 'center',
-      width: '5%',
       sortable: false
     },
     {
