@@ -16,6 +16,7 @@
             <v-text-field
               v-model="editTournament.title"
               label="Title"
+              data-cy="title"
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="4">
@@ -23,13 +24,14 @@
               v-model="editTournament.numberOfQuestions"
               label="Number of questions"
               type="number"
+              data-cy="numberOfQuestions"
             ></v-text-field>
           </v-col>
         </v-row>
         <v-row>
-          <v-col cols="12" sm="4">
+          <v-col cols="12" sm="4" data-cy="availableDate">
             <v-datetime-picker
-              label="*Available Date"
+              label="Available Date (default: now)"
               format="yyyy-MM-dd HH:mm"
               v-model="editTournament.availableDate"
               date-format="yyyy-MM-dd"
@@ -44,16 +46,19 @@
               v-model="editTournament.runningDate"
               date-format="yyyy-MM-dd"
               time-format="HH:mm"
+              data-cy="runningDate"
             >
             </v-datetime-picker>
           </v-col>
           <v-spacer></v-spacer>
           <v-col cols="12" sm="4">
             <v-datetime-picker
-              label="*ConclusionDate"
+              label="*Conclusion Date"
+              format="yyyy-MM-dd HH:mm"
               v-model="editTournament.conclusionDate"
               date-format="yyyy-MM-dd"
               time-format="HH:mm"
+              data-cy="conclusionDate"
             >
             </v-datetime-picker>
           </v-col>
@@ -67,6 +72,7 @@
           item-text="name"
           item-value="name"
           @change="saveTopics"
+          data-cy="topics"
         >
           <template v-slot:selection="data">
             <v-chip
@@ -90,7 +96,12 @@
           <v-btn color="blue darken-1" @click="$emit('dialog', false)"
             >Cancel</v-btn
           >
-          <v-btn color="blue darken-1" @click="saveTournament">Save</v-btn>
+          <v-btn
+            color="blue darken-1"
+            @click="saveTournament"
+            data-cy="saveTournament"
+            >Save</v-btn
+          >
         </v-card-actions>
       </v-card-text>
     </v-card>
@@ -132,7 +143,6 @@ export default class EditTournamentDialog extends Vue {
     if (
       this.editTournament &&
       (!this.editTournament.title ||
-        !this.editTournament.availableDate ||
         !this.editTournament.runningDate ||
         !this.editTournament.conclusionDate ||
         !this.editTournament.numberOfQuestions)

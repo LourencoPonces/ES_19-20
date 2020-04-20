@@ -170,26 +170,21 @@
         <!--Tournaments-->
         <v-menu offset-y v-if="isStudent && currentCourse" open-on-hover>
           <template v-slot:activator="{ on }">
-            <v-btn v-on="on" text dark>
+            <v-btn v-on="on" text dark data-cy="tournaments">
               Tournaments
               <v-icon>fas fa-file-alt</v-icon>
             </v-btn>
           </template>
           <v-list dense>
-            <v-list-item to="/student/tournaments-available">
+            <v-list-item
+              to="/student/tournaments-available"
+              data-cy="tournaments-available"
+            >
               <v-list-item-action>
                 <v-icon>assignment</v-icon>
               </v-list-item-action>
               <v-list-item-content>
                 <v-list-item-title>Available</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-            <v-list-item to="/student/tournaments-created">
-              <v-list-item-action>
-                <v-icon>create</v-icon>
-              </v-list-item-action>
-              <v-list-item-content>
-                <v-list-item-title>Created</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -218,7 +213,9 @@
                 <v-icon>fas fa-question</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>Clarifications</v-list-item-title>
+                <v-list-item-title data-cy="clarifications"
+                  >Clarifications</v-list-item-title
+                >
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -401,18 +398,18 @@
             <v-list-item-content>My Questions</v-list-item-content>
           </v-list-item>
 
-          <v-list-item to="">
+          <v-list-item to="/student/clarifications">
             <v-list-item-action>
               <v-icon>fas fa-question</v-icon>
             </v-list-item-action>
             <v-list-item-content>My Clarifications</v-list-item-content>
           </v-list-item>
 
-          <v-list-item to="/student/tournaments">
+          <v-list-item to="/student/tournaments-available">
             <v-list-item-action>
               <v-icon>fas fa-trophy</v-icon>
             </v-list-item-action>
-            <v-list-item-content>My Tournaments</v-list-item-content>
+            <v-list-item-content>Available Tournaments</v-list-item-content>
           </v-list-item>
 
           <v-list-item to="/student/stats">

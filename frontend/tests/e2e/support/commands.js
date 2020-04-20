@@ -41,11 +41,6 @@ Cypress.Commands.add('demoStudentLogin', () => {
   cy.get('[data-cy="studentButton"]').click();
 });
 
-Cypress.Commands.add('demoTeacherLogin', () => {
-  cy.visit('/');
-  cy.get('[data-cy="teacherButton"]').click();
-});
-
 Cypress.Commands.add('logout', () => {
   // Work around VMenu bug
   // this handler runs at most once, and only matches a specific error
@@ -101,7 +96,7 @@ Cypress.Commands.add(
   }
 );
 
-/* STUDENT QUESTION TESTS */
+/* CLARIFICATION REQUESTS TESTS */
 
 Cypress.Commands.add('generateAndAnswerQuiz', () => {
   cy.get('[data-cy="quizzes"]').click();
@@ -131,12 +126,59 @@ Cypress.Commands.add('submitClarificationRequest', (content, n) => {
       cy.get('[data-cy="newRequest"]').click();
       cy.get('[data-cy="inputRequest"]').type(content);
       cy.contains('Submit').click();
-      let requests = cy.get('[data-cy="questionRequests"]').children();
+      let requests = cy.get('[data-cy="questionRequests"]')
+                       .children();
       requests.should('have.length', 1);
       requests.first().should('have.text', content);
       cy.get('[data-cy="nextQuestion"]').click();
     }
   }
+});
+
+Cypress.Commands.add('goToMyClarifications',  () => {
+  cy.get('[data-cy="my-area"]').click();
+  cy.get('[data-cy="clarifications"]').click();
+});
+
+Cypress.Commands.add('deleteAllRequests', (n) => {
+  if (n > 0) {
+    for (i = 0; i < n; i++) {
+      cy.wait(500);
+      cy.get('[data-cy="table"]')
+        .find('tbody')
+        .children()
+        .should('have.length', n-i)
+        .first();
+
+        cy.get('[data-cy="delete"]')
+          .first()
+          .click();
+    }
+  }
+});
+
+Cypress.Commands.add('editClarificationRequest', (content) => {
+  cy.wait(500);
+  cy.get('[data-cy="edit"]')
+    .first()
+    .click();
+
+  cy.get('.v-dialog')
+    .get('[data-cy="inputNewContent"]')
+    .type(content);
+
+  cy.get('.v-dialog')
+    .get('[data-cy="actions"]')
+    .children()
+    .last()
+    .click();
+
+  cy.get('[data-cy="table"]')
+    .find('tbody')
+    .children()
+    .should('have.length', 1)
+    .first()
+    .should('contain.text', content);
 });
 
 Cypress.Commands.add(
@@ -147,7 +189,6 @@ Cypress.Commands.add(
     cy.get(
       `[data-cy^="answerClarification-${requestText.slice(0, 15)}"]`
     ).click();
-
     cy.get('[data-cy="answerField"]').type(answerText);
     cy.get('[data-cy="answerSubmit"]').click();
   }
@@ -162,6 +203,8 @@ Cypress.Commands.add('deleteClarificationRequestAnswer', requestText => {
 
   cy.get('[data-cy="answerDelete"]').click();
 });
+
+/* STUDENT QUESTION TESTS */
 
 Cypress.Commands.add(
   'createStudentQuestion',
@@ -199,6 +242,85 @@ Cypress.Commands.add(
     }
 
     cy.get('[data-cy="SaveStudentQuestion"]').click();
+  }
+);
+
+Cypress.Commands.add(
+  'evaluateStudentQuestion',
+  (title, prevStatus, status, justification) => {
+    // select evaluate question
+    cy.contains(title)
+      .parent()
+      .contains(prevStatus)
+      .click();
+
+    // select drop down
+    cy.get('[data-cy="status-dropdown"]')
+      .contains(prevStatus)
+      .click();
+
+    // select evaluation status
+    cy.get('[data-cy="status-options"]')
+      .contains(status)
+      .click();
+
+    // write justification
+    if (justification != null && justification != '') {
+      cy.get('[data-cy="justification-input"]').type(justification);
+    }
+
+    // select evaluate button
+    cy.get('[data-cy="do-evaluate"]')
+      .click();
+  }
+);
+
+Cypress.Commands.add(
+  'assertStudentQuestionEvaluation',
+  (questionTitle, status, justification) => {
+    // assert status
+    cy.contains(questionTitle)
+      .parent()
+      .children()
+      .eq(3)
+      .should('have.text', status);
+
+    // assert justification
+    cy.contains(questionTitle)
+      .parent()
+      .children()
+      .eq(4)
+      .should('have.text', justification);
+  }
+);
+
+Cypress.Commands.add(
+  'studentAssertEvaluation',
+  (questionTitle, status, justification) => {
+    // assert status
+    cy.contains(questionTitle)
+      .parent()
+      .children()
+      .eq(3)
+      .should('have.text', status);
+
+    if (justification == null) {
+      // assert no justification
+      cy.contains(questionTitle)
+        .parent()
+        .children()
+        .should('not.have.text', 'Justification');
+    } else {
+      // assert justification
+      cy.contains(questionTitle)
+        .parent()
+        .children()
+        .eq(6)
+        .contains('question_answer')
+        .click();
+
+      cy.get('[data-cy="justification-text"]').should('have.text', justification);
+    }
   }
 );
 
@@ -323,3 +445,94 @@ Cypress.Commands.add(
       .should('have.text', justification);
   }
 );
+
+Cypress.Commands.add(
+  'createTournament',
+  (title, numberOfQuestions, includeAvailable, dateOrder) => {
+    let availableNr = 1;
+    let runningNr = 2;
+    let conclusionNr = 3;
+
+    if (dateOrder) {
+      let nr = 0;
+      dateOrder.forEach(date => {
+        nr++;
+        switch (date) {
+          case 'available':
+            availableNr = nr;
+            break;
+          case 'running':
+            runningNr = nr;
+            break;
+          case 'conclusion':
+            conclusionNr = nr;
+            break;
+        }
+      });
+    }
+
+    cy.get('[data-cy="newTournament"]').click({ force: true });
+
+    // wait for dialog to open
+    cy.wait(500);
+
+    cy.get('[data-cy="title"]').type(title);
+
+    cy.get('[data-cy="numberOfQuestions"').type('12');
+
+    if (includeAvailable) {
+      cy.contains('.v-label', 'Available Date').click({ force: true });
+      cy.get('.mdi-chevron-left').click({ multiple: true, force: true });
+      // select day
+      cy.get(
+        `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${availableNr}) > .v-btn`
+      ).click({ multiple: true, force: true });
+      cy.contains('OK').click();
+    }
+
+    cy.contains('.v-label', 'Running Date').click({ force: true });
+    cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
+    // select day + 1
+    // The previously opened date pickers still exist, even though they aren't visible.
+    // The most recently opened one is the last in the list.
+    cy.get(
+      `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${runningNr}) > .v-btn`
+    )
+      .last()
+      .click({ force: true });
+    // click ok, contains('OK') doesn't work...
+    cy.get('.v-card__actions > .green--text > .v-btn__content').click({
+      multiple: true,
+      force: true
+    });
+
+    cy.contains('.v-label', 'Conclusion Date').click({ force: true });
+    cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
+    // select day + 2
+    cy.get(
+      `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${conclusionNr}) > .v-btn`
+    )
+      .last()
+      .click({ force: true });
+    // click ok
+    cy.get('.v-card__actions > .green--text > .v-btn__content').click({
+      multiple: true,
+      force: true
+    });
+
+    cy.get('[data-cy="topics"').click();
+    cy.get('[role=listbox]')
+      .children()
+      .first()
+      .click({ force: true });
+
+    cy.get('[data-cy="saveTournament"]').click();
+  }
+);
+
+Cypress.Commands.add('deleteTournament', title => {
+  cy.contains(title)
+    .parent()
+    .find('[data-cy="deleteTournament"]')
+    .click();
+});

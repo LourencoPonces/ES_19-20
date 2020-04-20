@@ -185,6 +185,14 @@ public class User implements UserDetails, DomainEntity {
     public Set<ClarificationRequest> getClarificationRequests() {
         return clarificationRequests;
     }
+    public void removeClarificationRequest(int reqId) {
+        for (ClarificationRequest req : clarificationRequests) {
+            if (req.getId() == reqId) {
+                clarificationRequests.remove(req);
+                break;
+            }
+        }
+    }
 
     public void addCreatedTournament(Tournament newCreatedTournament) {
         createdTournaments.add(newCreatedTournament);

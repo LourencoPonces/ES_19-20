@@ -70,6 +70,7 @@ public enum ErrorMessage {
     USER_ALREADY_SIGNED_UP_IN_TOURNAMENT("User already signed-up in tournament"),
     TOURNAMENT_CREATED_BY_NON_STUDENT("Tournament created by non-student"),
     USER_NOT_ENROLLED_IN_COURSE_EXECUTION("User not enrolled in course execution %s"),
+    MISSING_TOURNAMENT_OWNERSHIP("User did not create this tournament"),
 
 
     ACCESS_DENIED("You do not have permission to view this resource"),
@@ -82,6 +83,7 @@ public enum ErrorMessage {
     CLARIFICATION_REQUEST_NOT_SUBMITTED("Student %s didn't submit a clarification request"),
     CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT("Missing content of clarification request answer"),
     CLARIFICATION_REQUEST_UNANSWERED("The clarification request wasn't answered yet"),
+    CLARIFICATION_REQUEST_ANSWERED("The clarification request was answered already"),
 
     INVALID_STUDENT_QUESTION_EVALUATION("Invalid StudentQuestion Evaluation");
 
