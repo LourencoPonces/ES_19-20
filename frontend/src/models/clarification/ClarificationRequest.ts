@@ -32,6 +32,10 @@ export default class ClarificationRequest {
     return this.answer != null;
   }
 
+  getId(): number {
+    return this.id;
+  }
+
   getAnswer(): ClarificationRequestAnswer {
     if (!this.answer) throw Error('answer unavailable');
     return this.answer as ClarificationRequestAnswer;
@@ -53,11 +57,15 @@ export default class ClarificationRequest {
     this.owner = id;
   }
 
-  getOwnerId(): number {
-    return this.owner;
-  }
-
   setContent(c: string): void {
     this.content = c;
+  }
+
+  getContent(): string {
+    return this.content;
+  }
+
+  getAnswerContent(): string | void {
+    return this.answer?.getContent();
   }
 }

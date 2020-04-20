@@ -45,7 +45,7 @@
             }}</span>
           </v-expansion-panel-header>
           <v-expansion-panel-content v-if="request.hasAnswer">
-            <span class="multiline">{{ request.answer }}</span>
+            <span class="multiline">{{ showAnswer(request) }}</span>
           </v-expansion-panel-content>
           <v-expansion-panel-content v-else>
             No answer available.
@@ -71,7 +71,10 @@ export default class DiscussionComponent extends Vue {
 
   creatingRequest: boolean = false;
   requestContent = '';
-  nRequests!: number;
+
+  showAnswer(request: ClarificationRequest): string | void {
+    return request.getAnswerContent();
+  }
 
   newRequestButton(): void {
     this.creatingRequest = true;

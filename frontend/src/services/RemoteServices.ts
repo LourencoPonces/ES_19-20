@@ -323,6 +323,21 @@ export default class RemoteServices {
       });
   }
 
+  static async getAvailableTournaments(): Promise<Tournament[]> {
+    return httpClient
+      .get(
+        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments/available`
+      )
+      .then(response => {
+        return response.data.map((tournament: any) => {
+          return new Tournament(tournament);
+        });
+      })
+      .catch(async error => {
+        console.log(this.errorMessage(error));
+      });
+  }
+
   static async createTournament(tournament: Tournament): Promise<Tournament> {
     try {
       const response = await httpClient.post(
@@ -729,7 +744,6 @@ export default class RemoteServices {
   static async getClarificationRequests(): Promise<ClarificationRequest[]> {
     try {
       const response = await httpClient.get('/clarifications');
-
       return response.data.map(
         (req: ClarificationRequest) => new ClarificationRequest(req)
       );
@@ -756,6 +770,40 @@ export default class RemoteServices {
     } catch (err) {
       throw Error(await this.errorMessage(err));
     }
+  }
+
+  static async getStudentClarificationRequests(): Promise<
+    ClarificationRequest[]
+  > {
+    try {
+      const response = await httpClient.get('/student/clarifications');
+      return response.data.map(
+        (request: any) => new ClarificationRequest(request)
+      );
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
+  static async deleteClarificationRequest(id: number) {
+    return httpClient
+      .delete(`student/clarifications/${id}`)
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async editClarificationRequest(
+    request: ClarificationRequest
+  ): Promise<ClarificationRequest> {
+    return httpClient
+      .post(`/student/clarifications/${request.getId()}`, request)
+      .then(response => {
+        return new ClarificationRequest(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
   }
 
   static async deleteClarificationRequestAnswer(

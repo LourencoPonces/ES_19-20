@@ -15,12 +15,13 @@
 
       <v-card-text class="text-left" v-if="evalQuestion">
         <v-container grid-list-md fluid>
-          <v-layout column wrap>
+          <v-layout column wrap data-cy="status-dropdown">
             <v-select
               v-model="evalQuestion.submittedStatus"
               :items="statusList"
               :reduce="label => label.code"
               :label="`Status`"
+              data-cy="status-options"
             >
               <template v-slot:selection="{ item }">
                 <v-chip :color="evalQuestion.getEvaluationColor()" small>
@@ -33,6 +34,7 @@
               rows="3"
               v-model="evalQuestion.justification"
               :label="`Justification`"
+              data-cy="justification-input"
             ></v-textarea>
           </v-layout>
         </v-container>
@@ -46,7 +48,9 @@
           data-cy="CancelEvaluation"
           >Cancel</v-btn
         >
-        <v-btn color="primary" @click="evaluateQuestion">Evaluate</v-btn>
+        <v-btn color="primary" @click="evaluateQuestion" data-cy="do-evaluate"
+          >Evaluate</v-btn
+        >
       </v-card-actions>
     </v-card>
   </v-dialog>

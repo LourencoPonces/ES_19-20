@@ -95,4 +95,5 @@ public class ClarificationRequest {
     public Optional<ClarificationRequestAnswer> getAnswer() { return Optional.ofNullable(answer); }
     public void setAnswer(ClarificationRequestAnswer a) { this.answer = a; }
     public void removeAnswer() { this.setAnswer(null); }
+    public boolean hasAnswer() {return this.answer != null; }
 }
