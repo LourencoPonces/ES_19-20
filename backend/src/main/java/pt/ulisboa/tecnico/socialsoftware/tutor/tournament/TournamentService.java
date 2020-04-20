@@ -75,13 +75,14 @@ public class TournamentService {
         tournament.setCourseExecution(courseExecution);
         entityManager.persist(tournament);
 
-        courseExecution.addTournament(tournament);
         creator.addCreatedTournament(tournament);
         creator.addParticipantTournament(tournament);
+        entityManager.persist(creator);
+
         addTournamentToTopics(tournamentDto, courseExecution, tournament);
 
+        courseExecution.addTournament(tournament);
         entityManager.persist(courseExecution);
-        entityManager.persist(creator);
 
         return new TournamentDto(tournament);
     }
@@ -96,6 +97,7 @@ public class TournamentService {
 
     private void addCreator(TournamentDto tournamentDto, User creator, Tournament tournament) {
         if (creator.getRole() == User.Role.STUDENT) {
+            tournament.setCreator(creator);
             tournament.addParticipant(creator);
             tournamentDto.getParticipants().add(tournamentDto.getCreator());
         } else {
@@ -106,8 +108,6 @@ public class TournamentService {
     private void checkCreatorCourseExecution(CourseExecution courseExecution, User creator, Tournament tournament) {
         if (!creator.getCourseExecutions().contains(courseExecution)) {
             throw new TutorException(USER_NOT_ENROLLED_IN_COURSE_EXECUTION, courseExecution.getAcronym());
-        } else {
-            tournament.setCreator(creator);
         }
     }
 
@@ -171,6 +171,20 @@ public class TournamentService {
 
         user.addParticipantTournament(tournament);
         entityManager.persist(user);
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void deleteTournament(String username, int tournamentId) {
+        Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow(() -> new TutorException(TOURNAMENT_NOT_FOUND, tournamentId));
+
+        if (!tournament.getCreator().getUsername().equals(username)) {
+            throw new TutorException(MISSING_TOURNAMENT_OWNERSHIP);
+        }
+        tournament.delete();
+        tournamentRepository.deleteById(tournamentId);
     }
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)

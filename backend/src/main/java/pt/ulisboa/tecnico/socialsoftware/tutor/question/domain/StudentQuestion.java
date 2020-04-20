@@ -5,9 +5,10 @@ import javax.persistence.*;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
+
+import java.util.Set;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
@@ -75,8 +76,30 @@ public class StudentQuestion extends Question {
             throw new TutorException(NO_TOPICS);
         }
 
-        if(user.getRole() != User.Role.STUDENT) {
+        if(user.getRole() != User.Role.STUDENT ) {
             throw new TutorException(ACCESS_DENIED);
+        }
+    }
+
+    public void update(StudentQuestionDTO studentQuestionDTO, Set<Topic> newTopics) {
+        checkStudentQuestionConsistency(studentQuestionDTO, user);
+        super.update(studentQuestionDTO);
+        setJustification(studentQuestionDTO.getJustification());
+        setStudentQuestionKey(studentQuestionDTO.getStudentQuestionKey());
+        this.updateTopics(newTopics);
+
+    }
+
+    @Override
+    public void remove() {
+        canRemoveStudentQuestion();
+        getUser().getStudentQuestions().remove(this);
+        super.remove();
+    }
+
+    public void canRemoveStudentQuestion() {
+        if(getSubmittedStatus() != SubmittedStatus.WAITING_FOR_APPROVAL) {
+            throw new TutorException(QUESTION_ALREADY_READ, getId());
         }
     }
 

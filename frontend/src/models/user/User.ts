@@ -17,9 +17,11 @@ export default class User {
       this.username = jsonObj.username;
       this.role = jsonObj.role;
 
-      for (let [name, courses] of Object.entries(jsonObj.courses)) {
-        this.courses[name] = courses.map(course => new Course(course));
-        this.coursesNumber += this.courses[name].length;
+      if (jsonObj.courses) {
+        for (let [name, courses] of Object.entries(jsonObj.courses)) {
+          this.courses[name] = courses.map(course => new Course(course));
+          this.coursesNumber += this.courses[name].length;
+        }
       }
     }
   }

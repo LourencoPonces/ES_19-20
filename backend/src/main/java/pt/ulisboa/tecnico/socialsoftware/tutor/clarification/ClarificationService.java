@@ -24,7 +24,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Service
@@ -107,6 +111,45 @@ public class ClarificationService {
             value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void deleteClarificationRequest(int userId, int reqId) {
+        User student = getStudent(userId);
+        ClarificationRequest req = clarificationRequestRepository.findById(reqId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, reqId));
+        if (req.hasAnswer()) {
+            throw new TutorException(ErrorMessage.CLARIFICATION_REQUEST_ANSWERED);
+        }
+
+        student.removeClarificationRequest(req.getId());
+        clarificationRequestRepository.deleteById(req.getId());
+
+
+    }
+
+    @Retryable(
+            value = {SQLException.class},
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public ClarificationRequestDto updateClarificationRequest(ClarificationRequestDto clarificationRequestDto) {
+        ClarificationRequest req = clarificationRequestRepository.findById(clarificationRequestDto.getId())
+                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, clarificationRequestDto.getId()));
+
+        if  (req.hasAnswer()) {
+            throw new TutorException(ErrorMessage.CLARIFICATION_REQUEST_ANSWERED);
+        }
+        else if (clarificationRequestDto.getContent().isEmpty()) {
+            throw new TutorException((ErrorMessage.CLARIFICATION_REQUEST_MISSING_CONTENT));
+        }
+
+        req.setContent(clarificationRequestDto.getContent());
+        entityManager.persist(req);
+
+        return new ClarificationRequestDto(req);
+    }
+
+    @Retryable(
+            value = {SQLException.class},
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public ClarificationRequestDto submitClarificationRequest(int questionId, int userId, ClarificationRequestDto clarificationRequestDto) {
         User user = getStudent(userId);
 
@@ -127,7 +170,20 @@ public class ClarificationService {
     }
 
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<ClarificationRequestDto> getStudentClarificationRequests(int userId) {
+        User user = getStudent(userId);
+        return user.getClarificationRequests()
+                .stream()
+                .map(ClarificationRequestDto::new)
+                .sorted(Comparator.comparing(ClarificationRequestDto::getId).reversed())
+                .collect(Collectors.toList());
+    }
+
+    @Retryable(
+            value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     private ClarificationRequest createClarificationRequest(User user, Question question, ClarificationRequestDto clarificationRequestDto) {
@@ -144,7 +200,18 @@ public class ClarificationService {
     }
 
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
+            backoff = @Backoff(delay = 5000)
+    )
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<ClarificationRequestDto> getTeacherClarificationRequests(int teacherId) {
+        return clarificationRequestRepository.getTeacherRequests(teacherId)
+                .map(ClarificationRequestDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Retryable(
+            value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     private Question tryGetAnsweredQuestion(int questionId, int userId) {
@@ -174,7 +241,7 @@ public class ClarificationService {
     }
 
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     private User getStudent(int userId) {

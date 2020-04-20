@@ -12,6 +12,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 public class ClarificationController {
@@ -28,6 +29,54 @@ public class ClarificationController {
             throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
         }
         return clarificationService.submitClarificationRequest(questionId, user.getId(), clarificationRequestDto);
+    }
+
+    @DeleteMapping("/student/clarifications/{requestId}")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#requestId, 'CLARIFICATION.ACCESS')")
+    public void deleteClarificationRequest(Principal principal, @PathVariable int requestId) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        if (user == null) {
+            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
+        }
+
+        clarificationService.deleteClarificationRequest(user.getId(), requestId);
+    }
+
+    @PostMapping("/student/clarifications/{requestId}")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#requestId, 'CLARIFICATION.ACCESS')")
+    public ClarificationRequestDto updateClarificationRequest(Principal principal,  @PathVariable int requestId, @Valid @RequestBody ClarificationRequestDto clarificationRequestDto) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        if (user == null) {
+            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
+        }
+
+        return clarificationService.updateClarificationRequest(clarificationRequestDto);
+    }
+
+    @GetMapping("/student/clarifications")
+    @PreAuthorize("hasRole('ROLE_STUDENT')")
+    public List<ClarificationRequestDto> getStudentClarificationRequests(Principal principal) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        if (user == null) {
+            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
+        }
+
+        return clarificationService.getStudentClarificationRequests(user.getId());
+    }
+
+    @GetMapping("/clarifications")
+    @PreAuthorize("hasRole('ROLE_TEACHER')")
+    public List<ClarificationRequestDto> getTeacherClarificationRequests(Principal principal) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        if (user == null) {
+            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
+        }
+
+        return clarificationService.getTeacherClarificationRequests(user.getId());
     }
 
     @PutMapping("/clarifications/{requestId}/answer")

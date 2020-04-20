@@ -47,7 +47,7 @@
 
         <v-menu offset-y v-if="isTeacher && currentCourse" open-on-hover>
           <template v-slot:activator="{ on }">
-            <v-btn v-on="on" text dark>
+            <v-btn v-on="on" text dark data-cy="management">
               Management
               <v-icon>fas fa-file-alt</v-icon>
             </v-btn>
@@ -59,6 +59,27 @@
               </v-list-item-action>
               <v-list-item-content>
                 <v-list-item-title>Questions</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item
+              to="/management/clarifications"
+              data-cy="teacherClarifications"
+            >
+              <v-list-item-action>
+                <v-icon>fas fa-question</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Clarifications</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item to="/management/student-questions">
+              <v-list-item-action>
+                <v-icon>question_answer</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title data-cy="student-questions"
+                  >Student Questions</v-list-item-title
+                >
               </v-list-item-content>
             </v-list-item>
             <v-list-item to="/management/topics">
@@ -106,7 +127,7 @@
 
         <v-menu offset-y v-if="isStudent && currentCourse" open-on-hover>
           <template v-slot:activator="{ on }">
-            <v-btn v-on="on" text dark>
+            <v-btn v-on="on" text dark data-cy="quizzes">
               Quizzes
               <v-icon>fas fa-file-alt</v-icon>
             </v-btn>
@@ -146,7 +167,60 @@
             </v-list-item>
           </v-list>
         </v-menu>
-
+        <!--Tournaments-->
+        <v-menu offset-y v-if="isStudent && currentCourse" open-on-hover>
+          <template v-slot:activator="{ on }">
+            <v-btn v-on="on" text dark data-cy="tournaments">
+              Tournaments
+              <v-icon>fas fa-file-alt</v-icon>
+            </v-btn>
+          </template>
+          <v-list dense>
+            <v-list-item
+              to="/student/tournaments-available"
+              data-cy="tournaments-available"
+            >
+              <v-list-item-action>
+                <v-icon>assignment</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Available</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+        <!-- test My Area-->
+        <v-menu offset-y v-if="isStudent && currentCourse" open-on-hover>
+          <template v-slot:activator="{ on }">
+            <v-btn v-on="on" text dark data-cy="my-area">
+              My Area
+              <v-icon>fas fa-file-alt</v-icon>
+            </v-btn>
+          </template>
+          <v-list dense>
+            <v-list-item to="/student/student-questions">
+              <v-list-item-action>
+                <v-icon>assignment</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title data-cy="student-questions"
+                  >Student Questions</v-list-item-title
+                >
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item to="/student/clarifications">
+              <v-list-item-action>
+                <v-icon>fas fa-question</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title data-cy="clarifications"
+                  >Clarifications</v-list-item-title
+                >
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+        <!-- test My Area-->
         <v-btn to="/student/stats" v-if="isStudent && currentCourse" text dark>
           Stats
           <v-icon>fas fa-user</v-icon>
@@ -163,7 +237,7 @@
           <v-icon>fa fa-book</v-icon>
         </v-btn>
 
-        <v-btn v-if="isLoggedIn" @click="logout" text dark>
+        <v-btn v-if="isLoggedIn" @click="logout" text dark data-cy="logout">
           Logout
           <v-icon>fas fa-sign-out-alt</v-icon>
         </v-btn>
@@ -221,6 +295,14 @@
             </v-list-item-action>
             <v-list-item-content>
               <v-list-item-title>Questions</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item to="/management/clarifications">
+            <v-list-item-action>
+              <v-icon>fas fa-question</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>Clarifications</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
           <v-list-item to="/management/topics">
@@ -304,6 +386,30 @@
               <v-icon>done</v-icon>
             </v-list-item-action>
             <v-list-item-content>Solved Quizzes</v-list-item-content>
+          </v-list-item>
+
+          <v-list-item
+            to="/student/student-questions"
+            v-if="isStudent && currentCourse"
+          >
+            <v-list-item-action>
+              <v-icon>assignment</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>My Questions</v-list-item-content>
+          </v-list-item>
+
+          <v-list-item to="/student/clarifications">
+            <v-list-item-action>
+              <v-icon>fas fa-question</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>My Clarifications</v-list-item-content>
+          </v-list-item>
+
+          <v-list-item to="/student/tournaments-available">
+            <v-list-item-action>
+              <v-icon>fas fa-trophy</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>Available Tournaments</v-list-item-content>
           </v-list-item>
 
           <v-list-item to="/student/stats">

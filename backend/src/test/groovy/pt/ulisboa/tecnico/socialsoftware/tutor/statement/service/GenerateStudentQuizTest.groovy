@@ -12,6 +12,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.AnswersXmlImport
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Assessment
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
@@ -83,7 +84,7 @@ class GenerateStudentQuizTest extends Specification {
         user.getCourseExecutions().add(courseExecution)
         courseExecution.getUsers().add(user)
 
-        def topic = new Topic();
+        def topic = new Topic()
         topic.setName("TOPIC")
         topic.setCourse(course)
         topicRepository.save(topic)
@@ -126,7 +127,7 @@ class GenerateStudentQuizTest extends Specification {
         given:
         def quizForm = new StatementCreationDto()
         quizForm.setNumberOfQuestions(1)
-        quizForm.setAssessment(assessment.getId().toString())
+        quizForm.setAssessment(assessment.getId())
 
         when:
         statementService.generateStudentQuiz(USERNAME, courseExecution.getId(), quizForm)
@@ -151,7 +152,7 @@ class GenerateStudentQuizTest extends Specification {
         given:
         def quizForm = new StatementCreationDto()
         quizForm.setNumberOfQuestions(2)
-        quizForm.setAssessment(assessment.getId().toString())
+        quizForm.setAssessment(assessment.getId())
 
         when:
         statementService.generateStudentQuiz(USERNAME, courseExecution.getId(), quizForm)
@@ -174,7 +175,7 @@ class GenerateStudentQuizTest extends Specification {
         given:
         def quizForm = new StatementCreationDto()
         quizForm.setNumberOfQuestions(3)
-        quizForm.setAssessment(assessment.getId().toString())
+        quizForm.setAssessment(assessment.getId())
 
         when:
         statementService.generateStudentQuiz(USERNAME, courseExecution.getId(), quizForm)
@@ -205,6 +206,11 @@ class GenerateStudentQuizTest extends Specification {
         @Bean
         AnswersXmlImport answersXmlImport() {
             return new AnswersXmlImport()
+        }
+
+        @Bean
+        QuestionService questionService() {
+            return new QuestionService()
         }
     }
 
