@@ -190,8 +190,14 @@ public class Tournament {
         this.participants.add(participant);
     }
 
-    public void cancel(){
+    public void cancel() {
         isCancelled = true;
+    }
+
+    public void delete() {
+        creator.getCreatedTournaments().remove(this);
+        participants.forEach(user -> user.getParticipantTournaments().remove(this));
+        topics.forEach(topic -> topic.getTournaments().remove(this));
     }
 
     @Override
