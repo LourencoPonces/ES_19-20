@@ -54,7 +54,7 @@ public class TeacherEvaluatesStudentQuestionService {
         // approved questions can have no justification
         if(!justification.isEmpty()) {
             checkJustification(justification);
-        }
+        } //JFF: If the justification is not empty, you check whether it's null or empty? This should be changed
 
         StudentQuestion studentQuestion = findStudentQuestionById(studentQuestionId);
 
