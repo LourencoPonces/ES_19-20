@@ -51,9 +51,9 @@ Cypress.Commands.add('logout', () => {
 
 Cypress.Commands.add('createCourseExecution', (name, acronym, academicTerm) => {
   cy.get('[data-cy="createButton"]').click();
-  cy.get('[data-cy="Name"]').type(name);
-  cy.get('[data-cy="Acronym"]').type(acronym);
-  cy.get('[data-cy="AcademicTerm"]').type(academicTerm);
+  cy.get('[data-cy="courseExecutionNameInput"]').type(name);
+  cy.get('[data-cy="courseExecutionAcronymInput"]').type(acronym);
+  cy.get('[data-cy="courseExecutionAcademicTermInput"]').type(academicTerm);
   cy.get('[data-cy="saveButton"]').click();
 });
 
@@ -84,8 +84,8 @@ Cypress.Commands.add(
       .should('have.length', 7)
       .find('[data-cy="createFromCourse"]')
       .click();
-    cy.get('[data-cy="Acronym"]').type(acronym);
-    cy.get('[data-cy="AcademicTerm"]').type(academicTerm);
+    cy.get('[data-cy="courseExecutionAcronymInput"]').type(acronym);
+    cy.get('[data-cy="courseExecutionAcademicTermInput"]').type(academicTerm);
     cy.get('[data-cy="saveButton"]').click();
   }
 );
