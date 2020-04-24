@@ -14,11 +14,7 @@
         small
         color="primary"
         @click="demoStudent"
-<<<<<<< HEAD
         data-cy="studentButton"
-=======
-        data-cy="demoStudentLoginButton"
->>>>>>> reference/master
       >
         <i class="fa fa-graduation-cap" />Demo as student
       </v-btn>
@@ -27,11 +23,7 @@
         small
         color="primary"
         @click="demoTeacher"
-<<<<<<< HEAD
         data-cy="teacherButton"
-=======
-        data-cy="demoTeacherLoginButton"
->>>>>>> reference/master
       >
         <i class="fa fa-graduation-cap" />Demo as teacher
       </v-btn>
