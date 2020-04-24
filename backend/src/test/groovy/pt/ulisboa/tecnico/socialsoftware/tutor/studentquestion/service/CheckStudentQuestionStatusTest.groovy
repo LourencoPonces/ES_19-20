@@ -11,6 +11,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.CheckStudentQuestionStatusService
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto
@@ -91,7 +92,7 @@ class CheckStudentQuestionStatusTest extends Specification {
         def studentQuestion = new StudentQuestionDTO()
         studentQuestion.setTitle(QUESTION_TITLE)
         studentQuestion.setContent(QUESTION_CONTENT)
-        studentQuestion.setCreationDate(LocalDateTime.now().format(Course.formatter));
+        studentQuestion.setStatus(Question.Status.DISABLED.name())
         setKey(studentQuestion, user.getId())
         setTopics(studentQuestion)
         setOptions(studentQuestion)
