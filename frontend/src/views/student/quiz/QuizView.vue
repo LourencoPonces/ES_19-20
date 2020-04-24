@@ -33,16 +33,6 @@
         >
           {{ index }}
         </span>
-<<<<<<< HEAD
-        <span
-          class="end-quiz"
-          @click="confirmationDialog = true"
-          data-cy="endQuiz"
-        >
-          <i class="fas fa-times" />End Quiz</span
-        >
-      </header>
-=======
       </div>
       <span
         class="left-button"
@@ -68,7 +58,6 @@
       @select-option="changeAnswer"
       @decrease-order="decreaseOrder"
     />
->>>>>>> reference/master
 
     <v-dialog v-model="confirmationDialog" width="50%">
       <v-card>
@@ -99,31 +88,17 @@
 
         <v-divider />
 
-<<<<<<< HEAD
-          <v-card-actions>
-            <v-spacer />
-            <v-btn color="secondary" text @click="confirmationDialog = false">
-              Cancel
-            </v-btn>
-            <v-btn color="primary" text @click="endQuiz" data-cy="sure">
-              I'm sure
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-=======
         <v-card-actions>
           <v-spacer />
           <v-btn color="secondary" text @click="confirmationDialog = false">
             Cancel
           </v-btn>
-          <v-btn color="primary" text @click="concludeQuiz">
+          <v-btn color="primary" text @click="concludeQuiz" data-cy="sure">
             I'm sure
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
->>>>>>> reference/master
 
     <v-dialog v-model="nextConfirmationDialog" width="50%">
       <v-card>

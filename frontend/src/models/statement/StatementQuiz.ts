@@ -1,10 +1,7 @@
 import StatementQuestion from '@/models/statement/StatementQuestion';
 import StatementAnswer from '@/models/statement/StatementAnswer';
-<<<<<<< HEAD
 import ClarificationRequest from '@/models/clarification/ClarificationRequest';
-=======
 import { ISOtoString } from '@/services/ConvertDateService';
->>>>>>> reference/master
 
 export default class StatementQuiz {
   id!: number;

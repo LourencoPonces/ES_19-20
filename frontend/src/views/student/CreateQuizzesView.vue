@@ -29,15 +29,9 @@
           <v-btn text value="10">10</v-btn>
           <v-btn text value="20">20</v-btn>
         </v-btn-toggle>
-<<<<<<< HEAD
-      </v-container>
-      <v-container>
-        <v-btn @click="createQuiz" depressed color="primary" data-cy="generate">
-=======
       </div>
       <div>
-        <v-btn @click="createQuiz" depressed color="primary">
->>>>>>> reference/master
+        <v-btn @click="createQuiz" depressed color="primary" data-cy="generate">
           Create quiz
         </v-btn>
       </div>
