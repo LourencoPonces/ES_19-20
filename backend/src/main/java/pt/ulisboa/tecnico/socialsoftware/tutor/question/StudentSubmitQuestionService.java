@@ -6,6 +6,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
@@ -60,11 +61,6 @@ public class StudentSubmitQuestionService {
 
             studentQuestionDTO.setStudentQuestionKey(maxStudentQuestionNumber + 1);
         }
-
-        if (studentQuestionDTO.getCreationDate() == null) {
-            studentQuestionDTO.setCreationDate(LocalDateTime.now().format(Course.formatter));
-        }
-
 
         User student = userRepository.findById(studentId).orElseThrow(() -> new TutorException(USER_NOT_FOUND, studentId));
         StudentQuestion studentQuestion = new StudentQuestion(course, studentQuestionDTO, student);

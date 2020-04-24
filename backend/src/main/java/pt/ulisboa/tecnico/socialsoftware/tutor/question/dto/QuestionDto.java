@@ -1,11 +1,9 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.question.dto;
 
-<<<<<<< HEAD
+
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto;
-=======
 import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
->>>>>>> reference/master
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;

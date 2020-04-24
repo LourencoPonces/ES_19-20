@@ -77,7 +77,6 @@ public class Topic implements DomainEntity {
         return questions;
     }
 
-<<<<<<< HEAD
     public Set<Tournament> getTournaments() {
         return tournaments;
     }
@@ -94,10 +93,10 @@ public class Topic implements DomainEntity {
 
     public Set<Topic> getChildrenTopics() {
         return childrenTopics;
-=======
+    }
+
     public void addQuestion(Question question) {
         this.questions.add(question);
->>>>>>> reference/master
     }
 
     public List<TopicConjunction> getTopicConjunctions() {

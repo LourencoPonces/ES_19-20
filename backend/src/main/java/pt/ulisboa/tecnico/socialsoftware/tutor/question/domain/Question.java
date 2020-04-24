@@ -1,10 +1,7 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.question.domain;
 
-<<<<<<< HEAD
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
-=======
->>>>>>> reference/master
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
@@ -23,16 +20,12 @@ import java.util.stream.Collectors;
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
 @Entity
-<<<<<<< HEAD
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(
         name = "questions",
         indexes = {
                 @Index(name = "question_indx_0", columnList = "key")
         })
-=======
-@Table(name = "questions")
->>>>>>> reference/master
 public class Question implements DomainEntity {
     public enum Status {
         DISABLED, REMOVED, AVAILABLE
@@ -85,24 +78,7 @@ public class Question implements DomainEntity {
     }
 
     public Question(Course course, QuestionDto questionDto) {
-<<<<<<< HEAD
         checkConsistentQuestion(questionDto);
-        this.title = questionDto.getTitle();
-        this.key = questionDto.getKey();
-        this.content = questionDto.getContent();
-        if (questionDto.getStatus() != null) {
-            this.status = Status.valueOf(questionDto.getStatus());
-        }
-        this.creationDate = LocalDateTime.parse(questionDto.getCreationDate(), Course.formatter);
-        this.course = course;
-        course.addQuestion(this);
-
-        if (questionDto.getImage() != null) {
-            Image img = new Image(questionDto.getImage());
-            setImage(img);
-            img.setQuestion(this);
-        }
-=======
         setTitle(questionDto.getTitle());
         setKey(questionDto.getKey());
         setContent(questionDto.getContent());
@@ -110,7 +86,6 @@ public class Question implements DomainEntity {
         setCreationDate(DateHandler.toLocalDateTime(questionDto.getCreationDate()));
         setCourse(course);
         setOptions(questionDto.getOptions());
->>>>>>> reference/master
 
         if (questionDto.getImage() != null)
             setImage(new Image(questionDto.getImage()));
@@ -241,15 +216,12 @@ public class Question implements DomainEntity {
         quizQuestions.add(quizQuestion);
     }
 
-<<<<<<< HEAD
     public Set<ClarificationRequest> getClarificationRequests() { return clarificationRequests; }
 
     public void addClarificationRequest(ClarificationRequest request) { clarificationRequests.add(request); }
-=======
     public Set<Topic> getTopics() {
         return topics;
     }
->>>>>>> reference/master
 
     public void addTopic(Topic topic) {
         topics.add(topic);
@@ -324,7 +296,7 @@ public class Question implements DomainEntity {
         return chosenAssessment.getTopicConjunctions().stream().map(TopicConjunction::getTopics).collect(Collectors.toList()).contains(this.topics);
     }
 
-<<<<<<< HEAD
+
     private void checkConsistentQuestion(QuestionDto questionDto) {
         if ((long) questionDto.getOptions().size() == 0) {
             throw new TutorException(NO_OPTIONS);
@@ -349,13 +321,13 @@ public class Question implements DomainEntity {
                 && getQuizQuestions().stream().flatMap(quizQuestion -> quizQuestion.getQuestionAnswers().stream())
                 .findAny().isPresent()) {
             throw new TutorException(QUESTION_CHANGE_CORRECT_OPTION_HAS_ANSWERS);
-=======
+        }
+    }
+
     public void update(QuestionDto questionDto) {
         if (getQuizQuestions().stream().flatMap(quizQuestion -> quizQuestion.getQuestionAnswers().stream()).findAny().isPresent()) {
             throw new TutorException(CANNOT_CHANGE_ANSWERED_QUESTION);
->>>>>>> reference/master
         }
-
         setTitle(questionDto.getTitle());
         setContent(questionDto.getContent());
         setOptions(questionDto.getOptions());

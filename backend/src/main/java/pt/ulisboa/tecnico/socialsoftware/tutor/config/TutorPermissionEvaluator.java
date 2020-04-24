@@ -4,11 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-<<<<<<< HEAD
-import pt.ulisboa.tecnico.socialsoftware.tutor.administration.AdministrationService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService;
-=======
->>>>>>> reference/master
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.AssessmentService;
@@ -82,18 +78,8 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
                 case "ASSESSMENT.ACCESS":
                     return userHasThisExecution(userId, assessmentService.findAssessmentCourseExecution(id).getCourseExecutionId());
                 case "QUIZ.ACCESS":
-<<<<<<< HEAD
-                    return userHasThisExecution(username, quizService.findQuizCourseExecution(id).getCourseExecutionId());
-                case "TOURNAMENT.ACCESS":
-                    return userHasThisExecution(username, tournamentService.findTournamentCourseExecution(id).getCourseExecutionId());
-                case "CLARIFICATION.ACCESS":
-                    return userHasAnExecutionOfTheCourse(username, clarificationService.findClarificationRequestCourseId(id));
-                default:
-                    return false;
-=======
                     return userHasThisExecution(userId, quizService.findQuizCourseExecution(id).getCourseExecutionId());
                 default: return false;
->>>>>>> reference/master
             }
         }
 
