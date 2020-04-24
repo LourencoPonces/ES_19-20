@@ -1,13 +1,11 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.quiz.dto;
 
-import org.springframework.data.annotation.Transient;
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.QuestionDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -20,18 +18,16 @@ public class QuizDto implements Serializable {
     private boolean qrCodeOnly;
     private boolean oneWay;
     private String title;
-    private String creationDate = null;
-    private String availableDate = null;
-    private String conclusionDate = null;
-    private Quiz.QuizType type;
+    private String creationDate;
+    private String availableDate;
+    private String conclusionDate;
+    private String resultsDate;
+    private String type;
     private Integer series;
     private String version;
     private int numberOfQuestions;
     private int numberOfAnswers;
     private List<QuestionDto> questions = new ArrayList<>();
-
-    @Transient
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     public QuizDto(){
     }
@@ -43,18 +39,19 @@ public class QuizDto implements Serializable {
         this.qrCodeOnly = quiz.isQrCodeOnly();
         this.oneWay = quiz.isOneWay();
         this.title = quiz.getTitle();
-        this.type = quiz.getType();
+        this.type = quiz.getType().toString();
         this.series = quiz.getSeries();
         this.version = quiz.getVersion();
         this.numberOfQuestions = quiz.getQuizQuestions().size();
         this.numberOfAnswers = quiz.getQuizAnswers().size();
-
         if (quiz.getCreationDate() != null)
-            this.creationDate = quiz.getCreationDate().format(formatter);
+            this.creationDate = DateHandler.toISOString(quiz.getCreationDate());
         if (quiz.getAvailableDate() != null)
-            this.availableDate = quiz.getAvailableDate().format(formatter);
+            this.availableDate = DateHandler.toISOString(quiz.getAvailableDate());
         if (quiz.getConclusionDate() != null)
-            this.conclusionDate = quiz.getConclusionDate().format(formatter);
+            this.conclusionDate = DateHandler.toISOString(quiz.getConclusionDate());
+        if (quiz.getResultsDate() != null)
+            this.resultsDate = DateHandler.toISOString(quiz.getResultsDate());
 
         if (deepCopy) {
             this.questions = quiz.getQuizQuestions().stream()
@@ -70,10 +67,6 @@ public class QuizDto implements Serializable {
 
     public Integer getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public Integer getKey() {
@@ -117,7 +110,7 @@ public class QuizDto implements Serializable {
     }
 
     public String getCreationDate() {
-        return creationDate;
+        return this.creationDate;
     }
 
     public void setCreationDate(String creationDate) {
@@ -125,7 +118,7 @@ public class QuizDto implements Serializable {
     }
 
     public String getAvailableDate() {
-        return availableDate;
+        return this.availableDate;
     }
 
     public void setAvailableDate(String availableDate) {
@@ -140,11 +133,19 @@ public class QuizDto implements Serializable {
         this.conclusionDate = conclusionDate;
     }
 
-    public Quiz.QuizType getType() {
+    public String getResultsDate() {
+        return resultsDate;
+    }
+
+    public void setResultsDate(String resultsDate) {
+        this.resultsDate = resultsDate;
+    }
+
+    public String getType() {
         return type;
     }
 
-    public void setType(Quiz.QuizType type) {
+    public void setType(String type) {
         this.type = type;
     }
 
@@ -188,44 +189,25 @@ public class QuizDto implements Serializable {
         this.questions = questions;
     }
 
-    public LocalDateTime getCreationDateDate() {
-        if (getCreationDate() == null || getCreationDate().isEmpty()) {
-            return null;
-        }
-        return LocalDateTime.parse(getCreationDate(), formatter);
-    }
-
-    public LocalDateTime getAvailableDateDate() {
-        if (getAvailableDate() == null || getAvailableDate().isEmpty()) {
-            return null;
-        }
-        return LocalDateTime.parse(getAvailableDate(), formatter);
-    }
-
-    public LocalDateTime getConclusionDateDate() {
-        if (getConclusionDate() == null || getConclusionDate().isEmpty()) {
-            return null;
-        }
-        return LocalDateTime.parse(getConclusionDate(), formatter);
-    }
-
     @Override
     public String toString() {
         return "QuizDto{" +
                 "id=" + id +
-                ", id=" + id +
+                ", key=" + key +
                 ", scramble=" + scramble +
+                ", qrCodeOnly=" + qrCodeOnly +
+                ", oneWay=" + oneWay +
                 ", title='" + title + '\'' +
                 ", creationDate='" + creationDate + '\'' +
                 ", availableDate='" + availableDate + '\'' +
                 ", conclusionDate='" + conclusionDate + '\'' +
+                ", resultsDate='" + resultsDate + '\'' +
                 ", type=" + type +
                 ", series=" + series +
                 ", version='" + version + '\'' +
                 ", numberOfQuestions=" + numberOfQuestions +
                 ", numberOfAnswers=" + numberOfAnswers +
                 ", questions=" + questions +
-                ", formatter=" + formatter +
                 '}';
     }
 }

@@ -1,6 +1,9 @@
 describe('Administration walkthrough', () => {
   beforeEach(() => {
     cy.demoAdminLogin();
+
+    cy.contains('Administration').click();
+    cy.contains('Manage Courses').click();
   });
 
   afterEach(() => {

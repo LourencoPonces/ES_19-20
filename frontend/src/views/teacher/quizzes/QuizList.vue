@@ -4,7 +4,8 @@
       :headers="headers"
       :items="quizzes"
       :search="search"
-      multi-sort
+      :sort-by="['creationDate']"
+      sort-desc
       :mobile-breakpoint="0"
       :items-per-page="15"
       :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
@@ -23,11 +24,21 @@
         </v-card-title>
       </template>
 
+      <template v-slot:item.title="{ item }">
+        <p
+          @click="showQuizDialog(item.id)"
+          @contextmenu="editQuiz(item, $event)"
+          style="cursor: pointer"
+        >
+          {{ item.title }}
+        </p>
+      </template>
+
       <template v-slot:item.action="{ item }">
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              small
+              large
               class="mr-2"
               v-on="on"
               @click="showQuizDialog(item.id)"
@@ -39,7 +50,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              small
+              large
               class="mr-2"
               v-on="on"
               @click="showQuizAnswers(item.id)"
@@ -50,20 +61,32 @@
         </v-tooltip>
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
-            <v-icon
-              small
-              class="mr-2"
-              v-on="on"
-              @click="$emit('editQuiz', item.id)"
+            <v-icon large class="mr-2" v-on="on" @click="exportQuiz(item.id)"
+              >fas fa-download</v-icon
+            >
+          </template>
+          <span>Export</span>
+        </v-tooltip>
+        <v-tooltip bottom v-if="item.qrCodeOnly">
+          <template v-slot:activator="{ on }">
+            <v-icon large class="mr-2" v-on="on" @click="showQrCode(item.id)"
+              >fas fa-qrcode</v-icon
+            >
+          </template>
+          <span>Show QR Code</span>
+        </v-tooltip>
+        <v-tooltip bottom v-if="item.numberOfAnswers === 0">
+          <template v-slot:activator="{ on }">
+            <v-icon large class="mr-2" v-on="on" @click="editQuiz(item)"
               >edit</v-icon
             >
           </template>
           <span>Edit Quiz</span>
         </v-tooltip>
-        <v-tooltip bottom>
+        <v-tooltip bottom v-if="item.numberOfAnswers === 0">
           <template v-slot:activator="{ on }">
             <v-icon
-              small
+              large
               class="mr-2"
               v-on="on"
               @click="deleteQuiz(item.id)"
@@ -73,24 +96,13 @@
           </template>
           <span>Delete Quiz</span>
         </v-tooltip>
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
-            <v-icon small class="mr-2" v-on="on" @click="showQrCode(item.id)"
-              >fas fa-qrcode</v-icon
-            >
-          </template>
-          <span>Show QR Code</span>
-        </v-tooltip>
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
-            <v-icon small class="mr-2" v-on="on" @click="exportQuiz(item.id)"
-              >fas fa-download</v-icon
-            >
-          </template>
-          <span>Export</span>
-        </v-tooltip>
       </template>
     </v-data-table>
+    <footer>
+      <v-icon class="mr-2">mouse</v-icon>Left-click on quiz's title to view it.
+      <v-icon class="mr-2">mouse</v-icon>Right-click on quiz's title to edit it.
+    </footer>
+
     <show-quiz-dialog v-if="quiz" v-model="quizDialog" :quiz="quiz" />
 
     <show-quiz-answers-dialog
@@ -98,7 +110,7 @@
       v-model="quizAnswersDialog"
       :quiz-answers="quizAnswers"
       :correct-sequence="correctSequence"
-      :secondsToSubmission="secondsToSubmission"
+      :timeToSubmission="timeToSubmission"
     />
 
     <v-dialog
@@ -141,7 +153,7 @@ export default class QuizList extends Vue {
   quiz: Quiz | null = null;
   quizAnswers: QuizAnswer[] = [];
   correctSequence: number[] = [];
-  secondsToSubmission: number = 0;
+  timeToSubmission: number = 0;
   search: string = '';
 
   quizDialog: boolean = false;
@@ -150,13 +162,14 @@ export default class QuizList extends Vue {
 
   qrValue: number | null = null;
   headers: object = [
-    { text: 'Title', value: 'title', align: 'left', width: '20%' },
     {
-      text: 'Creation Date',
-      value: 'creationDate',
-      align: 'center',
-      width: '10%'
+      text: 'Actions',
+      value: 'action',
+      align: 'left',
+      width: '310px',
+      sortable: false
     },
+    { text: 'Title', value: 'title', align: 'left', width: '20%' },
     {
       text: 'Available Date',
       value: 'availableDate',
@@ -169,26 +182,16 @@ export default class QuizList extends Vue {
       align: 'center',
       width: '10%'
     },
-    { text: 'Scramble', value: 'scramble', align: 'center', width: '5%' },
-    { text: 'QRCode Only', value: 'qrCodeOnly', align: 'center', width: '5%' },
     {
-      text: 'One Way Quiz',
-      value: 'oneWay',
+      text: 'Results Date',
+      value: 'resultsDate',
       align: 'center',
-      width: '5%'
+      width: '10%'
     },
     { text: 'Type', value: 'type', align: 'center', width: '5%' },
-    { text: 'Series', value: 'series', align: 'center', width: '5%' },
-    { text: 'Version', value: 'version', align: 'center', width: '5%' },
     {
       text: 'Questions',
       value: 'numberOfQuestions',
-      align: 'center',
-      width: '5%'
-    },
-    {
-      text: 'Timer to submission',
-      value: 'timerToSubmission',
       align: 'center',
       width: '5%'
     },
@@ -199,11 +202,10 @@ export default class QuizList extends Vue {
       width: '5%'
     },
     {
-      text: 'Actions',
-      value: 'action',
+      text: 'Creation Date',
+      value: 'creationDate',
       align: 'center',
-      width: '10%',
-      sortable: false
+      width: '10%'
     }
   ];
 
@@ -224,11 +226,16 @@ export default class QuizList extends Vue {
 
       this.quizAnswers = quizAnswers.quizAnswers;
       this.correctSequence = quizAnswers.correctSequence;
-      this.secondsToSubmission = quizAnswers.secondsToSubmission;
+      this.timeToSubmission = quizAnswers.timeToSubmission;
       this.quizAnswersDialog = true;
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
+  }
+
+  editQuiz(quiz: Quiz, e?: Event) {
+    if (e) e.preventDefault();
+    this.$emit('editQuiz', quiz.id);
   }
 
   showQrCode(quizId: number) {
