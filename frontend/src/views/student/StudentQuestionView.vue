@@ -233,6 +233,9 @@ export default class StudentQuestionView extends Vue {
   duplicateStudentQuestion(studentQuestion: StudentQuestion) {
     this.currentStudentQuestion = new StudentQuestion(studentQuestion);
     this.currentStudentQuestion.id = null;
+    this.currentStudentQuestion.options.forEach(option => {
+      option.id = null;
+    });
     this.editStudentQuestionDialog = true;
   }
 

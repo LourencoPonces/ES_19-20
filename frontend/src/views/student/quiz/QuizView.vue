@@ -19,7 +19,8 @@
         class="end-quiz"
         @click="confirmationDialog = true"
         data-cy="endQuiz"
-      ><i class="fas fa-times" />End Quiz</span
+      >
+        <i class="fas fa-times" />End Quiz</span
       >
     </header>
 
