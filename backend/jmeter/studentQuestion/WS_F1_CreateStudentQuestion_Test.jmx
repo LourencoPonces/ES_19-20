@@ -346,6 +346,7 @@
           <stringProp name="dataSource">sampleReq</stringProp>
           <stringProp name="query">DELETE FROM student_question;
 DELETE FROM options WHERE content LIKE &apos;Option Content&apos;;
+DELETE FROM topics_questions WHERE topics_id = 1000;  
 DELETE FROM questions WHERE content LIKE &apos;Question Content&apos;;
 DELETE FROM topics WHERE id = 1000;
 </stringProp>
