@@ -54,6 +54,9 @@ public class ClarificationService {
         ClarificationRequest req = clarificationRequestRepository.findById(reqId)
                 .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, reqId));
 
+        if (!req.hasAnswer())
+            throw new TutorException(ErrorMessage.CLARIFICATION_REQUEST_UNANSWERED);
+
         if (makePublic)
             req.setStatus(ClarificationRequest.RequestStatus.PUBLIC);
         else

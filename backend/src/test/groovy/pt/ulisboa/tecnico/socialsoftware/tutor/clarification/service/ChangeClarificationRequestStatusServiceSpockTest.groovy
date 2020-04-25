@@ -33,7 +33,6 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
     static final String ACRONYM = "AS1"
     static final String ACADEMIC_TERM = "1 SEM"
     static final String CONTENT = "Test Content"
-    static final String NEW_CONTENT = "Edited Content"
     static final int NONEXISTENT_ID = 5000
 
     @Autowired
@@ -73,9 +72,11 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
     QuizQuestion quizQuestion
     QuizAnswer quizAnswer
     User student
+    User teacher
     ClarificationRequestDto clarificationRequestDto
     int studentId
     int questionId
+    int teacherId
     
     def setup() {
         course = createCourse(COURSE_NAME)
@@ -84,6 +85,7 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
         question = createQuestion(1, course)
         quizQuestion = new QuizQuestion(quiz, question, 1)
         student = createStudent(new User(), 1, 'NAME', 'USERNAME_ONE', courseExecution)
+        teacher = createTeacher(2, "TEACHER", courseExecution)
         quizAnswer = new QuizAnswer(student, quiz)
 
         courseRepository.save(course)
@@ -92,9 +94,11 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
         questionRepository.save(question)
         quizQuestionRepository.save(quizQuestion)
         userRepository.save(student)
+        userRepository.save(teacher)
         quizAnswerRepository.save(quizAnswer)
         questionId = question.getId()
         studentId = student.getId()
+        teacherId = teacher.getId()
     }
 
     private User createStudent(User student, int key, String name, String username, CourseExecution courseExecution) {
@@ -105,6 +109,17 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
         student.getCourseExecutions().add(courseExecution)
         courseExecution.getUsers().add(student)
         return student
+    }
+
+    private User createTeacher(int key, String name, CourseExecution courseExecution) {
+        def u = new User()
+        u.setKey(key)
+        u.setName(name)
+        u.setUsername(name)
+        u.setRole(User.Role.TEACHER)
+        u.getCourseExecutions().add(courseExecution)
+        courseExecution.getUsers().add(u)
+        return u
     }
 
     private Question createQuestion(int key, Course course) {
@@ -138,11 +153,12 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
         return course
     }
 
-    def "make submitted clarification request public"() {
+    def "make submitted and answered clarification request public"() {
         given:
         clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent(CONTENT)
         clarificationRequestDto = clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
+        clarificationService.submitClarificationRequestAnswer(teacher, clarificationRequestDto.getId(), CONTENT)
 
         when:
         def result = clarificationService.changeClarificationRequestStatus(clarificationRequestDto.getId(), true)
@@ -155,11 +171,13 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
         result.getStatus() == ClarificationRequest.RequestStatus.PUBLIC
     }
 
-    def "make submitted clarification request public and then private again"() {
+
+    def "make submitted and answered clarification request public and private again"() {
         given:
         clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent(CONTENT)
         clarificationRequestDto = clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
+        clarificationService.submitClarificationRequestAnswer(teacher, clarificationRequestDto.getId(), CONTENT)
 
         when:
         clarificationService.changeClarificationRequestStatus(clarificationRequestDto.getId(), true)
@@ -172,6 +190,22 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
         result.getQuestionId() == questionId
         result.getStatus() == ClarificationRequest.RequestStatus.PRIVATE
     }
+
+    def "clarification request wasn't answered"() {
+        given:
+        clarificationRequestDto = new ClarificationRequestDto()
+        clarificationRequestDto.setContent(CONTENT)
+        clarificationRequestDto = clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
+
+        when:
+        clarificationService.changeClarificationRequestStatus(clarificationRequestDto.getId(), true)
+
+        then:
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.CLARIFICATION_REQUEST_UNANSWERED
+    }
+
+
 
 
     def "clarification request doesn't exist"() {
