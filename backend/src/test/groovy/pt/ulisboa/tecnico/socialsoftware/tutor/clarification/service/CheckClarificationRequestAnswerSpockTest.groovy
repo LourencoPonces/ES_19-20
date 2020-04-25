@@ -39,7 +39,6 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
     static final String USERNAME_ONE = "STUDENT_ONE"
     static final String USERNAME_TWO = "STUDENT_TWO"
     static final String NAME = "NAME"
-    static final int INEXISTENT_USER_ID = -1
     static final int KEY_ONE = 1
     static final int KEY_TWO = 2
 
@@ -83,13 +82,12 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
     def quizAnswer
     def quizQuestion
     def clarificationRequestDto
-    def studentId
 
 
     def setup() {
-        course = createCourse(COURSE_NAME)
+        course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseExecution = createCourseExecution(course, ACRONYM, ACADEMIC_TERM)
-        quiz = createQuiz(KEY_ONE, courseExecution, Quiz.QuizType.GENERATED)
+        quiz = createQuiz(KEY_ONE, courseExecution, "GENERATED")
         question = createQuestion(KEY_ONE, course)
         quizQuestion = new QuizQuestion(quiz, question, 1)
         student = createUser(new User(), KEY_ONE, NAME, USERNAME_ONE, User.Role.STUDENT, courseExecution)
@@ -124,17 +122,13 @@ class CheckClarificationRequestAnswerSpockTest extends Specification {
         def question = new Question()
         question.setKey(key)
         question.setCourse(course)
+        question.setTitle("TITLE")
         course.addQuestion(question)
         return question
     }
 
-    private Course createCourse(String name) {
-        def course = new Course()
-        course.setName(name)
-        return course
-    }
 
-    private Quiz createQuiz(int key, CourseExecution courseExecution, Quiz.QuizType type) {
+    private Quiz createQuiz(int key, CourseExecution courseExecution, String type) {
         quiz = new Quiz()
         quiz.setKey(key)
         quiz.setType(type)
