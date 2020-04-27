@@ -50,20 +50,11 @@ public class ClarificationService {
             value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public ClarificationRequestDto changeClarificationRequestStatus(int reqId, boolean makePublic) {
+    public ClarificationRequestDto changeClarificationRequestStatus(int reqId, ClarificationRequest.RequestStatus status) {
         ClarificationRequest req = clarificationRequestRepository.findById(reqId)
                 .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, reqId));
 
-        if (!req.hasAnswer())
-            throw new TutorException(ErrorMessage.CLARIFICATION_REQUEST_UNANSWERED);
-
-        if (makePublic)
-            req.setStatus(ClarificationRequest.RequestStatus.PUBLIC);
-        else
-            req.setStatus(ClarificationRequest.RequestStatus.PRIVATE);
-
-        entityManager.persist(req);
-
+        req.setStatus(status);
         return new ClarificationRequestDto(req);
     }
 

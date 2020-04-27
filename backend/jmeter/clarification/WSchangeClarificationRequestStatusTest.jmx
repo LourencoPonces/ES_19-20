@@ -304,7 +304,7 @@ INSERT INTO clarification_requests(id, content, user_id, question_id) values(${r
               <collectionProp name="Arguments.arguments">
                 <elementProp name="" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                  <stringProp name="Argument.value">true</stringProp>
+                  <stringProp name="Argument.value">&quot;PUBLIC&quot;</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
               </collectionProp>
@@ -313,7 +313,7 @@ INSERT INTO clarification_requests(id, content, user_id, question_id) values(${r
             <stringProp name="HTTPSampler.port">${port}</stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/clarifications/${requestId}</stringProp>
+            <stringProp name="HTTPSampler.path">/clarifications/${requestId}/status</stringProp>
             <stringProp name="HTTPSampler.method">PUT</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -376,7 +376,7 @@ INSERT INTO clarification_requests(id, content, user_id, question_id) values(${r
               <collectionProp name="Arguments.arguments">
                 <elementProp name="" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                  <stringProp name="Argument.value">false</stringProp>
+                  <stringProp name="Argument.value">&quot;PRIVATE&quot;</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
               </collectionProp>
@@ -385,7 +385,7 @@ INSERT INTO clarification_requests(id, content, user_id, question_id) values(${r
             <stringProp name="HTTPSampler.port">${port}</stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/clarifications/${requestId}</stringProp>
+            <stringProp name="HTTPSampler.path">/clarifications/${requestId}/status</stringProp>
             <stringProp name="HTTPSampler.method">PUT</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>

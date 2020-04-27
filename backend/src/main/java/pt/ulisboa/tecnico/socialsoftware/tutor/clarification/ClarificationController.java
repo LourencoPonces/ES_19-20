@@ -117,15 +117,15 @@ public class ClarificationController {
         return clarificationService.getClarificationRequestAnswer(user.getId(), requestId);
     }
 
-    @PutMapping("/clarifications/{requestId}")
+    @PutMapping("/clarifications/{requestId}/status")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#requestId, 'CLARIFICATION.ACCESS')")
-    public ClarificationRequestDto changeClarificationRequestStatus(Principal principal, @PathVariable int requestId, @RequestBody boolean make_public) {
+    public ClarificationRequestDto changeClarificationRequestStatus(Principal principal, @PathVariable int requestId, @RequestBody ClarificationRequest.RequestStatus status) {
         User user = (User) ((Authentication) principal).getPrincipal();
 
         if (user == null) {
             throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
         }
 
-        return clarificationService.changeClarificationRequestStatus(requestId, make_public);
+        return clarificationService.changeClarificationRequestStatus(requestId, status);
     }
 }

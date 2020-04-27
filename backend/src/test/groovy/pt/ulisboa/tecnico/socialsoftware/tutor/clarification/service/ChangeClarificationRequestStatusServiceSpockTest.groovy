@@ -153,15 +153,14 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
         return course
     }
 
-    def "make submitted and answered clarification request public"() {
+    def "make submitted clarification request public"() {
         given:
         clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent(CONTENT)
         clarificationRequestDto = clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
-        clarificationService.submitClarificationRequestAnswer(teacher, clarificationRequestDto.getId(), CONTENT)
 
         when:
-        def result = clarificationService.changeClarificationRequestStatus(clarificationRequestDto.getId(), true)
+        def result = clarificationService.changeClarificationRequestStatus(clarificationRequestDto.getId(), ClarificationRequest.RequestStatus.PUBLIC)
 
         then:
         result != null
@@ -172,16 +171,15 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
     }
 
 
-    def "make submitted and answered clarification request public and private again"() {
+    def "make submitted clarification request public and private again"() {
         given:
         clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent(CONTENT)
         clarificationRequestDto = clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
-        clarificationService.submitClarificationRequestAnswer(teacher, clarificationRequestDto.getId(), CONTENT)
 
         when:
-        clarificationService.changeClarificationRequestStatus(clarificationRequestDto.getId(), true)
-        def result = clarificationService.changeClarificationRequestStatus(clarificationRequestDto.getId(), false)
+        clarificationService.changeClarificationRequestStatus(clarificationRequestDto.getId(), ClarificationRequest.RequestStatus.PUBLIC)
+        def result = clarificationService.changeClarificationRequestStatus(clarificationRequestDto.getId(), ClarificationRequest.RequestStatus.PRIVATE)
 
         then:
         result != null
@@ -190,23 +188,6 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
         result.getQuestionId() == questionId
         result.getStatus() == ClarificationRequest.RequestStatus.PRIVATE
     }
-
-    def "clarification request wasn't answered"() {
-        given:
-        clarificationRequestDto = new ClarificationRequestDto()
-        clarificationRequestDto.setContent(CONTENT)
-        clarificationRequestDto = clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
-
-        when:
-        clarificationService.changeClarificationRequestStatus(clarificationRequestDto.getId(), true)
-
-        then:
-        def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.CLARIFICATION_REQUEST_UNANSWERED
-    }
-
-
-
 
     def "clarification request doesn't exist"() {
         when:
