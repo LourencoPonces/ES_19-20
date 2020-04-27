@@ -47,10 +47,6 @@ describe('Teacher Clarification Requests', () => {
   });
 
   it('make clarication request public', () => {
-    cy.get('[data-cy="management"]').click();
-    cy.get('[data-cy="teacherClarifications"]').click();
-    cy.get(`[data-cy^="changeStatus-${TEST_REQ_2.slice(0, 15)}"]`)
-      .first()
-      .click()
+   cy.changeClarificationRequestStatus(TEST_REQ_2)
   });
 });

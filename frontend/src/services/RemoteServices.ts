@@ -839,7 +839,7 @@ export default class RemoteServices {
     return httpClient
       .put(`/clarifications/${id}/status`, status, {
         headers: {
-          'Content-Type': 'text/html'
+          'Content-Type': 'text/plain'
         }
       })
       .then(response => {

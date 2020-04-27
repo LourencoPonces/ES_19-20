@@ -40,10 +40,20 @@
               @click="changeRequestStatus(item)"
               :data-cy="'changeStatus-' + item.content.slice(0, 15)"
             >
-              <v-icon v-if="item.isPrivate()" small class="mr-2"
+              <v-icon
+                v-if="item.isPrivate()"
+                small
+                class="mr-2"
+                :data-cy="'private-' + item.content.slice(0, 15)"
                 >fas fa-eye-slash</v-icon
               >
-              <v-icon v-else small class="mr-2">fas fa-eye</v-icon>
+              <v-icon
+                v-else
+                small
+                class="mr-2"
+                :data-cy="'public-' + item.content.slice(0, 15)"
+                >fas fa-eye</v-icon
+              >
             </v-btn>
           </template>
           <span v-if="item.isPrivate()">Make Public</span>
@@ -264,8 +274,8 @@ export default class ClarificationRequestsView extends Vue {
   async changeRequestStatus(req: ClarificationRequest): Promise<void> {
     await this.$store.dispatch('loading');
     try {
-      var status = req.isPrivate() ? 'PUBLIC' : 'PRIVATE';
-      var result = await RemoteServices.changeClarificationRequestStatus(
+      const status = req.isPrivate() ? 'PUBLIC' : 'PRIVATE';
+      let result = await RemoteServices.changeClarificationRequestStatus(
         req.getId(),
         status
       );
