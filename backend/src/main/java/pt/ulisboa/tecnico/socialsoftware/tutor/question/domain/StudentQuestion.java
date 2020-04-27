@@ -22,7 +22,7 @@ import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 public class StudentQuestion extends Question {
 
     public enum SubmittedStatus {
-        WAITING_FOR_APPROVAL, REJECTED, APPROVED
+        WAITING_FOR_APPROVAL, REJECTED, APPROVED, PROMOTED
     }
 
 
@@ -58,7 +58,6 @@ public class StudentQuestion extends Question {
     }
 
     public Integer getStudentQuestionKey() { return studentQuestionKey; }
-
     public void setStudentQuestionKey(Integer studentQuestionKey) { this.studentQuestionKey = studentQuestionKey; }
 
     public String getJustification() { return justification; }

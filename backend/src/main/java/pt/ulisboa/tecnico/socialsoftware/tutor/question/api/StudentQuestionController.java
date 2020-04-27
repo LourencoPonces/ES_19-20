@@ -98,14 +98,8 @@ public class StudentQuestionController {
     public StudentQuestionDTO evaluateStudentQuestion(@PathVariable int studentQuestionId, @Valid @RequestBody EvaluationDto evaluation){
         String justification = evaluation.getJustification();
         StudentQuestion.SubmittedStatus newStatus = evaluation.getEvaluation();
-        switch (newStatus) {
-            case APPROVED:
-                return teacherEvaluatesStudentQuestionService.acceptStudentQuestion(studentQuestionId, justification);
-            case REJECTED:
-                return teacherEvaluatesStudentQuestionService.rejectStudentQuestion(studentQuestionId, justification);
-            default:
-                throw new TutorException(INVALID_STUDENT_QUESTION_EVALUATION);
-        }
+
+        return teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(studentQuestionId, newStatus, justification);
     }
 
 
