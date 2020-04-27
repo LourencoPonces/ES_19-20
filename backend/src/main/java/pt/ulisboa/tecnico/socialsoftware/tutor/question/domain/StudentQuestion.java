@@ -68,7 +68,40 @@ public class StudentQuestion extends Question {
     public void setUser(User user) { this.user = user; }
 
     public SubmittedStatus getSubmittedStatus() { return submittedStatus; }
+    /* Only used for easy test set up. Any domain logic should use the evaluate method */
     public void setSubmittedStatus(SubmittedStatus status) { this.submittedStatus = status; }
+
+    public void evaluate(SubmittedStatus status, String justification) {
+       if(this.submittedStatus == SubmittedStatus.PROMOTED) {
+           throw new TutorException(CANNOT_EVALUATE_PROMOTED_QUESTION);
+       }
+
+       // assert valid justification
+       if(justification != null && !this.validJustification(justification)) {
+           throw new TutorException(INVALID_JUSTIFICATION, justification);
+       }
+
+        // set status and justification
+        if(justification == null) justification = "";
+
+       if(status.equals(SubmittedStatus.REJECTED) && justification.isBlank()) {
+           throw new TutorException(CANNOT_REJECT_WITHOUT_JUSTIFICATION);
+       }
+
+       // TODO: REMOVE WHEN IMPLEMENTING F11 (keeping for now because i'm workin in another feature)
+       if(this.submittedStatus.equals(SubmittedStatus.APPROVED) && status.equals(SubmittedStatus.REJECTED)) {
+           throw new TutorException(CANNOT_REJECT_ACCEPTED_SUGGESTION);
+       }
+
+
+       this.submittedStatus = status;
+       this.justification = justification;
+
+    }
+
+    private boolean validJustification(String justification) {
+        return justification != null && !justification.isBlank();
+    }
 
     public void checkStudentQuestionConsistency(StudentQuestionDTO questionDto, User user) {
 
@@ -84,7 +117,7 @@ public class StudentQuestion extends Question {
     public void update(StudentQuestionDTO studentQuestionDTO, Set<Topic> newTopics) {
         checkStudentQuestionConsistency(studentQuestionDTO, user);
         super.update(studentQuestionDTO);
-        setJustification(studentQuestionDTO.getJustification());
+        this.justification = studentQuestionDTO.getJustification();
         setStudentQuestionKey(studentQuestionDTO.getStudentQuestionKey());
         this.updateTopics(newTopics);
 
