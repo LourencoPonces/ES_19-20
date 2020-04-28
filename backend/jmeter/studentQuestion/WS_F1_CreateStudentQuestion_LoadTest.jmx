@@ -365,6 +365,7 @@
         <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="JDBC Request" enabled="true">
           <stringProp name="dataSource">sampleReq</stringProp>
           <stringProp name="query">DELETE FROM student_question USING questions WHERE questions.id = student_question.id and questions.title  LIKE &apos;TEST_studentQuestion%&apos;;
+DELETE FROM topics_questions WHERE topics_id = 1000;
 DELETE FROM options WHERE content LIKE &apos;Option_Content&apos;;
 DELETE FROM questions WHERE title LIKE &apos;TEST_studentQuestion%&apos;;
 DELETE FROM topics WHERE id = 1000</stringProp>
