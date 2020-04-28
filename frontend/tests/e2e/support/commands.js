@@ -204,6 +204,20 @@ Cypress.Commands.add('deleteClarificationRequestAnswer', requestText => {
   cy.get('[data-cy="answerDelete"]').click();
 });
 
+Cypress.Commands.add('changeClarificationRequestStatus', requestText => {
+  cy.get('[data-cy="management"]').click();
+  cy.get('[data-cy="teacherClarifications"]').click();
+  cy.get(`[data-cy^="private-${requestText.slice(0, 15)}"]`)
+    .first()
+    .should('exist');
+  cy.get(`[data-cy^="changeStatus-${requestText.slice(0, 15)}"]`)
+    .first()
+    .click();
+  cy.get(`[data-cy^="public-${requestText.slice(0, 15)}"]`)
+    .first()
+    .should('exist');
+})
+
 /* STUDENT QUESTION TESTS */
 
 Cypress.Commands.add(
