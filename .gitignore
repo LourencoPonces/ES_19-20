@@ -8,3 +8,4 @@ backend/src/main/resources/static/images/questions/
 data/
 
 jmeter.log
+backend/jmeter/jmeter-docker.properties
