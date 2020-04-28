@@ -18,6 +18,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CANNOT_EVALUATE_PROMOTED_QUESTION
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CANNOT_REJECT_WITHOUT_JUSTIFICATION
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.INVALID_JUSTIFICATION
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CANNOT_REJECT_ACCEPTED_SUGGESTION
@@ -159,6 +160,21 @@ class TeacherRejectsStudentQuestionTest extends Specification {
 
         then:
         studentQuestionRepository.findAll().get(0).getSubmittedStatus() == StudentQuestion.SubmittedStatus.REJECTED
+    }
+
+    def "reject already promoted student question"() {
+        given: 'pending student question'
+        studentQuestionRepository.count() == 1L
+        def question = studentQuestionRepository.findAll().get(0)
+        question.setSubmittedStatus(StudentQuestion.SubmittedStatus.PROMOTED)
+
+
+        when:
+        teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(savedQuestionId, StudentQuestion.SubmittedStatus.REJECTED, null)
+
+        then:
+        def error = thrown(TutorException)
+        error.errorMessage == CANNOT_EVALUATE_PROMOTED_QUESTION
     }
 
     def "reject non existing student question"() {
