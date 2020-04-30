@@ -114,7 +114,8 @@ import Store from '@/store';
 import RemoteServices from '@/services/RemoteServices';
 import Tournament from '@/models/management/Tournament';
 import Topic from '@/models/management/Topic';
-
+import DatetimePicker from 'vuetify-datetime-picker';
+Vue.use(DatetimePicker);
 @Component
 export default class EditTournamentDialog extends Vue {
   @Model('dialog', Boolean) dialog!: boolean;

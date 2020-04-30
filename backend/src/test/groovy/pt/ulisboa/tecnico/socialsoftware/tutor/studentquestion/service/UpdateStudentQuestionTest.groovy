@@ -145,18 +145,18 @@ class UpdateStudentQuestionTest extends Specification{
         optionOK.setContent(OPTION_CONTENT)
         optionOK.setCorrect(true)
         optionOK.setQuestion(studentQuestion)
+        optionOK.setSequence(0)
         optionRepository.save(optionOK)
         optionKO = new Option()
         optionKO.setContent(OPTION_CONTENT)
         optionKO.setCorrect(false)
         optionKO.setQuestion(studentQuestion)
+        optionKO.setSequence(1)
         optionRepository.save(optionKO)
-        studentQuestion.addOption(optionOK)
-        studentQuestion.addOption(optionKO)
     }
 
     def createNewStudentQuestionDto() {
-        def studentQuestionDto = new StudentQuestionDTO()
+        def studentQuestionDto = new StudentQuestionDTO(studentQuestion)
         studentQuestionDto.setId(studentQuestion.getId())
         studentQuestionDto.setTitle(NEW_QUESTION_TITLE)
         studentQuestionDto.setContent(NEW_QUESTION_CONTENT)
@@ -179,14 +179,12 @@ class UpdateStudentQuestionTest extends Specification{
     }
 
     def createNewOption() {
-        def optionDto = new OptionDto()
-        optionDto.setId(optionOK.getId())
+        def optionDto = new OptionDto(optionKO)
         optionDto.setContent(NEW_OPTION_CONTENT)
         optionDto.setCorrect(false)
         def options = new ArrayList<OptionDto>()
         options.add(optionDto)
-        optionDto = new OptionDto()
-        optionDto.setId(optionKO.getId())
+        optionDto = new OptionDto(optionOK)
         optionDto.setContent(OPTION_CONTENT)
         optionDto.setCorrect(true)
         options.add(optionDto)
@@ -225,10 +223,10 @@ class UpdateStudentQuestionTest extends Specification{
         result.getNumberOfCorrect() == 1
         and: 'an option is changed'
         result.getOptions().size() == 2
-        def resOptionOne = result.getOptions().stream().filter({option -> option.getId() == optionOK.getId()}).findAny().orElse(null)
+        def resOptionOne = result.getOptions().stream().filter({option -> option.getId() == optionKO.getId()}).findAny().orElse(null)
         resOptionOne.getContent() == NEW_OPTION_CONTENT
         !resOptionOne.getCorrect()
-        def resOptionTwo = result.getOptions().stream().filter({option -> option.getId() == optionKO.getId()}).findAny().orElse(null)
+        def resOptionTwo = result.getOptions().stream().filter({option -> option.getId() == optionOK.getId()}).findAny().orElse(null)
         resOptionTwo.getContent() == OPTION_CONTENT
         resOptionTwo.getCorrect()
     }
