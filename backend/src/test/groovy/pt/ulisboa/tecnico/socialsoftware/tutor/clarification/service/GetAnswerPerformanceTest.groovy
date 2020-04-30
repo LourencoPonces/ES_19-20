@@ -74,7 +74,7 @@ class GetAnswerPerformanceTest extends Specification {
     User teacher
 
     def setup() {
-        course = createCourse(COURSE_NAME)
+        course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseExecution = createCourseExecution(course, ACRONYM, ACADEMIC_TERM)
         student = createUser(User.Role.STUDENT, 1, "STUDENT", courseExecution)
         teacher = createUser(User.Role.TEACHER, 2, "TEACHER", courseExecution)
@@ -100,6 +100,7 @@ class GetAnswerPerformanceTest extends Specification {
     private static Question createQuestion(Course course) {
         def question = new Question()
         question.setCourse(course)
+        question.setTitle("TITLE")
         course.addQuestion(question)
         return question
     }
@@ -114,7 +115,7 @@ class GetAnswerPerformanceTest extends Specification {
     }
 
 
-    private static Quiz createQuiz(int key, CourseExecution courseExecution, Quiz.QuizType type) {
+    private static Quiz createQuiz(int key, CourseExecution courseExecution, String type) {
         def quiz = new Quiz()
         quiz.setKey(key)
         quiz.setType(type)
@@ -131,12 +132,6 @@ class GetAnswerPerformanceTest extends Specification {
         return courseExecution
     }
 
-    private static Course createCourse(String name) {
-        def course = new Course()
-        course.setName(name)
-        return course
-    }
-
     @Unroll
     def "get #count clarification request answers as student"() {
         given:
@@ -144,7 +139,7 @@ class GetAnswerPerformanceTest extends Specification {
             int i = it as int
 
             def question = createQuestion(course)
-            def quiz = createQuiz(i, courseExecution, Quiz.QuizType.GENERATED)
+            def quiz = createQuiz(i, courseExecution, "GENERATED")
             def quizQuestion = new QuizQuestion(quiz, question, 1)
             def quizAnswer = new QuizAnswer(student, quiz)
             def questionAnswer = createQuestionAnswer(quizAnswer, quizQuestion)

@@ -79,12 +79,12 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
 
 
     def setup() {
-        course = createCourse("A course")
+        course = new Course("A course", Course.Type.TECNICO)
         question = createQuestion(1, course)
 
         courseExecution = createCourseExecution(course, "AC1", "1SEM")
         teacher = createUser(User.Role.TEACHER, 10, "t", courseExecution)
-        quiz = createQuiz(10, courseExecution, Quiz.QuizType.GENERATED)
+        quiz = createQuiz(10, courseExecution, "GENERATED")
         quizQuestion = createQuizQuestion(quiz, question, 1)
 
         student = createUser(User.Role.STUDENT, 1, "s1", courseExecution)
@@ -97,7 +97,7 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
         clarificationRequest3 = createClarificationRequest(3, student3, question, "but why?")
 
         courseExecution2 = createCourseExecution(course, "AC1", "1SEM")
-        quiz2 = createQuiz(20, courseExecution2, Quiz.QuizType.GENERATED)
+        quiz2 = createQuiz(20, courseExecution2, "GENERATED")
         quizQuestion2 = createQuizQuestion(quiz2, question, 1)
 
         student2 = createUser(User.Role.STUDENT, 2, "s2", courseExecution2)
@@ -122,20 +122,14 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
         def question = new Question()
         question.setKey(key)
         question.setCourse(course)
+        question.setTitle("TITLE")
         course.addQuestion(question)
         questionRepository.save(question)
         courseRepository.save(course)
         return question
     }
 
-    private Course createCourse(String name) {
-        def course = new Course()
-        course.setName(name)
-        courseRepository.save(course)
-        return course
-    }
-
-    private Quiz createQuiz(int key, CourseExecution courseExecution, Quiz.QuizType type) {
+    private Quiz createQuiz(int key, CourseExecution courseExecution, String type) {
         Quiz quiz = new Quiz()
         quiz.setKey(key)
         quiz.setType(type)

@@ -24,12 +24,6 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 /// <reference types="Cypress" />
-Cypress.Commands.add('demoAdminLogin', () => {
-  cy.visit('/');
-  cy.get('[data-cy="adminButton"]').click();
-  cy.contains('Administration').click();
-  cy.contains('Manage Courses').click();
-});
 
 Cypress.Commands.add('demoTeacherLogin', () => {
   cy.visit('/');
@@ -45,21 +39,22 @@ Cypress.Commands.add('logout', () => {
   // Work around VMenu bug
   // this handler runs at most once, and only matches a specific error
   cy.once('uncaught:exception', (error, _) => {
-    if (error.message == "Cannot read property 'contains' of undefined") {
+    // eslint-disable-next-line prettier/prettier
+    if (error.message == 'Cannot read property \'contains\' of undefined') {
       return true;
     }
 
     return false;
   });
 
-  cy.get('[data-cy="logout"]').click();
+  cy.get('[data-cy="logoutButton"]').click();
 });
 
 Cypress.Commands.add('createCourseExecution', (name, acronym, academicTerm) => {
   cy.get('[data-cy="createButton"]').click();
-  cy.get('[data-cy="Name"]').type(name);
-  cy.get('[data-cy="Acronym"]').type(acronym);
-  cy.get('[data-cy="AcademicTerm"]').type(academicTerm);
+  cy.get('[data-cy="courseExecutionNameInput"]').type(name);
+  cy.get('[data-cy="courseExecutionAcronymInput"]').type(acronym);
+  cy.get('[data-cy="courseExecutionAcademicTermInput"]').type(academicTerm);
   cy.get('[data-cy="saveButton"]').click();
 });
 
@@ -90,8 +85,8 @@ Cypress.Commands.add(
       .should('have.length', 7)
       .find('[data-cy="createFromCourse"]')
       .click();
-    cy.get('[data-cy="Acronym"]').type(acronym);
-    cy.get('[data-cy="AcademicTerm"]').type(academicTerm);
+    cy.get('[data-cy="courseExecutionAcronymInput"]').type(acronym);
+    cy.get('[data-cy="courseExecutionAcademicTermInput"]').type(academicTerm);
     cy.get('[data-cy="saveButton"]').click();
   }
 );
@@ -126,8 +121,7 @@ Cypress.Commands.add('submitClarificationRequest', (content, n) => {
       cy.get('[data-cy="newRequest"]').click();
       cy.get('[data-cy="inputRequest"]').type(content);
       cy.contains('Submit').click();
-      let requests = cy.get('[data-cy="questionRequests"]')
-                       .children();
+      let requests = cy.get('[data-cy="questionRequests"]').children();
       requests.should('have.length', 1);
       requests.first().should('have.text', content);
       cy.get('[data-cy="nextQuestion"]').click();
@@ -135,29 +129,29 @@ Cypress.Commands.add('submitClarificationRequest', (content, n) => {
   }
 });
 
-Cypress.Commands.add('goToMyClarifications',  () => {
+Cypress.Commands.add('goToMyClarifications', () => {
   cy.get('[data-cy="my-area"]').click();
   cy.get('[data-cy="clarifications"]').click();
 });
 
-Cypress.Commands.add('deleteAllRequests', (n) => {
+Cypress.Commands.add('deleteAllRequests', n => {
   if (n > 0) {
     for (i = 0; i < n; i++) {
       cy.wait(500);
       cy.get('[data-cy="table"]')
         .find('tbody')
         .children()
-        .should('have.length', n-i)
+        .should('have.length', n - i)
         .first();
 
-        cy.get('[data-cy="delete"]')
-          .first()
-          .click();
+      cy.get('[data-cy="delete"]')
+        .first()
+        .click();
     }
   }
 });
 
-Cypress.Commands.add('editClarificationRequest', (content) => {
+Cypress.Commands.add('editClarificationRequest', content => {
   cy.wait(500);
   cy.get('[data-cy="edit"]')
     .first()
@@ -231,10 +225,11 @@ Cypress.Commands.add(
     if (content) cy.get('[data-cy="StudentQuestionContent"]').type(content);
 
     correctOptions.forEach(correctOption => {
-      if (correctOption > 0 && correctOption < 5)
+      if (correctOption > 0 && correctOption < 5) {
         cy.get(`[data-cy="CorrectOption${correctOption}"]`)
           .parent()
           .click();
+      }
     });
 
     for (let i = 1; i < options.length + 1; i++) {
@@ -270,8 +265,7 @@ Cypress.Commands.add(
     }
 
     // select evaluate button
-    cy.get('[data-cy="do-evaluate"]')
-      .click();
+    cy.get('[data-cy="do-evaluate"]').click();
   }
 );
 
@@ -319,7 +313,10 @@ Cypress.Commands.add(
         .contains('question_answer')
         .click();
 
-      cy.get('[data-cy="justification-text"]').should('have.text', justification);
+      cy.get('[data-cy="justification-text"]').should(
+        'have.text',
+        justification
+      );
     }
   }
 );
@@ -537,28 +534,19 @@ Cypress.Commands.add('deleteTournament', title => {
     .click();
 });
 
-Cypress.Commands.add(
-    'assertAvailableTournaments',
-    (title) => {
-        cy.contains(title)
-            .parent()
-            .should('have.length', 1)
-            .children()
-            .should('have.length', 10)
+Cypress.Commands.add('assertAvailableTournaments', title => {
+  cy.contains(title)
+    .parent()
+    .should('have.length', 1)
+    .children()
+    .should('have.length', 10);
 
-        cy.contains(title)
-            .parent()
-            .find('[data-cy="topics-list"]')
-            .should('have.length', 1)
-    }
-);
+  cy.contains(title)
+    .parent()
+    .find('[data-cy="topics-list"]')
+    .should('have.length', 1);
+});
 
-Cypress.Commands.add(
-    'assertSignUpTournament',
-    (title) => {
-        cy.contains('Signed-Up')
-    }
-);
-
-
-
+Cypress.Commands.add('assertSignUpTournament', title => {
+  cy.contains('Signed-Up');
+});
