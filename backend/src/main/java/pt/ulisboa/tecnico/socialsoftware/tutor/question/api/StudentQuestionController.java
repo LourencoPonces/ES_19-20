@@ -11,6 +11,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.CheckStudentQuestionStatusService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.RemoveStudentQuestionService;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO;
 
@@ -66,6 +67,7 @@ public class StudentQuestionController {
             throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
         }
         studentQuestion.setUser(user.getUsername());
+        studentQuestion.setStatus(Question.Status.DISABLED.name());
         studentQuestion.setSubmittedStatus(StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL); // ensure it is pending
         return studentSubmitQuestionService.studentSubmitQuestion(courseId, studentQuestion, user.getId());
     }
