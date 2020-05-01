@@ -31,6 +31,11 @@ class TeacherApprovesStudentQuestionTest extends Specification {
 
     public static final String USER_NAME = "ist199999"
 
+    public static final String QUESTION_TITLE = "Question Title"
+    public static final String QUESTION_CONTENT = "Question Content"
+
+    public static final String OPTION_CONTENT = "Option Content"
+
     public static final Integer STUDENT_QUESTION_KEY = 1
     public static final Integer FAKE_STUDENT_QUESTION_ID = 2
 
@@ -76,11 +81,15 @@ class TeacherApprovesStudentQuestionTest extends Specification {
 
     private StudentQuestion createStudentQuestion(User user, Course course) {
         def studentQuestion = new StudentQuestion()
+        studentQuestion.setTitle(QUESTION_TITLE)
+        studentQuestion.setContent(QUESTION_CONTENT)
         studentQuestion.addTopic(new Topic())
 
         Option o = new Option()
         o.setCorrect(true)
         o.setQuestion(studentQuestion)
+        o.setContent(OPTION_CONTENT)
+        o.setSequence(0)
         studentQuestion.addOption(o)
         studentQuestion.setKey(STUDENT_QUESTION_KEY)
         studentQuestion.setStudentQuestionKey(STUDENT_QUESTION_KEY)

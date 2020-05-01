@@ -77,9 +77,9 @@ class DeleteAnswerTest extends Specification {
     int reqId
 
     def setup() {
-        course = createCourse(COURSE_NAME)
+        course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseExecution = createCourseExecution(course, ACRONYM, ACADEMIC_TERM)
-        quiz = createQuiz(1, courseExecution, Quiz.QuizType.GENERATED)
+        quiz = createQuiz(1, courseExecution, "GENERATED")
         question = createQuestion(1, course)
         quizQuestion = new QuizQuestion(quiz, question, 1)
         student = createStudent(1, "STUDENT", courseExecution)
@@ -133,11 +133,12 @@ class DeleteAnswerTest extends Specification {
         def question = new Question()
         question.setKey(key)
         question.setCourse(course)
+        question.setTitle("TITLE")
         course.addQuestion(question)
         return question
     }
 
-    private Quiz createQuiz(int key, CourseExecution courseExecution, Quiz.QuizType type) {
+    private Quiz createQuiz(int key, CourseExecution courseExecution, String type) {
         def quiz = new Quiz()
         quiz.setKey(key)
         quiz.setType(type)
@@ -154,11 +155,6 @@ class DeleteAnswerTest extends Specification {
         return courseExecution
     }
 
-    private Course createCourse(String name) {
-        def course = new Course()
-        course.setName(name)
-        return course
-    }
 
     def "remove an answer"() {
         given: "answered clarification request"

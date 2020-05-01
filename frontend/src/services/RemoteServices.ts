@@ -660,20 +660,9 @@ export default class RemoteServices {
       });
   }
 
-  static async activateCourse(course: Course): Promise<Course> {
+  static getCourses(): Promise<Course[]> {
     return httpClient
-      .post('/courses', course)
-      .then(response => {
-        return new Course(response.data);
-      })
-      .catch(async error => {
-        throw Error(await this.errorMessage(error));
-      });
-  }
-
-  static async getCourses(): Promise<Course[]> {
-    return httpClient
-      .get('/admin/courses/executions')
+      .get('/courses/executions')
       .then(response => {
         return response.data.map((course: any) => {
           return new Course(course);
@@ -684,9 +673,20 @@ export default class RemoteServices {
       });
   }
 
-  static async createCourse(course: Course): Promise<Course> {
+  static async activateCourse(course: Course): Promise<Course> {
     return httpClient
-      .post('/admin/courses/executions', course)
+      .post('/courses/activate', course)
+      .then(response => {
+        return new Course(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async createExternalCourse(course: Course): Promise<Course> {
+    return httpClient
+      .post('/courses/external', course)
       .then(response => {
         return new Course(response.data);
       })
@@ -697,7 +697,7 @@ export default class RemoteServices {
 
   static async deleteCourse(courseExecutionId: number | undefined) {
     return httpClient
-      .delete('/admin/courses/executions/' + courseExecutionId)
+      .delete(`/executions/${courseExecutionId}`)
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });

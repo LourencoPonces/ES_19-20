@@ -32,7 +32,7 @@
         small
         color="primary"
         @click="demoAdmin"
-        data-cy="adminButton"
+        data-cy="demoAdminLoginButton"
       >
         <i class="fa fa-user-cog" />Demo as administrator
       </v-btn>
@@ -78,7 +78,6 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import Store from '@/store';
-import RemoteServices from '@/services/RemoteServices';
 
 @Component
 export default class HomeView extends Vue {

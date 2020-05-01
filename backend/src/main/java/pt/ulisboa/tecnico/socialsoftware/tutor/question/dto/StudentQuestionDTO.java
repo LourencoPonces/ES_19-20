@@ -24,7 +24,6 @@ public class StudentQuestionDTO extends QuestionDto{
     @Override
     public Integer getId() { return id; }
 
-    @Override
     public void setId(Integer id) { this.id = id; }
 
 
