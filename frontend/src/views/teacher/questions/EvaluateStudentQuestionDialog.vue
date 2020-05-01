@@ -68,7 +68,7 @@ export default class EvaluateQuestionDialog extends Vue {
   @Prop({ type: StudentQuestion, required: true })
   readonly studentQuestion!: StudentQuestion;
 
-  statusList = ['Waiting for Approval', 'Approved', 'Rejected'];
+  statusList = ['Waiting for Approval', 'Approved', 'Rejected', 'Promoted'];
 
   evalQuestion!: StudentQuestion;
 
@@ -92,6 +92,16 @@ export default class EvaluateQuestionDialog extends Vue {
         'error',
         'Rejected questions must be justified'
       );
+      return;
+    }
+
+    // confirm question promotion
+    if (
+      this.evalQuestion.submittedStatus === 'Promoted' &&
+      !confirm(
+        'Are you sure you want to promote this question? This action cannot be undone'
+      )
+    ) {
       return;
     }
     try {

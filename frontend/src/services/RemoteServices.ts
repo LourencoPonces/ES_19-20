@@ -259,7 +259,7 @@ export default class RemoteServices {
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${questionId}/evaluate`,
         {
           evaluation: StudentQuestion.getServerStatusFormat(status),
-          justification: justification
+          justification: justification.trim() === '' ? null : justification
         }
       );
       return new StudentQuestion(response.data);
