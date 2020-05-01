@@ -68,7 +68,7 @@ public class StatementQuestionDto implements Serializable {
 
     public void setQuestionId(Integer questionId) { this.questionId = questionId; }
 
-    public List<ClarificationRequestDto> getClarifications() { return clarifications; }
+    public List<ClarificationRequestDto> getClarifications() { return this.clarifications; }
 
     public void setClarifications(List<ClarificationRequestDto> clarifications) { this.clarifications = clarifications; }
 
