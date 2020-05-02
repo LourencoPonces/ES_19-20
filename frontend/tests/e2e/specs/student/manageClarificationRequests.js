@@ -64,7 +64,32 @@ describe('Clarification Request', () => {
     cy.demoStudentLogin();
     cy.goToMyClarifications();
     cy.deleteAllRequests(1);
+  });
+
+  it('login and see request made public', () => {
+    cy.submitClarificationRequest(content, 1);
+    cy.goToMyClarifications();
+    cy.get(`[data-cy^="private-${content.slice(0, 15)}"]`)
+      .first()
+      .should('exist');
+    cy.logout();
+
+    cy.demoTeacherLogin();
+    cy.changeClarificationRequestStatus(content);
+    cy.logout();
+
+    cy.demoStudentLogin();
+    cy.goToMyClarifications();
+    cy.get(`[data-cy^="public-${content.slice(0, 15)}"]`)
+      .first()
+      .should('exist');
+
+    cy.checkRequestInDiscussion(content);
+    cy.get('[data-cy="newRequest"]')
+      .should('be.disabled');
     
+    cy.goToMyClarifications();
+    cy.deleteAllRequests(1);
   });
 
 });

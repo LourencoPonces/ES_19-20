@@ -157,7 +157,7 @@
                 <v-list-item-title>Scan</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item to="/student/solved">
+            <v-list-item to="/student/solved" data-cy="solved">
               <v-list-item-action>
                 <v-icon>done</v-icon>
               </v-list-item-action>
