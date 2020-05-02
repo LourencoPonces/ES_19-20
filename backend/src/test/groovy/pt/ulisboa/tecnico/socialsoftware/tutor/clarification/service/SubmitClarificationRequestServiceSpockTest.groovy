@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.clarification.service
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest
 import spock.lang.Specification
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
@@ -162,6 +163,7 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         result.getOwner().getId() == student.getId()
         result.getQuestion().getId() == question.getId()
         result.getCreationDate() != null
+        result.getStatus() == ClarificationRequest.RequestStatus.PRIVATE
         and: "the clarification request was added to the student"
         def user = userRepository.findAll().get(0)
         user.getClarificationRequests().size() == 1
