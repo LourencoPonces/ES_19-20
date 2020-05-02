@@ -13,4 +13,6 @@ public class MyStatsDto implements Serializable {
     public MyStats.StatsVisibility getTestStat() {
         return testStat;
     }
+
+    public void setTestStat(Integer value) {this.testStatValue = value;}
 }
