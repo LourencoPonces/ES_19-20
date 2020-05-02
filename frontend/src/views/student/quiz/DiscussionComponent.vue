@@ -74,7 +74,6 @@
 
 <script lang="ts">
 import { Vue, Prop, Emit, Component } from 'vue-property-decorator';
-import Store from '@/store';
 import StatementQuestion from '@/models/statement/StatementQuestion';
 import ClarificationRequest from '@/models/clarification/ClarificationRequest';
 
