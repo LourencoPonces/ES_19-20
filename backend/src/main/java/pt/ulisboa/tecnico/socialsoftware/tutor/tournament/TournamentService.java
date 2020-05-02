@@ -156,8 +156,8 @@ public class TournamentService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public List<TournamentDto> getCreatedTournaments(String username, int executionId) {
-        User user = userRepository.findByUsername(username);
+    public List<TournamentDto> getCreatedTournaments(int userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND, userId));
 
         return user.getCreatedTournaments()
                 .stream()
