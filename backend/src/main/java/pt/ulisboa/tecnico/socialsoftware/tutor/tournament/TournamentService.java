@@ -87,53 +87,6 @@ public class TournamentService {
         return new TournamentDto(tournament);
     }
 
-    private void checkKey(TournamentDto tournamentDto) {
-        if (tournamentDto.getKey() == null) {
-            int maxQuestionNumber = tournamentRepository.getMaxTournamentKey() != null ?
-                    tournamentRepository.getMaxTournamentKey() : 0;
-            tournamentDto.setKey(maxQuestionNumber + 1);
-        }
-    }
-
-    private void addCreator(TournamentDto tournamentDto, User creator, Tournament tournament) {
-        if (creator.getRole() == User.Role.STUDENT) {
-            tournament.setCreator(creator);
-            tournament.addParticipant(creator);
-            tournamentDto.getParticipants().add(tournamentDto.getCreator());
-        } else {
-            throw new TutorException(TOURNAMENT_CREATED_BY_NON_STUDENT);
-        }
-    }
-
-    private void checkCreatorCourseExecution(CourseExecution courseExecution, User creator, Tournament tournament) {
-        if (!creator.getCourseExecutions().contains(courseExecution)) {
-            throw new TutorException(USER_NOT_ENROLLED_IN_COURSE_EXECUTION, courseExecution.getAcronym());
-        }
-    }
-
-    private void checkTopics(TournamentDto tournamentDto, CourseExecution courseExecution, Tournament tournament) {
-        for(TopicDto t: tournamentDto.getTopics()) {
-            Topic topic = topicRepository.findTopicByName(courseExecution.getCourse().getId(), t.getName());
-            if (topic == null) {
-                throw new TutorException(TOPIC_NOT_FOUND, t.getId());
-            } else {
-                tournament.addTopic(topic);
-            }
-        }
-    }
-
-    private CourseExecution getCourseExecution(int executionId) {
-        return courseExecutionRepository.findById(executionId).orElseThrow(() -> new TutorException(COURSE_EXECUTION_NOT_FOUND, executionId));
-    }
-
-    private void addTournamentToTopics(TournamentDto tournamentDto, CourseExecution courseExecution, Tournament tournament){
-        for(TopicDto t: tournamentDto.getTopics()) {
-            Topic topic = topicRepository.findTopicByName(courseExecution.getCourse().getId(), t.getName());
-            topic.addTournament(tournament);
-            entityManager.persist(topic);
-        }
-    }
-
     @Retryable(
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
@@ -193,5 +146,52 @@ public class TournamentService {
                 .map(Tournament::getCourseExecution)
                 .map(CourseDto::new)
                 .orElseThrow(() -> new TutorException(TOURNAMENT_NOT_FOUND, tournamentId));
+    }
+
+    private void checkKey(TournamentDto tournamentDto) {
+        if (tournamentDto.getKey() == null) {
+            int maxQuestionNumber = tournamentRepository.getMaxTournamentKey() != null ?
+                    tournamentRepository.getMaxTournamentKey() : 0;
+            tournamentDto.setKey(maxQuestionNumber + 1);
+        }
+    }
+
+    private void addCreator(TournamentDto tournamentDto, User creator, Tournament tournament) {
+        if (creator.getRole() == User.Role.STUDENT) {
+            tournament.setCreator(creator);
+            tournament.addParticipant(creator);
+            tournamentDto.getParticipants().add(tournamentDto.getCreator());
+        } else {
+            throw new TutorException(TOURNAMENT_CREATED_BY_NON_STUDENT);
+        }
+    }
+
+    private void checkCreatorCourseExecution(CourseExecution courseExecution, User creator, Tournament tournament) {
+        if (!creator.getCourseExecutions().contains(courseExecution)) {
+            throw new TutorException(USER_NOT_ENROLLED_IN_COURSE_EXECUTION, courseExecution.getAcronym());
+        }
+    }
+
+    private void checkTopics(TournamentDto tournamentDto, CourseExecution courseExecution, Tournament tournament) {
+        for(TopicDto t: tournamentDto.getTopics()) {
+            Topic topic = topicRepository.findTopicByName(courseExecution.getCourse().getId(), t.getName());
+            if (topic == null) {
+                throw new TutorException(TOPIC_NOT_FOUND, t.getId());
+            } else {
+                tournament.addTopic(topic);
+            }
+        }
+    }
+
+    private CourseExecution getCourseExecution(int executionId) {
+        return courseExecutionRepository.findById(executionId).orElseThrow(() -> new TutorException(COURSE_EXECUTION_NOT_FOUND, executionId));
+    }
+
+    private void addTournamentToTopics(TournamentDto tournamentDto, CourseExecution courseExecution, Tournament tournament){
+        for(TopicDto t: tournamentDto.getTopics()) {
+            Topic topic = topicRepository.findTopicByName(courseExecution.getCourse().getId(), t.getName());
+            topic.addTournament(tournament);
+            entityManager.persist(topic);
+        }
     }
 }
