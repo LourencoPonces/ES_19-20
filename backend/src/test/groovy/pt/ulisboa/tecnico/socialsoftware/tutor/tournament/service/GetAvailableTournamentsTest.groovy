@@ -148,11 +148,10 @@ class GetAvailableTournamentsTest extends Specification {
 
     def "get the available tournaments, although there are not any"() {
         when:
-        tournamentService.getAvailableTournaments(courseExecution.getId())
+        def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId())
 
-        then:
-        def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_AVAILABLE
+        then: "There are no tournaments"
+        tournamentsList.size() == 0
     }
 
     @Unroll("get the available tournaments, although there are only tournaments in #createdDateDay | #availableDateDay | #runningDateDay | #conclusionDateDay")
@@ -169,17 +168,18 @@ class GetAvailableTournamentsTest extends Specification {
         tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
 
         when:
-        tournamentService.getAvailableTournaments(courseExecution.getId())
+        def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId())
 
-        then:
-        def exception = thrown(TutorException)
-        exception.getErrorMessage() == errorMessage
+        then: "There are no tournaments"
+        /*def exception = thrown(TutorException)
+        exception.getErrorMessage() == errorMessage*/
+        tournamentsList.size() == size
 
         where:
-        creationDateDay | availableDateDay | runningDateDay | conclusionDateDay || errorMessage
-         0              |  1               |  2             | 3                 || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
-        -2              | -1               |  0             | 1                 || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
-        -3              | -2               | -1             | 0                 || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
+        creationDateDay | availableDateDay | runningDateDay | conclusionDateDay || size
+         0              |  1               |  2             | 3                 || 0
+        -2              | -1               |  0             | 1                 || 0
+        -3              | -2               | -1             | 0                 || 0
     }
 
     def "get the available tournaments with a non-existing course"() {

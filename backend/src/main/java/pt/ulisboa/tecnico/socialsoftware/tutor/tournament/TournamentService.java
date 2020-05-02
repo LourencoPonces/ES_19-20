@@ -96,10 +96,7 @@ public class TournamentService {
         getCourseExecution(executionId);
 
         List<TournamentDto> availableTournaments = tournamentRepository.findAvailableTournaments(executionId).stream().map(TournamentDto::new).collect(Collectors.toList());
-
-        if (availableTournaments.isEmpty())
-            throw new TutorException(TOURNAMENT_NOT_AVAILABLE);
-
+        
         return availableTournaments;
     }
 
