@@ -78,7 +78,7 @@
         </v-tooltip>
         <v-tooltip
           bottom
-          v-if="item.numberOfAnswers === 0 && item.isChangeable()"
+          v-if="item.numberOfAnswers === 0 && item.isEditable()"
         >
           <template v-slot:activator="{ on }">
             <v-icon
