@@ -36,7 +36,7 @@ public class MyStatsService {
 
         //Calculate only if public, lets assume it's the users num
         if(statsDto.getTestStatVisibility() == MyStats.StatsVisibility.PUBLIC) {
-            statsDto.setTestStatVisibility(user.getNumberOfCorrectInClassAnswers());
+            statsDto.setTestStatValue(user.getNumberOfCorrectInClassAnswers());
         }
 
         return statsDto;

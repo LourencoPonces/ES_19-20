@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class MyStatsDto implements Serializable {
     private MyStats.StatsVisibility testStatVisibility;
-    private Integer testStatValue = 0;
+    private Integer testStat = 0;
 
     public MyStatsDto(MyStats myStats) {
         this.testStatVisibility = myStats.getTestStat();
@@ -14,5 +14,13 @@ public class MyStatsDto implements Serializable {
         return testStatVisibility;
     }
 
-    public void setTestStatVisibility(Integer value) {this.testStatValue = value;}
+    public Integer getTestStat() {
+        return testStat;
+    }
+
+    public void setTestStatValue(Integer value) {this.testStat = value;}
+
+    public void setTestStatVisibility(MyStats.StatsVisibility testStatVisibility) {
+        this.testStatVisibility = testStatVisibility;
+    }
 }
