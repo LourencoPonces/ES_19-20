@@ -218,6 +218,7 @@ Cypress.Commands.add('checkRequestInDiscussion', requestText => {
     .click();
   cy.get('[data-cy="questionRequests"]')
     .children()
+    .should('have.length', 1)
     .first()
     .should('contain.text', requestText);
 })
