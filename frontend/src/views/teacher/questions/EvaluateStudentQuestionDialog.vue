@@ -43,7 +43,7 @@
       <v-card-actions>
         <v-spacer />
         <v-btn
-          color="primary"
+          color="error"
           @click="$emit('cancel-evaluate', false)"
           data-cy="CancelEvaluation"
           >Cancel</v-btn
