@@ -12,6 +12,7 @@
       :items-per-page="15"
       :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
       data-cy="studentQuestionTable"
+      style="{table-layout : fixed;}"
     >
       <template v-slot:top>
         <v-card-title>
@@ -34,9 +35,15 @@
         </v-card-title>
       </template>
 
-      <template v-slot:item.content="{ item }">
-        <p @click="showStudentQuestionDialog(item)"
-      /></template>
+      <template v-slot:item.title="{ item }">
+        <p
+          @click="showStudentQuestionDialog(item)"
+          @contextmenu="editStudentQuestion(item, $event)"
+          style="cursor: pointer"
+        >
+          {{ item.title }}
+        </p>
+      </template>
 
       <template v-slot:item.topics="{ item }">
         <v-chip-group data-cy="questionTopics">
@@ -47,9 +54,23 @@
       </template>
 
       <template v-slot:item.submittedStatus="{ item }">
-        <v-chip :color="item.getEvaluationColor()" small>
+        <v-chip
+          :color="item.getEvaluationColor()"
+          small
+          @click="showJustification(item)"
+        >
           <span data-cy="showStatus">{{ item.submittedStatus }}</span>
         </v-chip>
+      </template>
+
+      <template v-slot:item.justification="{ item }">
+        <p
+          @click="showJustification(item)"
+          style="cursor:pointer"
+          data-cy="show-justification"
+        >
+          {{ truncate(item.justification) }}
+        </p>
       </template>
 
       <template v-slot:item.image="{ item }">
@@ -66,7 +87,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              small
+              large
               class="mr-2"
               v-on="on"
               @click="showStudentQuestionDialog(item)"
@@ -76,13 +97,10 @@
           </template>
           <span>Show Question</span>
         </v-tooltip>
-        <v-tooltip
-          bottom
-          v-if="item.numberOfAnswers === 0 && item.isChangeable()"
-        >
+        <v-tooltip bottom v-if="item.isChangeable()">
           <template v-slot:activator="{ on }">
             <v-icon
-              small
+              large
               class="mr-2"
               v-on="on"
               @click="editStudentQuestion(item)"
@@ -95,7 +113,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              small
+              large
               class="mr-2"
               v-on="on"
               @click="duplicateStudentQuestion(item)"
@@ -108,7 +126,7 @@
         <v-tooltip bottom v-if="item.isChangeable()">
           <template v-slot:activator="{ on }">
             <v-icon
-              small
+              large
               class="mr-2"
               v-on="on"
               @click="deleteStudentQuestion(item)"
@@ -122,7 +140,7 @@
         <v-tooltip bottom v-if="item.justification">
           <template v-slot:activator="{ on }">
             <v-icon
-              small
+              large
               class="mr-2"
               v-on="on"
               @click="showJustification(item)"
@@ -185,31 +203,44 @@ export default class StudentQuestionView extends Vue {
   search: string = '';
 
   headers: object = [
-    { text: 'Title', value: 'title', align: 'center' },
-    { text: 'Question', value: 'content', align: 'left' },
+    {
+      text: 'Actions',
+      value: 'action',
+      align: 'left',
+      width: '15%',
+      sortable: false
+    },
+    { text: 'Title', value: 'title', align: 'left', width: '20%' },
     {
       text: 'Topics',
       value: 'topics',
       align: 'center',
       sortable: false
     },
-    { text: 'Submitted Status', value: 'submittedStatus', align: 'center' },
-    {
-      text: 'Creation Date',
-      value: 'creationDate',
-      align: 'center'
-    },
     {
       text: 'Image',
       value: 'image',
       align: 'center',
+      width: '5%',
       sortable: false
     },
     {
-      text: 'Actions',
-      value: 'action',
-      align: 'center',
-      sortable: false
+      text: 'Submitted Status',
+      value: 'submittedStatus',
+      align: 'left',
+      width: '10%'
+    },
+    {
+      text: 'Justification',
+      value: 'justification',
+      align: 'left',
+      width: '20%'
+    },
+    {
+      text: 'Creation Date',
+      value: 'creationDate',
+      width: '10%',
+      align: 'center'
     }
   ];
 
@@ -225,7 +256,12 @@ export default class StudentQuestionView extends Vue {
     this.editStudentQuestionDialog = true;
   }
 
-  editStudentQuestion(studentQuestion: StudentQuestion) {
+  editStudentQuestion(studentQuestion: StudentQuestion, e?: Event) {
+    if (e) e.preventDefault();
+    if (!studentQuestion.isChangeable()) {
+      this.$store.dispatch('error', 'Cannot edit this question');
+      return;
+    }
     this.currentStudentQuestion = studentQuestion;
     this.editStudentQuestionDialog = true;
   }
@@ -322,6 +358,11 @@ export default class StudentQuestionView extends Vue {
   showJustification(studentQuestion: StudentQuestion) {
     this.currentStudentQuestion = studentQuestion;
     this.studentQuestionJustification = true;
+  }
+
+  truncate(s: String): String {
+    const max = 35;
+    return s.length > max ? s.substr(0, max - 1) + '...' : s;
   }
 }
 </script>

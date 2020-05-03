@@ -23,9 +23,11 @@
         </v-card-title>
       </template>
 
-      <template v-slot:item.content="{ item }">
-        <p @click="showQuestionDialog(item)"
-      /></template>
+      <template v-slot:item.title="{ item }">
+        <p style="cursor: pointer" @click="showQuestionDialog(item)">
+          {{ item.title }}
+        </p>
+      </template>
 
       <template v-slot:item.topics="{ item }">
         <v-chip-group>
@@ -50,7 +52,13 @@
       </template>
 
       <template v-slot:item.justification="{ item }">
-        <span margin="5%">{{ item.justification }}</span>
+        <p
+          @click="showEvaluateStudentQuestionDialog(item)"
+          style="cursor:pointer"
+          data-cy="showJustification"
+        >
+          {{ truncate(item.justification) }}
+        </p>
       </template>
 
       <template v-slot:item.image="{ item }">
@@ -67,7 +75,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              small
+              large
               class="mr-2"
               v-on="on"
               @click="showQuestionDialog(item)"
@@ -75,6 +83,18 @@
             >
           </template>
           <span>Show Question</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-icon
+              large
+              class="mr-2"
+              v-on="on"
+              @click="showEvaluateStudentQuestionDialog(item)"
+              >fa-clipboard-check</v-icon
+            >
+          </template>
+          <span>Evaluate</span>
         </v-tooltip>
       </template>
     </v-data-table>
@@ -119,32 +139,37 @@ export default class StudentQuestionsView extends Vue {
   search: string = '';
 
   headers: object = [
-    { text: 'Title', value: 'title', align: 'center' },
-    { text: 'Question', value: 'content', align: 'left' },
+    {
+      text: 'Actions',
+      value: 'action',
+      align: 'left',
+      width: '15%',
+      sortable: false
+    },
+    { text: 'Title', value: 'title', align: 'left', width: '20%' },
     {
       text: 'Topics',
       value: 'topics',
       align: 'center',
       sortable: false
     },
-    { text: 'Submitted Status', value: 'submittedStatus', align: 'center' },
-    { text: 'Justification', value: 'justification', align: 'center' },
+    {
+      text: 'Submitted Status',
+      value: 'submittedStatus',
+      align: 'left',
+      width: '10%'
+    },
+    {
+      text: 'Justification',
+      value: 'justification',
+      align: 'left',
+      width: '20%'
+    },
     {
       text: 'Creation Date',
       value: 'creationDate',
+      width: '10%',
       align: 'center'
-    },
-    {
-      text: 'Image',
-      value: 'image',
-      align: 'center',
-      sortable: false
-    },
-    {
-      text: 'Actions',
-      value: 'action',
-      align: 'center',
-      sortable: false
     }
   ];
 
@@ -220,6 +245,12 @@ export default class StudentQuestionsView extends Vue {
     });
     this.evaluateQuestion = false;
     this.currentQuestion = null;
+  }
+
+  truncate(s: String): String {
+    s.trim();
+    const max = 35;
+    return s.length > max ? s.substr(0, max - 1) + '...' : s;
   }
 }
 </script>
