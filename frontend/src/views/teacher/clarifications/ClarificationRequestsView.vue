@@ -30,6 +30,37 @@
           :aria-label="item.hasAnswer"
         />
       </template>
+
+      <template v-slot:item.status="{ item }">
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on }">
+            <v-btn
+              v-on="on"
+              text
+              @click="changeRequestStatus(item)"
+              :data-cy="'changeStatus-' + item.content.slice(0, 15)"
+            >
+              <v-icon
+                v-if="item.isPrivate()"
+                small
+                class="mr-2"
+                :data-cy="'private-' + item.content.slice(0, 15)"
+                >fas fa-eye-slash</v-icon
+              >
+              <v-icon
+                v-else
+                small
+                class="mr-2"
+                :data-cy="'public-' + item.content.slice(0, 15)"
+                >fas fa-eye</v-icon
+              >
+            </v-btn>
+          </template>
+          <span v-if="item.isPrivate()">Make Public</span>
+          <span v-else>Make Private</span>
+        </v-tooltip>
+      </template>
+
       <template v-slot:item.actions="{ item }">
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
@@ -125,6 +156,14 @@ export default class ClarificationRequestsView extends Vue {
   search: string = '';
   headers: object = [
     { text: 'Clarification Request', value: 'content', align: 'left' },
+
+    {
+      text: 'Visibility',
+      value: 'status',
+      align: 'center',
+      width: '60px',
+      sortable: false
+    },
     {
       text: 'Answered',
       value: 'hasAnswer',
@@ -225,6 +264,23 @@ export default class ClarificationRequestsView extends Vue {
       this.requestBeingAnswered.setAnswer(null);
 
       this.closeDialogue();
+    } catch (err) {
+      await this.$store.dispatch('error', err);
+    } finally {
+      await this.$store.dispatch('clearLoading');
+    }
+  }
+
+  async changeRequestStatus(req: ClarificationRequest): Promise<void> {
+    await this.$store.dispatch('loading');
+    try {
+      const status = req.isPrivate() ? 'PUBLIC' : 'PRIVATE';
+      let result = await RemoteServices.changeClarificationRequestStatus(
+        req.getId(),
+        status
+      );
+
+      this.clarifications.splice(this.clarifications.indexOf(req), 1, result);
     } catch (err) {
       await this.$store.dispatch('error', err);
     } finally {

@@ -45,4 +45,8 @@ describe('Teacher Clarification Requests', () => {
 
     cy.deleteClarificationRequestAnswer(TEST_REQ_2);
   });
+
+  it('make clarication request public', () => {
+   cy.changeClarificationRequestStatus(TEST_REQ_2)
+  });
 });
