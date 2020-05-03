@@ -6,7 +6,6 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
@@ -14,7 +13,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 import java.sql.SQLException;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.USERNAME_NOT_FOUND;
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.USER_NOT_FOUND;
 
 @Service
 public class MyStatsService {
@@ -37,8 +35,8 @@ public class MyStatsService {
 
 
         //Calculate only if public, lets assume it's the users num
-        if(statsDto.getTestStat() == MyStats.StatsVisibility.PUBLIC) {
-            statsDto.setTestStat(user.getNumberOfCorrectInClassAnswers());
+        if(statsDto.getTestStatVisibility() == MyStats.StatsVisibility.PUBLIC) {
+            statsDto.setTestStatVisibility(user.getNumberOfCorrectInClassAnswers());
         }
 
         return statsDto;
