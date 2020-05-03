@@ -9,6 +9,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuestionAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.*
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.AnswersXmlImport
@@ -25,7 +28,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 import spock.lang.Unroll
-
 import java.time.LocalDateTime
 
 @DataJpaTest
@@ -49,6 +51,9 @@ class GetSolvedQuizzesTest extends Specification {
 
     @Autowired
     StatementService statementService
+
+    @Autowired
+    ClarificationService clarificationService
 
     @Autowired
     UserRepository userRepository
@@ -77,6 +82,8 @@ class GetSolvedQuizzesTest extends Specification {
     def option
     def quiz
     def quizQuestion
+    def quizAnswer
+    def questionAnswer
     def course
     def courseExecution
 
@@ -93,25 +100,53 @@ class GetSolvedQuizzesTest extends Specification {
         user.getCourseExecutions().add(courseExecution)
         courseExecution.getUsers().add(user)
 
-        question = new Question()
-        question.setKey(1)
-        question.setCourse(course)
-        question.setContent("Question Content")
-        question.setTitle("Question Title")
-
-        option = new Option()
-        option.setContent("Option Content")
-        option.setCorrect(true)
-        option.setSequence(0)
-        option.setQuestion(question)
+        createQuestion()
+        createOption()
 
         userRepository.save(user)
         questionRepository.save(question)
     }
 
-    @Unroll
-    def "returns solved quiz with: quizType=#quizType | conclusionDate=#conclusionDate | resultsDate=#resultsDate"() {
-        given: 'a quiz answered by the user'
+    private void createOption() {
+        option = new Option()
+        option.setContent("Option Content")
+        option.setCorrect(true)
+        option.setSequence(0)
+        option.setQuestion(question)
+    }
+
+    private void createQuestion() {
+        question = new Question()
+        question.setKey(1)
+        question.setCourse(course)
+        question.setContent("Question Content")
+        question.setTitle("Question Title")
+    }
+
+    private void createQuestionAnswer() {
+        questionAnswer = new QuestionAnswer()
+        questionAnswer.setSequence(0)
+        questionAnswer.setQuizAnswer(quizAnswer)
+        questionAnswer.setQuizQuestion(quizQuestion)
+        questionAnswer.setOption(option)
+    }
+
+    private void createQuizAnswer() {
+        quizAnswer = new QuizAnswer()
+        quizAnswer.setAnswerDate(DateHandler.now())
+        quizAnswer.setCompleted(true)
+        quizAnswer.setUser(user)
+        quizAnswer.setQuiz(quiz)
+    }
+
+    private void createQuizQuestion() {
+        quizQuestion = new QuizQuestion()
+        quizQuestion.setSequence(1)
+        quizQuestion.setQuiz(quiz)
+        quizQuestion.setQuestion(question)
+    }
+
+    private void createQuiz(Quiz.QuizType quizType, LocalDateTime conclusionDate, LocalDateTime resultsDate) {
         quiz = new Quiz()
         quiz.setKey(1)
         quiz.setTitle(QUIZ_TITLE)
@@ -120,24 +155,15 @@ class GetSolvedQuizzesTest extends Specification {
         quiz.setConclusionDate(conclusionDate)
         quiz.setResultsDate(resultsDate)
         quiz.setCourseExecution(courseExecution)
+    }
 
-        quizQuestion = new QuizQuestion()
-        quizQuestion.setSequence(1)
-        quizQuestion.setQuiz(quiz)
-        quizQuestion.setQuestion(question)
-
-        def quizAnswer = new QuizAnswer()
-        quizAnswer.setAnswerDate(DateHandler.now())
-        quizAnswer.setCompleted(true)
-        quizAnswer.setUser(user)
-        quizAnswer.setQuiz(quiz)
-
-        def questionAnswer = new QuestionAnswer()
-        questionAnswer.setSequence(0)
-        questionAnswer.setQuizAnswer(quizAnswer)
-        questionAnswer.setQuizQuestion(quizQuestion)
-        questionAnswer.setOption(option)
-
+    @Unroll
+    def "returns solved quiz with: quizType=#quizType | conclusionDate=#conclusionDate | resultsDate=#resultsDate"() {
+        given: "a quiz answered by the user"
+        createQuiz(Quiz.QuizType.PROPOSED, YESTERDAY, TODAY.minusHours(1))
+        createQuizQuestion()
+        createQuizAnswer()
+        createQuestionAnswer()
         quizRepository.save(quiz)
         quizAnswerRepository.save(quizAnswer)
         questionAnswerRepository.save(questionAnswer)
@@ -166,35 +192,61 @@ class GetSolvedQuizzesTest extends Specification {
         Quiz.QuizType.IN_CLASS  | YESTERDAY      | null
     }
 
+    def "question has a private clarification request"() {
+        given: "a quiz answered by the user"
+        createQuiz(Quiz.QuizType.PROPOSED, YESTERDAY, TODAY.minusHours(1))
+        createQuizQuestion()
+        createQuizAnswer()
+        createQuestionAnswer()
+        quizRepository.save(quiz)
+        quizAnswerRepository.save(quizAnswer)
+        questionAnswerRepository.save(questionAnswer)
+
+        and: "a clarification request about the question"
+        def clarificationRequestDto = new ClarificationRequestDto()
+        clarificationRequestDto.setContent('CONTENT')
+        clarificationService.submitClarificationRequest(question.getId(), user.getId(), clarificationRequestDto)
+
+        when:
+        def solvedQuizDtos = statementService.getSolvedQuizzes(user.getId(), courseDto.getCourseExecutionId())
+
+        then:
+        def statementQuizDto = solvedQuizDtos.get(0).getStatementQuiz()
+        statementQuizDto.getQuestions().get(0).getClarifications().size() == 0
+    }
+
+    def "question has a public clarification request"() {
+        given: "a quiz answered by the user"
+        createQuiz(Quiz.QuizType.PROPOSED, YESTERDAY, TODAY.minusHours(1))
+        createQuizQuestion()
+        createQuizAnswer()
+        createQuestionAnswer()
+        quizRepository.save(quiz)
+        quizAnswerRepository.save(quizAnswer)
+        questionAnswerRepository.save(questionAnswer)
+
+        and: "a clarification request about the question"
+        def clarificationRequestDto = new ClarificationRequestDto()
+        clarificationRequestDto.setContent('CONTENT')
+        clarificationRequestDto = clarificationService.submitClarificationRequest(question.getId(), user.getId(), clarificationRequestDto)
+        clarificationService.changeClarificationRequestStatus(clarificationRequestDto.getId(), ClarificationRequest.RequestStatus.PUBLIC)
+
+        when:
+        def solvedQuizDtos = statementService.getSolvedQuizzes(user.getId(), courseDto.getCourseExecutionId())
+
+        then:
+        def statementQuizDto = solvedQuizDtos.get(0).getStatementQuiz()
+        statementQuizDto.getQuestions().get(0).getClarifications().size() == 1
+    }
+
+
     @Unroll
     def "does not return quiz with: quizType=#quizType | conclusionDate=#conclusionDate | resultsDate=#resultsDate"() {
-        given: 'a quiz answered by the user'
-        quiz = new Quiz()
-        quiz.setKey(1)
-        quiz.setTitle(QUIZ_TITLE)
-        quiz.setType(quizType.toString())
-        quiz.setAvailableDate(BEFORE)
-        quiz.setConclusionDate(conclusionDate)
-        quiz.setResultsDate(resultsDate)
-        quiz.setCourseExecution(courseExecution)
-
-        quizQuestion = new QuizQuestion()
-        quizQuestion.setSequence(1)
-        quizQuestion.setQuiz(quiz)
-        quizQuestion.setQuestion(question)
-
-        def quizAnswer = new QuizAnswer()
-        quizAnswer.setAnswerDate(DateHandler.now())
-        quizAnswer.setCompleted(true)
-        quizAnswer.setUser(user)
-        quizAnswer.setQuiz(quiz)
-
-        def questionAnswer = new QuestionAnswer()
-        questionAnswer.setSequence(0)
-        questionAnswer.setQuizAnswer(quizAnswer)
-        questionAnswer.setQuizQuestion(quizQuestion)
-        questionAnswer.setOption(option)
-
+        given: "a quiz answered by the user"
+        createQuiz(quizType, conclusionDate, resultsDate)
+        createQuizQuestion()
+        createQuizAnswer()
+        createQuestionAnswer()
         quizRepository.save(quiz)
         quizAnswerRepository.save(quizAnswer)
         questionAnswerRepository.save(questionAnswer)
@@ -210,6 +262,7 @@ class GetSolvedQuizzesTest extends Specification {
         Quiz.QuizType.IN_CLASS  | TOMORROW       | LATER
         Quiz.QuizType.IN_CLASS  | TOMORROW       | null
     }
+
 
     @TestConfiguration
     static class QuizServiceImplTestContextConfiguration {
@@ -232,6 +285,11 @@ class GetSolvedQuizzesTest extends Specification {
         @Bean
         QuestionService questionService() {
             return new QuestionService()
+        }
+
+        @Bean
+        ClarificationService clarificationService() {
+            return new ClarificationService()
         }
     }
 }

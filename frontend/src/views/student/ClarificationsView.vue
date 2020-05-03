@@ -35,6 +35,23 @@
           <span style="white-space: pre;">{{ showAnswer(item) }}</span>
         </template>
 
+        <template v-slot:item.status="{ item }">
+          <v-icon
+            v-if="item.isPrivate()"
+            small
+            class="mr-2"
+            :data-cy="'private-' + item.content.slice(0, 15)"
+            >fas fa-eye-slash</v-icon
+          >
+          <v-icon
+            v-else
+            small
+            class="mr-2"
+            :data-cy="'public-' + item.content.slice(0, 15)"
+            >fas fa-eye</v-icon
+          >
+        </template>
+
         <template v-slot:item.action="{ item }">
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
@@ -130,10 +147,38 @@ export default class ClarificationsView extends Vue {
   dialog: boolean = false;
 
   headers: object = [
-    { text: 'Request', value: 'content', align: 'center', sortable: false },
-    { text: 'Answer', value: 'answer', align: 'center', sortable: false },
-    { text: 'Submission Date', value: 'creationDate', align: 'center' },
-    { text: 'Actions', value: 'action', align: 'center', sortable: false }
+    {
+      text: 'Request',
+      value: 'content',
+      align: 'center',
+      sortable: false
+    },
+    {
+      text: 'Answer',
+      value: 'answer',
+      align: 'center',
+      sortable: false
+    },
+    {
+      text: 'Visibility',
+      value: 'status',
+      align: 'center',
+      sortable: false,
+      width: '100px'
+    },
+    {
+      text: 'Submission Date',
+      value: 'creationDate',
+      align: 'center',
+      width: '150px'
+    },
+    {
+      text: 'Actions',
+      value: 'action',
+      align: 'center',
+      sortable: false,
+      width: '100px'
+    }
   ];
 
   async created() {
