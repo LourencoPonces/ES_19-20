@@ -7,6 +7,7 @@ export default class ClarificationRequest {
   creationDate!: string;
   content!: string;
   answer: ClarificationRequestAnswer | null = null;
+  status!: string;
 
   constructor(jsonObj?: ClarificationRequest) {
     if (jsonObj) {
@@ -15,6 +16,7 @@ export default class ClarificationRequest {
       this.content = jsonObj.content;
       this.owner = jsonObj.owner;
       this.creationDate = jsonObj.creationDate;
+      this.status = jsonObj.status;
 
       if (jsonObj.answer) {
         this.answer = new ClarificationRequestAnswer(jsonObj.answer);
@@ -67,5 +69,17 @@ export default class ClarificationRequest {
 
   getAnswerContent(): string | void {
     return this.answer?.getContent();
+  }
+
+  isPrivate(): boolean {
+    return this.status == 'PRIVATE';
+  }
+
+  setStatus(status: string): void {
+    this.status = status;
+  }
+
+  getStatus(): string {
+    return this.status;
   }
 }

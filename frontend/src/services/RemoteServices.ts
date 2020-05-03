@@ -831,4 +831,22 @@ export default class RemoteServices {
       throw Error(await this.errorMessage(err));
     }
   }
+
+  static async changeClarificationRequestStatus(
+    id: number,
+    status: string
+  ): Promise<ClarificationRequest> {
+    return httpClient
+      .put(`/clarifications/${id}/status`, status, {
+        headers: {
+          'Content-Type': 'text/plain'
+        }
+      })
+      .then(response => {
+        return new ClarificationRequest(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
 }

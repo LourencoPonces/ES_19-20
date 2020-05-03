@@ -90,8 +90,9 @@ export default class StudentQuestion extends Question {
 
   isChangeable(): boolean {
     return (
-      this.numberOfAnswers === 0 &&
-      this.submittedStatus === internalStatuses.WAITING_FOR_APPROVAL
+      this.submittedStatus === internalStatuses.REJECTED ||
+      (this.numberOfAnswers === 0 &&
+        this.submittedStatus === internalStatuses.WAITING_FOR_APPROVAL)
     );
   }
 }

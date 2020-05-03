@@ -11,6 +11,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.StudentSubmitQuestionService
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.TeacherEvaluatesStudentQuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Image
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Option
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
@@ -47,6 +48,9 @@ class UpdateStudentQuestionTest extends Specification{
 
     @Autowired
     StudentSubmitQuestionService studentSubmitQuestionService
+
+    @Autowired
+    TeacherEvaluatesStudentQuestionService teacherEvaluatesStudentQuestionService
 
     @Autowired
     CourseRepository courseRepository
@@ -151,10 +155,9 @@ class UpdateStudentQuestionTest extends Specification{
         optionRepository.save(optionKO)
     }
 
-
-    def "update a student question"() {
-        given: "a new StudentQuestion"
+    def createNewStudentQuestionDto() {
         def studentQuestionDto = new StudentQuestionDTO(studentQuestion)
+        studentQuestionDto.setId(studentQuestion.getId())
         studentQuestionDto.setTitle(NEW_QUESTION_TITLE)
         studentQuestionDto.setContent(NEW_QUESTION_CONTENT)
         studentQuestionDto.setStatus(Question.Status.DISABLED.name())
@@ -162,18 +165,20 @@ class UpdateStudentQuestionTest extends Specification{
         studentQuestionDto.setNumberOfAnswers(4)
         studentQuestionDto.setNumberOfCorrect(2)
         studentQuestionDto.setUser(USER_NAME)
+        return studentQuestionDto
+    }
 
-        and: "a new Topic"
-        def newTopic = new Topic()
+    def createNewTopic(Topic newTopic) {
         newTopic.setName(NEW_TOPIC_NAME)
         newTopic.setCourse(course)
         topicRepository.save(newTopic);
         def topicDto = new TopicDto(newTopic)
         def list = new ArrayList<TopicDto>()
         list.add(topicDto)
-        studentQuestionDto.setTopics(list)
+        return list
+    }
 
-        and: 'a optionId'
+    def createNewOption() {
         def optionDto = new OptionDto(optionKO)
         optionDto.setContent(NEW_OPTION_CONTENT)
         optionDto.setCorrect(false)
@@ -183,6 +188,21 @@ class UpdateStudentQuestionTest extends Specification{
         optionDto.setContent(OPTION_CONTENT)
         optionDto.setCorrect(true)
         options.add(optionDto)
+        return options
+    }
+
+
+    def "update a student question"() {
+        given: "a new StudentQuestion"
+        def studentQuestionDto = createNewStudentQuestionDto()
+
+        and: "a new Topic"
+        def newTopic = new Topic()
+        def list = createNewTopic(newTopic)
+        studentQuestionDto.setTopics(list)
+
+        and: 'a optionId'
+        def options = createNewOption()
         studentQuestionDto.setOptions(options)
 
         when:
@@ -240,6 +260,33 @@ class UpdateStudentQuestionTest extends Specification{
         StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL |  true            |            User.Role.TEACHER        || ErrorMessage.ACCESS_DENIED
     }
 
+    def "Update a question that was rejected by a teacher"() {
+        given: "A Rejection by a teacher"
+        teacherEvaluatesStudentQuestionService.rejectStudentQuestion(studentQuestion.getId(), "bad question")
+        and: "a updated questionDto"
+        def studentQuestionDto = createNewStudentQuestionDto()
+        def newTopic = new Topic()
+        def list = createNewTopic(newTopic)
+        studentQuestionDto.setTopics(list)
+        def options = createNewOption()
+        studentQuestionDto.setOptions(options)
+
+        when:
+        studentSubmitQuestionService.updateStudentQuestion(studentQuestionDto.getId(), studentQuestionDto, course.getId())
+
+
+        // Some verifications can be overlooked as they were verified in another test
+        then: "The question has changed and status is back to WAITING_FOR_APPROVAL"
+        studentQuestionRepository.count() == 1L
+        def result = studentQuestionRepository.findAll().get(0)
+        result.getId() == studentQuestionDto.getId()
+        and: 'are not changed'
+        result.getStatus() == Question.Status.DISABLED
+        result.getSubmittedStatus() == StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL
+        and: 'an option is changed'
+        result.getOptions().size() == 2
+    }
+
     def addTopic(toAdd, list) {
         if(toAdd) {
             list.add(new TopicDto(topic))
@@ -251,6 +298,11 @@ class UpdateStudentQuestionTest extends Specification{
         @Bean
         StudentSubmitQuestionService studentSubmitQuestionService() {
             return new StudentSubmitQuestionService()
+        }
+
+        @Bean
+        TeacherEvaluatesStudentQuestionService teacherEvaluatesStudentQuestionService() {
+            return new TeacherEvaluatesStudentQuestionService()
         }
     }
 }

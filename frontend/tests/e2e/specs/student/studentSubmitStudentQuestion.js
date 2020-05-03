@@ -49,8 +49,8 @@ describe('Student Question Submission', () => {
 
     for (topictoAdd of topics)
       cy.contains(questionTitle) // get question title
-        .parents('tr')           // get question row
-        .eq(0)                   // make sure closest row
+        .parents('tr') // get question row
+        .eq(0) // make sure closest row
         .find('[data-cy=questionTopics]')
         .children()
         .contains(topictoAdd);
@@ -158,6 +158,73 @@ describe('Student Question Submission', () => {
   });
 
   // Test 4
+  it('Edit a rejected student question', () => {
+    let justification = 'Very bad question, dear student!';
+    let prevStatus = WAITING_FOR_APPROVAL;
+    let status = REJECTED;
+
+    cy.get('[data-cy="my-area"]').click();
+    cy.get('[data-cy="student-questions"]').click();
+
+    cy.createStudentQuestion(questionTitle, questionContent, topics, options, [
+      1
+    ]);
+
+    // Teacher rejects questions
+    cy.contains('Demo Course').click();
+    cy.logout();
+    cy.demoTeacherLogin();
+
+    cy.get('[data-cy="management"]').click();
+    cy.get('[data-cy="student-questions"]').click();
+
+    cy.evaluateStudentQuestion(
+      questionTitle,
+      prevStatus,
+      status,
+      justification
+    );
+    // Student edits it
+    cy.contains('Demo Course').click();
+    cy.logout();
+    cy.demoStudentLogin();
+
+    cy.get('[data-cy="my-area"]').click();
+    cy.get('[data-cy="student-questions"]').click();
+
+    cy.editStudentQuestion(
+      'edit',
+      questionTitle,
+      newQuestionTitle,
+      newQuestionContent,
+      topics,
+      newTopics,
+      newOptions
+    );
+
+    for (topictoAdd of newTopics)
+      cy.contains(questionTitle) // get question title
+        .parents('tr') // get question row
+        .eq(0) // make sure closest row
+        .find('[data-cy=questionTopics]')
+        .children()
+        .contains(topictoAdd);
+
+    cy.contains(newQuestionTitle)
+      .parents('tr')
+      .eq(0)
+      .find('[data-cy=showStatus]')
+      .should('have.text', WAITING_FOR_APPROVAL);
+
+    // delete the question
+    cy.contains(questionTitle)
+      .parents('tr')
+      .eq(0)
+      .find('[data-cy="deleteStudentQuestion"]')
+      .click();
+  });
+
+  // Test 5
   it('Duplicate an existing student question' + '', () => {
     cy.get('[data-cy="my-area"]').click();
     cy.get('[data-cy="student-questions"]').click();
@@ -176,17 +243,17 @@ describe('Student Question Submission', () => {
       newOptions
     );
 
-      // delete the question
-      cy.contains(questionTitle)
-        .parents('tr')
-        .eq(0)
-        .find('[data-cy="deleteStudentQuestion"]')
-        .click();
+    // delete the question
+    cy.contains(questionTitle)
+      .parents('tr')
+      .eq(0)
+      .find('[data-cy="deleteStudentQuestion"]')
+      .click();
 
-      cy.contains(newQuestionTitle)
-        .parents('tr')
-        .eq(0)
-        .find('[data-cy="deleteStudentQuestion"]')
-        .click();
+    cy.contains(newQuestionTitle)
+      .parents('tr')
+      .eq(0)
+      .find('[data-cy="deleteStudentQuestion"]')
+      .click();
   });
 });
