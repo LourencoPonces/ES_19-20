@@ -94,7 +94,7 @@ public class TournamentController {
         }
     }
 
-    @GetMapping("/tournaments/created")
+    @GetMapping("/executions/{executionId}/tournaments/created")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
     public List<TournamentDto> getCreatedTournaments(Principal principal, @PathVariable int executionId) {
         User user = (User) ((Authentication) principal).getPrincipal();
