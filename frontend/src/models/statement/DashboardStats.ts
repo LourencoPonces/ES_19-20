@@ -5,12 +5,12 @@ const visibility = {
 
 export default class DashboardStats {
   testStatVisibility: string = visibility.PUBLIC;
-  testStatValue: number = 0;
+  testStat: number = 0;
 
   constructor(jsonObj?: DashboardStats) {
     if (jsonObj) {
       this.testStatVisibility = jsonObj.testStatVisibility;
-      this.testStatValue = jsonObj.testStatValue;
+      this.testStat = jsonObj.testStat;
     }
   }
 

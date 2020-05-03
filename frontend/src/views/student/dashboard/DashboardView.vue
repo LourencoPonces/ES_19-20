@@ -3,7 +3,7 @@
     <div class="container">
       <h2>Dashboard</h2>
       <h3>My Stats</h3>
-      <div class="dashboard-stats-container">
+      <div v-if="myStats" class="dashboard-stats-container">
         <div class="items">
           <div class="icon-wrapper" ref="totalQuizzes">
             <animated-number :number="myStats.testStatValue" />
@@ -56,7 +56,7 @@
                 small
                 class="mr-2"
                 v-on="on"
-                @click="showStudentQuestionDialog(item)"
+                @click="showDashboardStatsDialog(item)"
                 >visibility</v-icon
               >
             </template>
@@ -64,6 +64,12 @@
           </v-tooltip>
         </template>
       </v-data-table>
+      <show-dashboard-stats-dialog
+        v-if="dashboardUserToSee"
+        v-model="dashboardStatsDialog"
+        :username="dashboardUserToSee"
+        v-on:close-show-dashboard-stats-dialog="onCloseShowDashboardStatsDialog"
+      />
     </v-card>
   </div>
 </template>
@@ -75,16 +81,22 @@ import RemoteServices from '@/services/RemoteServices';
 import Course from '@/models/user/Course';
 import AnimatedNumber from '@/components/AnimatedNumber.vue';
 import { Student } from '@/models/management/Student';
+import ShowDashboardStatsDialog from '@/views/student/dashboard/ShowDashboardStatsDialog.vue';
 
 @Component({
-  components: { AnimatedNumber }
+  components: {
+    AnimatedNumber,
+    'show-dashboard-stats-dialog': ShowDashboardStatsDialog
+  }
 })
-export default class StatsView extends Vue {
-  myStats: DashboardStats = new DashboardStats();
+export default class DashboardView extends Vue {
+  myStats: DashboardStats | null = null;
   statVisibility = ['PUBLIC', 'PRIVATE'];
   course: Course | null = null;
   students: Student[] = [];
   search: string = '';
+  dashboardStatsDialog: boolean = false;
+  dashboardUserToSee: string = '';
   headers: object = [
     { text: 'Name', value: 'name', align: 'left', width: '40%' },
     {
@@ -131,6 +143,15 @@ export default class StatsView extends Vue {
       await this.$store.dispatch('error', error);
     }
     await this.$store.dispatch('clearLoading');
+  }
+
+  showDashboardStatsDialog(student: Student) {
+    this.dashboardUserToSee = student.username;
+    this.dashboardStatsDialog = true;
+  }
+
+  onCloseShowDashboardStatsDialog() {
+    this.dashboardStatsDialog = false;
   }
 }
 </script>
