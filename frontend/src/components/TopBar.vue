@@ -172,7 +172,7 @@
           <template v-slot:activator="{ on }">
             <v-btn v-on="on" text dark data-cy="tournaments">
               Tournaments
-              <v-icon>fas fa-file-alt</v-icon>
+              <v-icon>fas fa-trophy</v-icon>
             </v-btn>
           </template>
           <v-list dense>
@@ -185,6 +185,17 @@
               </v-list-item-action>
               <v-list-item-content>
                 <v-list-item-title>Available</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item
+              to="/student/tournaments-created"
+              data-cy="tournaments-created"
+            >
+              <v-list-item-action>
+                <v-icon>create</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Created</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -411,9 +422,16 @@
 
           <v-list-item to="/student/tournaments-available">
             <v-list-item-action>
-              <v-icon>fas fa-trophy</v-icon>
+              <v-icon>assignment</v-icon>
             </v-list-item-action>
             <v-list-item-content>Available Tournaments</v-list-item-content>
+          </v-list-item>
+
+          <v-list-item to="/student/tournaments-created">
+            <v-list-item-action>
+              <v-icon>create</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>Created Tournaments</v-list-item-content>
           </v-list-item>
 
           <v-list-item to="/student/stats">
