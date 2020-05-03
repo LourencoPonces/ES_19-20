@@ -227,6 +227,16 @@
         </v-btn>
 
         <v-btn
+          to="/student/dashboard"
+          v-if="isStudent && currentCourse"
+          text
+          dark
+        >
+          Dashboard
+          <v-icon>fas fa-address-card</v-icon>
+        </v-btn>
+
+        <v-btn
           v-if="isLoggedIn && moreThanOneCourse"
           to="/courses"
           active-class="no-active"
