@@ -60,7 +60,6 @@
 import { Component, Model, Prop, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import StudentQuestion from '@/models/management/StudentQuestion';
-import internalStatuses from '@/models/management/StudentQuestion';
 
 @Component
 export default class EvaluateQuestionDialog extends Vue {
@@ -74,7 +73,6 @@ export default class EvaluateQuestionDialog extends Vue {
 
   created() {
     this.evalQuestion = new StudentQuestion(this.studentQuestion);
-    this.evalQuestion.justification = '';
   }
 
   async evaluateQuestion() {
