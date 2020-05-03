@@ -12,6 +12,7 @@
                     :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
                     no-data-text="No Created Tournaments"
                     no-results-text="No Tournaments Found"
+                    data-cy="createdTournamentsTable"
             >
                 <template v-slot:top>
                     <v-card-title>

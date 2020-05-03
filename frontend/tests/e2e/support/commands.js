@@ -458,8 +458,9 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add(
-  'createTournament',
+  'createAvailableTournament',
   (title, includeAvailable, dateOrder) => {
+    let nQuestions = '10';
     let availableNr = 1;
     let runningNr = 2;
     let conclusionNr = 3;
@@ -489,7 +490,7 @@ Cypress.Commands.add(
 
     cy.get('[data-cy="title"]').type(title);
 
-    cy.get('[data-cy="numberOfQuestions"').type('12');
+    cy.get('[data-cy="numberOfQuestions"').type(nQuestions);
 
     if (includeAvailable) {
       cy.contains('.v-label', 'Available Date').click({ force: true });
@@ -541,6 +542,92 @@ Cypress.Commands.add(
   }
 );
 
+
+Cypress.Commands.add(
+    'createTournament', (title, afterAvailable, afterRunning, afterConclusion) => {
+        let availableNr = 1;
+        let runningNr = 2;
+        let conclusionNr = 3;
+        let nQuestions = '10';
+
+        cy.get('[data-cy="newTournament"]').click({ force: true });
+        // wait for dialog to open
+        cy.wait(500);
+        cy.get('[data-cy="title"]').type(title);
+        cy.get('[data-cy="numberOfQuestions"').type(nQuestions);
+
+        // --------- Available Date ---------
+        cy.contains('.v-label', 'Available Date').click({ force: true });
+        cy.wait(500);
+        if (afterAvailable)
+            cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
+        else
+            cy.get('.mdi-chevron-left').click({ multiple: true, force: true });
+        cy.wait(500);
+        cy.get(
+            `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${availableNr}) > .v-btn`
+        )
+            .first()
+            .click({ force: true });
+        // click ok, contains('OK') doesn't work...
+        cy.get('.v-card__actions > .green--text > .v-btn__content').click({
+            multiple: true,
+            force: true
+        });
+        // --------- Available Date ---------
+
+        // --------- Running Date ---------
+        cy.contains('.v-label', 'Running Date').click({ force: true });
+        cy.wait(500);
+        if (afterRunning)
+            cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
+        else
+            cy.get('.mdi-chevron-left').click({ multiple: true, force: true });
+        cy.wait(500);
+        cy.get(
+            `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${runningNr}) > .v-btn`
+        )
+            .last()
+            .click({ force: true });
+        // click ok, contains('OK') doesn't work...
+        cy.get('.v-card__actions > .green--text > .v-btn__content').click({
+            multiple: true,
+            force: true
+        });
+        // --------- Running Date ---------
+
+        // --------- Conclusion Date ---------
+        cy.contains('.v-label', 'Conclusion Date').click({ force: true });
+        cy.wait(500);
+        if (afterConclusion)
+            cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
+        else
+            cy.get('.mdi-chevron-left').click({ multiple: true, force: true });
+        cy.wait(500);
+        cy.get(
+            `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${conclusionNr}) > .v-btn`
+        )
+            .last()
+            .click({ force: true });
+        // click ok, contains('OK') doesn't work...
+        cy.get('.v-card__actions > .green--text > .v-btn__content').click({
+            multiple: true,
+            force: true
+        });
+        // --------- Conclusion Date ---------
+
+        cy.get('[data-cy="topics"').click();
+        cy.get('[role=listbox]')
+            .children()
+            .first()
+            .click({ force: true });
+
+        cy.get('[data-cy="saveTournament"]').click();
+    }
+);
+
+
+
 Cypress.Commands.add('deleteTournament', title => {
   cy.contains(title)
     .parent()
@@ -548,17 +635,17 @@ Cypress.Commands.add('deleteTournament', title => {
     .click();
 });
 
-Cypress.Commands.add('assertAvailableTournaments', title => {
+Cypress.Commands.add('assertAvailableTournaments', (title, col, topics) => {
   cy.contains(title)
     .parent()
     .should('have.length', 1)
     .children()
-    .should('have.length', 10);
+    .should('have.length', col);
 
   cy.contains(title)
     .parent()
     .find('[data-cy="topics-list"]')
-    .should('have.length', 1);
+    .should('have.length', topics);
 });
 
 Cypress.Commands.add('assertSignUpTournament', title => {
