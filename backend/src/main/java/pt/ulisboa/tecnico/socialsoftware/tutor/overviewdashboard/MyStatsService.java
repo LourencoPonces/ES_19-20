@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
@@ -17,12 +18,16 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 import java.sql.SQLException;
 import java.util.Collection;
 
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.COURSE_NOT_FOUND;
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.USERNAME_NOT_FOUND;
 
 @Service
 public class MyStatsService {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private CourseRepository courseRepository;
 
     @Autowired
     private ClarificationService clarificationService;
@@ -33,10 +38,7 @@ public class MyStatsService {
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public MyStatsDto getMyStats(String username, int courseId) {
-        User user = userRepository.findByUsername(username);
-        if (user == null ) {
-            throw new TutorException(USERNAME_NOT_FOUND, username);
-        }
+        User user = validateUserAndCourse(username, courseId);
 
         MyStatsDto statsDto = new MyStatsDto(user.getMyStats());
 
@@ -52,10 +54,7 @@ public class MyStatsService {
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public MyStatsDto getOtherUserStats(String username, int courseId) {
-        User user = userRepository.findByUsername(username);
-        if (user == null ) {
-            throw new TutorException(USERNAME_NOT_FOUND, username);
-        }
+        User user = validateUserAndCourse(username, courseId);
 
         MyStatsDto statsDto = new MyStatsDto(user.getMyStats());
 
@@ -66,6 +65,18 @@ public class MyStatsService {
             statsDto.setPublicRequestsStat(calculatePublicRequests(user, courseId));
         
         return statsDto;
+    }
+
+    private User validateUserAndCourse(String username, int courseId) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new TutorException(USERNAME_NOT_FOUND);
+        }
+
+        if (!courseRepository.existsById(courseId)) {
+            throw new TutorException(COURSE_NOT_FOUND);
+        }
+        return user;
     }
 
     private Integer calculateRequestsSubmitted(User user, int courseId) {

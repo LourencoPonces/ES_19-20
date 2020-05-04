@@ -31,8 +31,10 @@ public class MyStats implements DomainEntity {
 
     public MyStats() {}
 
-    public MyStats(StatsVisibility statsVisibility) {
+    public MyStats(User user, StatsVisibility statsVisibility) {
+        this.user = user;
         this.requestsSubmitted = statsVisibility;
+        this.publicRequests = statsVisibility;
     }
 
     public User getUser() { return this.user; }

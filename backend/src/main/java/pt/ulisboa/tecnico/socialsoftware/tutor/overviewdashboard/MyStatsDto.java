@@ -6,9 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MyStatsDto implements Serializable {
-    private MyStats.StatsVisibility testStatVisibility;
     private Map<String, Integer> statsValues = new HashMap<>();
     private Map<String, MyStats.StatsVisibility> statsVisibility = new HashMap();
+
+    public MyStatsDto() { }
 
     public MyStatsDto(MyStats myStats) {
         this.statsVisibility.put("requestsSubmitted", myStats.getRequestsSubmitted());
