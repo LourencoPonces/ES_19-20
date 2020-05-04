@@ -8,11 +8,16 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
@@ -23,6 +28,8 @@ public class TeacherEvaluatesStudentQuestionService {
     @Autowired
     private StudentQuestionRepository studentQuestionRepository;
 
+    @Autowired
+    private TopicRepository topicRepository;
 
     public void TeacherEvaluatesStudentQuestionService() {}
 
@@ -62,5 +69,27 @@ public class TeacherEvaluatesStudentQuestionService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     private StudentQuestion findStudentQuestionById(Integer id) {
          return studentQuestionRepository.findById(id).orElseThrow(() -> new TutorException(STUDENT_QUESTION_NOT_FOUND, id));
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public StudentQuestionDTO updateAndPromoteStudentQuestion(Integer courseId, Integer studentQuestionId, StudentQuestionDTO changedStudentQuestionDTO) {
+        // get question
+        StudentQuestion studentQuestion = studentQuestionRepository.findById(studentQuestionId).orElseThrow(() -> new TutorException(STUDENT_QUESTION_NOT_FOUND, studentQuestionId));
+
+        // set topics
+        TopicDto[] topicArray = new TopicDto[changedStudentQuestionDTO.getTopics().size()];
+        Set<Topic> newTopics = Arrays.stream(changedStudentQuestionDTO.getTopics().toArray(topicArray)).map(topicDto -> topicRepository.findTopicByName(courseId, topicDto.getName())).collect(Collectors.toSet());
+
+        // update question
+        System.out.println(changedStudentQuestionDTO);
+        studentQuestion.update(changedStudentQuestionDTO, newTopics);
+
+        // evaluate
+        studentQuestion.evaluate(StudentQuestion.SubmittedStatus.PROMOTED, changedStudentQuestionDTO.getJustification());
+
+        return new StudentQuestionDTO(studentQuestion);
     }
 }
