@@ -106,7 +106,8 @@
           >Cancel</v-btn
         >
         <v-btn
-          color="blue darken-1"
+          color="primary"
+          dark
           @click="saveStudentQuestion"
           data-cy="SaveStudentQuestion"
         >
