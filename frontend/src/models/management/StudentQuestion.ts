@@ -88,13 +88,11 @@ export default class StudentQuestion extends Question {
     return req;
   }
 
-  isEditable(): boolean {
-    return (
-      this.isChangeable() || this.submittedStatus === internalStatuses.REJECTED
-    );
-  }
-
   isChangeable(): boolean {
-    return this.submittedStatus === internalStatuses.WAITING_FOR_APPROVAL;
+    return (
+      this.submittedStatus === internalStatuses.REJECTED ||
+      (this.numberOfAnswers === 0 &&
+        this.submittedStatus === internalStatuses.WAITING_FOR_APPROVAL)
+    );
   }
 }
