@@ -41,6 +41,7 @@ class TeacherApprovesStudentQuestionTest extends Specification {
     public static final Integer FAKE_STUDENT_QUESTION_ID = 2
 
     public static final String JUSTIFICATION = "very good question"
+    public static final String LONG_JUSTIFICATION = "very long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long justification"
 
     @Autowired
     TeacherEvaluatesStudentQuestionService teacherEvaluatesStudentQuestionService
@@ -142,9 +143,10 @@ class TeacherApprovesStudentQuestionTest extends Specification {
         // invalid justifications:
         //   empty strings or null
         where:
-        justification || result
-        "   "         || INVALID_JUSTIFICATION
-        "\n  \t"      || INVALID_JUSTIFICATION
+        justification       || result
+        "   "               || INVALID_JUSTIFICATION
+        LONG_JUSTIFICATION  || INVALID_JUSTIFICATION
+        "\n  \t"            || INVALID_JUSTIFICATION
     }
 
     def "approve already evaluated student question, #isApproved->#result"() {
