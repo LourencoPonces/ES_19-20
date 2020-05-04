@@ -269,6 +269,8 @@ export default class StudentQuestionView extends Vue {
   duplicateStudentQuestion(studentQuestion: StudentQuestion) {
     this.currentStudentQuestion = new StudentQuestion(studentQuestion);
     this.currentStudentQuestion.id = null;
+    this.currentStudentQuestion.justification = null;
+    this.currentStudentQuestion.submittedStatus = StudentQuestion.getWaitingForApproval();
     this.currentStudentQuestion.options.forEach(option => {
       option.id = null;
     });
