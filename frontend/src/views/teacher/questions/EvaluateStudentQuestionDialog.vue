@@ -35,6 +35,7 @@
               v-model="evalQuestion.justification"
               :label="`Justification`"
               data-cy="justification-input"
+              counter="255"
             ></v-textarea>
           </v-layout>
         </v-container>
@@ -61,6 +62,8 @@ import { Component, Model, Prop, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import StudentQuestion from '@/models/management/StudentQuestion';
 import internalStatuses from '@/models/management/StudentQuestion';
+
+const JUST_LIMIT = 255;
 
 @Component
 export default class EvaluateQuestionDialog extends Vue {
@@ -92,6 +95,9 @@ export default class EvaluateQuestionDialog extends Vue {
         'error',
         'Rejected questions must be justified'
       );
+      return;
+    } else if (this.evalQuestion.justification.length > JUST_LIMIT) {
+      await this.$store.dispatch('error', 'Justification is too long');
       return;
     }
 
