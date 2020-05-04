@@ -227,6 +227,16 @@
         </v-btn>
 
         <v-btn
+          to="/student/dashboard"
+          v-if="isStudent && currentCourse"
+          text
+          dark
+        >
+          Dashboard
+          <v-icon>fas fa-address-card</v-icon>
+        </v-btn>
+
+        <v-btn
           v-if="isLoggedIn && moreThanOneCourse"
           to="/courses"
           active-class="no-active"
@@ -421,6 +431,17 @@
               <v-icon>fas fa-user</v-icon>
             </v-list-item-action>
             <v-list-item-content>Stats</v-list-item-content>
+          </v-list-item>
+          <v-list-item
+            to="/student/dashboard"
+            v-if="isStudent && currentCourse"
+            text
+            dark
+          >
+            <v-list-item-action>
+              <v-icon>fas fa-address-card</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>Dashboard</v-list-item-content>
           </v-list-item>
         </v-list-group>
 
