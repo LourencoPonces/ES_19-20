@@ -23,26 +23,43 @@ public class MyStats implements DomainEntity {
     @JoinColumn(name="user_id", nullable = false)
     private User user;
 
-    // All stats
-    private StatsVisibility testStat;
+    @Column(name="requests_submitted", nullable = false)
+    private StatsVisibility requestsSubmitted;
+
+    @Column(name="public_requests", nullable = false)
+    private StatsVisibility publicRequests;
 
     public MyStats() {}
 
-    public MyStats(StatsVisibility statsVisibility) {
-        this.testStat = statsVisibility;
+    public MyStats(User user, StatsVisibility statsVisibility) {
+        this.user = user;
+        this.requestsSubmitted = statsVisibility;
+        this.publicRequests = statsVisibility;
     }
 
-    public StatsVisibility getTestStat() {
-        return testStat;
+    public User getUser() { return this.user; }
+    public void setUser(User user) { this.user = user; }
+
+    // Number of clarification requests submitted
+    public StatsVisibility getRequestsSubmitted() {
+        return this.requestsSubmitted;
+    }
+    public void setRequestsSubmitted(StatsVisibility requestsSubmitted) {
+        this.requestsSubmitted = requestsSubmitted;
+    }
+    public boolean canSeeRequestsSubmitted() {
+        return this.requestsSubmitted == StatsVisibility.PUBLIC;
     }
 
-    public void setTestStat(StatsVisibility testStat) {
-        this.testStat = testStat;
+    // Number of submitted clarification requests that were made public
+    public StatsVisibility getPublicRequests() { return this.publicRequests; }
+    public void setPublicRequests(StatsVisibility publicRequests) {
+        this.publicRequests = publicRequests;
+    }
+    public boolean canSeePublicRequests() {
+        return this.publicRequests == StatsVisibility.PUBLIC;
     }
 
-    public boolean canSeeTestStat() {
-        return this.testStat == StatsVisibility.PUBLIC;
-    }
 
     @Override
     public void accept(Visitor visitor) {

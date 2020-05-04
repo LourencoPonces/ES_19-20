@@ -85,7 +85,7 @@ public class User implements UserDetails, DomainEntity {
     @OneToOne(fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
             mappedBy = "user")
-    private MyStats myStats;
+    private MyStats myStats = new MyStats(this, MyStats.StatsVisibility.PRIVATE);
 
     public User() {
     }
@@ -105,7 +105,6 @@ public class User implements UserDetails, DomainEntity {
         this.numberOfCorrectTeacherAnswers = 0;
         this.numberOfCorrectInClassAnswers = 0;
         this.numberOfCorrectStudentAnswers = 0;
-        this.myStats = new MyStats(MyStats.StatsVisibility.PUBLIC);
     }
 
     @Override
