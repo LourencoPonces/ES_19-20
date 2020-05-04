@@ -245,8 +245,22 @@ export default class StudentQuestionView extends Vue {
   ];
 
   @Watch('editStudentQuestionDialog')
-  closeError() {
+  closeEditDialog() {
     if (!this.editStudentQuestionDialog) {
+      this.currentStudentQuestion = null;
+    }
+  }
+
+  @Watch('studentQuestionDialog')
+  closeShowDialog() {
+    if (!this.studentQuestionDialog) {
+      this.currentStudentQuestion = null;
+    }
+  }
+
+  @Watch('studentQuestionJustification')
+  closeJustificationDialog() {
+    if (!this.studentQuestionJustification) {
       this.currentStudentQuestion = null;
     }
   }
@@ -314,10 +328,12 @@ export default class StudentQuestionView extends Vue {
 
   onCloseShowStudentQuestionDialog() {
     this.studentQuestionDialog = false;
+    this.currentStudentQuestion = null;
   }
 
   onCloseShowStudentQuestionJustification() {
     this.studentQuestionJustification = false;
+    this.currentStudentQuestion = null;
   }
 
   async handleFileUpload(event: File, studentQuestion: StudentQuestion) {
