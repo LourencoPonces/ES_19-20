@@ -4,6 +4,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
+import pt.ulisboa.tecnico.socialsoftware.tutor.overviewdashboard.MyStats;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.*;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
@@ -33,6 +34,8 @@ public interface Visitor {
     default void visitAssessment(Assessment assessment) {}
 
     default void visitCourseExecution(CourseExecution courseExecution) {}
+
+    default void visitMyStats(MyStats myStats) {}
 
     default String convertSequenceToLetter(Integer value) {
         switch (value) {

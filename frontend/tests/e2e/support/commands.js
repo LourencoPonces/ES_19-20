@@ -121,9 +121,6 @@ Cypress.Commands.add('submitClarificationRequest', (content, n) => {
       cy.get('[data-cy="newRequest"]').click();
       cy.get('[data-cy="inputRequest"]').type(content);
       cy.contains('Submit').click();
-      let requests = cy.get('[data-cy="questionRequests"]').children();
-      requests.should('have.length', 1);
-      requests.first().should('have.text', content);
       cy.get('[data-cy="nextQuestion"]').click();
     }
   }
@@ -210,6 +207,20 @@ Cypress.Commands.add('changeClarificationRequestStatus', requestText => {
   cy.get(`[data-cy^="public-${requestText.slice(0, 15)}"]`)
     .first()
     .should('exist');
+})
+
+Cypress.Commands.add('checkRequestInDiscussion', requestText => {
+  cy.get('[data-cy="quizzes"]').click();
+  cy.get('[data-cy="solved"]').click();
+  cy.get('[data-cy="solvedList"]')
+    .children()
+    .first()
+    .click();
+  cy.get('[data-cy="questionRequests"]')
+    .children()
+    .should('have.length', 1)
+    .first()
+    .should('contain.text', requestText);
 })
 
 /* STUDENT QUESTION TESTS */
