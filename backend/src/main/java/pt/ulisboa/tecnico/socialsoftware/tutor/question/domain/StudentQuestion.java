@@ -25,8 +25,7 @@ public class StudentQuestion extends Question {
         WAITING_FOR_APPROVAL, REJECTED, APPROVED, PROMOTED
     }
 
-    private final Integer MAX_JUSTIFICATION_SIZE = 255;
-
+    static private final int MAX_JUSTIFICATION_SIZE = 255;
 
     @Column(name="student_question_key")
     private Integer studentQuestionKey;
@@ -99,8 +98,8 @@ public class StudentQuestion extends Question {
 
     }
 
-    private boolean validJustification(String justification) {
-        return justification != null && justification.length() <= MAX_JUSTIFICATION_SIZE && !justification.isBlank();
+    private boolean validJustification(String just) {
+        return just != null && !just.isBlank() && just.length() <= this.MAX_JUSTIFICATION_SIZE;
     }
 
     public void checkStudentQuestionConsistency(StudentQuestionDTO questionDto, User user) {
