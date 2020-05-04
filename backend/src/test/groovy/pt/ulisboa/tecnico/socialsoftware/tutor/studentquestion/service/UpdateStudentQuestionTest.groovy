@@ -257,12 +257,11 @@ class UpdateStudentQuestionTest extends Specification{
         where:
         status                                               | toAdd            |           role                      || errorMessage
         StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL |  false           |            User.Role.STUDENT        || ErrorMessage.NO_TOPICS
-        StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL |  true            |            User.Role.TEACHER        || ErrorMessage.ACCESS_DENIED
     }
 
     def "Update a question that was rejected by a teacher"() {
         given: "A Rejection by a teacher"
-        teacherEvaluatesStudentQuestionService.rejectStudentQuestion(studentQuestion.getId(), "bad question")
+        teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(studentQuestion.getId(), StudentQuestion.SubmittedStatus.REJECTED, "bad question")
         and: "a updated questionDto"
         def studentQuestionDto = createNewStudentQuestionDto()
         def newTopic = new Topic()

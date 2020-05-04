@@ -4,17 +4,25 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
-import pt.ulisboa.tecnico.socialsoftware.tutor.TutorApplication
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.StudentSubmitQuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.TeacherEvaluatesStudentQuestionService
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Image
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Option
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.OptionDto
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.ImageRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.OptionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
@@ -38,6 +46,19 @@ class TeacherPromotesStudentQuestionTest extends Specification {
 
     public static final String JUSTIFICATION = "very good question"
 
+    public static final String QUESTION_TITLE = "Question title"
+    public static final String NEW_QUESTION_TITLE = "New question title"
+
+    public static final String OPTION_CONTENT = "Option content"
+    public static final String QUESTION_CONTENT = "Question content"
+
+    public static final String TOPIC_NAME = "topic name"
+    public static final String NEW_TOPIC_NAME = "new topic name"
+    public static final String NEW_OPTION_CONTENT = "new optionId content"
+    public static final String NEW_QUESTION_CONTENT = 'new question content'
+    public static final String URL = 'URL'
+
+
     @Autowired
     TeacherEvaluatesStudentQuestionService teacherEvaluatesStudentQuestionService
 
@@ -54,52 +75,134 @@ class TeacherPromotesStudentQuestionTest extends Specification {
     @Autowired
     UserRepository userRepository
 
+    @Autowired
+    TopicRepository topicRepository
+
+    @Autowired
+    ImageRepository imageRepository
+
+    @Autowired
+    OptionRepository optionRepository
+
     def savedQuestionId
+    def course
+    def user
+    def topic
+    def studentQuestion
+    def optionOK
+    def optionKO
 
     def setup() {
-        def course = new Course(COURSE_NAME, Course.Type.TECNICO)
+        course = new Course()
+        course.setName(COURSE_NAME)
         courseRepository.save(course)
 
-        // course execution
         def courseExecution = new CourseExecution(course, ACRONYM, ACADEMIC_TERM, Course.Type.TECNICO)
         courseExecutionRepository.save(courseExecution)
 
-        // user
-        User user = createUser(courseExecution)
+        user = createUser(courseExecution)
         userRepository.save(user)
 
-        // studentQuestion
-        StudentQuestion studentQuestion = createStudentQuestion(user, course)
-        studentQuestionRepository.save(studentQuestion)
 
-        // get studentQuestionId
-        savedQuestionId = studentQuestion.getId()
+        createTopic()
+        setUpStudentQuestion();
+        savedQuestionId = studentQuestionRepository.findAll().get(0).getId()
     }
 
-    private StudentQuestion createStudentQuestion(User user, Course course) {
-        def studentQuestion = new StudentQuestion()
-        studentQuestion.addTopic(new Topic())
+    def createTopic() {
+        topic = new Topic()
+        topic.setName(TOPIC_NAME)
+        topic.setCourse(course)
+        topicRepository.save(topic)
+    }
 
-        Option o = new Option()
-        o.setCorrect(true)
-        o.setQuestion(studentQuestion)
-        studentQuestion.addOption(o)
-        studentQuestion.setKey(STUDENT_QUESTION_KEY)
-        studentQuestion.setStudentQuestionKey(STUDENT_QUESTION_KEY)
-        studentQuestion.setUser(user)
+    def setUpStudentQuestion() {
+        studentQuestion =  new StudentQuestion();
+        studentQuestion.addTopic(topic)
+        studentQuestion.setKey(1);
+        studentQuestion.setStudentQuestionKey(1);
+        studentQuestion.setTitle(QUESTION_TITLE)
+        studentQuestion.setContent(QUESTION_CONTENT)
+        studentQuestion.setStatus(Question.Status.DISABLED)
+        studentQuestion.setSubmittedStatus(StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL)
+        studentQuestion.setNumberOfAnswers(2)
+        studentQuestion.setNumberOfCorrect(1)
         studentQuestion.setCourse(course)
-        studentQuestion
+        studentQuestion.setUser(user)
+        createOptions();
+        createImage();
+        course.addQuestion(studentQuestion)
+        topic.addQuestion(studentQuestion)
+        studentQuestionRepository.save(studentQuestion)
     }
 
-    private User createUser(CourseExecution courseExecution) {
+    def createImage() {
+        def image = new Image()
+        image.setUrl(URL)
+        image.setWidth(20)
+        imageRepository.save(image)
+        studentQuestion.setImage(image)
+    }
+
+    def createUser(CourseExecution courseExecution) {
         def user = new User()
         user.setKey(1)
         user.setUsername(USER_NAME)
+        user.setRole(User.Role.TEACHER)
         user.getCourseExecutions().add(courseExecution)
-        user
+        userRepository.save(user)
     }
 
+    def createOptions() {
+        optionOK = new Option()
+        optionOK.setContent(OPTION_CONTENT)
+        optionOK.setCorrect(true)
+        optionOK.setQuestion(studentQuestion)
+        optionOK.setSequence(0)
+        optionRepository.save(optionOK)
+        optionKO = new Option()
+        optionKO.setContent(OPTION_CONTENT)
+        optionKO.setCorrect(false)
+        optionKO.setQuestion(studentQuestion)
+        optionKO.setSequence(1)
+        optionRepository.save(optionKO)
+    }
 
+    def createNewStudentQuestionDto() {
+        def studentQuestionDto = new StudentQuestionDTO(studentQuestion)
+        studentQuestionDto.setId(studentQuestion.getId())
+        studentQuestionDto.setTitle(NEW_QUESTION_TITLE)
+        studentQuestionDto.setContent(NEW_QUESTION_CONTENT)
+        studentQuestionDto.setStatus(Question.Status.DISABLED.name())
+        studentQuestionDto.setSubmittedStatus(StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL)
+        studentQuestionDto.setNumberOfAnswers(4)
+        studentQuestionDto.setNumberOfCorrect(2)
+        studentQuestionDto.setUser(USER_NAME)
+        return studentQuestionDto
+    }
+
+    def createNewTopic(Topic newTopic) {
+        newTopic.setName(NEW_TOPIC_NAME)
+        newTopic.setCourse(course)
+        topicRepository.save(newTopic);
+        def topicDto = new TopicDto(newTopic)
+        def list = new ArrayList<TopicDto>()
+        list.add(topicDto)
+        return list
+    }
+
+    def createNewOption() {
+        def optionDto = new OptionDto(optionKO)
+        optionDto.setContent(NEW_OPTION_CONTENT)
+        optionDto.setCorrect(false)
+        def options = new ArrayList<OptionDto>()
+        options.add(optionDto)
+        optionDto = new OptionDto(optionOK)
+        optionDto.setContent(OPTION_CONTENT)
+        optionDto.setCorrect(true)
+        options.add(optionDto)
+        return options
+    }
 
     def "promote existing pending question with no justification"() {
         when:
@@ -121,6 +224,23 @@ class TeacherPromotesStudentQuestionTest extends Specification {
         def result = studentQuestionRepository.findAll().get(0)
         result.getSubmittedStatus() == StudentQuestion.SubmittedStatus.PROMOTED
         result.getJustification() == JUSTIFICATION
+    }
+
+    def "edit and promote existing student question"() {
+        given: "a new student question"
+        StudentQuestionDTO newStudentquestion = new StudentQuestionDTO(studentQuestionRepository.findAll().get(0))
+        newStudentquestion.setTitle(NEW_QUESTION_TITLE)
+        newStudentquestion.setJustification(JUSTIFICATION)
+
+        when:
+        teacherEvaluatesStudentQuestionService.updateAndPromoteStudentQuestion(courseRepository.findAll().get(0).getId(), savedQuestionId, newStudentquestion)
+
+        then:
+        def result = studentQuestionRepository.findAll().get(0)
+        result.getTitle() == NEW_QUESTION_TITLE
+        result.getSubmittedStatus() == StudentQuestion.SubmittedStatus.PROMOTED
+        result.getJustification() == JUSTIFICATION
+
     }
 
     def "promote existing pending question with invalid justification"() {
