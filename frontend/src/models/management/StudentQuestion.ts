@@ -1,6 +1,6 @@
 import Question from './Question';
 
-const internalStatuses = {
+export const internalStatuses = {
   REJECTED: 'Rejected',
   APPROVED: 'Approved',
   WAITING_FOR_APPROVAL: 'Waiting for Approval',
@@ -99,6 +99,21 @@ export default class StudentQuestion extends Question {
   }
 
   isChangeable(): boolean {
-    return this.submittedStatus === internalStatuses.WAITING_FOR_APPROVAL;
+    return (
+      this.submittedStatus === internalStatuses.REJECTED ||
+      (this.numberOfAnswers === 0 &&
+        this.submittedStatus === internalStatuses.WAITING_FOR_APPROVAL)
+    );
+  }
+
+  // get status representation
+  static getRejected(): string {
+    return internalStatuses.REJECTED;
+  }
+  static getApproved(): string {
+    return internalStatuses.APPROVED;
+  }
+  static getWaitingForApproval(): string {
+    return internalStatuses.WAITING_FOR_APPROVAL;
   }
 }

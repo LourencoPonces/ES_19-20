@@ -46,6 +46,18 @@ public class ClarificationService {
     @PersistenceContext
     EntityManager entityManager;
 
+    @Retryable(
+            value = {SQLException.class},
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public ClarificationRequestDto changeClarificationRequestStatus(int reqId, ClarificationRequest.RequestStatus status) {
+        ClarificationRequest req = clarificationRequestRepository.findById(reqId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, reqId));
+
+        req.setStatus(status);
+        return new ClarificationRequestDto(req);
+    }
+
 
     @Retryable(
             value = {SQLException.class},
@@ -189,6 +201,7 @@ public class ClarificationService {
     private ClarificationRequest createClarificationRequest(User user, Question question, ClarificationRequestDto clarificationRequestDto) {
         clarificationRequestDto.setOwner(user.getId());
         clarificationRequestDto.setQuestionId(question.getId());
+        clarificationRequestDto.setStatus(ClarificationRequest.RequestStatus.PRIVATE);
         ClarificationRequest clarificationRequest = new ClarificationRequest(user, question, clarificationRequestDto);
 
         if (clarificationRequestDto.getCreationDate() == null) {
@@ -258,4 +271,6 @@ public class ClarificationService {
                 .map(req -> req.getQuestion().getCourse().getId())
                 .orElse(-1);
     }
+
+
 }

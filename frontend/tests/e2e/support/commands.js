@@ -40,7 +40,7 @@ Cypress.Commands.add('logout', () => {
   // this handler runs at most once, and only matches a specific error
   cy.once('uncaught:exception', (error, _) => {
     // eslint-disable-next-line prettier/prettier
-    if (error.message == 'Cannot read property \'contains\' of undefined') {
+    if (error.message == "Cannot read property 'contains' of undefined") {
       return true;
     }
 
@@ -198,6 +198,20 @@ Cypress.Commands.add('deleteClarificationRequestAnswer', requestText => {
   cy.get('[data-cy="answerDelete"]').click();
 });
 
+Cypress.Commands.add('changeClarificationRequestStatus', requestText => {
+  cy.get('[data-cy="management"]').click();
+  cy.get('[data-cy="teacherClarifications"]').click();
+  cy.get(`[data-cy^="private-${requestText.slice(0, 15)}"]`)
+    .first()
+    .should('exist');
+  cy.get(`[data-cy^="changeStatus-${requestText.slice(0, 15)}"]`)
+    .first()
+    .click();
+  cy.get(`[data-cy^="public-${requestText.slice(0, 15)}"]`)
+    .first()
+    .should('exist');
+})
+
 /* STUDENT QUESTION TESTS */
 
 Cypress.Commands.add(
@@ -293,9 +307,9 @@ Cypress.Commands.add(
   (questionTitle, status, justification) => {
     // assert status
     cy.contains(questionTitle)
-      .parent()
-      .children()
-      .eq(3)
+      .parents('tr')
+      .eq(0)
+      .find('[data-cy="showStatus"]')
       .should('have.text', status);
 
     if (justification == null) {
@@ -307,10 +321,9 @@ Cypress.Commands.add(
     } else {
       // assert justification
       cy.contains(questionTitle)
-        .parent()
-        .children()
-        .eq(6)
-        .contains('question_answer')
+        .parents('tr')
+        .eq(0)
+        .find('[data-cy="showStatus"]')
         .click();
 
       cy.get('[data-cy="justification-text"]').should(
@@ -341,15 +354,15 @@ Cypress.Commands.add(
   ) => {
     if (command === 'edit') {
       cy.contains(questionTitle)
-        .parent()
-        .children()
-        .contains('edit')
+        .parents('tr')
+        .eq(0)
+        .find('[data-cy="editStudentQuestion"]')
         .click();
     } else if (command === 'duplicate') {
       cy.contains(questionTitle)
-        .parent()
-        .children()
-        .contains('cached')
+        .parents('tr')
+        .eq(0)
+        .find('[data-cy="duplicateStudentQuestion"]')
         .click();
     }
 
@@ -398,7 +411,8 @@ Cypress.Commands.add(
   (title, prevStatus, status, justification) => {
     // select evaluate question
     cy.contains(title)
-      .parent()
+      .parents('tr')
+      .eq(0)
       .contains(prevStatus)
       .click();
 
@@ -429,17 +443,18 @@ Cypress.Commands.add(
   (questionTitle, status, justification) => {
     // assert status
     cy.contains(questionTitle)
-      .parent()
-      .children()
-      .eq(3)
+      .parents('tr')
+      .eq(0)
+      .find('[data-cy="evaluate"]')
       .should('have.text', status);
 
     // assert justification
     cy.contains(questionTitle)
-      .parent()
-      .children()
-      .eq(4)
-      .should('have.text', justification);
+      .parents('tr')
+      .eq(0)
+      .find('[data-cy="showJustification"]')
+      .should('have.text', ' ' + justification + ' ');
+    // prettier is surrounding justification with spaces...
   }
 );
 

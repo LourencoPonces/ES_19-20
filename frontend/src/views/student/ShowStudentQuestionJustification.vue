@@ -7,11 +7,21 @@
   >
     <v-card>
       <v-card-title>
-        <span class="headline">{{ studentQuestion.title }}</span>
+        <span class="headline">{{
+          'Evaluation - ' + studentQuestion.title
+        }}</span>
       </v-card-title>
-
       <v-card-text class="text-left" data-cy="justification-text">
-        <show-justification :studentQuestion="studentQuestion" />
+        <div>
+          <v-chip :color="studentQuestion.getEvaluationColor()" small>
+            <span data-cy="showStatus">{{
+              studentQuestion.submittedStatus
+            }}</span>
+          </v-chip>
+        </div>
+        <div style="margin: 1%;">
+          <show-justification :studentQuestion="studentQuestion" />
+        </div>
       </v-card-text>
       <v-card-actions>
         <v-spacer />

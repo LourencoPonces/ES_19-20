@@ -100,13 +100,14 @@
       <v-card-actions>
         <v-spacer />
         <v-btn
-          color="blue darken-1"
+          color="error"
           @click="$emit('dialog', false)"
           data-cy="CancelStudentQuestion"
           >Cancel</v-btn
         >
         <v-btn
-          color="blue darken-1"
+          color="primary"
+          dark
           @click="saveStudentQuestion"
           data-cy="SaveStudentQuestion"
         >

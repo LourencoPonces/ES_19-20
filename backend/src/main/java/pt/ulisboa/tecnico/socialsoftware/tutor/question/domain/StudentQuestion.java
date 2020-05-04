@@ -119,7 +119,8 @@ public class StudentQuestion extends Question {
         this.justification = studentQuestionDTO.getJustification();
         setStudentQuestionKey(studentQuestionDTO.getStudentQuestionKey());
         this.updateTopics(newTopics);
-
+        if(getSubmittedStatus() == SubmittedStatus.REJECTED)
+            setSubmittedStatus(SubmittedStatus.WAITING_FOR_APPROVAL);
     }
 
     @Override
