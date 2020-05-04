@@ -104,10 +104,6 @@ public class StudentQuestion extends Question {
 
     public void checkStudentQuestionConsistency(StudentQuestionDTO questionDto, User user) {
 
-        if(user.getRole() != User.Role.STUDENT ) {
-            throw new TutorException(ACCESS_DENIED);
-        }
-
         if ((long) questionDto.getTopics().size() == 0) {
             throw new TutorException(NO_TOPICS);
         }
