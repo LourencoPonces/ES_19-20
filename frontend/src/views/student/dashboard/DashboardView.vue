@@ -2,7 +2,6 @@
   <div>
     <div class="container">
       <h2>Dashboard</h2>
-      <h3>My Stats</h3>
       <div v-if="myStats" class="dashboard-stats-container">
         <div class="items">
           <div class="icon-wrapper" ref="totalQuizzes">
