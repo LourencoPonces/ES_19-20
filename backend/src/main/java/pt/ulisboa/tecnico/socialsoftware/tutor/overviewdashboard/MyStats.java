@@ -36,6 +36,14 @@ public class MyStats implements DomainEntity {
         return testStat;
     }
 
+    public void setTestStat(StatsVisibility testStat) {
+        this.testStat = testStat;
+    }
+
+    public boolean canSeeTestStat() {
+        return this.testStat == StatsVisibility.PUBLIC;
+    }
+
     @Override
     public void accept(Visitor visitor) {
         visitor.visitMyStats(this);
