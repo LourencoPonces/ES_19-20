@@ -215,7 +215,7 @@ public class User implements UserDetails, DomainEntity {
 
     public void removeParticipantTournament(Integer participantTournamentId) {
         Tournament participantTournament = getParticipantTournament(participantTournamentId);
-        createdTournaments.remove(participantTournament);
+        participantTournaments.remove(participantTournament);
     }
 
     public Set<Tournament> getParticipantTournaments() {

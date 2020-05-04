@@ -73,7 +73,7 @@
             'edit-tournament-dialog': EditTournamentDialog
         }
     })
-    export default class AvailableTournamentsView extends Vue {
+    export default class CreatedTournamentsView extends Vue {
         createdTournaments: Tournament[] = [];
         currentTournament: Tournament | null = null;
         editTournamentDialog: boolean = false;

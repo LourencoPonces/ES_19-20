@@ -13,7 +13,7 @@ describe('Create Tournament', () => {
     // Wait for fetching topics data
     cy.wait(1000);
     let title = 'test' + Date.now().toString();
-    cy.createAvailableTournament(title);
+    cy.createTournament(title, false, true, true);
     cy.wait(1000);
     cy.deleteTournament(title);
     cy.wait(1000);
@@ -25,7 +25,7 @@ describe('Create Tournament', () => {
     // Wait for fetching topics data
     cy.wait(1000);
     let title = 'test' + Date.now().toString();
-    cy.createAvailableTournament(title, true);
+    cy.createTournament(title, false, true, true);
     cy.wait(1000);
     cy.deleteTournament(title);
     cy.wait(1000);
@@ -36,11 +36,7 @@ describe('Create Tournament', () => {
     cy.get('[data-cy=tournaments-available]').click();
     // Wait for fetching topics data
     cy.wait(1000);
-    cy.createAvailableTournament('test' + Date.now().toString(), true, [
-      'conclusion',
-      'running',
-      'available'
-    ]);
+    cy.createTournament('test' + Date.now().toString(), false, true, false);
     cy.errorMessageClose(
       'Error: Field Running date of tournament is not consistent'
     );

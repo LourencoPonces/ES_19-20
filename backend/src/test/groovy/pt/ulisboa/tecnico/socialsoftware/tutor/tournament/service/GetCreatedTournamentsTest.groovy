@@ -155,7 +155,7 @@ class GetCreatedTournamentsTest extends Specification {
     }
 
 
-    def "get the available tournaments with a non-existing id"() {
+    def "get the created tournaments with a non-existing id"() {
         given: 'a bad userId'
         def badUserId = 12345678
 
