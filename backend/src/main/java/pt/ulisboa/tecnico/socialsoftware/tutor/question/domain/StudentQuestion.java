@@ -25,6 +25,7 @@ public class StudentQuestion extends Question {
         WAITING_FOR_APPROVAL, REJECTED, APPROVED, PROMOTED
     }
 
+    private final Integer MAX_JUSTIFICATION_SIZE = 255;
 
 
     @Column(name="student_question_key")
@@ -87,7 +88,7 @@ public class StudentQuestion extends Question {
            throw new TutorException(CANNOT_REJECT_WITHOUT_JUSTIFICATION);
        }
 
-       // TODO: REMOVE WHEN IMPLEMENTING F11 (keeping for now because i'm workin in another feature)
+       // TODO: REMOVE WHEN IMPLEMENTING F11 (keeping for now because i'm working in another feature)
        if(this.submittedStatus.equals(SubmittedStatus.APPROVED) && status.equals(SubmittedStatus.REJECTED)) {
            throw new TutorException(CANNOT_REJECT_ACCEPTED_SUGGESTION);
        }
@@ -99,17 +100,17 @@ public class StudentQuestion extends Question {
     }
 
     private boolean validJustification(String justification) {
-        return justification != null && !justification.isBlank();
+        return justification != null && justification.length() <= MAX_JUSTIFICATION_SIZE && !justification.isBlank();
     }
 
     public void checkStudentQuestionConsistency(StudentQuestionDTO questionDto, User user) {
 
-        if ((long) questionDto.getTopics().size() == 0) {
-            throw new TutorException(NO_TOPICS);
-        }
-
         if(user.getRole() != User.Role.STUDENT ) {
             throw new TutorException(ACCESS_DENIED);
+        }
+
+        if ((long) questionDto.getTopics().size() == 0) {
+            throw new TutorException(NO_TOPICS);
         }
     }
 
