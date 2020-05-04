@@ -357,6 +357,7 @@ export default class StudentQuestionView extends Vue {
       toDeleteStudentquestion.id &&
       confirm('Are you sure you want to delete this question?')
     ) {
+      await this.$store.dispatch('loading');
       try {
         await RemoteServices.deleteStudentQuestion(toDeleteStudentquestion.id);
         this.studentQuestions = this.studentQuestions.filter(
@@ -365,6 +366,7 @@ export default class StudentQuestionView extends Vue {
       } catch (error) {
         await this.$store.dispatch('error', error);
       }
+      await this.$store.dispatch('clearLoading');
     }
   }
 
