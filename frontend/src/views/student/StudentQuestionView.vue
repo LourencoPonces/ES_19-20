@@ -283,7 +283,7 @@ export default class StudentQuestionView extends Vue {
   duplicateStudentQuestion(studentQuestion: StudentQuestion) {
     this.currentStudentQuestion = new StudentQuestion(studentQuestion);
     this.currentStudentQuestion.id = null;
-    this.currentStudentQuestion.justification = null;
+    this.currentStudentQuestion.justification = '';
     this.currentStudentQuestion.submittedStatus = StudentQuestion.getWaitingForApproval();
     this.currentStudentQuestion.options.forEach(option => {
       option.id = null;
@@ -379,7 +379,7 @@ export default class StudentQuestionView extends Vue {
   }
 
   truncate(s: String): String {
-    if(s == null) return '';
+    if (s == null) return '';
     const max = 35;
     return s.length > max ? s.substr(0, max - 1) + '...' : s;
   }
