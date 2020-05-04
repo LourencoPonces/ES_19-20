@@ -379,6 +379,7 @@ export default class StudentQuestionView extends Vue {
   }
 
   truncate(s: String): String {
+    if(s == null) return '';
     const max = 35;
     return s.length > max ? s.substr(0, max - 1) + '...' : s;
   }
