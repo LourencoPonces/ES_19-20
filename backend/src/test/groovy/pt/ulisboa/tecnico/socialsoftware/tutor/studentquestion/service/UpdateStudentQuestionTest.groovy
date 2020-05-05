@@ -240,23 +240,19 @@ class UpdateStudentQuestionTest extends Specification{
         studentQuestionDto.setUser(USER_NAME)
         studentQuestionDto.setStatus(Question.Status.DISABLED.name())
         def list = new ArrayList<TopicDto>()
-        addTopic(toAdd, list)
+        addTopic(false, list)
         studentQuestionDto.setTopics(list)
 
         and: "User (student or not)"
         def user = userRepository.findByUsername(USER_NAME)
-        user.setRole(role)
+        user.setRole(User.Role.STUDENT )
 
         when:
         studentSubmitQuestionService.updateStudentQuestion(studentQuestionDto.getId(), studentQuestionDto, course.getId())
 
         then:
         def error = thrown(TutorException)
-        error.getErrorMessage() == errorMessage
-
-        where:
-        status                                               | toAdd            |           role                      || errorMessage
-        StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL |  false           |            User.Role.STUDENT        || ErrorMessage.NO_TOPICS
+        error.getErrorMessage() == ErrorMessage.NO_TOPICS
     }
 
     def "Update a question that was rejected by a teacher"() {
