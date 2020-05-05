@@ -114,8 +114,8 @@ public class TournamentController {
         if (user == null) {
             throw new TutorException(AUTHENTICATION_ERROR);
         }
-        
-        tournamentService.signUpInTournament(tournamentId, user.getUsername());
+
+        tournamentService.cancelTournament(user.getUsername(), tournamentId);
     }
 
 }
