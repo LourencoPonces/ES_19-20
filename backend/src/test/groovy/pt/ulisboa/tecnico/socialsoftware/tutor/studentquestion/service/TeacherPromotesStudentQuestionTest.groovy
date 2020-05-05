@@ -9,7 +9,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.StudentSubmitQuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.TeacherEvaluatesStudentQuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Image
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Option
@@ -100,7 +99,7 @@ class TeacherPromotesStudentQuestionTest extends Specification {
         def courseExecution = new CourseExecution(course, ACRONYM, ACADEMIC_TERM, Course.Type.TECNICO)
         courseExecutionRepository.save(courseExecution)
 
-        user = createUser(courseExecution)
+        user = createTeacher(courseExecution)
         userRepository.save(user)
 
 
@@ -144,7 +143,7 @@ class TeacherPromotesStudentQuestionTest extends Specification {
         studentQuestion.setImage(image)
     }
 
-    def createUser(CourseExecution courseExecution) {
+    def createTeacher(CourseExecution courseExecution) {
         def user = new User()
         user.setKey(1)
         user.setUsername(USER_NAME)
