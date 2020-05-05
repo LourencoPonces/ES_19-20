@@ -6,6 +6,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import java.io.Serializable;
 
 public class StudentDto implements Serializable {
+    private int id;
     private String username;
     private String name;
     private Integer numberOfTeacherQuizzes;
@@ -23,6 +24,7 @@ public class StudentDto implements Serializable {
     private String lastAccess;
 
     public StudentDto(User user) {
+        this.id = user.getId();
         this.username = user.getUsername();
         this.name = user.getName();
         this.numberOfTeacherQuizzes = user.getNumberOfTeacherQuizzes();
@@ -45,6 +47,10 @@ public class StudentDto implements Serializable {
             this.percentageOfCorrectAnswers = (user.getNumberOfCorrectTeacherAnswers() + user.getNumberOfCorrectInClassAnswers() + user.getNumberOfCorrectStudentAnswers())  * 100 / this.numberOfAnswers;
 
     }
+
+    public int getId() { return id; }
+
+    public void setId(int id) { this.id = id; }
 
     public String getUsername() {
         return username;

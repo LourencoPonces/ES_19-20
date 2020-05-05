@@ -101,11 +101,11 @@ export default class RemoteServices {
    */
 
   static async getUserDashboardStats(
-    username: string
+    userId: number
   ): Promise<DashboardStats> {
     try {
       const response = await httpClient.get(
-        `/courses/${Store.getters.getCurrentCourse.courseId}/dashboardStats/${username}`
+        `/courses/${Store.getters.getCurrentCourse.courseId}/dashboardStats/${userId}`
       );
       return new DashboardStats(response.data);
     } catch (error) {

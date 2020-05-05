@@ -92,7 +92,7 @@
       <show-dashboard-stats-dialog
         v-if="dashboardUserToSee"
         v-model="dashboardStatsDialog"
-        :username="dashboardUserToSee"
+        :student="dashboardUserToSee"
         v-on:close-show-dashboard-stats-dialog="onCloseShowDashboardStatsDialog"
       />
     </v-card>
@@ -121,15 +121,9 @@ export default class DashboardView extends Vue {
   students: Student[] = [];
   search: string = '';
   dashboardStatsDialog: boolean = false;
-  dashboardUserToSee: string = '';
+  dashboardUserToSee: Student | null = null;
   headers: object = [
     { text: 'Name', value: 'name', align: 'left', width: '40%' },
-    {
-      text: 'Username',
-      value: 'username',
-      align: 'center',
-      width: '10%'
-    },
     {
       text: 'Number',
       value: 'number',
@@ -149,7 +143,7 @@ export default class DashboardView extends Vue {
     try {
       this.course = this.$store.getters.getCurrentCourse;
       this.myStats = await RemoteServices.getUserDashboardStats(
-        this.$store.getters.getUser.username
+        this.$store.getters.getUser.id
       );
     } catch (error) {
       await this.$store.dispatch('error', error);
@@ -171,12 +165,13 @@ export default class DashboardView extends Vue {
   }
 
   showDashboardStatsDialog(student: Student) {
-    this.dashboardUserToSee = student.username;
+    this.dashboardUserToSee = student;
     this.dashboardStatsDialog = true;
   }
 
   onCloseShowDashboardStatsDialog() {
     this.dashboardStatsDialog = false;
+    this.dashboardUserToSee = null;
   }
 }
 </script>
@@ -235,7 +230,4 @@ export default class DashboardView extends Vue {
   transition: all 0.5s;
 }
 
-.v-chip {
-  right: -35px;
-}
 </style>

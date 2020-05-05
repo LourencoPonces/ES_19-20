@@ -11,6 +11,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationServic
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
@@ -37,8 +38,8 @@ public class MyStatsService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public MyStatsDto getMyStats(String username, int courseId) {
-        User user = validateUserAndCourse(username, courseId);
+    public MyStatsDto getMyStats(int userId, int courseId) {
+        User user = validateUserAndCourse(userId, courseId);
 
         MyStatsDto statsDto = new MyStatsDto(user.getMyStats());
 
@@ -53,8 +54,8 @@ public class MyStatsService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public MyStatsDto getOtherUserStats(String username, int courseId) {
-        User user = validateUserAndCourse(username, courseId);
+    public MyStatsDto getOtherUserStats(int userId, int courseId) {
+        User user = validateUserAndCourse(userId, courseId);
 
         MyStatsDto statsDto = new MyStatsDto(user.getMyStats());
 
@@ -67,11 +68,9 @@ public class MyStatsService {
         return statsDto;
     }
 
-    private User validateUserAndCourse(String username, int courseId) {
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new TutorException(USERNAME_NOT_FOUND);
-        }
+    private User validateUserAndCourse(int userId, int courseId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, userId));
 
         if (!courseRepository.existsById(courseId)) {
             throw new TutorException(COURSE_NOT_FOUND);
