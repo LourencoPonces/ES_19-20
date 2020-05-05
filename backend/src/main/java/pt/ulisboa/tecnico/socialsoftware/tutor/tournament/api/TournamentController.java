@@ -48,7 +48,6 @@ public class TournamentController {
             throw new TutorException(AUTHENTICATION_ERROR);
         }
 
-
         return tournamentService.getAvailableTournaments(executionId);
     }
 
@@ -71,7 +70,6 @@ public class TournamentController {
         } else {
             username = user.getUsername();
         }
-
         tournamentService.signUpInTournament(tournamentId, username);
     }
 
@@ -94,6 +92,18 @@ public class TournamentController {
         if (tournament.getConclusionDate() != null && !tournament.getConclusionDate().matches("(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}):(\\d{2})")) {
             tournament.setConclusionDate(LocalDateTime.parse(tournament.getConclusionDate().replaceAll(".$", ""), DateTimeFormatter.ISO_DATE_TIME).format(formatter));
         }
+    }
+
+    @GetMapping("/executions/{executionId}/tournaments/created")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
+    public List<TournamentDto> getCreatedTournaments(Principal principal, @PathVariable int executionId) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        if (user == null) {
+            throw new TutorException(AUTHENTICATION_ERROR);
+        }
+
+        return tournamentService.getCreatedTournaments(user.getId());
     }
 
 }

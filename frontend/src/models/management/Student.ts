@@ -1,5 +1,5 @@
 export class Student {
-  number!: number;
+  id!: number;
   username: string | null = null;
   name: string | null = null;
   numberOfTeacherQuizzes!: number;
@@ -11,7 +11,7 @@ export class Student {
 
   constructor(jsonObj?: Student) {
     if (jsonObj) {
-      this.number = jsonObj.number;
+      this.id = jsonObj.id;
       this.username = jsonObj.username;
       this.name = jsonObj.name;
       this.numberOfTeacherQuizzes = jsonObj.numberOfTeacherQuizzes;
