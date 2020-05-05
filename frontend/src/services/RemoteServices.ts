@@ -105,7 +105,7 @@ export default class RemoteServices {
   ): Promise<DashboardStats> {
     try {
       const response = await httpClient.get(
-        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/dashboardStats/${username}`
+        `/courses/${Store.getters.getCurrentCourse.courseId}/dashboardStats/${username}`
       );
       return new DashboardStats(response.data);
     } catch (error) {
