@@ -153,7 +153,7 @@ class CancelTournamentTest extends Specification {
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_FOUND
     }
-    
+
     def prepareStatus(TournamentDto tournamentDto, Tournament.Status status) {
         def now = LocalDateTime.now()
 
