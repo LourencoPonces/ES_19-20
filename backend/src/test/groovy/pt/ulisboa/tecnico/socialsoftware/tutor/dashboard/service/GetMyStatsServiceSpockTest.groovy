@@ -45,7 +45,6 @@ class GetMyStatsServiceSpockTest extends Specification {
     static final String ACADEMIC_TERM = "1 SEM"
     static final String CONTENT = "Test Content"
     static final String USERNAME_1 = "USERNAME_ONE"
-    static final String USERNAME_2 = "USERNAME_TWO"
     static final String INVALID_USERNAME = "INVALID_USERNAME"
     static final int INVALID_COURSE_ID = 50
 
@@ -246,22 +245,7 @@ class GetMyStatsServiceSpockTest extends Specification {
 
     }
 
-    def "get other user's student question dashboard stats"() {
-        given: "a new student"
-        def newStudent = createUser(courseExecution, Role.STUDENT, USERNAME_2, 2)
-        userRepository.save(newStudent)
 
-        when:
-        def result = myStatsService.getOtherUserStats(student.getUsername(), courseId)
-
-        then:
-        result != null
-        result.getSubmittedQuestionsVisibility() == MyStats.StatsVisibility.PRIVATE
-        result.getSubmittedQuestionsStat() == null
-        result.getApprovedQuestionsVisibility() == MyStats.StatsVisibility.PRIVATE
-        result.getApprovedQuestionsStat() == null
-
-    }
 
     @Unroll("invalid arguments: #isUsername | #isCourseid || #error_message")
     def "invalid arguments"() {
