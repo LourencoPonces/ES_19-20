@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.TOURNAMENT_NOT_CONSISTENT;
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
 @Entity
 @Table(name = "tournaments")
@@ -191,7 +191,17 @@ public class Tournament {
     }
 
     public void cancel() {
-        isCancelled = true;
+        Status currentStatus = getStatus();
+        switch (currentStatus){
+            case RUNNING:
+                throw new TutorException(TOURNAMENT_CANNOT_BE_CANCELED, "running");
+            case FINISHED:
+                throw new TutorException(TOURNAMENT_CANNOT_BE_CANCELED, "finished");
+            case CANCELLED:
+                throw new TutorException(TOURNAMENT_CANNOT_BE_CANCELED, "cancelled");
+            default:
+                isCancelled = true;
+        }
     }
 
     public void delete() {

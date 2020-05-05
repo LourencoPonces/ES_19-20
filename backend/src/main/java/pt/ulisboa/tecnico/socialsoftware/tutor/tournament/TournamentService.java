@@ -35,9 +35,6 @@ import java.util.stream.Collectors;
 @Service
 public class TournamentService {
     @Autowired
-    private CourseRepository courseRepository;
-
-    @Autowired
     private CourseExecutionRepository courseExecutionRepository;
 
     @Autowired
