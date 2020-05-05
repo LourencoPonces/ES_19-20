@@ -27,7 +27,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @DataJpaTest
-class GetAvailableTournamentsTest extends Specification {
+class GetCreatedTournamentsTest extends Specification {
     public static final String COURSE_NAME = "Software Architecture"
     public static final String ACRONYM = "AS1"
     public static final String ACADEMIC_TERM = "1 SEM"
@@ -122,12 +122,12 @@ class GetAvailableTournamentsTest extends Specification {
         tournamentDto.setTopics(topicDtoList)
     }
 
-    def "get the available tournaments"() {
+    def "get the created tournaments"() {
         given: "an available tournament"
         tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
 
         when:
-        def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId())
+        def tournamentsList = tournamentService.getCreatedTournaments(creator.getId())
 
         then: "there are only one tournament in the list"
         tournamentsList.size() == 1
@@ -146,54 +146,26 @@ class GetAvailableTournamentsTest extends Specification {
         tournamentElement.getParticipants().size() == 1
     }
 
-    def "get the available tournaments, although there are not any"() {
+    def "get the created tournaments, although there are not any"() {
         when:
-        def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId())
+        def tournamentsList = tournamentService.getCreatedTournaments(creator.getId());
 
         then: "There are no tournaments"
         tournamentsList.size() == 0
     }
 
-    @Unroll("get the available tournaments, although there are only tournaments in #createdDateDay | #availableDateDay | #runningDateDay | #conclusionDateDay")
-    def "invalid dates"() {
-        given: "tournaments in different phases"
-        creationDate = LocalDateTime.now().plusDays(creationDateDay)
-        availableDate = LocalDateTime.now().plusDays(availableDateDay)
-        runningDate = LocalDateTime.now().plusDays(runningDateDay)
-        conclusionDate = LocalDateTime.now().plusDays(conclusionDateDay)
-        tournamentDto.setCreationDate(creationDate.format(formatter))
-        tournamentDto.setAvailableDate(availableDate.format(formatter))
-        tournamentDto.setRunningDate(runningDate.format(formatter))
-        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
-        tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
+
+    def "get the created tournaments with a non-existing id"() {
+        given: 'a bad userId'
+        def badUserId = 12345678
 
         when:
-        def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId())
+        tournamentService.getCreatedTournaments(badUserId)
 
-        then: "There are no tournaments"
-        /*def exception = thrown(TutorException)
-        exception.getErrorMessage() == errorMessage*/
-        tournamentsList.size() == size
-
-        where:
-        creationDateDay | availableDateDay | runningDateDay | conclusionDateDay || size
-         0              |  1               |  2             | 3                 || 0
-        -2              | -1               |  0             | 1                 || 0
-        -3              | -2               | -1             | 0                 || 0
-    }
-
-    def "get the available tournaments with a non-existing course"() {
-        given: 'a bad courseId'
-        def badCourseId = 2
-
-        when:
-        tournamentService.getAvailableTournaments(badCourseId)
-
-        then:
+        then: ""
         def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.COURSE_EXECUTION_NOT_FOUND
+        exception.getErrorMessage() == ErrorMessage.USER_NOT_FOUND
     }
-
 
     @TestConfiguration
     static class TournamentServiceImplTestContextConfiguration {
