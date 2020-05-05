@@ -142,7 +142,6 @@ export default class EditStudentQuestionDialog extends Vue {
   }
 
   async saveStudentQuestion() {
-    console.log('here???');
     if (
       this.editStudentQuestion &&
       (!this.editStudentQuestion.title ||
