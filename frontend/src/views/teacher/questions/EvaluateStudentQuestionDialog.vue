@@ -34,7 +34,7 @@
               rows="3"
               v-model="evalQuestion.justification"
               :label="`Justification`"
-              data-cy="justification-input"
+              data-cy="justification-text"
               counter="255"
             ></v-textarea>
           </v-layout>
