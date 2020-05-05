@@ -17,18 +17,15 @@ public class MyStatsController {
     @Autowired
     private MyStatsService myStatsService;
 
-    @GetMapping("/executions/{executionId}/dashboardStats/{username}")
-    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
-    public MyStatsDto getMyStats(@PathVariable int executionId, @PathVariable String username, Principal principal) {
+    @GetMapping("/courses/{courseId}/dashboardStats/{username}")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#courseId, 'COURSE.ACCESS')")
+    public MyStatsDto getDashboardStats(@PathVariable int courseId, @PathVariable String username, Principal principal) {
         User loggedInUser = (User) ((Authentication) principal).getPrincipal();
 
         if(loggedInUser.getUsername().equals(username)) {
-            return myStatsService.getMyStats(loggedInUser.getUsername(), executionId);
+            return myStatsService.getMyStats(loggedInUser.getUsername(), courseId);
         } else {
-            return myStatsService.getOtherUserStats(username, executionId);
+            return myStatsService.getOtherUserStats(username, courseId);
         }
-
-
-
     }
 }
