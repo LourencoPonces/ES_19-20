@@ -157,7 +157,7 @@
                 <v-list-item-title>Scan</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
-            <v-list-item to="/student/solved">
+            <v-list-item to="/student/solved" data-cy="solved">
               <v-list-item-action>
                 <v-icon>done</v-icon>
               </v-list-item-action>
@@ -235,6 +235,16 @@
         <v-btn to="/student/stats" v-if="isStudent && currentCourse" text dark>
           Stats
           <v-icon>fas fa-user</v-icon>
+        </v-btn>
+
+        <v-btn
+          to="/student/dashboard"
+          v-if="isStudent && currentCourse"
+          text
+          dark
+        >
+          Dashboard
+          <v-icon>fas fa-address-card</v-icon>
         </v-btn>
 
         <v-btn
@@ -439,6 +449,17 @@
               <v-icon>fas fa-user</v-icon>
             </v-list-item-action>
             <v-list-item-content>Stats</v-list-item-content>
+          </v-list-item>
+          <v-list-item
+            to="/student/dashboard"
+            v-if="isStudent && currentCourse"
+            text
+            dark
+          >
+            <v-list-item-action>
+              <v-icon>fas fa-address-card</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>Dashboard</v-list-item-content>
           </v-list-item>
         </v-list-group>
 
