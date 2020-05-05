@@ -171,6 +171,8 @@ export default class EditAndPromoteStudentQuestionDialog extends Vue {
     this.editStudentQuestion.topics = this.studentQuestionTopics;
     this.editStudentQuestion.justification = 'Question edited by teacher';
 
+
+    await this.$store.dispatch('loading');
     try {
       const result = await RemoteServices.editAndPromoteStudentQuestion(
         this.editStudentQuestion
@@ -179,6 +181,7 @@ export default class EditAndPromoteStudentQuestionDialog extends Vue {
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
+    await this.$store.dispatch('clearLoading');
   }
 
   removeTopic(topic: Topic) {
