@@ -1,5 +1,7 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.overviewdashboard;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +12,7 @@ public class MyStatsDto implements Serializable {
     private Map<String, MyStats.StatsVisibility> statsVisibility = new HashMap<>();
 
     private static final String SUBMITTED_QUESTIONS = "submittedQuestions";
-    private static final String APPROVED_QUESTIONS = "acceptedQuestions";
+    private static final String APPROVED_QUESTIONS = "approvedQuestions";
     private static final String REQUESTS_SUBMITTED = "requestsSubmitted";
     private static final String PUBLIC_REQUESTS = "publicRequests";
 
@@ -27,6 +29,7 @@ public class MyStatsDto implements Serializable {
     // DDP
     // ======================================
 
+    @JsonIgnore
     public MyStats.StatsVisibility getRequestsSubmittedVisibility() {
         return this.statsVisibility.get(REQUESTS_SUBMITTED);
     }
@@ -35,6 +38,7 @@ public class MyStatsDto implements Serializable {
         this.statsVisibility.put(REQUESTS_SUBMITTED, visibility);
     }
 
+    @JsonIgnore
     public MyStats.StatsVisibility getPublicRequestsVisibility() {
         return this.statsVisibility.get(PUBLIC_REQUESTS);
     }
@@ -43,10 +47,12 @@ public class MyStatsDto implements Serializable {
         this.statsVisibility.put(PUBLIC_REQUESTS, visibility);
     }
 
+    @JsonIgnore
     public Integer getRequestsSubmittedStat() { return this.statsValues.get(REQUESTS_SUBMITTED); }
 
     public void setRequestsSubmittedStat(Integer value) { this.statsValues.put(REQUESTS_SUBMITTED, value); }
 
+    @JsonIgnore
     public Integer getPublicRequestsStat() { return this.statsValues.get(PUBLIC_REQUESTS); }
 
     public void setPublicRequestsStat(Integer value) { this.statsValues.put(PUBLIC_REQUESTS, value); }
@@ -55,6 +61,7 @@ public class MyStatsDto implements Serializable {
     // PPA
     // ======================================
 
+    @JsonIgnore
     public MyStats.StatsVisibility getSubmittedQuestionsVisibility() {
         return this.statsVisibility.get(SUBMITTED_QUESTIONS);
     }
@@ -63,6 +70,7 @@ public class MyStatsDto implements Serializable {
         this.statsVisibility.put(SUBMITTED_QUESTIONS, visibility);
     }
 
+    @JsonIgnore
     public MyStats.StatsVisibility getApprovedQuestionsVisibility() {
         return this.statsVisibility.get(APPROVED_QUESTIONS);
     }
@@ -71,10 +79,19 @@ public class MyStatsDto implements Serializable {
         this.statsVisibility.put(APPROVED_QUESTIONS, visibility);
     }
 
+    @JsonIgnore
     public Integer getSubmittedQuestionsStat() { return this.statsValues.get(SUBMITTED_QUESTIONS); }
     public void setSubmittedQuestionsStat(Integer value) { this.statsValues.put(SUBMITTED_QUESTIONS, value); }
 
+    @JsonIgnore
     public Integer getApprovedQuestionsStat() { return this.statsValues.get(APPROVED_QUESTIONS); }
     public void setApprovedQuestionsStat(Integer value) { this.statsValues.put(APPROVED_QUESTIONS, value); }
 
+    public Map<String, Integer> getStatsValues() {
+        return statsValues;
+    }
+
+    public Map<String, MyStats.StatsVisibility> getStatsVisibility() {
+        return statsVisibility;
+    }
 }

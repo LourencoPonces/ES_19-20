@@ -481,7 +481,7 @@ INSERT INTO student_question(id, user_id, submitted_status, justification, stude
         </hashTree>
         <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Authenticated Requests" enabled="true"/>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request to change clarification request&apos;s status" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request to get student question stats" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
               <collectionProp name="Arguments.arguments"/>
             </elementProp>
@@ -501,7 +501,7 @@ INSERT INTO student_question(id, user_id, submitted_status, justification, stude
           </HTTPSamplerProxy>
           <hashTree>
             <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert submittedQuestions" enabled="true">
-              <stringProp name="JSON_PATH">$.submittedQuestionsStat</stringProp>
+              <stringProp name="JSON_PATH">$.statsValues.submittedQuestions</stringProp>
               <stringProp name="EXPECTED_VALUE">2</stringProp>
               <boolProp name="JSONVALIDATION">true</boolProp>
               <boolProp name="EXPECT_NULL">false</boolProp>
@@ -510,7 +510,7 @@ INSERT INTO student_question(id, user_id, submitted_status, justification, stude
             </JSONPathAssertion>
             <hashTree/>
             <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert approved" enabled="true">
-              <stringProp name="JSON_PATH">$.approvedQuestionsStat</stringProp>
+              <stringProp name="JSON_PATH">$.statsValues.approvedQuestions</stringProp>
               <stringProp name="EXPECTED_VALUE">1</stringProp>
               <boolProp name="JSONVALIDATION">true</boolProp>
               <boolProp name="EXPECT_NULL">false</boolProp>
