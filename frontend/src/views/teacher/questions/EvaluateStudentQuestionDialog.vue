@@ -1,15 +1,15 @@
 <template>
   <v-dialog
     :value="dialog"
-    @input="$emit('dialog', false)"
-    @keydown.esc="$emit('dialog', false)"
+    @input="$emit('cancel-evaluate', false)"
+    @keydown.esc="$emit('cancel-evaluate', false)"
     max-width="75%"
     max-height="60%"
   >
     <v-card>
       <v-card-title>
         <span class="headline">
-          {{ 'Evaluate: ' + this.evalQuestion.title }}
+          {{ 'Evaluate - ' + this.evalQuestion.title }}
         </span>
       </v-card-title>
 

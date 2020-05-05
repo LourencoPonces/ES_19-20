@@ -24,7 +24,11 @@
       </template>
 
       <template v-slot:item.title="{ item }">
-        <p style="cursor: pointer" @click="showQuestionDialog(item)">
+        <p
+          style="cursor: pointer"
+          @click="showQuestionDialog(item)"
+          @contextmenu="editStudentQuestion(item, $event)"
+        >
           {{ item.title }}
         </p>
       </template>
@@ -61,16 +65,6 @@
         </p>
       </template>
 
-      <template v-slot:item.image="{ item }">
-        <v-file-input
-          show-size
-          dense
-          small-chips
-          @change="handleFileUpload($event, item)"
-          accept="image/*"
-        />
-      </template>
-
       <template v-slot:item.action="{ item }">
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
@@ -84,7 +78,7 @@
           </template>
           <span>Show Question</span>
         </v-tooltip>
-        <v-tooltip bottom>
+        <v-tooltip bottom v-if="item.canEvaluate()">
           <template v-slot:activator="{ on }">
             <v-icon
               large
@@ -99,17 +93,31 @@
       </template>
     </v-data-table>
     <show-question-dialog
-      v-if="currentQuestion"
+      v-if="questionDialog"
       v-model="questionDialog"
-      :question="currentQuestion"
-      v-on:close-show-question-dialog="onCloseShowQuestionDialog"
+      :question="currentStudentQuestion"
+      v-on:close-show-question-dialog="onCloseDialog"
     />
     <evaluate-question-dialog
-      v-if="currentQuestion"
+      v-if="evaluateQuestion"
       v-model="evaluateQuestion"
-      :studentQuestion="currentQuestion"
-      v-on:evaluated-question="onEvaluatedQuestion"
-      v-on:cancel-evaluate="onCancelEvaluation"
+      :studentQuestion="currentStudentQuestion"
+      v-on:evaluated-question="onSaveStudentQuestion"
+      v-on:cancel-evaluate="onCloseDialog"
+    />
+    <edit-and-promote-question-dialog
+      v-if="editAndPromoteStudentQuestionDialog"
+      v-model="editAndPromoteStudentQuestionDialog"
+      :studentQuestion="currentStudentQuestion"
+      :topics="topics"
+      v-on:save-student-question="onSaveStudentQuestion"
+      v-on:cancel-evaluate="onCloseDialog"
+    />
+    <show-student-question-justification
+      v-if="studentQuestionJustification"
+      v-model="studentQuestionJustification"
+      :studentQuestion="currentStudentQuestion"
+      v-on:close-show-student-question-justification="onCloseDialog"
     />
   </v-card>
 </template>
@@ -118,24 +126,29 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import Question from '@/models/management/Question';
-import Image from '@/models/management/Image';
 import Topic from '@/models/management/Topic';
 import ShowQuestionDialog from '@/views/teacher/questions/ShowQuestionDialog.vue';
 import EvaluateQuestionDialog from '@/views/teacher/questions/EvaluateStudentQuestionDialog.vue';
 import StudentQuestion from '@/models/management/StudentQuestion';
+import EditAndPromoteStudentQuestionDialog from '@/views/teacher/questions/EditAndPromoteStudentQuestionDialog.vue';
+import ShowStudentQuestionJustification from '@/views/student/ShowStudentQuestionJustification.vue';
 
 @Component({
   components: {
     'show-question-dialog': ShowQuestionDialog,
-    'evaluate-question-dialog': EvaluateQuestionDialog
+    'evaluate-question-dialog': EvaluateQuestionDialog,
+    'edit-and-promote-question-dialog': EditAndPromoteStudentQuestionDialog,
+    'show-student-question-justification': ShowStudentQuestionJustification
   }
 })
 export default class StudentQuestionsView extends Vue {
   studentQuestions: StudentQuestion[] = [];
   topics: Topic[] = [];
-  currentQuestion: StudentQuestion | null = null;
+  currentStudentQuestion: StudentQuestion | null = null;
   evaluateQuestion: boolean = false;
   questionDialog: boolean = false;
+  editAndPromoteStudentQuestionDialog: boolean = false;
+  studentQuestionJustification: boolean = false;
   search: string = '';
 
   headers: object = [
@@ -176,7 +189,7 @@ export default class StudentQuestionsView extends Vue {
   @Watch('evaluateQuestion')
   closeError() {
     if (!this.evaluateQuestion) {
-      this.currentQuestion = null;
+      this.currentStudentQuestion = null;
     }
   }
 
@@ -203,48 +216,49 @@ export default class StudentQuestionsView extends Vue {
     );
   }
 
-  async handleFileUpload(event: File, question: Question) {
-    if (question.id) {
-      try {
-        const imageURL = await RemoteServices.uploadImage(event, question.id);
-        question.image = new Image();
-        question.image.url = imageURL;
-        confirm('Image ' + imageURL + ' was uploaded!');
-      } catch (error) {
-        await this.$store.dispatch('error', error);
-      }
+  editStudentQuestion(studentQuestion: StudentQuestion, e?: Event) {
+    if (e) e.preventDefault();
+
+    if (!studentQuestion.canEvaluate()) {
+      // this.$store.dispatch('error', 'Cannot edit or evaluate this question');
+      this.onCloseDialog();
+      return;
     }
+
+    this.currentStudentQuestion = studentQuestion;
+    this.editAndPromoteStudentQuestionDialog = true;
   }
 
-  showQuestionDialog(question: StudentQuestion) {
-    this.currentQuestion = question;
+  showQuestionDialog(studentQuestion: StudentQuestion) {
+    this.currentStudentQuestion = studentQuestion;
     this.questionDialog = true;
   }
 
-  onCloseShowQuestionDialog() {
-    this.questionDialog = false;
-  }
-
   async showEvaluateStudentQuestionDialog(sq: StudentQuestion) {
-    this.currentQuestion = sq;
-    this.evaluateQuestion = true;
-    return;
+    this.currentStudentQuestion = sq;
+    if (!sq.canEvaluate()) {
+      this.studentQuestionJustification = true;
+    } else {
+      this.evaluateQuestion = true;
+    }
   }
 
-  onCancelEvaluation() {
-    this.evaluateQuestion = false;
+  async onSaveStudentQuestion(studentQuestion: StudentQuestion) {
+    this.studentQuestions = this.studentQuestions.filter(
+      sQ => sQ.id !== studentQuestion.id
+    );
+    this.studentQuestions.unshift(studentQuestion);
+
+    this.onCloseDialog();
   }
 
-  onEvaluatedQuestion(studentQuestion: StudentQuestion) {
-    // update evaluated question
-    this.studentQuestions.forEach(sq => {
-      if (sq.id === studentQuestion.id) {
-        sq.justification = studentQuestion.justification;
-        sq.submittedStatus = studentQuestion.submittedStatus;
-      }
-    });
+  onCloseDialog() {
+    this.currentStudentQuestion = null;
+
     this.evaluateQuestion = false;
-    this.currentQuestion = null;
+    this.questionDialog = false;
+    this.editAndPromoteStudentQuestionDialog = false;
+    this.studentQuestionJustification = false;
   }
 
   truncate(s: String): String {

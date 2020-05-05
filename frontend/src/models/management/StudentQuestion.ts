@@ -98,6 +98,10 @@ export default class StudentQuestion extends Question {
     return req;
   }
 
+  canEvaluate(): boolean {
+    return this.submittedStatus !== internalStatuses.PROMOTED;
+  }
+
   isChangeable(): boolean {
     return (
       this.submittedStatus === internalStatuses.REJECTED ||
