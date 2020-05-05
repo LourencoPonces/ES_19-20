@@ -4,7 +4,7 @@
       <v-card-title class="title">
         <span>Clarification Requests</span>
         <v-spacer />
-        <v-btn 
+        <v-btn
           :disabled="this.alreadySubmitted()"
           color="primary"
           @click="newRequestButton()"
@@ -61,7 +61,12 @@
               >
                 Cancel
               </v-btn>
-              <v-btn dark color="primary" style="margin: 5px;" @click="submitRequest()">
+              <v-btn
+                dark
+                color="primary"
+                style="margin: 5px;"
+                @click="submitRequest()"
+              >
                 Submit
               </v-btn>
             </v-card-actions>
@@ -85,7 +90,6 @@ export default class DiscussionComponent extends Vue {
 
   creatingRequest: boolean = false;
   requestContent = '';
-  
 
   showAnswer(request: ClarificationRequest): string | void {
     return request.getAnswerContent();
@@ -121,7 +125,7 @@ export default class DiscussionComponent extends Vue {
         return;
       }
     });
-    return submitted;  
+    return submitted;
   }
 }
 </script>

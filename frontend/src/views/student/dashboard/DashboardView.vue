@@ -4,26 +4,52 @@
       <h2>Dashboard</h2>
       <div v-if="myStats" class="dashboard-stats-container">
         <div class="items">
-          <div class="icon-wrapper" ref="totalQuizzes">
-            <animated-number :number="myStats.testStatValue" />
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-icon
+                v-if="!myStats.isPublic('requestsSubmittedVisibility')"
+                v-on="on"
+                medium
+                class="mr-2"
+                >fas fa-eye-slash</v-icon
+              >
+              <v-icon v-else v-on="on" medium class="mr-2">fas fa-eye</v-icon>
+            </template>
+            <span v-if="!myStats.isPublic('requestsSubmittedVisibility')">
+              Make Public
+            </span>
+            <span v-else>Make Private</span>
+          </v-tooltip>
+          <div class="icon-wrapper" ref="requestsSubmitted">
+            <animated-number :number="myStats.requestsSubmittedStat" />
           </div>
           <div class="project-name">
-            <p>Total Quizzes Solved</p>
+            <p>Clarification Requests Submitted</p>
           </div>
-          <v-select
-            v-model="myStats.testStatVisibility"
-            :items="statVisibility"
-            :reduce="label => label.code"
-          >
-            <template v-slot:selection="{ item }">
-              <v-chip
-                :color="myStats.getVisibilityColor(myStats.testStatVisibility)"
-                small
+        </div>
+        <div class="items">
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-icon
+                v-if="!myStats.isPublic('publicRequestsVisibility')"
+                v-on="on"
+                medium
+                class="mr-2"
+                >fas fa-eye-slash</v-icon
               >
-                <span>{{ item }}</span>
-              </v-chip>
+              <v-icon v-else v-on="on" medium class="mr-2">fas fa-eye</v-icon>
             </template>
-          </v-select>
+            <span v-if="!myStats.isPublic('publicRequestsVisibility')">
+              Make Public
+            </span>
+            <span v-else>Make Private</span>
+          </v-tooltip>
+          <div class="icon-wrapper" ref="publicRequests">
+            <animated-number :number="myStats.publicRequestsStat" />
+          </div>
+          <div class="project-name">
+            <p>Public Clarification Requests</p>
+          </div>
         </div>
       </div>
     </div>
@@ -66,7 +92,7 @@
       <show-dashboard-stats-dialog
         v-if="dashboardUserToSee"
         v-model="dashboardStatsDialog"
-        :username="dashboardUserToSee"
+        :student="dashboardUserToSee"
         v-on:close-show-dashboard-stats-dialog="onCloseShowDashboardStatsDialog"
       />
     </v-card>
@@ -95,15 +121,9 @@ export default class DashboardView extends Vue {
   students: Student[] = [];
   search: string = '';
   dashboardStatsDialog: boolean = false;
-  dashboardUserToSee: string = '';
+  dashboardUserToSee: Student | null = null;
   headers: object = [
     { text: 'Name', value: 'name', align: 'left', width: '40%' },
-    {
-      text: 'Username',
-      value: 'username',
-      align: 'center',
-      width: '10%'
-    },
     {
       text: 'Number',
       value: 'number',
@@ -123,7 +143,7 @@ export default class DashboardView extends Vue {
     try {
       this.course = this.$store.getters.getCurrentCourse;
       this.myStats = await RemoteServices.getUserDashboardStats(
-        this.$store.getters.getUser.username
+        this.$store.getters.getUser.id
       );
     } catch (error) {
       await this.$store.dispatch('error', error);
@@ -145,12 +165,13 @@ export default class DashboardView extends Vue {
   }
 
   showDashboardStatsDialog(student: Student) {
-    this.dashboardUserToSee = student.username;
+    this.dashboardUserToSee = student;
     this.dashboardStatsDialog = true;
   }
 
   onCloseShowDashboardStatsDialog() {
     this.dashboardStatsDialog = false;
+    this.dashboardUserToSee = null;
   }
 }
 </script>
@@ -170,8 +191,14 @@ export default class DashboardView extends Vue {
     border-radius: 5px;
     flex-basis: 25%;
     margin: 20px;
+    max-height: 250px;
     cursor: pointer;
     transition: all 0.6s;
+
+    .v-icon {
+      left: 55px;
+      top: 10px;
+    }
   }
 }
 
@@ -183,7 +210,7 @@ export default class DashboardView extends Vue {
 }
 
 .icon-wrapper {
-  font-size: 50px;
+  font-size: 75px;
   transform: translateY(0px);
   transition: all 0.6s;
 }
@@ -196,9 +223,11 @@ export default class DashboardView extends Vue {
   align-self: start;
 }
 .project-name p {
-  font-size: 11px;
+  font-size: 20px;
   font-weight: bold;
+  letter-spacing: 2px;
   transform: translateY(0px);
   transition: all 0.5s;
 }
+
 </style>

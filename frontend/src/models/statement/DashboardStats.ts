@@ -4,28 +4,21 @@ const visibility = {
 };
 
 export default class DashboardStats {
-  testStatVisibility: string = visibility.PUBLIC;
-  testStat: number = 0;
+  requestsSubmittedVisibility: string = visibility.PRIVATE;
+  requestsSubmittedStat: number = 0;
+  publicRequestsVisibility: string = visibility.PRIVATE;
+  publicRequestsStat: number = 0;
 
   constructor(jsonObj?: DashboardStats) {
     if (jsonObj) {
-      this.testStatVisibility = jsonObj.testStatVisibility;
-      this.testStat = jsonObj.testStat;
+      this.requestsSubmittedVisibility = jsonObj.requestsSubmittedVisibility;
+      this.requestsSubmittedStat = jsonObj.requestsSubmittedStat;
+      this.publicRequestsVisibility = jsonObj.publicRequestsVisibility;
+      this.publicRequestsStat = jsonObj.publicRequestsStat;
     }
   }
 
   isPublic(stat: string): boolean {
     return stat === visibility.PUBLIC;
-  }
-
-  getVisibilityColor(stat: string): string {
-    switch (stat) {
-      case visibility.PRIVATE:
-        return 'red';
-      case visibility.PUBLIC:
-        return 'green';
-      default:
-        throw new Error('Invalid status');
-    }
   }
 }
