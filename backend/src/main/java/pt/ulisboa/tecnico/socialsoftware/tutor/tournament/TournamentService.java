@@ -241,6 +241,8 @@ public class TournamentService {
         quiz.setConclusionDate(tournament.getConclusionDate());
         quiz.setResultsDate(tournament.getConclusionDate());
 
+        entityManager.persist(quiz);
+
         // Add quiz answers to the first two signed-up students
         for (User user: tournament.getParticipants()) {
             QuizAnswer quizAnswer = new QuizAnswer(user, quiz);
