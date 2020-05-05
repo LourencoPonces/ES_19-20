@@ -210,7 +210,7 @@ Cypress.Commands.add('changeClarificationRequestStatus', requestText => {
   cy.get(`[data-cy^="public-${requestText.slice(0, 15)}"]`)
     .first()
     .should('exist');
-})
+});
 
 /* STUDENT QUESTION TESTS */
 
@@ -259,7 +259,8 @@ Cypress.Commands.add(
   (title, prevStatus, status, justification) => {
     // select evaluate question
     cy.contains(title)
-      .parent()
+      .parents('tr')
+      .eq(0)
       .contains(prevStatus)
       .click();
 
@@ -342,30 +343,61 @@ Cypress.Commands.add('errorMessageClose', message => {
 });
 
 Cypress.Commands.add(
-  'editStudentQuestion',
-  (
-    command,
-    questionTitle,
-    newTitle,
-    newContent,
-    oldTopics,
-    newTopics,
-    newOptions
-  ) => {
-    if (command === 'edit') {
-      cy.contains(questionTitle)
-        .parents('tr')
-        .eq(0)
-        .find('[data-cy="editStudentQuestion"]')
-        .click();
-    } else if (command === 'duplicate') {
-      cy.contains(questionTitle)
-        .parents('tr')
-        .eq(0)
-        .find('[data-cy="duplicateStudentQuestion"]')
-        .click();
-    }
+  'editAndPromoteStudentQuestion',
+  (questionTitle, newTitle, newContent, oldTopics, newTopics, newOptions) => {
+    cy.contains(questionTitle).rightclick();
 
+    cy.fillStudentQuestionDialog(
+      newTitle,
+      newContent,
+      oldTopics,
+      newTopics,
+      newOptions
+    );
+  }
+);
+
+Cypress.Commands.add(
+  'editStudentQuestion',
+  (questionTitle, newTitle, newContent, oldTopics, newTopics, newOptions) => {
+    cy.contains(questionTitle)
+      .parents('tr')
+      .eq(0)
+      .find('[data-cy="editStudentQuestion"]')
+      .click();
+
+    cy.fillStudentQuestionDialog(
+      newTitle,
+      newContent,
+      oldTopics,
+      newTopics,
+      newOptions
+    );
+  }
+);
+
+Cypress.Commands.add(
+  'duplicateStudentQuestion',
+  (questionTitle, newTitle, newContent, oldTopics, newTopics, newOptions) => {
+    cy.contains(questionTitle)
+      .parents('tr')
+      .eq(0)
+      .find('[data-cy="duplicateStudentQuestion"]')
+      .click();
+
+    cy.fillStudentQuestionDialog(
+      newTitle,
+      newContent,
+      oldTopics,
+      newTopics,
+      newOptions
+    );
+  }
+);
+
+Cypress.Commands.add(
+  'fillStudentQuestionDialog',
+  (newTitle, newContent, oldTopics, newTopics, newOptions) => {
     for (oldTopic of oldTopics) {
       cy.get(`[data-cy="${oldTopic}"]`)
         .find('button')
@@ -403,58 +435,6 @@ Cypress.Commands.add(
     }
 
     cy.get('[data-cy="SaveStudentQuestion"]').click();
-  }
-);
-
-Cypress.Commands.add(
-  'evaluateStudentQuestion',
-  (title, prevStatus, status, justification) => {
-    // select evaluate question
-    cy.contains(title)
-      .parents('tr')
-      .eq(0)
-      .contains(prevStatus)
-      .click();
-
-    // select drop down
-    cy.get('.layout')
-      .contains(prevStatus)
-      .click();
-
-    // select evaluation status
-    cy.get('.v-list-item__content')
-      .contains(status)
-      .click();
-
-    // write justification
-    if (justification != null && justification != '') {
-      cy.get('.v-textarea').type(justification);
-    }
-
-    // select evaluate button
-    cy.get('button')
-      .contains('Evaluate')
-      .click();
-  }
-);
-
-Cypress.Commands.add(
-  'assertStudentQuestionEvaluation',
-  (questionTitle, status, justification) => {
-    // assert status
-    cy.contains(questionTitle)
-      .parents('tr')
-      .eq(0)
-      .find('[data-cy="evaluate"]')
-      .should('have.text', status);
-
-    // assert justification
-    cy.contains(questionTitle)
-      .parents('tr')
-      .eq(0)
-      .find('[data-cy="showJustification"]')
-      .should('have.text', ' ' + justification + ' ');
-    // prettier is surrounding justification with spaces...
   }
 );
 

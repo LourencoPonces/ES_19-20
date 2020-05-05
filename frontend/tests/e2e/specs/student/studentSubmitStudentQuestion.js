@@ -126,7 +126,6 @@ describe('Student Question Submission', () => {
     ]);
 
     cy.editStudentQuestion(
-      'edit',
       questionTitle,
       newQuestionTitle,
       newQuestionContent,
@@ -193,7 +192,6 @@ describe('Student Question Submission', () => {
     cy.get('[data-cy="student-questions"]').click();
 
     cy.editStudentQuestion(
-      'edit',
       questionTitle,
       newQuestionTitle,
       newQuestionContent,
@@ -233,8 +231,7 @@ describe('Student Question Submission', () => {
       1
     ]);
 
-    cy.editStudentQuestion(
-      'duplicate',
+    cy.duplicateStudentQuestion(
       questionTitle,
       newQuestionTitle,
       newQuestionContent,
