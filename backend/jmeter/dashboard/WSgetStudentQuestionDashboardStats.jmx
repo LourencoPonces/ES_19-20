@@ -489,7 +489,7 @@ INSERT INTO student_question(id, user_id, submitted_status, justification, stude
             <stringProp name="HTTPSampler.port">${port}</stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/courses/${courseId}/dashboardStats/${username}</stringProp>
+            <stringProp name="HTTPSampler.path">/courses/${courseId}/dashboardStats/${studentId}</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>

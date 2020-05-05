@@ -101,11 +101,11 @@ export default class RemoteServices {
    */
 
   static async getUserDashboardStats(
-    username: string
+    userId: number
   ): Promise<DashboardStats> {
     try {
       const response = await httpClient.get(
-        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/dashboardStats/${username}`
+        `/courses/${Store.getters.getCurrentCourse.courseId}/dashboardStats/${userId}`
       );
       return new DashboardStats(response.data);
     } catch (error) {
@@ -359,6 +359,21 @@ export default class RemoteServices {
     return httpClient
       .get(
         `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments/available`
+      )
+      .then(response => {
+        return response.data.map((tournament: any) => {
+          return new Tournament(tournament);
+        });
+      })
+      .catch(async error => {
+        console.log(this.errorMessage(error));
+      });
+  }
+
+  static async getCreatedTournaments(): Promise<Tournament[]> {
+    return httpClient
+      .get(
+        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments/created`
       )
       .then(response => {
         return response.data.map((tournament: any) => {

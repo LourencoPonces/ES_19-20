@@ -97,38 +97,6 @@ public class TournamentDto implements Serializable {
             return Tournament.Status.FINISHED;
     }
 
-    public String getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(String creationDate) {
-        this.creationDate = creationDate;
-    }
-
-    public String getAvailableDate() {
-        return availableDate;
-    }
-
-    public void setAvailableDate(String availableDate) {
-        this.availableDate = availableDate;
-    }
-
-    public String getRunningDate() {
-        return runningDate;
-    }
-
-    public void setRunningDate(String runningDate) {
-        this.runningDate = runningDate;
-    }
-
-    public String getConclusionDate() {
-        return conclusionDate;
-    }
-
-    public void setConclusionDate(String conclusionDate) {
-        this.conclusionDate = conclusionDate;
-    }
-
     public Integer getNumberOfQuestions() {
         return numberOfQuestions;
     }
@@ -159,6 +127,38 @@ public class TournamentDto implements Serializable {
 
     public void setTopics(List<TopicDto> topics) {
         this.topics = topics;
+    }
+
+    public String getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(String creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public String getAvailableDate() {
+        return availableDate;
+    }
+
+    public void setAvailableDate(String availableDate) {
+        this.availableDate = availableDate;
+    }
+
+    public String getRunningDate() {
+        return runningDate;
+    }
+
+    public void setRunningDate(String runningDate) {
+        this.runningDate = runningDate;
+    }
+
+    public String getConclusionDate() {
+        return conclusionDate;
+    }
+
+    public void setConclusionDate(String conclusionDate) {
+        this.conclusionDate = conclusionDate;
     }
 
     public LocalDateTime getCreationDateDate() {

@@ -127,7 +127,9 @@ export default class ResultsView extends Vue {
       this.userRequests.push(
         await RemoteServices.submitClarificationRequest(req)
       );
-      alert('Request submitted! You can see it in your Clarification Requests.');
+      alert(
+        'Request submitted! You can see it in your Clarification Requests.'
+      );
     } catch (error) {
       await this.$store.dispatch('error', error);
     }

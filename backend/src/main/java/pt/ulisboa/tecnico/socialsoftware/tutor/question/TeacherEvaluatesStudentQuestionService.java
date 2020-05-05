@@ -84,7 +84,6 @@ public class TeacherEvaluatesStudentQuestionService {
         Set<Topic> newTopics = Arrays.stream(changedStudentQuestionDTO.getTopics().toArray(topicArray)).map(topicDto -> topicRepository.findTopicByName(courseId, topicDto.getName())).collect(Collectors.toSet());
 
         // update question
-        System.out.println(changedStudentQuestionDTO);
         studentQuestion.update(changedStudentQuestionDTO, newTopics);
 
         // evaluate
