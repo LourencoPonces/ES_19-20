@@ -1,11 +1,17 @@
 <template>
-  <div>
-    <ul>
-      <li v-if="stats.isPublic(stats.testStatVisibility)">
-        <span><b>Test Stat:</b> {{ stats.testStat }}</span>
-      </li>
-    </ul>
-    <br />
+  <div class="">
+      <v-row>
+        <v-col><b>Clarification Requests Submitted:</b></v-col>
+        <v-col v-if="stats.isPublic('requestsSubmittedVisibility')">{{stats.requestsSubmittedStat}}</v-col>
+        <v-col v-else>Private</v-col>
+      </v-row>
+      <v-divider/>
+      <v-row>
+        <v-col><b>Public Clarification Requests:</b></v-col>
+        <v-col v-if="stats.isPublic('publicRequestsVisibility')">{{stats.publicRequestsStat}}</v-col>
+        <v-col v-else>Private</v-col>
+      </v-row>
+      
   </div>
 </template>
 
