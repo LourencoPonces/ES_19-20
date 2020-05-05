@@ -60,6 +60,7 @@ public class Tournament {
     @ManyToMany(mappedBy = "participantTournaments")
     private Set<User> participants = new HashSet<>();
 
+
     public Tournament() {}
 
     public Tournament(TournamentDto tournamentDto) {
