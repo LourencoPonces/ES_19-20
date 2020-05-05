@@ -278,7 +278,7 @@ export default class StudentQuestionView extends Vue {
   editStudentQuestion(studentQuestion: StudentQuestion, e?: Event) {
     if (e) e.preventDefault();
     if (!studentQuestion.isChangeable()) {
-      this.$store.dispatch('error', 'Cannot edit this question');
+      // this.$store.dispatch('error', 'Cannot edit this question');
       return;
     }
     this.currentStudentQuestion = studentQuestion;
