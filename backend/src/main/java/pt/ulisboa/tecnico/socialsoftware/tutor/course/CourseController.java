@@ -52,7 +52,7 @@ public class CourseController {
     }
 
     @GetMapping("/executions/{executionId}/students")
-    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
+    @PreAuthorize("(hasRole('ROLE_TEACHER') or hasRole('ROLE_STUDENT')) and hasPermission(#executionId, 'EXECUTION.ACCESS')")
     public List<StudentDto> getCourseStudents(@PathVariable int executionId) {
         return courseService.courseStudents(executionId);
     }

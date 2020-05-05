@@ -13,6 +13,7 @@
         v-for="quiz in quizzes"
         :key="quiz.quizAnswerId"
         @click="showResults(quiz)"
+        data-cy="solvedList"
       >
         <div class="col">
           {{ quiz.statementQuiz.title }}

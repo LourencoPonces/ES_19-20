@@ -1,0 +1,204 @@
+<template>
+  <div>
+    <div class="container">
+      <h2>Dashboard</h2>
+      <div v-if="myStats" class="dashboard-stats-container">
+        <div class="items">
+          <div class="icon-wrapper" ref="totalQuizzes">
+            <animated-number :number="myStats.testStatValue" />
+          </div>
+          <div class="project-name">
+            <p>Total Quizzes Solved</p>
+          </div>
+          <v-select
+            v-model="myStats.testStatVisibility"
+            :items="statVisibility"
+            :reduce="label => label.code"
+          >
+            <template v-slot:selection="{ item }">
+              <v-chip
+                :color="myStats.getVisibilityColor(myStats.testStatVisibility)"
+                small
+              >
+                <span>{{ item }}</span>
+              </v-chip>
+            </template>
+          </v-select>
+        </div>
+      </div>
+    </div>
+    <v-card class="table">
+      <v-data-table
+        :headers="headers"
+        :items="students"
+        :search="search"
+        disable-pagination
+        :hide-default-footer="true"
+        :mobile-breakpoint="0"
+      >
+        <template v-slot:top>
+          <v-card-title>
+            <v-text-field
+              v-model="search"
+              append-icon="search"
+              label="Search"
+              class="mx-2"
+            />
+
+            <v-spacer />
+          </v-card-title>
+        </template>
+        <template v-slot:item.action="{ item }">
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-icon
+                small
+                class="mr-2"
+                v-on="on"
+                @click="showDashboardStatsDialog(item)"
+                >visibility</v-icon
+              >
+            </template>
+            <span>Show stats</span>
+          </v-tooltip>
+        </template>
+      </v-data-table>
+      <show-dashboard-stats-dialog
+        v-if="dashboardUserToSee"
+        v-model="dashboardStatsDialog"
+        :username="dashboardUserToSee"
+        v-on:close-show-dashboard-stats-dialog="onCloseShowDashboardStatsDialog"
+      />
+    </v-card>
+  </div>
+</template>
+
+<script lang="ts">
+import { Component, Vue, Watch } from 'vue-property-decorator';
+import DashboardStats from '@/models/statement/DashboardStats';
+import RemoteServices from '@/services/RemoteServices';
+import Course from '@/models/user/Course';
+import AnimatedNumber from '@/components/AnimatedNumber.vue';
+import { Student } from '@/models/management/Student';
+import ShowDashboardStatsDialog from '@/views/student/dashboard/ShowDashboardStatsDialog.vue';
+
+@Component({
+  components: {
+    AnimatedNumber,
+    'show-dashboard-stats-dialog': ShowDashboardStatsDialog
+  }
+})
+export default class DashboardView extends Vue {
+  myStats: DashboardStats | null = null;
+  statVisibility = ['PUBLIC', 'PRIVATE'];
+  course: Course | null = null;
+  students: Student[] = [];
+  search: string = '';
+  dashboardStatsDialog: boolean = false;
+  dashboardUserToSee: string = '';
+  headers: object = [
+    { text: 'Name', value: 'name', align: 'left', width: '40%' },
+    {
+      text: 'Username',
+      value: 'username',
+      align: 'center',
+      width: '10%'
+    },
+    {
+      text: 'Number',
+      value: 'number',
+      align: 'center',
+      width: '10%'
+    },
+    {
+      text: 'Actions',
+      value: 'action',
+      align: 'center',
+      width: '10%'
+    }
+  ];
+
+  async created() {
+    await this.$store.dispatch('loading');
+    try {
+      this.course = this.$store.getters.getCurrentCourse;
+      this.myStats = await RemoteServices.getUserDashboardStats(
+        this.$store.getters.getUser.username
+      );
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
+    await this.$store.dispatch('clearLoading');
+  }
+
+  @Watch('course')
+  async onAcademicTermChange() {
+    await this.$store.dispatch('loading');
+    try {
+      if (this.course) {
+        this.students = await RemoteServices.getCourseStudents(this.course);
+      }
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
+    await this.$store.dispatch('clearLoading');
+  }
+
+  showDashboardStatsDialog(student: Student) {
+    this.dashboardUserToSee = student.username;
+    this.dashboardStatsDialog = true;
+  }
+
+  onCloseShowDashboardStatsDialog() {
+    this.dashboardStatsDialog = false;
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.dashboard-stats-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch;
+  align-content: center;
+  height: 50%;
+
+  .items {
+    background-color: rgba(255, 255, 255, 0.75);
+    color: #1976d2;
+    border-radius: 5px;
+    flex-basis: 25%;
+    margin: 20px;
+    cursor: pointer;
+    transition: all 0.6s;
+  }
+}
+
+.icon-wrapper,
+.project-name {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-wrapper {
+  font-size: 50px;
+  transform: translateY(0px);
+  transition: all 0.6s;
+}
+
+.icon-wrapper {
+  align-self: end;
+}
+
+.project-name {
+  align-self: start;
+}
+.project-name p {
+  font-size: 11px;
+  font-weight: bold;
+  transform: translateY(0px);
+  transition: all 0.5s;
+}
+</style>
