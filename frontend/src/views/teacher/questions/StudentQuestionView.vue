@@ -92,6 +92,11 @@
         </v-tooltip>
       </template>
     </v-data-table>
+    <footer>
+      <v-icon class="mr-2">mouse</v-icon>Left-click on question's title to view
+      it. <v-icon class="mr-2">mouse</v-icon>Right-click on question's title to
+      edit it.
+    </footer>
     <show-question-dialog
       v-if="questionDialog"
       v-model="questionDialog"
