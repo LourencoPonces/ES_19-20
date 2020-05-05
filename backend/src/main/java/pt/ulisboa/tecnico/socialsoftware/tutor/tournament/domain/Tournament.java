@@ -90,6 +90,56 @@ public class Tournament {
         this.key = key;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        checkTitle(title);
+        this.title = title;
+    }
+
+    public Integer getNumberOfQuestions() {
+        return numberOfQuestions;
+    }
+
+    public void setNumberOfQuestions(Integer numberOfQuestions) {
+        checkNumberOfQuestions(numberOfQuestions);
+        this.numberOfQuestions = numberOfQuestions;
+    }
+
+    public User getCreator() {
+        return creator;
+    }
+
+    public void setCreator(User creator) {
+        this.creator = creator;
+    }
+
+    public Set<User> getParticipants() {
+        return participants;
+    }
+
+    public void addParticipant(User participant) {
+        this.participants.add(participant);
+    }
+
+    public Set<Topic> getTopics() {
+        return topics;
+    }
+
+    public void addTopic(Topic topic) {
+        this.topics.add(topic);
+    }
+
+    public CourseExecution getCourseExecution() {
+        return courseExecution;
+    }
+
+    public void setCourseExecution(CourseExecution courseExecution) {
+        this.courseExecution = courseExecution;
+    }
+
     public LocalDateTime getCreationDate() {
         return creationDate;
     }
@@ -126,15 +176,6 @@ public class Tournament {
         this.conclusionDate = conclusionDate;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        checkTitle(title);
-        this.title = title;
-    }
-
     public Status getStatus() {
         if (isCancelled) return Status.CANCELLED;
 
@@ -147,48 +188,6 @@ public class Tournament {
             return Status.RUNNING;
         else
             return Status.FINISHED;
-    }
-
-    public Integer getNumberOfQuestions() {
-        return numberOfQuestions;
-    }
-
-    public void setNumberOfQuestions(Integer numberOfQuestions) {
-        checkNumberOfQuestions(numberOfQuestions);
-        this.numberOfQuestions = numberOfQuestions;
-    }
-
-
-    public Set<Topic> getTopics() {
-        return topics;
-    }
-
-    public void addTopic(Topic topic) {
-        this.topics.add(topic);
-    }
-
-    public CourseExecution getCourseExecution() {
-        return courseExecution;
-    }
-
-    public void setCourseExecution(CourseExecution courseExecution) {
-        this.courseExecution = courseExecution;
-    }
-
-    public User getCreator() {
-        return creator;
-    }
-
-    public void setCreator(User creator) {
-        this.creator = creator;
-    }
-
-    public Set<User> getParticipants() {
-        return participants;
-    }
-
-    public void addParticipant(User participant) {
-        this.participants.add(participant);
     }
 
     public void cancel() {

@@ -163,6 +163,19 @@ public class TournamentService {
                 .collect(Collectors.toList());
     }
 
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void cancelTournament(String username, int tournamentId) {
+        Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow(() -> new TutorException(TOURNAMENT_NOT_FOUND, tournamentId));
+
+        if (!tournament.getCreator().getUsername().equals(username)) {
+            throw new TutorException(MISSING_TOURNAMENT_OWNERSHIP);
+        }
+        tournament.cancel();
+    }
+
     private void checkKey(TournamentDto tournamentDto) {
         if (tournamentDto.getKey() == null) {
             int maxQuestionNumber = tournamentRepository.getMaxTournamentKey() != null ?
