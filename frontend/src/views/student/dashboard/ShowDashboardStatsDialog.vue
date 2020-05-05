@@ -8,7 +8,9 @@
     >
       <v-card>
         <v-card-title>
-          <span class="headline"><b>{{ student.name }}</b></span>
+          <span class="headline"
+            ><b>{{ student.name }}</b></span
+          >
         </v-card-title>
 
         <v-card-text class="text-left">
@@ -27,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Model, Watch} from 'vue-property-decorator';
+import { Component, Vue, Prop, Model, Watch } from 'vue-property-decorator';
 import DashboardStats from '@/models/statement/DashboardStats';
 import RemoteServices from '@/services/RemoteServices';
 import { Student } from '@/models/management/Student';
@@ -41,24 +43,7 @@ import ShowDashboardStats from '@/views/student/dashboard/ShowDashboardStats.vue
 export default class ShowDashboardStatsDialog extends Vue {
   @Model('dialog', Boolean) dialog!: boolean;
   @Prop(Student) readonly student!: Student;
-  userStats: DashboardStats | null = null;
-
-  @Watch('student')
-  async getUserDashboardStats() {
-    await this.$store.dispatch('loading');
-    try {
-      this.userStats = await RemoteServices.getUserDashboardStats(
-        this.student.id
-      );
-    } catch (error) {
-      await this.$store.dispatch('error', error);
-      this.dialog = false;
-      this.$emit('dialog');
-    }
-    await this.$store.dispatch('clearLoading');
-  }
+  @Prop(DashboardStats) readonly userStats: DashboardStats | null = null;
 }
 </script>
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>
