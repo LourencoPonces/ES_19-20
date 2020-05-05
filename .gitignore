@@ -7,5 +7,7 @@ scripts
 backend/src/main/resources/static/images/questions/
 data/
 
+frontend/cypress.json
+
 jmeter.log
 backend/jmeter/jmeter-docker.properties
