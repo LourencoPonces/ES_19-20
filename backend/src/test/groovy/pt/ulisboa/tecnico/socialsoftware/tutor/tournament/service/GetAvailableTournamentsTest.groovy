@@ -171,8 +171,6 @@ class GetAvailableTournamentsTest extends Specification {
         def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId())
 
         then: "There are no tournaments"
-        /*def exception = thrown(TutorException)
-        exception.getErrorMessage() == errorMessage*/
         tournamentsList.size() == size
 
         where:
