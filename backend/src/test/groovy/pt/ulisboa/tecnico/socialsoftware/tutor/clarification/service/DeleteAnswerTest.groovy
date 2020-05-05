@@ -9,7 +9,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepos
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestAnswerRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationMessageRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
@@ -58,7 +58,7 @@ class DeleteAnswerTest extends Specification {
     ClarificationRequestRepository clarificationRequestRepository
 
     @Autowired
-    ClarificationRequestAnswerRepository clarificationRequestAnswerRepository;
+    ClarificationMessageRepository clarificationRequestAnswerRepository;
 
     @Autowired
     ClarificationService clarificationService
@@ -161,7 +161,7 @@ class DeleteAnswerTest extends Specification {
         clarificationService.submitClarificationRequestAnswer(teacher, reqId, "some answer")
 
         when: "answer is removed"
-        clarificationService.deleteClarificationRequestAnswer(teacher, reqId)
+        clarificationService.deleteClarificationMessage(reqId)
 
         then: "clarification request has no answer"
         clarificationRequest.getAnswer().isEmpty()
@@ -178,7 +178,7 @@ class DeleteAnswerTest extends Specification {
         // empty
 
         when: "answer is removed"
-        clarificationService.deleteClarificationRequestAnswer(teacher, reqId)
+        clarificationService.deleteClarificationMessage(reqId)
 
         then: "thrown exception"
         def exception = thrown(TutorException)
@@ -187,7 +187,7 @@ class DeleteAnswerTest extends Specification {
 
     def "don't remove non-existent things"() {
         when: "trying to remove an answer from a non-existent clarification request"
-        clarificationService.deleteClarificationRequestAnswer(teacher, clarificationRequest.getId() + 10)
+        clarificationService.deleteClarificationMessage(clarificationRequest.getId() + 10)
 
         then: "thrown exception"
         def exception = thrown(TutorException)

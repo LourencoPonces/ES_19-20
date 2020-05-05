@@ -26,13 +26,6 @@ describe('Clarification Request', () => {
   });
 
 
-  it('login submits, edits and deletes a clarification request', () => {
-    cy.submitClarificationRequest(content, 1);
-    cy.goToMyClarifications();
-    cy.editClarificationRequest(newContent);
-    cy.deleteAllRequests(1);
-  });
-
   it('login submit request with empty content', () => {
     cy.get('[data-cy="newRequest"]').click();
     cy.get('[data-cy="inputRequest"]').type('   ');
@@ -41,7 +34,7 @@ describe('Clarification Request', () => {
       .should('contain.text', 'Missing content');
   });
 
-  it('login and try to edit and delete answered request', () => {
+  it('login and try and delete a request with more than one message', () => {
     cy.submitClarificationRequest(content, 1);
     cy.logout();
 
@@ -51,16 +44,14 @@ describe('Clarification Request', () => {
 
     cy.demoStudentLogin();
     cy.goToMyClarifications();
-    cy.get('[data-cy="edit"]')
-      .should('be.disabled');
     cy.get('[data-cy="delete"]')
       .should('be.disabled');
     cy.logout();
 
     cy.demoTeacherLogin();
-    cy.deleteClarificationRequestAnswer(content);
+    cy.deleteClarificationRequestMessage(content);
     cy.logout();
-    
+
     cy.demoStudentLogin();
     cy.goToMyClarifications();
     cy.deleteAllRequests(1);
@@ -87,7 +78,7 @@ describe('Clarification Request', () => {
     cy.checkRequestInDiscussion(content);
     cy.get('[data-cy="newRequest"]')
       .should('be.disabled');
-    
+
     cy.goToMyClarifications();
     cy.deleteAllRequests(1);
   });

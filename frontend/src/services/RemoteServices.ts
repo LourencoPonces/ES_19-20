@@ -791,8 +791,12 @@ export default class RemoteServices {
   static async getStudentClarificationRequests(): Promise<
     ClarificationRequest[]
   > {
+    return getAllClarificationRequests();
+  }
+
+  static async getAllClarificationRequests(): Promise<ClarificationRequest[]> {
     try {
-      const response = await httpClient.get('/student/clarifications');
+      const response = await httpClient.get('/clarifications');
       return response.data.map(
         (request: any) => new ClarificationRequest(request)
       );
@@ -803,20 +807,7 @@ export default class RemoteServices {
 
   static async deleteClarificationRequest(id: number) {
     return httpClient
-      .delete(`student/clarifications/${id}`)
-      .catch(async error => {
-        throw Error(await this.errorMessage(error));
-      });
-  }
-
-  static async editClarificationRequest(
-    request: ClarificationRequest
-  ): Promise<ClarificationRequest> {
-    return httpClient
-      .post(`/student/clarifications/${request.getId()}`, request)
-      .then(response => {
-        return new ClarificationRequest(response.data);
-      })
+      .delete(`/clarifications/${id}`)
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });

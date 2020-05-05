@@ -5,7 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest;
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestAnswerDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationMessageDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
@@ -32,7 +32,7 @@ public class ClarificationController {
         return clarificationService.submitClarificationRequest(questionId, user.getId(), clarificationRequestDto);
     }
 
-    @DeleteMapping("/student/clarifications/{requestId}")
+    @DeleteMapping("/clarifications/{requestId}")
     @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#requestId, 'CLARIFICATION.ACCESS')")
     public void deleteClarificationRequest(Principal principal, @PathVariable int requestId) {
         User user = (User) ((Authentication) principal).getPrincipal();
@@ -44,77 +44,43 @@ public class ClarificationController {
         clarificationService.deleteClarificationRequest(user.getId(), requestId);
     }
 
-    @PostMapping("/student/clarifications/{requestId}")
-    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#requestId, 'CLARIFICATION.ACCESS')")
-    public ClarificationRequestDto updateClarificationRequest(Principal principal,  @PathVariable int requestId, @Valid @RequestBody ClarificationRequestDto clarificationRequestDto) {
-        User user = (User) ((Authentication) principal).getPrincipal();
-
-        if (user == null) {
-            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
-        }
-
-        return clarificationService.updateClarificationRequest(clarificationRequestDto);
-    }
-
-    @GetMapping("/student/clarifications")
-    @PreAuthorize("hasRole('ROLE_STUDENT')")
-    public List<ClarificationRequestDto> getStudentClarificationRequests(Principal principal) {
-        User user = (User) ((Authentication) principal).getPrincipal();
-
-        if (user == null) {
-            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
-        }
-
-        return clarificationService.getStudentClarificationRequests(user.getId());
-    }
-
     @GetMapping("/clarifications")
-    @PreAuthorize("hasRole('ROLE_TEACHER')")
-    public List<ClarificationRequestDto> getTeacherClarificationRequests(Principal principal) {
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_STUDENT')")
+    public List<ClarificationRequestDto> getClarificationRequests(Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
 
         if (user == null) {
             throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
         }
 
-        return clarificationService.getTeacherClarificationRequests(user.getId());
+        if (user.getRole() == User.Role.TEACHER) {
+            return clarificationService.getTeacherClarificationRequests(user.getId());
+        } else {
+            return clarificationService.getStudentClarificationRequests(user.getId());
+        }
     }
 
-    @PutMapping("/clarifications/{requestId}/answer")
-    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#requestId, 'CLARIFICATION.ACCESS')")
-    public ClarificationRequestAnswerDto submitAnswer(Principal principal, @PathVariable int requestId, @RequestBody String answer) {
+    @PostMapping("/clarifications/{requestId}/messages")
+    @PreAuthorize("(hasRole('ROLE_TEACHER') or hasRole('ROLE_STUDENT')) and hasPermission(#requestId, 'CLARIFICATION.ACCESS')")
+    public ClarificationMessageDto submitMessage(Principal principal, @PathVariable int requestId, @RequestBody ClarificationMessageDto messageDto) {
         User user = (User) ((Authentication) principal).getPrincipal();
 
         if (user == null) {
             throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
         }
 
-        return clarificationService.submitClarificationRequestAnswer(user, requestId, answer);
+        return clarificationService.submitClarificationMessage(user, requestId, messageDto);
     }
 
-    @DeleteMapping("/clarifications/{requestId}/answer")
-    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#requestId, 'CLARIFICATION.ACCESS')")
-    public void deleteAnswer(Principal principal, @PathVariable int requestId) {
+    @DeleteMapping("/clarifications/messages/{messageId}")
+    public void deleteClarificationMessage(@PathVariable int messageId, Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
 
         if (user == null) {
             throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
         }
 
-        clarificationService.deleteClarificationRequestAnswer(user, requestId);
-    }
-
-
-    @GetMapping("/clarifications/{requestId}/answer")
-    @PreAuthorize("(hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')) and hasPermission(#requestId, 'CLARIFICATION.ACCESS')")
-    public ClarificationRequestAnswerDto getClarificationRequestAnswer(@PathVariable int requestId, Principal principal) {
-        User user = (User) ((Authentication) principal).getPrincipal();
-
-        if (user == null) {
-            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
-        }
-
-        return clarificationService.getClarificationRequestAnswer(user.getId(), requestId);
+        clarificationService.deleteClarificationMessage(user, messageId);
     }
 
     @PutMapping("/clarifications/{requestId}/status")

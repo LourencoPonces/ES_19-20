@@ -7,10 +7,10 @@ import org.springframework.context.annotation.Bean
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequestAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestAnswerRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationMessageRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
@@ -56,7 +56,7 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
     ClarificationService clarificationService
 
     @Autowired
-    ClarificationRequestAnswerRepository clarificationRequestAnswerRepository
+    ClarificationMessageRepository clarificationRequestAnswerRepository
 
     Course course
     Question question
@@ -68,7 +68,7 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
     QuizAnswer quizAnswer, quizAnswer3
     QuizQuestion quizQuestion
     ClarificationRequest clarificationRequest, clarificationRequest3
-    ClarificationRequestAnswer clarificationRequestAnswer
+    ClarificationMessage clarificationRequestAnswer
 
     CourseExecution courseExecution2
     User student2
@@ -170,8 +170,8 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
         return clarificationRequest
     }
 
-    private ClarificationRequestAnswer createClarificationRequestAnswer(User teacher, ClarificationRequest clarificationRequest, String content) {
-        ClarificationRequestAnswer clarificationRequestAnswer = new ClarificationRequestAnswer()
+    private ClarificationMessage createClarificationRequestAnswer(User teacher, ClarificationRequest clarificationRequest, String content) {
+        ClarificationMessage clarificationRequestAnswer = new ClarificationMessage()
         clarificationRequestAnswer.setCreator(teacher)
         clarificationRequestAnswer.setRequest(clarificationRequest)
         clarificationRequestAnswer.setContent(content)

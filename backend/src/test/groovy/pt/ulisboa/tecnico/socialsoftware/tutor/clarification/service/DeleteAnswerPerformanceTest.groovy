@@ -11,7 +11,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuestionAnswerR
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestAnswerRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationMessageRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
@@ -60,7 +60,7 @@ class DeleteAnswerPerformanceTest extends Specification {
     ClarificationRequestRepository clarificationRequestRepository
 
     @Autowired
-    ClarificationRequestAnswerRepository clarificationRequestAnswerRepository;
+    ClarificationMessageRepository clarificationRequestAnswerRepository;
 
     @Autowired
     QuestionAnswerRepository questionAnswerRepository;
@@ -171,7 +171,7 @@ class DeleteAnswerPerformanceTest extends Specification {
 
         when:
         1.upto(count, {
-            clarificationService.deleteClarificationRequestAnswer(teacher, it as int)
+            clarificationService.deleteClarificationMessage(it as int)
         })
 
         then:

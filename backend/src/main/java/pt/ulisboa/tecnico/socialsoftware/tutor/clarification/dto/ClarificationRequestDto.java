@@ -1,39 +1,60 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Transient;
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ClarificationRequestDto {
     private Integer id;
     private Integer key;
-    private Integer owner;
-    private Integer question;
-    private String content;
-    private String creationDate;
-    private ClarificationRequestAnswerDto answer;
+    private Integer questionId;
     private ClarificationRequest.RequestStatus status;
+    private Integer creatorId;
+    private String content;
+    private LocalDateTime creationDate;
+    private List<ClarificationMessageDto> messages;
 
     @Transient
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+    // send usernames and user names in reply
+    private Map<Integer, String> usernames = new HashMap<>();
+    private Map<Integer, String> names = new HashMap<>();
 
     public ClarificationRequestDto() {
     }
 
     public ClarificationRequestDto(ClarificationRequest clarificationRequest) {
         this.id = clarificationRequest.getId();
-        this.content = clarificationRequest.getContent();
-        this.question = clarificationRequest.getQuestion().getId();
-        this.owner = clarificationRequest.getOwner().getId();
+        this.questionId = clarificationRequest.getQuestion().getId();
         this.status = clarificationRequest.getStatus();
+        this.creatorId = clarificationRequest.getCreator().getId();
+        this.content = clarificationRequest.getContent();
 
-        if (clarificationRequest.getCreationDate() != null)
-            this.creationDate = clarificationRequest.getCreationDate().format(formatter);
+        this.messages = clarificationRequest.getMessages()
+                .stream()
+                .map(ClarificationMessageDto::new)
+                .collect(Collectors.toList());
 
-        clarificationRequest.getAnswer().ifPresent(ans -> this.answer = new ClarificationRequestAnswerDto(ans));
+        Stream.concat(
+                clarificationRequest.getMessages().stream()
+                    .map(ClarificationMessage::getCreator),
+                Stream.of(clarificationRequest.getCreator())
+        )
+                .forEach(u -> {
+                    usernames.put(u.getId(), u.getUsername());
+                    names.put(u.getId(), u.getName());
+                });
     }
 
     public Integer getId() {
@@ -52,54 +73,60 @@ public class ClarificationRequestDto {
         this.key = key;
     }
 
-    public Integer getOwner() {
-        return owner;
-    }
-
-    public void setOwner(Integer id) {
-        this.owner = id;
+    public Integer getCreatorId() {
+        return this.creatorId;
     }
 
     public Integer getQuestionId() {
-        return question;
+        return questionId;
     }
 
     public void setQuestionId(Integer id) {
-        this.question = id;
+        this.questionId = id;
     }
 
     public String getContent() {
         return content;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public List<ClarificationMessageDto> getMessages() {
+        return messages;
     }
 
+    public ClarificationRequest.RequestStatus getStatus() {
+        return this.status;
+    }
+
+    public void setStatus(ClarificationRequest.RequestStatus status) {
+        this.status = status;
+    }
+
+    public Map<Integer, String> getUsernames() {
+        return this.usernames;
+    }
+
+    public Map<Integer, String> getNames() {
+        return names;
+    }
+
+    @JsonProperty
     public String getCreationDate() {
-        return creationDate;
+        return this.creationDate.format(this.formatter);
     }
 
-    public void setCreationDate(String date) {
-        creationDate = date;
+    @JsonProperty
+    public void setCreationDate(String s) {
+        this.creationDate = LocalDateTime.parse(s, this.formatter);
     }
 
+
+    @JsonIgnore
+    public void setCreationDateDate(LocalDateTime date) {
+        this.creationDate = date;
+    }
+
+    @JsonIgnore
     public LocalDateTime getCreationDateDate() {
-        if (getCreationDate() == null || getCreationDate().isEmpty()) {
-            return null;
-        }
-        return LocalDateTime.parse(getCreationDate(), formatter);
+        return this.creationDate;
     }
-
-    public void setAnswer(ClarificationRequestAnswerDto answer) {
-        this.answer = answer;
-    }
-
-    public ClarificationRequestAnswerDto getAnswer() {
-        return answer;
-    }
-
-    public ClarificationRequest.RequestStatus getStatus() { return this.status; }
-
-    public void setStatus(ClarificationRequest.RequestStatus status) { this.status = status; }
 }

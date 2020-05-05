@@ -9,7 +9,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepos
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestAnswerRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationMessageRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
@@ -62,7 +62,7 @@ class SubmitAnswerTest extends Specification {
     ClarificationRequestRepository clarificationRequestRepository
 
     @Autowired
-    ClarificationRequestAnswerRepository clarificationRequestAnswerRepository;
+    ClarificationMessageRepository clarificationRequestAnswerRepository;
 
     @Autowired
     ClarificationService clarificationService
@@ -179,7 +179,7 @@ class SubmitAnswerTest extends Specification {
         clarificationService.submitClarificationRequestAnswer(teacher, reqId, ANSWER_2)
 
         then: "the answer was replaced"
-        def saved_answer = clarificationRequest.getAnswer().map({a -> a.getContent()}).get()
+        def saved_answer = clarificationRequest.getAnswer().map({ a -> a.getContent() }).get()
         saved_answer == ANSWER_2
     }
 
@@ -196,8 +196,8 @@ class SubmitAnswerTest extends Specification {
         where:
         validR | answer     || errorMessage
         false  | ANSWER_1   || ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND
-        true   | " \n  \t " || ErrorMessage.CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT
-        true   | null       || ErrorMessage.CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT
+        true   | " \n  \t " || ErrorMessage.CLARIFICATION_MESSAGE_MISSING_CONTENT
+        true   | null       || ErrorMessage.CLARIFICATION_MESSAGE_MISSING_CONTENT
     }
 
     @TestConfiguration

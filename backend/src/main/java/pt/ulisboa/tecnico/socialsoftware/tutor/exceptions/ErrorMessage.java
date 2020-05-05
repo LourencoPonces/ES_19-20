@@ -94,14 +94,14 @@ public enum ErrorMessage {
     ACCESS_DENIED("You do not have permission to view this resource"),
     CANNOT_OPEN_FILE("Cannot open file"),
 
-    CLARIFICATION_REQUEST_MISSING_CONTENT("Missing content of clarification request"),
+    CLARIFICATION_REQUEST_MISSING_INITIAL_MESSAGE("Missing content of clarification request"),
     QUESTION_NOT_ANSWERED_BY_STUDENT("Question not answered yet"),
     DUPLICATE_CLARIFICATION_REQUEST("%s already submitted a clarification request for this question"),
     CLARIFICATION_REQUEST_NOT_FOUND("Clarification Request not found"),
     CLARIFICATION_REQUEST_NOT_SUBMITTED("Student %s didn't submit a clarification request"),
-    CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT("Missing content of clarification request answer"),
-    CLARIFICATION_REQUEST_UNANSWERED("The clarification request wasn't answered yet"),
-    CLARIFICATION_REQUEST_ANSWERED("The clarification request was answered already"),
+    CLARIFICATION_REQUEST_NOT_EMPTY("Clarification Request has more than the initial message"),
+    CLARIFICATION_MESSAGE_MISSING_CONTENT("Missing content of clarification request answer"),
+    CLARIFICATION_MESSAGE_NOT_FOUND("Clarification Message not found"),
 
     INVALID_STUDENT_QUESTION_EVALUATION("Invalid StudentQuestion Evaluation");
 

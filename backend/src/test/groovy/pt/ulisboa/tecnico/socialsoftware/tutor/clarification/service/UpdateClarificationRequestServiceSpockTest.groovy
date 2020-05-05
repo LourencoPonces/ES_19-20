@@ -8,7 +8,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestAnswerRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationMessageRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
@@ -60,7 +60,7 @@ class UpdateClarificationRequestServiceSpockTest extends Specification {
     ClarificationRequestRepository clarificationRequestRepository
 
     @Autowired
-    ClarificationRequestAnswerRepository clarificationRequestAnswerRepository;
+    ClarificationMessageRepository clarificationRequestAnswerRepository;
 
     @Autowired
     ClarificationService clarificationService
@@ -75,7 +75,7 @@ class UpdateClarificationRequestServiceSpockTest extends Specification {
     ClarificationRequestDto clarificationRequestDto
     int studentId
     int questionId
-    
+
     def setup() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseExecution = createCourseExecution(course, ACRONYM, ACADEMIC_TERM)
