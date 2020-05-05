@@ -1,15 +1,15 @@
 <template>
   <v-dialog
     :value="dialog"
-    @input="$emit('dialog', false)"
-    @keydown.esc="$emit('dialog', false)"
+    @input="$emit('cancel-evaluate', false)"
+    @keydown.esc="$emit('cancel-evaluate', false)"
     max-width="75%"
     max-height="60%"
   >
     <v-card>
       <v-card-title>
         <span class="headline">
-          {{ 'Evaluate: ' + this.evalQuestion.title }}
+          {{ 'Evaluate - ' + this.evalQuestion.title }}
         </span>
       </v-card-title>
 
@@ -34,7 +34,8 @@
               rows="3"
               v-model="evalQuestion.justification"
               :label="`Justification`"
-              data-cy="justification-input"
+              data-cy="justification-text"
+              counter="255"
             ></v-textarea>
           </v-layout>
         </v-container>
@@ -61,13 +62,15 @@ import { Component, Model, Prop, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import StudentQuestion from '@/models/management/StudentQuestion';
 
+const JUST_LIMIT = 255;
+
 @Component
 export default class EvaluateQuestionDialog extends Vue {
   @Model('dialog', Boolean) dialog!: boolean;
   @Prop({ type: StudentQuestion, required: true })
   readonly studentQuestion!: StudentQuestion;
 
-  statusList = ['Waiting for Approval', 'Approved', 'Rejected'];
+  statusList = ['Waiting for Approval', 'Approved', 'Rejected', 'Promoted'];
 
   evalQuestion!: StudentQuestion;
 
@@ -90,6 +93,19 @@ export default class EvaluateQuestionDialog extends Vue {
         'error',
         'Rejected questions must be justified'
       );
+      return;
+    } else if (this.evalQuestion.justification.length > JUST_LIMIT) {
+      await this.$store.dispatch('error', 'Justification is too long');
+      return;
+    }
+
+    // confirm question promotion
+    if (
+      this.evalQuestion.submittedStatus === 'Promoted' &&
+      !confirm(
+        'Are you sure you want to promote this question? This action cannot be undone'
+      )
+    ) {
       return;
     }
     try {

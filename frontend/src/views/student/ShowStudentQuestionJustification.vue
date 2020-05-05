@@ -11,7 +11,7 @@
           'Evaluation - ' + studentQuestion.title
         }}</span>
       </v-card-title>
-      <v-card-text class="text-left" data-cy="justification-text">
+      <v-card-text class="text-left">
         <div>
           <v-chip :color="studentQuestion.getEvaluationColor()" small>
             <span data-cy="showStatus">{{
@@ -25,7 +25,13 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn dark color="blue darken-1" @click="$emit('dialog')">close</v-btn>
+        <v-btn
+          dark
+          color="blue darken-1"
+          @click="$emit('dialog')"
+          data-cy="CancelEvaluation"
+          >close</v-btn
+        >
       </v-card-actions>
     </v-card>
   </v-dialog>

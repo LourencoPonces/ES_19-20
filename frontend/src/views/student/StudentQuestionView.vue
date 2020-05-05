@@ -152,6 +152,11 @@
         </v-tooltip>
       </template>
     </v-data-table>
+    <footer>
+      <v-icon class="mr-2">mouse</v-icon>Left-click on question's title to view
+      it. <v-icon class="mr-2">mouse</v-icon>Right-click on question's title to
+      edit it.
+    </footer>
     <edit-student-question-dialog
       v-if="currentStudentQuestion"
       v-model="editStudentQuestionDialog"
@@ -273,7 +278,7 @@ export default class StudentQuestionView extends Vue {
   editStudentQuestion(studentQuestion: StudentQuestion, e?: Event) {
     if (e) e.preventDefault();
     if (!studentQuestion.isChangeable()) {
-      this.$store.dispatch('error', 'Cannot edit this question');
+      // this.$store.dispatch('error', 'Cannot edit this question');
       return;
     }
     this.currentStudentQuestion = studentQuestion;
@@ -357,6 +362,7 @@ export default class StudentQuestionView extends Vue {
       toDeleteStudentquestion.id &&
       confirm('Are you sure you want to delete this question?')
     ) {
+      await this.$store.dispatch('loading');
       try {
         await RemoteServices.deleteStudentQuestion(toDeleteStudentquestion.id);
         this.studentQuestions = this.studentQuestions.filter(
@@ -365,6 +371,7 @@ export default class StudentQuestionView extends Vue {
       } catch (error) {
         await this.$store.dispatch('error', error);
       }
+      await this.$store.dispatch('clearLoading');
     }
   }
 
