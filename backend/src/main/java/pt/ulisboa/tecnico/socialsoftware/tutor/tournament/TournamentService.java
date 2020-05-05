@@ -6,16 +6,23 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository;
@@ -48,6 +55,12 @@ public class TournamentService {
 
     @Autowired
     private TopicRepository topicRepository;
+
+    @Autowired
+    private QuestionRepository questionRepository;
+
+    @Autowired
+    private QuizService quizService;
 
     @PersistenceContext
     EntityManager entityManager;
@@ -118,9 +131,16 @@ public class TournamentService {
         }
 
         tournament.addParticipant(user);
-        entityManager.persist(tournament);
-
         user.addParticipantTournament(tournament);
+
+        if (tournament.getQuiz() == null) {
+            if (tournament.getParticipants().size() == 2)
+                generateQuiz(tournament);
+        } else {
+            entityManager.persist(new QuizAnswer(user, tournament.getQuiz()));
+        }
+
+        entityManager.persist(tournament);
         entityManager.persist(user);
     }
 
@@ -208,5 +228,63 @@ public class TournamentService {
             topic.addTournament(tournament);
             entityManager.persist(topic);
         }
+    }
+
+    private void generateQuiz(Tournament tournament) {
+        Quiz quiz = new Quiz();
+
+        quiz.setKey(quizService.getMaxQuizKey() + 1);
+        quiz.setType(Quiz.QuizType.TOURNAMENT.toString());
+
+        quiz.setCreationDate(tournament.getCreationDate());
+        quiz.setAvailableDate(tournament.getRunningDate());
+        quiz.setConclusionDate(tournament.getConclusionDate());
+        quiz.setResultsDate(tournament.getConclusionDate());
+
+        // Add quiz answers to the first two signed-up students
+        for (User user: tournament.getParticipants()) {
+            QuizAnswer quizAnswer = new QuizAnswer(user, quiz);
+            entityManager.persist(quizAnswer);
+        }
+
+        ArrayList<Question> validQuestions = getValidQuestions(tournament);
+        Random rand = new Random(System.currentTimeMillis());
+
+        int numQuestions = tournament.getNumberOfQuestions();
+
+        while (quiz.getQuizQuestions().size() < numQuestions) {
+            int next = rand.nextInt(numQuestions);
+            if (!quiz.getQuizQuestions().contains(validQuestions.get(next))) {
+                quiz.getQuizQuestions().add(new QuizQuestion(quiz, validQuestions.get(next),
+                        quiz.getQuizQuestions().size()));
+            }
+        }
+
+        tournament.setQuiz(quiz);
+    }
+
+    private ArrayList<Question> getValidQuestions(Tournament tournament) {
+        List<Question> availableQuestions = questionRepository.findAvailableQuestions(
+                tournament.getCourseExecution().getCourse().getId());
+
+        ArrayList<Question> validQuestions = new ArrayList<>();
+
+        Set<Topic> topics = tournament.getTopics();
+
+        // Only accept questions whose every topic belongs to the tournament
+        for (Question question: availableQuestions) {
+            boolean valid = true;
+
+            for (Topic questionTopic: question.getTopics()) {
+                if (!topics.contains(questionTopic)) {
+                    valid = false;
+                    break;
+                }
+            }
+
+            if (valid) validQuestions.add(question);
+        }
+
+        return validQuestions;
     }
 }
