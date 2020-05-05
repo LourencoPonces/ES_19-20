@@ -70,20 +70,20 @@ public class StudentQuestion extends Question {
     /* Only used for easy test set up. Any domain logic should use the evaluate method */
     public void setSubmittedStatus(SubmittedStatus status) { this.submittedStatus = status; }
 
-    public void evaluate(SubmittedStatus status, String justification) {
+    public void evaluate(SubmittedStatus status, String newJustification) {
        if(this.submittedStatus == SubmittedStatus.PROMOTED) {
            throw new TutorException(CANNOT_EVALUATE_PROMOTED_QUESTION);
        }
 
        // assert valid justification
-       if(justification != null && !this.validJustification(justification)) {
-           throw new TutorException(INVALID_JUSTIFICATION, justification);
+       if(newJustification != null && !this.validJustification(newJustification)) {
+           throw new TutorException(INVALID_JUSTIFICATION, newJustification);
        }
 
         // set status and justification
-        if(justification == null) justification = "";
+        if(newJustification == null) newJustification = "";
 
-       if(status.equals(SubmittedStatus.REJECTED) && justification.isBlank()) {
+       if(status.equals(SubmittedStatus.REJECTED) && newJustification.isBlank()) {
            throw new TutorException(CANNOT_REJECT_WITHOUT_JUSTIFICATION);
        }
 
@@ -94,7 +94,7 @@ public class StudentQuestion extends Question {
 
 
        this.submittedStatus = status;
-       this.justification = justification;
+       this.justification = newJustification;
 
     }
 
