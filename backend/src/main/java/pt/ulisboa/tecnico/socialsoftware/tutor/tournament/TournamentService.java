@@ -206,6 +206,7 @@ public class TournamentService {
         for(TopicDto t: tournamentDto.getTopics()) {
             Topic topic = topicRepository.findTopicByName(courseExecution.getCourse().getId(), t.getName());
             topic.addTournament(tournament);
+            entityManager.persist(topic);
         }
     }
 }
