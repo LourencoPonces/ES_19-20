@@ -56,7 +56,7 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
     ClarificationService clarificationService
 
     @Autowired
-    ClarificationMessageRepository clarificationRequestAnswerRepository
+    ClarificationMessageRepository clarificationMessageRepository
 
     Course course
     Question question
@@ -68,7 +68,7 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
     QuizAnswer quizAnswer, quizAnswer3
     QuizQuestion quizQuestion
     ClarificationRequest clarificationRequest, clarificationRequest3
-    ClarificationMessage clarificationRequestAnswer
+    ClarificationMessage clarificationReply
 
     CourseExecution courseExecution2
     User student2
@@ -92,7 +92,7 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
 
         quizAnswer = createQuizAnswer(student, quiz)
         clarificationRequest = createClarificationRequest(1, student, question, "can we skip jmeter tests?")
-        clarificationRequestAnswer = createClarificationRequestAnswer(teacher, clarificationRequest, "lol no")
+        clarificationReply = createClarificationMessage(teacher, clarificationRequest, "lol no")
         quizAnswer3 = createQuizAnswer(student3, quiz)
         clarificationRequest3 = createClarificationRequest(3, student3, question, "but why?")
 
@@ -164,22 +164,23 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
     private ClarificationRequest createClarificationRequest(int key, User student, Question question, String content) {
         ClarificationRequestDto clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent(content)
-        ClarificationRequest clarificationRequest = new ClarificationRequest(student, question, clarificationRequestDto)
+        ClarificationRequest clarificationRequest = new ClarificationRequest(question, student, clarificationRequestDto)
         clarificationRequest.setKey(key)
         clarificationRequestRepository.save(clarificationRequest)
         return clarificationRequest
     }
 
-    private ClarificationMessage createClarificationRequestAnswer(User teacher, ClarificationRequest clarificationRequest, String content) {
-        ClarificationMessage clarificationRequestAnswer = new ClarificationMessage()
-        clarificationRequestAnswer.setCreator(teacher)
-        clarificationRequestAnswer.setRequest(clarificationRequest)
-        clarificationRequestAnswer.setContent(content)
-        clarificationRequest.setAnswer(clarificationRequestAnswer)
+    private ClarificationMessage createClarificationMessage(User teacher, ClarificationRequest clarificationRequest, String content) {
+        ClarificationMessage message = new ClarificationMessage()
+        message.setCreator(teacher)
+        message.setRequest(clarificationRequest)
+        message.setContent(content)
 
-        clarificationRequestAnswerRepository.save(clarificationRequestAnswer)
+        clarificationRequest.getMessages().add(message)
+
+        clarificationMessageRepository.save(message)
         clarificationRequestRepository.save(clarificationRequest)
-        return clarificationRequestAnswer
+        return message
     }
 
 
@@ -201,15 +202,17 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
         requests.size() == 2
         requests[0].getCreationDateDate() == clarificationRequest.getCreationDate()
         requests[0].getContent() == clarificationRequest.getContent()
-        requests[0].getOwner() == clarificationRequest.getOwner().getId()
+        requests[0].getCreatorId() == clarificationRequest.getCreator().getId()
         requests[0].getQuestionId() == clarificationRequest.getQuestion().getId()
-        requests[0].getAnswer() != null
-        requests[0].getAnswer().getCreationDateDate() == clarificationRequestAnswer.getCreationDate()
-        requests[0].getAnswer().getCreatorId() == clarificationRequestAnswer.getCreator().getId()
-        requests[0].getAnswer().getContent() == clarificationRequestAnswer.getContent()
+        requests[0].getMessages() != null
+        requests[0].getMessages().size() == 1
+        def reply0 = requests[0].getMessages().get(0)
+        reply0.getCreationDateDate() == clarificationReply.getCreationDate()
+        reply0.getCreatorId() == clarificationReply.getCreator().getId()
+        reply0.getContent() == clarificationReply.getContent()
         requests[1].getCreationDateDate() == clarificationRequest3.getCreationDate()
         requests[1].getContent() == clarificationRequest3.getContent()
-        requests[1].getOwner() == clarificationRequest3.getOwner().getId()
+        requests[1].getCreatorId() == clarificationRequest3.getCreator().getId()
         requests[1].getQuestionId() == clarificationRequest3.getQuestion().getId()
     }
 

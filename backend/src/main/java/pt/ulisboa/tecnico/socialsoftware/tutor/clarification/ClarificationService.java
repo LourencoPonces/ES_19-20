@@ -21,10 +21,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -46,9 +43,6 @@ public class ClarificationService {
     @Autowired
     private ClarificationMessageRepository clarificationMessageRepository;
 
-    @PersistenceContext
-    EntityManager entityManager;
-
     @Retryable(
             value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
@@ -69,20 +63,18 @@ public class ClarificationService {
         ClarificationRequest req = clarificationRequestRepository.findById(reqId)
                 .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND));
 
-        // Create/update answer
-        ClarificationMessage message = new ClarificationMessage();
-        message.setContent(message.getContent());
-        message.setCreationDate(LocalDateTime.now());
-        message.setCreator(user);
-        message.setRequest(req);
+        // Create message
+        ClarificationMessage message = new ClarificationMessage(req, user, messageDto);
 
         req.getMessages().add(message);
+        user.getClarificationMessages().add(message);
 
         // Update resolved flag
         req.setResolved(messageDto.getResolved());
 
-        entityManager.persist(message);
-        entityManager.persist(req);
+        clarificationMessageRepository.save(message);
+        clarificationRequestRepository.save(req);
+        userRepository.save(user);
 
         return new ClarificationMessageDto(message);
     }
@@ -102,9 +94,11 @@ public class ClarificationService {
         }
 
         request.getMessages().remove(message);
+        user.getClarificationMessages().remove(message);
 
-        entityManager.persist(request);
-        entityManager.remove(message);
+        userRepository.save(user);
+        clarificationRequestRepository.save(request);
+        clarificationMessageRepository.delete(message);
     }
 
     @Retryable(
@@ -124,7 +118,12 @@ public class ClarificationService {
             throw new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_EMPTY);
         }
 
-        clarificationRequestRepository.deleteById(req.getId());
+        student.getClarificationRequests().remove(req);
+        req.getQuestion().getClarificationRequests().remove(req);
+
+        userRepository.save(student);
+        questionRepository.save(req.getQuestion());
+        clarificationRequestRepository.delete(req);
     }
 
     @Retryable(
@@ -139,13 +138,13 @@ public class ClarificationService {
         Question question = tryGetAnsweredQuestion(questionId, userId);
 
         ClarificationRequest clarificationRequest = new ClarificationRequest(question, user, clarificationRequestDto);
-        entityManager.persist(clarificationRequest);
 
         user.addClarificationRequest(clarificationRequest);
-        entityManager.persist(user);
-
         question.addClarificationRequest(clarificationRequest);
-        entityManager.persist(question);
+
+        clarificationRequestRepository.save(clarificationRequest);
+        userRepository.save(user);
+        questionRepository.save(question);
 
         return new ClarificationRequestDto(clarificationRequest);
     }

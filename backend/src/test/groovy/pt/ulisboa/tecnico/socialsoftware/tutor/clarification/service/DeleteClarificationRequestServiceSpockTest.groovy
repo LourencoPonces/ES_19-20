@@ -8,8 +8,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationMessageRepository
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
@@ -56,12 +54,6 @@ class DeleteClarificationRequestServiceSpockTest extends Specification {
     QuizAnswerRepository quizAnswerRepository
 
     @Autowired
-    ClarificationRequestRepository clarificationRequestRepository
-
-    @Autowired
-    ClarificationMessageRepository clarificationRequestAnswerRepository;
-
-    @Autowired
     ClarificationService clarificationService
 
     Course course
@@ -81,7 +73,7 @@ class DeleteClarificationRequestServiceSpockTest extends Specification {
         quiz = createQuiz(1, courseExecution, "GENERATED")
         question = createQuestion(1, course)
         quizQuestion = new QuizQuestion(quiz, question, 1)
-        student = createStudent(new User(), 1, 'NAME', 'USERNAME_ONE', courseExecution)
+        student = createStudent(1, 'NAME', 'USERNAME_ONE', courseExecution)
         quizAnswer = new QuizAnswer(student, quiz)
 
         courseRepository.save(course)
@@ -95,7 +87,8 @@ class DeleteClarificationRequestServiceSpockTest extends Specification {
         studentId = student.getId()
     }
 
-    private User createStudent(User student, int key, String name, String username, CourseExecution courseExecution) {
+    private User createStudent(int key, String name, String username, CourseExecution courseExecution) {
+        def student = new User()
         student.setKey(key)
         student.setName(name)
         student.setUsername(username)

@@ -1,12 +1,14 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,17 +31,17 @@ public class ClarificationRequest {
     @JoinColumn(name = "question_id", nullable = false)
     private Question question;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "creator_id", nullable = false)
     private User creator;
 
-    private LocalDateTime creationDate;
+    private LocalDateTime creationDate = LocalDateTime.now();
 
     private String content;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "request", fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "request", orphanRemoval = true)
     @OrderBy("creationDate ASC")
-    private List<ClarificationMessage> messages;
+    private List<ClarificationMessage> messages = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private RequestStatus status = RequestStatus.PRIVATE;
@@ -54,8 +56,14 @@ public class ClarificationRequest {
         this.question = question;
         this.status = clarificationRequestDto.getStatus();
         this.creator = creator;
-        this.creationDate = LocalDateTime.now();
         this.content = clarificationRequestDto.getContent();
+
+        this.ensureConsistent();
+    }
+
+    private void ensureConsistent() {
+        if (this.content == null || this.content.isBlank())
+            throw new TutorException(ErrorMessage.CLARIFICATION_REQUEST_MISSING_CONTENT);
     }
 
     public Integer getId() {
@@ -74,7 +82,7 @@ public class ClarificationRequest {
     }
 
     private void generateKeys() {
-        Integer max = this.question.getClarificationRequests().stream()
+        int max = this.question.getClarificationRequests().stream()
                 .filter(request -> request.key != null)
                 .map(ClarificationRequest::getKey)
                 .max(Comparator.comparing(Integer::valueOf))
@@ -131,6 +139,6 @@ public class ClarificationRequest {
     }
 
     public List<ClarificationMessage> getMessages() {
-        return Collections.unmodifiableList(messages);
+        return messages;
     }
 }

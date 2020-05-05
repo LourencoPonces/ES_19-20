@@ -10,6 +10,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuestionAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationMessageDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationMessageRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
@@ -30,10 +31,18 @@ import spock.lang.Unroll
 
 @DataJpaTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class GetAnswerPerformanceTest extends Specification {
+class SubmitMessagePerformanceTest extends Specification {
     static final String COURSE_NAME = "Software Architecture"
     static final String ACRONYM = "AS1"
     static final String ACADEMIC_TERM = "1 SEM"
+
+    static final ClarificationMessageDto MESSAGE_1 = new ClarificationMessageDto()
+    static final ClarificationMessageDto MESSAGE_2 = new ClarificationMessageDto()
+
+    static {
+        MESSAGE_1.setContent("some message 1")
+        MESSAGE_2.setContent("some message 2")
+    }
 
     @Autowired
     CourseRepository courseRepository
@@ -60,7 +69,7 @@ class GetAnswerPerformanceTest extends Specification {
     ClarificationRequestRepository clarificationRequestRepository
 
     @Autowired
-    ClarificationMessageRepository clarificationRequestAnswerRepository;
+    ClarificationMessageRepository clarificationMessageRepository;
 
     @Autowired
     QuestionAnswerRepository questionAnswerRepository;
@@ -83,7 +92,6 @@ class GetAnswerPerformanceTest extends Specification {
         courseExecutionRepository.save(courseExecution)
         userRepository.save(teacher)
         userRepository.save(student)
-
     }
 
     private static User createUser(User.Role role, int key, String name, CourseExecution courseExecution) {
@@ -114,7 +122,6 @@ class GetAnswerPerformanceTest extends Specification {
         return questionAnswer
     }
 
-
     private static Quiz createQuiz(int key, CourseExecution courseExecution, String type) {
         def quiz = new Quiz()
         quiz.setKey(key)
@@ -132,9 +139,10 @@ class GetAnswerPerformanceTest extends Specification {
         return courseExecution
     }
 
+
     @Unroll
-    def "get #count clarification request answers as student"() {
-        given:
+    def "submit #count messages for different requests (for the first time)"() {
+        given: "#count unanswered clarification requests"
         1.upto(count, {
             int i = it as int
 
@@ -152,20 +160,53 @@ class GetAnswerPerformanceTest extends Specification {
 
             def clarificationRequest = new ClarificationRequestDto()
             clarificationRequest.setContent("i need help with my performance")
-            clarificationService.submitClarificationRequest(i, student.getId(), clarificationRequest)
-            clarificationService.submitClarificationRequestAnswer(teacher, it as int, "0.75")
+            clarificationService.submitClarificationRequest(question.getId(), student.getId(), clarificationRequest)
         })
+
 
         when:
         1.upto(count, {
-            def ans = clarificationService.getClarificationRequestAnswer(student.getId(), it as int)
+            clarificationService.submitClarificationMessage(teacher, it as int, MESSAGE_1)
         })
 
         then:
         true
 
         where:
-        count = 10 // set to a big number like 1000 for a proper test
+        count = 1 // set to a big number like 1000 for a proper test
+    }
+
+    @Unroll
+    def "submit #count messages for the same request"() {
+        given: "#count unanswered clarification requests"
+
+            def question = createQuestion(course)
+            def quiz = createQuiz(1, courseExecution, "GENERATED")
+            def quizQuestion = new QuizQuestion(quiz, question, 1)
+            def quizAnswer = new QuizAnswer(student, quiz)
+            def questionAnswer = createQuestionAnswer(quizAnswer, quizQuestion)
+
+            questionRepository.save(question)
+            quizRepository.save(quiz)
+            quizQuestionRepository.save(quizQuestion)
+            quizAnswerRepository.save(quizAnswer)
+            questionAnswerRepository.save(questionAnswer)
+
+            def clarificationRequest = new ClarificationRequestDto()
+            clarificationRequest.setContent("i need help with my performance")
+            clarificationRequest = clarificationService.submitClarificationRequest(question.getId(), student.getId(), clarificationRequest)
+
+
+        when:
+        1.upto(count, {
+            clarificationService.submitClarificationMessage(teacher, clarificationRequest.id, MESSAGE_1)
+        })
+
+        then:
+        true
+
+        where:
+        count = 1 // set to a big number like 1000 for a proper test
     }
 
     @TestConfiguration

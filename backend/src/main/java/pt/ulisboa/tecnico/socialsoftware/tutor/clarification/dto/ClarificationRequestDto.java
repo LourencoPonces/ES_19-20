@@ -5,9 +5,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Transient;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest;
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +20,7 @@ public class ClarificationRequestDto {
     private Integer id;
     private Integer key;
     private Integer questionId;
-    private ClarificationRequest.RequestStatus status;
+    private ClarificationRequest.RequestStatus status = ClarificationRequest.RequestStatus.PRIVATE;
     private Integer creatorId;
     private String content;
     private LocalDateTime creationDate;
@@ -32,6 +34,7 @@ public class ClarificationRequestDto {
     private Map<Integer, String> names = new HashMap<>();
 
     public ClarificationRequestDto() {
+        this.messages = new ArrayList<>();
     }
 
     public ClarificationRequestDto(ClarificationRequest clarificationRequest) {
@@ -40,15 +43,26 @@ public class ClarificationRequestDto {
         this.status = clarificationRequest.getStatus();
         this.creatorId = clarificationRequest.getCreator().getId();
         this.content = clarificationRequest.getContent();
+        this.creationDate = clarificationRequest.getCreationDate();
 
-        this.messages = clarificationRequest.getMessages()
-                .stream()
-                .map(ClarificationMessageDto::new)
-                .collect(Collectors.toList());
+        if (clarificationRequest.getMessages() == null) {
+            this.messages = new ArrayList<>();
+        } else {
+            this.messages = clarificationRequest.getMessages()
+                    .stream()
+                    .map(ClarificationMessageDto::new)
+                    .collect(Collectors.toList());
+
+        }
+
+        Stream<User> messageUsers = Stream.empty();
+        if (clarificationRequest.getMessages() != null) {
+            messageUsers = clarificationRequest.getMessages().stream()
+                            .map(ClarificationMessage::getCreator);
+        }
 
         Stream.concat(
-                clarificationRequest.getMessages().stream()
-                    .map(ClarificationMessage::getCreator),
+                messageUsers,
                 Stream.of(clarificationRequest.getCreator())
         )
                 .forEach(u -> {
@@ -87,6 +101,10 @@ public class ClarificationRequestDto {
 
     public String getContent() {
         return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public List<ClarificationMessageDto> getMessages() {

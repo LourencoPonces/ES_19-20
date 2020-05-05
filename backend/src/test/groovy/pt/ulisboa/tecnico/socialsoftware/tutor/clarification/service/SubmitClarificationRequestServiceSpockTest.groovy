@@ -70,17 +70,17 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
     @Autowired
     ClarificationService clarificationService
 
-    def course
-    def courseExecution
-    def question
-    def quiz
-    def quizQuestion
-    def quizAnswer
-    def student
-    def clarificationRequestDto
-    def formatter
-    def studentId
-    def questionId
+    Course course
+    CourseExecution courseExecution
+    Question question
+    Quiz quiz
+    QuizQuestion quizQuestion
+    QuizAnswer quizAnswer
+    User student
+    ClarificationRequestDto clarificationRequestDto
+    DateTimeFormatter formatter
+    int studentId
+    int questionId
 
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
@@ -90,7 +90,7 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         quiz = createQuiz(KEY_ONE, courseExecution, "GENERATED")
         question = createQuestion(KEY_ONE, course)
         quizQuestion = new QuizQuestion(quiz, question, 1)
-        student = createStudent(new User(), KEY_ONE, NAME, USERNAME_ONE, courseExecution)
+        student = createStudent(KEY_ONE, NAME, USERNAME_ONE, courseExecution)
         quizAnswer = new QuizAnswer(student, quiz)
 
         courseRepository.save(course)
@@ -107,7 +107,8 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         studentId = student.getId()
     }
 
-    private User createStudent(User student, int key, String name, String username, CourseExecution courseExecution) {
+    private static User createStudent(int key, String name, String username, CourseExecution courseExecution) {
+        def student = new User()
         student.setKey(key)
         student.setName(name)
         student.setUsername(username)
@@ -117,8 +118,8 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         return student
     }
 
-    private Question createQuestion(int key, Course course) {
-        question = new Question()
+    private static Question createQuestion(int key, Course course) {
+        def question = new Question()
         question.setKey(key)
         question.setCourse(course)
         question.setTitle("TITLE")
@@ -126,8 +127,8 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         return question
     }
 
-    private Quiz createQuiz(int key, CourseExecution courseExecution, String type) {
-        quiz = new Quiz()
+    private static Quiz createQuiz(int key, CourseExecution courseExecution, String type) {
+        def quiz = new Quiz()
         quiz.setKey(key)
         quiz.setType(type)
         quiz.setCourseExecution(courseExecution)
@@ -135,21 +136,13 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         return quiz
     }
 
-    private CourseExecution createCourseExecution(Course course, String acronym, String term) {
-        courseExecution = new CourseExecution()
+    private static CourseExecution createCourseExecution(Course course, String acronym, String term) {
+        def courseExecution = new CourseExecution()
         courseExecution.setCourse(course)
         courseExecution.setAcronym(acronym)
         courseExecution.setAcademicTerm(term)
         return courseExecution
     }
-/*
-    private Course createCourse(String name) {
-        course = new Course()
-        course.setName(name)
-        return course
-    }
-*/
-
 
     def "the question has been answered and submit request"() {
         //the clarification request is created
@@ -161,7 +154,7 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         clarificationRequestRepository.count() == 1L
         def result = clarificationRequestRepository.findAll().get(0)
         result.getId() != null
-        result.getOwner().getId() == student.getId()
+        result.getCreator().getId() == student.getId()
         result.getQuestion().getId() == question.getId()
         result.getCreationDate() != null
         result.getStatus() == ClarificationRequest.RequestStatus.PRIVATE
@@ -194,7 +187,7 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
     @Unroll("invalid arguments: #content | #is_student | #has_answered || #error_message")
     def "invalid arguments"() {
         given:
-        def student2 = createStudent(new User(), KEY_TWO, NAME, USERNAME_TWO, courseExecution)
+        def student2 = createStudent(KEY_TWO, NAME, USERNAME_TWO, courseExecution)
         userRepository.save(student2)
 
         when:
@@ -214,9 +207,9 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
 
         where:
         content | is_student | is_question | has_answered || error_message
-        ""      | true       | true        | true         || ErrorMessage.CLARIFICATION_REQUEST_MISSING_INITIAL_MESSAGE
-        "    "  | true       | true        | true         || ErrorMessage.CLARIFICATION_REQUEST_MISSING_INITIAL_MESSAGE
-        null    | true       | true        | true         || ErrorMessage.CLARIFICATION_REQUEST_MISSING_INITIAL_MESSAGE
+        ""      | true       | true        | true         || ErrorMessage.CLARIFICATION_REQUEST_MISSING_CONTENT
+        "    "  | true       | true        | true         || ErrorMessage.CLARIFICATION_REQUEST_MISSING_CONTENT
+        null    | true       | true        | true         || ErrorMessage.CLARIFICATION_REQUEST_MISSING_CONTENT
         CONTENT | false      | true        | true         || ErrorMessage.ACCESS_DENIED
         CONTENT | true       | false       | true         || ErrorMessage.QUESTION_NOT_FOUND
         CONTENT | true       | true        | false        || ErrorMessage.QUESTION_NOT_ANSWERED_BY_STUDENT

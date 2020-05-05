@@ -8,8 +8,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationMessageRepository
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
@@ -25,7 +23,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
 @DataJpaTest
-class getStudentClarificationRequestsServiceSpockTest extends Specification {
+class GetStudentClarificationRequestsServiceSpockTest extends Specification {
     static final String COURSE_NAME = "Software Architecture"
     static final String ACRONYM = "AS1"
     static final String ACADEMIC_TERM = "1 SEM"
@@ -52,12 +50,6 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
 
     @Autowired
     QuizAnswerRepository quizAnswerRepository
-
-    @Autowired
-    ClarificationRequestRepository clarificationRequestRepository
-
-    @Autowired
-    ClarificationMessageRepository clarificationRequestAnswerRepository;
 
     @Autowired
     ClarificationService clarificationService
@@ -143,7 +135,7 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
         result != null
         result.size() == 1
         ClarificationRequestDto req = result[0]
-        req.owner == studentId
+        req.creatorId == studentId
         req.content == CONTENT
         req.questionId == question.getId()
     }
@@ -175,10 +167,10 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
         then: "returns list ordered by request Id DSC"
         result != null
         result.size() == 2
-        result[1].owner == studentId
+        result[1].creatorId == studentId
         result[1].content == CONTENT
         result[1].questionId == question.getId()
-        result[0].owner == studentId
+        result[0].creatorId == studentId
         result[0].content == CONTENT_2
         result[0].questionId == q.getId()
     }
