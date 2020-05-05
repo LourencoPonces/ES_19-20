@@ -1071,7 +1071,7 @@ INSERT INTO student_question(id, user_id, submitted_status, justification, stude
         <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="JDBC Request" enabled="true">
           <stringProp name="dataSource">sampleReq</stringProp>
           <stringProp name="query">DELETE FROM student_question;
-DELETE FROM options where content = &apos;CHECK_STUDENT_QUESTION_STATUS_OPTION&apos;;
+DELETE FROM options where question_id &gt;=10001 and question_id &lt;=10012;
 DELETE FROM topics_questions where questions_id &gt;= 10001 and questions_id &lt;= 10012;
 DELETE FROM questions where id &gt;= 10001 and id &lt; 10012;
 DELETE FROM topics where id = 1000;</stringProp>
