@@ -23,7 +23,7 @@ echo "INSERT INTO topics(id, name, course_id) VALUES(${TOPIC_ID}, '${TOPIC_NAME}
 
 echo ""
 
-#Criar pergunta
+# Create question
 total_questions=0
 for round in `seq 0 $((${NUM_ROUNDS} - 1))`; do
     for status_ind in `seq 0 $((${#STATUS[@]} - 1))`; do
@@ -52,7 +52,7 @@ echo ""
 echo ""
 
 # Cleanup
-# apagar primeiro a student question e depois a question
+# delete student question first and then the question
 echo "--Teardown"
 echo "DELETE FROM student_question;"
 echo "DELETE FROM options where content = '${OPTION_CONTENT}';"

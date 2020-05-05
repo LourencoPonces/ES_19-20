@@ -9,8 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.CheckStudentQuestionStatusService;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.RemoveStudentQuestionService;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.*;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO;
@@ -23,8 +22,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.StudentSubmitQuestionService;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.TeacherEvaluatesStudentQuestionService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.EvaluationDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
@@ -100,16 +97,15 @@ public class StudentQuestionController {
     public StudentQuestionDTO evaluateStudentQuestion(@PathVariable int studentQuestionId, @Valid @RequestBody EvaluationDto evaluation){
         String justification = evaluation.getJustification();
         StudentQuestion.SubmittedStatus newStatus = evaluation.getEvaluation();
-        switch (newStatus) {
-            case APPROVED:
-                return teacherEvaluatesStudentQuestionService.acceptStudentQuestion(studentQuestionId, justification);
-            case REJECTED:
-                return teacherEvaluatesStudentQuestionService.rejectStudentQuestion(studentQuestionId, justification);
-            default:
-                throw new TutorException(INVALID_STUDENT_QUESTION_EVALUATION);
-        }
+
+        return teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(studentQuestionId, newStatus, justification);
     }
 
+    @PutMapping("/courses/{courseId}/studentQuestions/{studentQuestionId}/evaluate")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#studentQuestionId, 'QUESTION.ACCESS')")
+    public StudentQuestionDTO updateAndPromoteStudentQuestion(@PathVariable Integer studentQuestionId, @PathVariable Integer courseId, @Valid @RequestBody StudentQuestionDTO studentQuestion) {
+        return teacherEvaluatesStudentQuestionService.updateAndPromoteStudentQuestion(courseId, studentQuestionId, studentQuestion);
+    }
 
     /* ===========================================
      * F3: Student checks questions status

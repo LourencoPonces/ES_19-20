@@ -106,7 +106,6 @@ class StudentSubmitQuestionTest extends Specification {
         false   |    true  |     true  | true     || NO_TOPICS
         true    |   false  |   false   | true     || NO_OPTIONS
         true    |   true   |  false    | true     || NO_CORRECT_OPTIONS
-        true    |   true   |  true     | false    || ACCESS_DENIED
 
     }
 
