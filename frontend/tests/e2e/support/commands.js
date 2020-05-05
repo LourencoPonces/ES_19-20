@@ -353,6 +353,7 @@ Cypress.Commands.add(
         .parents('tr')
         .eq(0)
         .find('[data-cy="showStatus"]')
+        .scrollIntoView()
         .click();
 
       cy.get('[data-cy="justification-text"]').should(
