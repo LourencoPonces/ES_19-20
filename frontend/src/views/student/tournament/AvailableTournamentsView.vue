@@ -48,7 +48,9 @@
         </template>
 
         <template v-slot:item.sign-up-button="{ item }">
-          <v-btn color="primary" @click="signUpInTournament(item)">Sign-up</v-btn>
+          <v-btn color="primary" @click="signUpInTournament(item)"
+            >Sign-up</v-btn
+          >
         </template>
 
         <template v-slot:item.creator="{ item }">
@@ -242,20 +244,20 @@ export default class AvailableTournamentsView extends Vue {
 </script>
 
 <style lang="scss" scoped>
-  .container {
-    max-width: 90%;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 10px;
-    padding-right: 10px;
+.container {
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 10px;
+  padding-right: 10px;
 
-    h2 {
-      font-size: 26px;
-      margin: 20px 0;
-      text-align: center;
-      small {
-        font-size: 0.5em;
-      }
+  h2 {
+    font-size: 26px;
+    margin: 20px 0;
+    text-align: center;
+    small {
+      font-size: 0.5em;
     }
   }
+}
 </style>

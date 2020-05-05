@@ -14,7 +14,7 @@ describe('Sign-up in Tournament', () => {
     cy.wait(1000);
     let title = 'test' + Date.now().toString();
 
-    cy.createTournament(title, false, true, true);
+    cy.createTournament(title, false, true, true, true);
     cy.wait(1000);
     cy.assertSignUpTournament(title, 10, 1);
     cy.deleteTournament(title);

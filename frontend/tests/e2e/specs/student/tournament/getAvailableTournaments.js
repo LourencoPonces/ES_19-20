@@ -15,7 +15,7 @@ describe('getAvailableTournaments', () => {
 
     let title = 'test' + Date.now().toString();
 
-    cy.createTournament(title, false, true, true);
+    cy.createTournament(title, false, true, true, false);
     cy.wait(1000);
     cy.assertAvailableTournaments(title, 10, 1);
     cy.wait(1000);
@@ -32,11 +32,11 @@ describe('getAvailableTournaments', () => {
     let title2 = 'test2'
     let title3 = 'test3'
 
-    cy.createTournament(title1, false, true, true);
+    cy.createTournament(title1, false, true, true, false);
     cy.wait(1000);
-    cy.createTournament(title2, false, true, true);
+    cy.createTournament(title2, false, true, true, false);
     cy.wait(1000);
-    cy.createTournament(title3, false, true, true);
+    cy.createTournament(title3, false, true, true, false);
     cy.wait(1000);
     cy.assertAvailableTournaments(title1, 10, 1);
     cy.assertAvailableTournaments(title2, 10, 1);
