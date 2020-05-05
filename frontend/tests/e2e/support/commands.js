@@ -270,13 +270,15 @@ Cypress.Commands.add(
       .click();
 
     // select evaluation status
-    cy.get('[data-cy="status-options"]')
+    cy.get('.v-list-item__content')
       .contains(status)
       .click();
 
     // write justification
     if (justification != null && justification != '') {
-      cy.get('[data-cy="justification-input"]').type(justification);
+      cy.get('[data-cy="justification-text"]')
+        .clear()
+        .type(justification);
     }
 
     // select evaluate button
@@ -289,17 +291,32 @@ Cypress.Commands.add(
   (questionTitle, status, justification) => {
     // assert status
     cy.contains(questionTitle)
-      .parent()
-      .children()
-      .eq(3)
+      .parents('tr')
+      .eq(0)
+      .find('[data-cy="evaluate"]')
       .should('have.text', status);
 
-    // assert justification
-    cy.contains(questionTitle)
-      .parent()
-      .children()
-      .eq(4)
-      .should('have.text', justification);
+    if (justification.length !== 0) {
+      // assert justification
+      cy.contains(questionTitle)
+        .parents('tr')
+        .eq(0)
+        .find('[data-cy="showJustification"]')
+        .click();
+
+      cy.get('[data-cy="justification-text"]').should($el => {
+        let elem = $el[0];
+
+        // if promoted question, justification is in span
+        if (elem.tagName === 'SPAN') {
+          expect(elem.innerText).to.equal(justification);
+        } else {
+          // else (evaluating), justification is in textarea
+          expect(elem.value).to.equal(justification);
+        }
+      });
+      cy.get('[data-cy=CancelEvaluation]').click();
+    }
   }
 );
 
