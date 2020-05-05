@@ -5,13 +5,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MyStatsDto implements Serializable {
+
     private Map<String, Integer> statsValues = new HashMap<>();
     private Map<String, MyStats.StatsVisibility> statsVisibility = new HashMap<>();
 
-    private final String REQUESTS_SUBMITTED = "requestsSubmitted";
-    private final String PUBLIC_REQUESTS = "publicRequests";
-    private final String SUBMITTED_QUESTIONS = "submittedQuestions";
-    private final String APPROVED_QUESTIONS = "acceptedQuestions";
+    private static final String SUBMITTED_QUESTIONS = "submittedQuestions";
+    private static final String APPROVED_QUESTIONS = "acceptedQuestions";
+    private static final String REQUESTS_SUBMITTED = "requestsSubmitted";
+    private static final String PUBLIC_REQUESTS = "publicRequests";
 
     public MyStatsDto() { }
 
