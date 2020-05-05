@@ -93,12 +93,12 @@
         <v-tooltip bottom v-if="item.canEvaluate()">
           <template v-slot:activator="{ on }">
             <v-icon
-                    large
-                    class="mr-2"
-                    v-on="on"
-                    @click="editStudentQuestion(item)"
-                    data-cy="editStudentQuestion"
-            >edit</v-icon
+              large
+              class="mr-2"
+              v-on="on"
+              @click="editStudentQuestion(item)"
+              data-cy="editStudentQuestion"
+              >edit</v-icon
             >
           </template>
           <span>Edit and Promote Question</span>
