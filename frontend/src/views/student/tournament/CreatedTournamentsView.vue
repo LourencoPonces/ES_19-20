@@ -254,13 +254,12 @@
             }
 
             getStatus(tournament: Tournament) {
-              console.log('--------------------------');
-              console.log(tournament.isCancelled);
-              console.log(tournament.title);
-              console.log('--------------------------');
+              let date = Date.now();
               if (tournament.isCancelled)
                 return 'Cancelled';
-              else
+              else if (date < tournament.availableDate)
+                return 'Created';
+              else if (date < tournament.availableDate)
                 return 'Available';
             }
           }
