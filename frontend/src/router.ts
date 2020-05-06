@@ -22,7 +22,7 @@ import StatsView from './views/student/StatsView.vue';
 import DashboardView from './views/student/dashboard/DashboardView.vue';
 import ScanView from './views/student/ScanView.vue';
 import ClarificationsStudentView from './views/student/ClarificationsView.vue';
-import StudentQuestionView from './views/student/StudentQuestionView.vue';
+import StudentQuestionView from './views/student/studentQuestions/StudentQuestionView.vue';
 import AvailableTournamentsView from '@/views/student/tournament/AvailableTournamentsView.vue';
 import CreatedTournamentsView from '@/views/student/tournament/CreatedTournamentsView.vue';
 

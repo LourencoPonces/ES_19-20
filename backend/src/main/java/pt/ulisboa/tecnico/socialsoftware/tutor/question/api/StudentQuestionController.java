@@ -30,9 +30,6 @@ import javax.validation.Valid;
 import java.security.Principal;
 import java.util.Optional;
 
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.INVALID_STUDENT_QUESTION_EVALUATION;
-
-
 @RestController
 public class StudentQuestionController {
 
@@ -101,11 +98,6 @@ public class StudentQuestionController {
         return teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(studentQuestionId, newStatus, justification);
     }
 
-    @PutMapping("/courses/{courseId}/studentQuestions/{studentQuestionId}/evaluate")
-    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#studentQuestionId, 'QUESTION.ACCESS')")
-    public StudentQuestionDTO updateAndPromoteStudentQuestion(@PathVariable Integer studentQuestionId, @PathVariable Integer courseId, @Valid @RequestBody StudentQuestionDTO studentQuestion) {
-        return teacherEvaluatesStudentQuestionService.updateAndPromoteStudentQuestion(courseId, studentQuestionId, studentQuestion);
-    }
 
     /* ===========================================
      * F3: Student checks questions status
@@ -143,6 +135,17 @@ public class StudentQuestionController {
 
         return ResponseEntity.ok().build();
 
+    }
+
+    /* ==================================================
+     * F5: Teacher can update a question before approving
+     * ==================================================
+     */
+
+    @PutMapping("/courses/{courseId}/studentQuestions/{studentQuestionId}/evaluate")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#studentQuestionId, 'QUESTION.ACCESS')")
+    public StudentQuestionDTO updateAndPromoteStudentQuestion(@PathVariable Integer studentQuestionId, @PathVariable Integer courseId, @Valid @RequestBody StudentQuestionDTO studentQuestion) {
+        return teacherEvaluatesStudentQuestionService.updateAndPromoteStudentQuestion(courseId, studentQuestionId, studentQuestion);
     }
 
 

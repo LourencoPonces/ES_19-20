@@ -76,7 +76,7 @@ public class StudentQuestion extends Question {
        }
 
        // assert valid justification
-       if(newJustification != null && !this.validJustification(newJustification)) {
+       if(!this.validJustification(newJustification)) {
            throw new TutorException(INVALID_JUSTIFICATION, newJustification);
        }
 
@@ -99,7 +99,7 @@ public class StudentQuestion extends Question {
     }
 
     private boolean validJustification(String just) {
-        return just != null && !just.isBlank() && just.length() <= this.MAX_JUSTIFICATION_SIZE;
+        return just == null || ( !just.isBlank() && just.length() <= MAX_JUSTIFICATION_SIZE);
     }
 
     public void checkStudentQuestionConsistency(StudentQuestionDTO questionDto, User user) {
