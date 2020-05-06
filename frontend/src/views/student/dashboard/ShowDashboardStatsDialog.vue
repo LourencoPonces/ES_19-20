@@ -4,11 +4,11 @@
       :value="dialog"
       @input="$emit('dialog', false)"
       @keydown.esc="$emit('dialog', false)"
-      max-width="75%"
+      max-width="70%"
     >
       <v-card>
         <v-card-title>
-          <span class="headline">{{ username }}</span>
+          <span class="headline"><b>{{ student.name }}</b></span>
         </v-card-title>
 
         <v-card-text class="text-left">
@@ -27,9 +27,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Model } from 'vue-property-decorator';
+import { Component, Vue, Prop, Model, Watch} from 'vue-property-decorator';
 import DashboardStats from '@/models/statement/DashboardStats';
 import RemoteServices from '@/services/RemoteServices';
+import { Student } from '@/models/management/Student';
 import ShowDashboardStats from '@/views/student/dashboard/ShowDashboardStats.vue';
 
 @Component({
@@ -39,20 +40,25 @@ import ShowDashboardStats from '@/views/student/dashboard/ShowDashboardStats.vue
 })
 export default class ShowDashboardStatsDialog extends Vue {
   @Model('dialog', Boolean) dialog!: boolean;
-  @Prop({ required: true })
-  readonly username!: string;
+  @Prop(Student) readonly student!: Student;
   userStats: DashboardStats | null = null;
 
-  async created() {
+  @Watch('student')
+  async getUserDashboardStats() {
     await this.$store.dispatch('loading');
     try {
       this.userStats = await RemoteServices.getUserDashboardStats(
-        this.username
+        this.student.id
       );
     } catch (error) {
       await this.$store.dispatch('error', error);
+      this.dialog = false;
+      this.$emit('dialog');
     }
     await this.$store.dispatch('clearLoading');
   }
 }
 </script>
+<style lang="scss" scoped>
+
+</style>

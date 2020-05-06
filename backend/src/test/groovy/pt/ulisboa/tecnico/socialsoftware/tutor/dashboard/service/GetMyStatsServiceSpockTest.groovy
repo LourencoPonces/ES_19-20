@@ -37,7 +37,7 @@ class GetMyStatsServiceSpockTest extends Specification {
     static final String ACADEMIC_TERM = "1 SEM"
     static final String CONTENT = "Test Content"
     static final String USERNAME_1 = "USERNAME_ONE"
-    static final String INVALID_USERNAME = "INVALID_USERNAME"
+    static final int INVALID_USER_ID= 50
     static final int INVALID_COURSE_ID = 50
 
     @Autowired
@@ -153,7 +153,7 @@ class GetMyStatsServiceSpockTest extends Specification {
         clarificationService.changeClarificationRequestStatus(request2.getId(), ClarificationRequest.RequestStatus.PUBLIC)
 
         when:
-        def result = myStatsService.getMyStats(student.getUsername(), courseId)
+        def result = myStatsService.getMyStats(student.getId(), courseId)
 
         then:
         result != null
@@ -163,26 +163,26 @@ class GetMyStatsServiceSpockTest extends Specification {
         result.getPublicRequestsVisibility() == MyStats.StatsVisibility.PRIVATE
     }
 
-    @Unroll("invalid arguments: #isUsername | #isCourseid || #error_message")
+    @Unroll("invalid arguments: #isUserId | #isCourseid || #error_message")
     def "invalid arguments"() {
         when:
         changeCourseId(isCourseId)
-        myStatsService.getMyStats(getUsername(isUsername), courseId)
+        myStatsService.getMyStats(getUserId(isUserId), courseId)
 
         then:
         def exception = thrown(TutorException)
         exception.getErrorMessage() == error_message
 
         where:
-        isUsername | isCourseId  || error_message
-        false      | true        || ErrorMessage.USERNAME_NOT_FOUND
-        true       | false       || ErrorMessage.COURSE_NOT_FOUND
+        isUserId | isCourseId  || error_message
+        false    | true        || ErrorMessage.USER_NOT_FOUND
+        true     | false       || ErrorMessage.COURSE_NOT_FOUND
     }
 
-    private String getUsername(boolean isUsername) {
-        if (!isUsername)
-            return INVALID_USERNAME
-        return student.getUsername()
+    private int getUserId(boolean isUserId) {
+        if (!isUserId)
+            return INVALID_USER_ID
+        return student.getId()
     }
 
     private void changeCourseId(boolean isCourseId) {
