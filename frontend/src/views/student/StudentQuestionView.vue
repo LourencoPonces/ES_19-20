@@ -27,7 +27,7 @@
           <v-btn
             color="primary"
             dark
-            @click="newStudentQuestion"
+            @click="showNewStudentQuestionDialog"
             data-cy="NewQuestion"
           >
             New Question
@@ -38,7 +38,7 @@
       <template v-slot:item.title="{ item }">
         <p
           @click="showStudentQuestionDialog(item)"
-          @contextmenu="editStudentQuestion(item, $event)"
+          @contextmenu="showEditStudentQuestionDialog(item, $event)"
           style="cursor: pointer"
         >
           {{ item.title }}
@@ -57,7 +57,7 @@
         <v-chip
           :color="item.getEvaluationColor()"
           small
-          @click="showJustification(item)"
+          @click="showJustificationDialog(item)"
         >
           <span data-cy="showStatus">{{ item.submittedStatus }}</span>
         </v-chip>
@@ -65,7 +65,7 @@
 
       <template v-slot:item.justification="{ item }">
         <p
-          @click="showJustification(item)"
+          @click="showJustificationDialog(item)"
           style="cursor:pointer"
           data-cy="show-justification"
         >
@@ -103,7 +103,7 @@
               large
               class="mr-2"
               v-on="on"
-              @click="editStudentQuestion(item)"
+              @click="showEditStudentQuestionDialog(item)"
               data-cy="editStudentQuestion"
               >edit</v-icon
             >
@@ -116,7 +116,7 @@
               large
               class="mr-2"
               v-on="on"
-              @click="duplicateStudentQuestion(item)"
+              @click="showDuplicateStudentQuestionDialog(item)"
               data-cy="duplicateStudentQuestion"
               >cached</v-icon
             >
@@ -143,7 +143,7 @@
               large
               class="mr-2"
               v-on="on"
-              @click="showJustification(item)"
+              @click="showJustificationDialog(item)"
               data-cy="checkJustification"
               >question_answer</v-icon
             >
@@ -158,25 +158,24 @@
       edit it.
     </footer>
     <edit-student-question-dialog
-      v-if="currentStudentQuestion"
+      v-if="editStudentQuestionDialog"
       v-model="editStudentQuestionDialog"
       :studentQuestion="currentStudentQuestion"
       :topics="topics"
       v-on:save-student-question="onSaveStudentQuestion"
+      v-on:close-edit-student-question-dialog="closeDialogs"
     />
     <show-student-question-dialog
-      v-if="currentStudentQuestion"
+      v-if="studentQuestionDialog"
       v-model="studentQuestionDialog"
       :studentQuestion="currentStudentQuestion"
-      v-on:close-show-student-question-dialog="onCloseShowStudentQuestionDialog"
+      v-on:close-show-student-question-dialog="closeDialogs"
     />
     <show-student-question-justification
-      v-if="currentStudentQuestion"
+      v-if="studentQuestionJustification"
       v-model="studentQuestionJustification"
       :studentQuestion="currentStudentQuestion"
-      v-on:close-show-student-question-justification="
-        onCloseShowStudentQuestionJustification
-      "
+      v-on:close-show-student-question-justification="closeDialogs"
     />
   </v-card>
 </template>
@@ -249,53 +248,6 @@ export default class StudentQuestionView extends Vue {
     }
   ];
 
-  @Watch('editStudentQuestionDialog')
-  closeEditDialog() {
-    if (!this.editStudentQuestionDialog) {
-      this.currentStudentQuestion = null;
-    }
-  }
-
-  @Watch('studentQuestionDialog')
-  closeShowDialog() {
-    if (!this.studentQuestionDialog) {
-      this.currentStudentQuestion = null;
-    }
-  }
-
-  @Watch('studentQuestionJustification')
-  closeJustificationDialog() {
-    if (!this.studentQuestionJustification) {
-      this.currentStudentQuestion = null;
-    }
-  }
-
-  newStudentQuestion() {
-    this.currentStudentQuestion = new StudentQuestion();
-    this.editStudentQuestionDialog = true;
-  }
-
-  editStudentQuestion(studentQuestion: StudentQuestion, e?: Event) {
-    if (e) e.preventDefault();
-    if (!studentQuestion.isChangeable()) {
-      // this.$store.dispatch('error', 'Cannot edit this question');
-      return;
-    }
-    this.currentStudentQuestion = studentQuestion;
-    this.editStudentQuestionDialog = true;
-  }
-
-  duplicateStudentQuestion(studentQuestion: StudentQuestion) {
-    this.currentStudentQuestion = new StudentQuestion(studentQuestion);
-    this.currentStudentQuestion.id = null;
-    this.currentStudentQuestion.justification = '';
-    this.currentStudentQuestion.submittedStatus = StudentQuestion.getWaitingForApproval();
-    this.currentStudentQuestion.options.forEach(option => {
-      option.id = null;
-    });
-    this.editStudentQuestionDialog = true;
-  }
-
   async created() {
     await this.$store.dispatch('loading');
     try {
@@ -322,41 +274,6 @@ export default class StudentQuestionView extends Vue {
     );
   }
 
-  async onSaveStudentQuestion(studentQuestion: StudentQuestion) {
-    this.studentQuestions = this.studentQuestions.filter(
-      sQ => sQ.id !== studentQuestion.id
-    );
-    this.studentQuestions.unshift(studentQuestion);
-    this.editStudentQuestionDialog = false;
-    this.currentStudentQuestion = null;
-  }
-
-  onCloseShowStudentQuestionDialog() {
-    this.studentQuestionDialog = false;
-    this.currentStudentQuestion = null;
-  }
-
-  onCloseShowStudentQuestionJustification() {
-    this.studentQuestionJustification = false;
-    this.currentStudentQuestion = null;
-  }
-
-  async handleFileUpload(event: File, studentQuestion: StudentQuestion) {
-    if (studentQuestion.id) {
-      try {
-        const imageURL = await RemoteServices.uploadImage(
-          event,
-          studentQuestion.id
-        );
-        studentQuestion.image = new Image();
-        studentQuestion.image.url = imageURL;
-        confirm('Image ' + imageURL + ' was uploaded!');
-      } catch (error) {
-        await this.$store.dispatch('error', error);
-      }
-    }
-  }
-
   async deleteStudentQuestion(toDeleteStudentquestion: StudentQuestion) {
     if (
       toDeleteStudentquestion.id &&
@@ -375,14 +292,70 @@ export default class StudentQuestionView extends Vue {
     }
   }
 
+  async handleFileUpload(event: File, studentQuestion: StudentQuestion) {
+    if (studentQuestion.id) {
+      try {
+        const imageURL = await RemoteServices.uploadImage(
+          event,
+          studentQuestion.id
+        );
+        studentQuestion.image = new Image();
+        studentQuestion.image.url = imageURL;
+        confirm('Image ' + imageURL + ' was uploaded!');
+      } catch (error) {
+        await this.$store.dispatch('error', error);
+      }
+    }
+  }
   showStudentQuestionDialog(studentQuestion: StudentQuestion) {
     this.currentStudentQuestion = studentQuestion;
     this.studentQuestionDialog = true;
   }
 
-  showJustification(studentQuestion: StudentQuestion) {
+  showJustificationDialog(studentQuestion: StudentQuestion) {
     this.currentStudentQuestion = studentQuestion;
     this.studentQuestionJustification = true;
+  }
+
+  showNewStudentQuestionDialog() {
+    this.currentStudentQuestion = new StudentQuestion();
+    this.editStudentQuestionDialog = true;
+  }
+
+  showEditStudentQuestionDialog(studentQuestion: StudentQuestion, e?: Event) {
+    if (e) e.preventDefault();
+    if (!studentQuestion.isChangeable()) {
+      // this.$store.dispatch('error', 'Cannot edit this question');
+      return;
+    }
+    this.currentStudentQuestion = studentQuestion;
+    this.editStudentQuestionDialog = true;
+  }
+
+  showDuplicateStudentQuestionDialog(studentQuestion: StudentQuestion) {
+    this.currentStudentQuestion = new StudentQuestion(studentQuestion);
+    this.currentStudentQuestion.id = null;
+    this.currentStudentQuestion.justification = '';
+    this.currentStudentQuestion.submittedStatus = StudentQuestion.getWaitingForApproval();
+    this.currentStudentQuestion.options.forEach(option => {
+      option.id = null;
+    });
+    this.editStudentQuestionDialog = true;
+  }
+
+  async onSaveStudentQuestion(studentQuestion: StudentQuestion) {
+    this.studentQuestions = this.studentQuestions.filter(
+      sQ => sQ.id !== studentQuestion.id
+    );
+    this.studentQuestions.unshift(studentQuestion);
+    this.closeDialogs();
+  }
+
+  closeDialogs() {
+    this.currentStudentQuestion = null;
+    this.editStudentQuestionDialog = false;
+    this.studentQuestionDialog = false;
+    this.studentQuestionJustification = false;
   }
 
   truncate(s: String): String {

@@ -56,19 +56,10 @@ public class TeacherEvaluatesStudentQuestionService {
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public StudentQuestionDTO evaluateStudentQuestion(Integer studentQuestionId, StudentQuestion.SubmittedStatus status, String justification) {
-        StudentQuestion studentQuestion = findStudentQuestionById(studentQuestionId);
+        StudentQuestion studentQuestion = studentQuestionRepository.findById(studentQuestionId).orElseThrow(() -> new TutorException(STUDENT_QUESTION_NOT_FOUND, studentQuestionId));
 
         studentQuestion.evaluate(status, justification);
         return new StudentQuestionDTO(studentQuestion);
-    }
-
-
-    @Retryable(
-            value = { SQLException.class },
-            backoff = @Backoff(delay = 5000))
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
-    private StudentQuestion findStudentQuestionById(Integer id) {
-         return studentQuestionRepository.findById(id).orElseThrow(() -> new TutorException(STUDENT_QUESTION_NOT_FOUND, id));
     }
 
     @Retryable(
