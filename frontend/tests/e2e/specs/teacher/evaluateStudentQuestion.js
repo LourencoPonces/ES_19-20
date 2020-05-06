@@ -131,10 +131,10 @@ describe('Student Question Evaluation', () => {
     cy.get('[data-cy="student-questions"]').click();
 
     cy.evaluateStudentQuestion(
-        questionTitle,
-        prevStatus,
-        status,
-        justification
+      questionTitle,
+      prevStatus,
+      status,
+      justification
     );
 
     cy.errorMessageClose('You must approve or reject the question');
@@ -169,17 +169,8 @@ describe('Student Question Evaluation', () => {
     cy.get('[data-cy="management"]').click();
     cy.get('[data-cy="student-questions"]').click();
 
-    cy.evaluateStudentQuestion(
-      questionTitle,
-      status[0],
-      status[1],
-      null
-    );
-    cy.assertStudentQuestionEvaluation(
-        questionTitle,
-        status[1],
-        ''
-    );
+    cy.evaluateStudentQuestion(questionTitle, status[0], status[1], null);
+    cy.assertStudentQuestionEvaluation(questionTitle, status[1], '');
 
     cy.evaluateStudentQuestion(
       questionTitle,
