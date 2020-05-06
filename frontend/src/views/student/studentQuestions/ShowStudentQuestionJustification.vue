@@ -40,7 +40,7 @@
 <script lang="ts">
 import { Component, Vue, Prop, Model } from 'vue-property-decorator';
 import StudentQuestion from '@/models/management/StudentQuestion';
-import ShowJustification from '@/views/student/ShowJustification.vue';
+import ShowJustification from '@/views/student/studentQuestions/ShowJustification.vue';
 
 @Component({
   components: {

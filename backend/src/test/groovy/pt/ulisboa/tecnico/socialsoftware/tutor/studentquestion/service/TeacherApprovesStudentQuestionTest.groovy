@@ -41,7 +41,9 @@ class TeacherApprovesStudentQuestionTest extends Specification {
     public static final Integer FAKE_STUDENT_QUESTION_ID = 2
 
     public static final String JUSTIFICATION = "very good question"
-    public static final String LONG_JUSTIFICATION = "very long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long justification"
+    public static final String LONG_JUSTIFICATION = "very long long long long long long long long long long long " +
+            "long long long long long long long long long long long long long long long long long long long long " +
+            "long long long long long long long long long long long long long long long long long justification"
 
     @Autowired
     TeacherEvaluatesStudentQuestionService teacherEvaluatesStudentQuestionService

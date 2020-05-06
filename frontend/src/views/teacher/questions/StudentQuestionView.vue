@@ -149,7 +149,7 @@ import ShowQuestionDialog from '@/views/teacher/questions/ShowQuestionDialog.vue
 import EvaluateQuestionDialog from '@/views/teacher/questions/EvaluateStudentQuestionDialog.vue';
 import StudentQuestion from '@/models/management/StudentQuestion';
 import EditAndPromoteStudentQuestionDialog from '@/views/teacher/questions/EditAndPromoteStudentQuestionDialog.vue';
-import ShowStudentQuestionJustification from '@/views/student/ShowStudentQuestionJustification.vue';
+import ShowStudentQuestionJustification from '@/views/student/studentQuestions/ShowStudentQuestionJustification.vue';
 
 @Component({
   components: {
