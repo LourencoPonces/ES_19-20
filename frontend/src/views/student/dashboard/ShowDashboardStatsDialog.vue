@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Model, Watch} from 'vue-property-decorator';
+import { Component, Vue, Prop, Model, Watch } from 'vue-property-decorator';
 import DashboardStats from '@/models/statement/DashboardStats';
 import RemoteServices from '@/services/RemoteServices';
 import { Student } from '@/models/management/Student';
@@ -61,5 +61,4 @@ export default class ShowDashboardStatsDialog extends Vue {
   }
 }
 </script>
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>
