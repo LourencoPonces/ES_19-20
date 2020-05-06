@@ -19,6 +19,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentService
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament
@@ -75,6 +76,7 @@ class SignUpInTournamentTest extends Specification{
     def conclusionDate
     def formatter
     def topicDtoList
+    def question
 
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
@@ -101,7 +103,7 @@ class SignUpInTournamentTest extends Specification{
         topic.setCourse(course)
 
         // So that quiz generation doesn't throw exceptions
-        def question = new Question()
+        question = new Question()
         question.addTopic(topic)
         question.setTitle("question_title")
         question.setCourse(course)
@@ -135,6 +137,17 @@ class SignUpInTournamentTest extends Specification{
         def tournamentCreated = tournamentRepository.findAll().get(0)
         def participants = tournamentCreated.getParticipants()
         participants.size() == 2
+
+        def generatedQuiz = tournamentCreated.getQuiz()
+        generatedQuiz.getId() != null
+        generatedQuiz.getKey() != null
+        generatedQuiz.getTitle() != null
+        generatedQuiz.getType() == Quiz.QuizType.TOURNAMENT
+        generatedQuiz.getCreationDate().equals(tournamentCreated.getCreationDate())
+        generatedQuiz.getAvailableDate().equals(tournamentCreated.getRunningDate())
+        generatedQuiz.getConclusionDate().equals(tournamentCreated.getConclusionDate())
+        generatedQuiz.getResultsDate().equals(tournamentCreated.getConclusionDate())
+        generatedQuiz.getQuizQuestions().first().getId() == question.getId()
     }
 
     def "sign-up in a tournament although there aren't tournaments"() {
