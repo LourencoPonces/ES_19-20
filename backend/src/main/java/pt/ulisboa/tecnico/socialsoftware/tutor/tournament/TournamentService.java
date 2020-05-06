@@ -245,6 +245,8 @@ public class TournamentService {
         quiz.setKey(quizService.getMaxQuizKey() + 1);
         quiz.setType(Quiz.QuizType.TOURNAMENT.toString());
 
+        quiz.setTitle(tournament.getTitle() + " - Quiz");
+
         quiz.setCreationDate(tournament.getCreationDate());
         quiz.setAvailableDate(tournament.getRunningDate());
         quiz.setConclusionDate(tournament.getConclusionDate());
