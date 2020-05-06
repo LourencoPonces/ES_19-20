@@ -8,9 +8,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
-import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.StudentSubmitQuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.TeacherEvaluatesStudentQuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Image
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Option
@@ -28,35 +26,50 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CANNOT_EVALUATE_PROMOTED_QUESTION
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.INVALID_JUSTIFICATION
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.STUDENT_QUESTION_NOT_FOUND
+
 @DataJpaTest
-class UpdateStudentQuestionTest extends Specification{
-    public static final String COURSE_NAME = "Arquitetura de Software"
-    public static final String TOPIC_NAME = "topic name"
-    public static final String NEW_TOPIC_NAME = "new topic name"
-    public static final String QUESTION_TITLE = 'question title'
-    public static final String QUESTION_CONTENT = 'question content'
-    public static final String OPTION_CONTENT = "optionId content"
-    public static final String NEW_OPTION_CONTENT = "new optionId content"
-    public static final String NEW_QUESTION_TITLE = 'new question title'
-    public static final String NEW_QUESTION_CONTENT = 'new question content'
-    public static final String URL = 'URL'
+class TeacherPromotesStudentQuestionTest extends Specification {
+
+    public static final String COURSE_NAME = "Software Architecture"
+
     public static final String ACRONYM = "AS1"
     public static final String ACADEMIC_TERM = "1 SEM"
 
-
     public static final String USER_NAME = "ist199999"
 
-    @Autowired
-    StudentSubmitQuestionService studentSubmitQuestionService
+    public static final Integer STUDENT_QUESTION_KEY = 1
+    public static final Integer FAKE_STUDENT_QUESTION_ID = 2
+
+    public static final String JUSTIFICATION = "very good question"
+
+    public static final String QUESTION_TITLE = "Question title"
+    public static final String NEW_QUESTION_TITLE = "New question title"
+
+    public static final String OPTION_CONTENT = "Option content"
+    public static final String QUESTION_CONTENT = "Question content"
+
+    public static final String TOPIC_NAME = "topic name"
+    public static final String NEW_TOPIC_NAME = "new topic name"
+    public static final String NEW_OPTION_CONTENT = "new optionId content"
+    public static final String NEW_QUESTION_CONTENT = 'new question content'
+    public static final String URL = 'URL'
+
 
     @Autowired
     TeacherEvaluatesStudentQuestionService teacherEvaluatesStudentQuestionService
+
 
     @Autowired
     CourseRepository courseRepository
 
     @Autowired
     CourseExecutionRepository courseExecutionRepository
+
+    @Autowired
+    StudentQuestionRepository studentQuestionRepository
 
     @Autowired
     UserRepository userRepository
@@ -70,9 +83,7 @@ class UpdateStudentQuestionTest extends Specification{
     @Autowired
     OptionRepository optionRepository
 
-    @Autowired
-    StudentQuestionRepository studentQuestionRepository
-
+    def savedQuestionId
     def course
     def user
     def topic
@@ -88,12 +99,13 @@ class UpdateStudentQuestionTest extends Specification{
         def courseExecution = new CourseExecution(course, ACRONYM, ACADEMIC_TERM, Course.Type.TECNICO)
         courseExecutionRepository.save(courseExecution)
 
-        user = createUser(courseExecution)
+        user = createTeacher(courseExecution)
         userRepository.save(user)
 
 
         createTopic()
         setUpStudentQuestion();
+        savedQuestionId = studentQuestionRepository.findAll().get(0).getId()
     }
 
     def createTopic() {
@@ -131,11 +143,11 @@ class UpdateStudentQuestionTest extends Specification{
         studentQuestion.setImage(image)
     }
 
-    def createUser(CourseExecution courseExecution) {
+    def createTeacher(CourseExecution courseExecution) {
         def user = new User()
         user.setKey(1)
         user.setUsername(USER_NAME)
-        user.setRole(User.Role.STUDENT)
+        user.setRole(User.Role.TEACHER)
         user.getCourseExecutions().add(courseExecution)
         userRepository.save(user)
     }
@@ -191,113 +203,93 @@ class UpdateStudentQuestionTest extends Specification{
         return options
     }
 
-
-    def "update a student question"() {
-        given: "a new StudentQuestion"
-        def studentQuestionDto = createNewStudentQuestionDto()
-
-        and: "a new Topic"
-        def newTopic = new Topic()
-        def list = createNewTopic(newTopic)
-        studentQuestionDto.setTopics(list)
-
-        and: 'a optionId'
-        def options = createNewOption()
-        studentQuestionDto.setOptions(options)
-
+    def "promote existing pending question with no justification"() {
         when:
-        studentSubmitQuestionService.updateStudentQuestion(studentQuestionDto.getId(), studentQuestionDto, course.getId());
+        teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(savedQuestionId, StudentQuestion.SubmittedStatus.PROMOTED, null)
 
-        then: "the student question is changed"
+        then:
         studentQuestionRepository.count() == 1L
         def result = studentQuestionRepository.findAll().get(0)
-        result.getId() == studentQuestionDto.getId()
-        result.getTitle() == NEW_QUESTION_TITLE
-        result.getContent() == NEW_QUESTION_CONTENT
-        result.getTopics().size() == 1;
-        result.getTopics().contains(newTopic)
-        and: 'are not changed'
-        result.getStatus() == Question.Status.DISABLED
-        result.getSubmittedStatus() == StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL
-        result.getNumberOfAnswers() == 2
-        result.getNumberOfCorrect() == 1
-        and: 'an option is changed'
-        result.getOptions().size() == 2
-        def resOptionOne = result.getOptions().stream().filter({option -> option.getId() == optionKO.getId()}).findAny().orElse(null)
-        resOptionOne.getContent() == NEW_OPTION_CONTENT
-        !resOptionOne.getCorrect()
-        def resOptionTwo = result.getOptions().stream().filter({option -> option.getId() == optionOK.getId()}).findAny().orElse(null)
-        resOptionTwo.getContent() == OPTION_CONTENT
-        resOptionTwo.getCorrect()
+        result.getSubmittedStatus() == StudentQuestion.SubmittedStatus.PROMOTED
+        result.getJustification() == ""
     }
 
-    def "update a student question with bad data"() {
-        given: "Missing data"
-        def studentQuestionDto =  new StudentQuestionDTO()
-        studentQuestionDto.setId(studentQuestion.getId())
-        studentQuestionDto.setTitle(NEW_QUESTION_TITLE)
-        studentQuestionDto.setContent(NEW_QUESTION_CONTENT)
-        studentQuestionDto.setUser(USER_NAME)
-        studentQuestionDto.setStatus(Question.Status.DISABLED.name())
-        def list = new ArrayList<TopicDto>()
-        addTopic(false, list)
-        studentQuestionDto.setTopics(list)
+    def "promote existing pending question with valid justification"() {
+        when:
+        teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(savedQuestionId, StudentQuestion.SubmittedStatus.PROMOTED, JUSTIFICATION)
 
-        and: "User (student or not)"
-        def user = userRepository.findByUsername(USER_NAME)
-        user.setRole(User.Role.STUDENT )
+        then:
+        studentQuestionRepository.count() == 1L
+        def result = studentQuestionRepository.findAll().get(0)
+        result.getSubmittedStatus() == StudentQuestion.SubmittedStatus.PROMOTED
+        result.getJustification() == JUSTIFICATION
+    }
+
+    def "edit and promote existing student question"() {
+        given: "a new student question"
+        StudentQuestionDTO newStudentquestion = new StudentQuestionDTO(studentQuestionRepository.findAll().get(0))
+        newStudentquestion.setTitle(NEW_QUESTION_TITLE)
+        newStudentquestion.setJustification(JUSTIFICATION)
 
         when:
-        studentSubmitQuestionService.updateStudentQuestion(studentQuestionDto.getId(), studentQuestionDto, course.getId())
+        teacherEvaluatesStudentQuestionService.updateAndPromoteStudentQuestion(courseRepository.findAll().get(0).getId(), savedQuestionId, newStudentquestion)
+
+        then:
+        def result = studentQuestionRepository.findAll().get(0)
+        result.getTitle() == NEW_QUESTION_TITLE
+        result.getSubmittedStatus() == StudentQuestion.SubmittedStatus.PROMOTED
+        result.getJustification() == JUSTIFICATION
+
+    }
+
+    def "promote existing pending question with invalid justification"() {
+        when:
+        teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(savedQuestionId, StudentQuestion.SubmittedStatus.PROMOTED, justification)
 
         then:
         def error = thrown(TutorException)
-        error.getErrorMessage() == ErrorMessage.NO_TOPICS
+        error.errorMessage == result
+
+        // invalid justifications:
+        //   empty strings or null
+        where:
+        justification || result
+        "   "         || INVALID_JUSTIFICATION
+        "\n  \t"      || INVALID_JUSTIFICATION
     }
 
-    def "Update a question that was rejected by a teacher"() {
-        given: "A Rejection by a teacher"
-        teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(studentQuestion.getId(), StudentQuestion.SubmittedStatus.REJECTED, "bad question")
-        and: "a updated questionDto"
-        def studentQuestionDto = createNewStudentQuestionDto()
-        def newTopic = new Topic()
-        def list = createNewTopic(newTopic)
-        studentQuestionDto.setTopics(list)
-        def options = createNewOption()
-        studentQuestionDto.setOptions(options)
+    def "promote already promoted student question"() {
+        given: 'pending student question'
+        studentQuestionRepository.count() == 1L
+        def question = studentQuestionRepository.findAll().get(0)
+        question.setSubmittedStatus(StudentQuestion.SubmittedStatus.PROMOTED);
+
 
         when:
-        studentSubmitQuestionService.updateStudentQuestion(studentQuestionDto.getId(), studentQuestionDto, course.getId())
+        teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(savedQuestionId, StudentQuestion.SubmittedStatus.PROMOTED, null)
 
+        then:
+        def error = thrown(TutorException)
+        error.errorMessage == CANNOT_EVALUATE_PROMOTED_QUESTION
 
-        // Some verifications can be overlooked as they were verified in another test
-        then: "The question has changed and status is back to WAITING_FOR_APPROVAL"
-        studentQuestionRepository.count() == 1L
-        def result = studentQuestionRepository.findAll().get(0)
-        result.getId() == studentQuestionDto.getId()
-        and: 'are not changed'
-        result.getStatus() == Question.Status.DISABLED
-        result.getSubmittedStatus() == StudentQuestion.SubmittedStatus.WAITING_FOR_APPROVAL
-        and: 'an option is changed'
-        result.getOptions().size() == 2
     }
 
-    def addTopic(toAdd, list) {
-        if(toAdd) {
-            list.add(new TopicDto(topic))
-        }
+    def "promote non existing student question"(){
+        when:
+        teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(FAKE_STUDENT_QUESTION_ID, StudentQuestion.SubmittedStatus.PROMOTED, null)
+
+        then:
+        def error = thrown(TutorException)
+        error.errorMessage == STUDENT_QUESTION_NOT_FOUND
     }
+
 
     @TestConfiguration
-    static class StudentQuestionServiceImplTestContextConfiguration {
-        @Bean
-        StudentSubmitQuestionService studentSubmitQuestionService() {
-            return new StudentSubmitQuestionService()
-        }
+    static class TeacherEvaluatesImplTestContextConfiguration {
 
         @Bean
         TeacherEvaluatesStudentQuestionService teacherEvaluatesStudentQuestionService() {
-            return new TeacherEvaluatesStudentQuestionService()
+            return  new TeacherEvaluatesStudentQuestionService();
         }
     }
 }

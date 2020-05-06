@@ -40,7 +40,7 @@ Cypress.Commands.add('logout', () => {
   // this handler runs at most once, and only matches a specific error
   cy.once('uncaught:exception', (error, _) => {
     // eslint-disable-next-line prettier/prettier
-    if (error.message == 'Cannot read property \'contains\' of undefined') {
+    if (error.message == "Cannot read property 'contains' of undefined") {
       return true;
     }
 
@@ -207,7 +207,7 @@ Cypress.Commands.add('changeClarificationRequestStatus', requestText => {
   cy.get(`[data-cy^="public-${requestText.slice(0, 15)}"]`)
     .first()
     .should('exist');
-})
+});
 
 Cypress.Commands.add('checkRequestInDiscussion', requestText => {
   cy.get('[data-cy="quizzes"]').click();
@@ -221,7 +221,7 @@ Cypress.Commands.add('checkRequestInDiscussion', requestText => {
     .should('have.length', 1)
     .first()
     .should('contain.text', requestText);
-})
+});
 
 /* STUDENT QUESTION TESTS */
 
@@ -270,7 +270,8 @@ Cypress.Commands.add(
   (title, prevStatus, status, justification) => {
     // select evaluate question
     cy.contains(title)
-      .parent()
+      .parents('tr')
+      .eq(0)
       .contains(prevStatus)
       .click();
 
@@ -280,13 +281,15 @@ Cypress.Commands.add(
       .click();
 
     // select evaluation status
-    cy.get('[data-cy="status-options"]')
+    cy.get('.v-list-item__content')
       .contains(status)
       .click();
 
     // write justification
     if (justification != null && justification != '') {
-      cy.get('[data-cy="justification-input"]').type(justification);
+      cy.get('[data-cy="justification-text"]')
+        .clear()
+        .type(justification);
     }
 
     // select evaluate button
@@ -299,17 +302,32 @@ Cypress.Commands.add(
   (questionTitle, status, justification) => {
     // assert status
     cy.contains(questionTitle)
-      .parent()
-      .children()
-      .eq(3)
+      .parents('tr')
+      .eq(0)
+      .find('[data-cy="evaluate"]')
       .should('have.text', status);
 
-    // assert justification
-    cy.contains(questionTitle)
-      .parent()
-      .children()
-      .eq(4)
-      .should('have.text', justification);
+    if (justification.length !== 0) {
+      // assert justification
+      cy.contains(questionTitle)
+        .parents('tr')
+        .eq(0)
+        .find('[data-cy="showJustification"]')
+        .click();
+
+      cy.get('[data-cy="justification-text"]').should($el => {
+        let elem = $el[0];
+
+        // if promoted question, justification is in span
+        if (elem.tagName === 'SPAN') {
+          expect(elem.innerText).to.equal(justification);
+        } else {
+          // else (evaluating), justification is in textarea
+          expect(elem.value).to.equal(justification);
+        }
+      });
+      cy.get('[data-cy=CancelEvaluation]').click();
+    }
   }
 );
 
@@ -318,9 +336,9 @@ Cypress.Commands.add(
   (questionTitle, status, justification) => {
     // assert status
     cy.contains(questionTitle)
-      .parent()
-      .children()
-      .eq(3)
+      .parents('tr')
+      .eq(0)
+      .find('[data-cy="showStatus"]')
       .should('have.text', status);
 
     if (justification == null) {
@@ -332,10 +350,10 @@ Cypress.Commands.add(
     } else {
       // assert justification
       cy.contains(questionTitle)
-        .parent()
-        .children()
-        .eq(6)
-        .contains('question_answer')
+        .parents('tr')
+        .eq(0)
+        .find('[data-cy="showStatus"]')
+        .scrollIntoView()
         .click();
 
       cy.get('[data-cy="justification-text"]').should(
@@ -354,30 +372,61 @@ Cypress.Commands.add('errorMessageClose', message => {
 });
 
 Cypress.Commands.add(
-  'editStudentQuestion',
-  (
-    command,
-    questionTitle,
-    newTitle,
-    newContent,
-    oldTopics,
-    newTopics,
-    newOptions
-  ) => {
-    if (command === 'edit') {
-      cy.contains(questionTitle)
-        .parent()
-        .children()
-        .contains('edit')
-        .click();
-    } else if (command === 'duplicate') {
-      cy.contains(questionTitle)
-        .parent()
-        .children()
-        .contains('cached')
-        .click();
-    }
+  'editAndPromoteStudentQuestion',
+  (questionTitle, newTitle, newContent, oldTopics, newTopics, newOptions) => {
+    cy.contains(questionTitle).rightclick();
 
+    cy.fillStudentQuestionDialog(
+      newTitle,
+      newContent,
+      oldTopics,
+      newTopics,
+      newOptions
+    );
+  }
+);
+
+Cypress.Commands.add(
+  'editStudentQuestion',
+  (questionTitle, newTitle, newContent, oldTopics, newTopics, newOptions) => {
+    cy.contains(questionTitle)
+      .parents('tr')
+      .eq(0)
+      .find('[data-cy="editStudentQuestion"]')
+      .click();
+
+    cy.fillStudentQuestionDialog(
+      newTitle,
+      newContent,
+      oldTopics,
+      newTopics,
+      newOptions
+    );
+  }
+);
+
+Cypress.Commands.add(
+  'duplicateStudentQuestion',
+  (questionTitle, newTitle, newContent, oldTopics, newTopics, newOptions) => {
+    cy.contains(questionTitle)
+      .parents('tr')
+      .eq(0)
+      .find('[data-cy="duplicateStudentQuestion"]')
+      .click();
+
+    cy.fillStudentQuestionDialog(
+      newTitle,
+      newContent,
+      oldTopics,
+      newTopics,
+      newOptions
+    );
+  }
+);
+
+Cypress.Commands.add(
+  'fillStudentQuestionDialog',
+  (newTitle, newContent, oldTopics, newTopics, newOptions) => {
     for (oldTopic of oldTopics) {
       cy.get(`[data-cy="${oldTopic}"]`)
         .find('button')
@@ -419,143 +468,171 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add(
-  'evaluateStudentQuestion',
-  (title, prevStatus, status, justification) => {
-    // select evaluate question
-    cy.contains(title)
-      .parent()
-      .contains(prevStatus)
-      .click();
+  'createTournament',
+  (title, afterAvailable, afterRunning, afterConclusion, hasAvailable) => {
+    let availableNr = 1;
+    let runningNr = 2;
+    let conclusionNr = 3;
+    let nQuestions = '10';
 
-    // select drop down
-    cy.get('.layout')
-      .contains(prevStatus)
-      .click();
+    cy.get('[data-cy="newTournament"]').click({ force: true });
+    // wait for dialog to open
+    cy.wait(500);
+    cy.get('[data-cy="title"]').type(title);
+    cy.get('[data-cy="numberOfQuestions"').type(nQuestions);
 
-    // select evaluation status
-    cy.get('.v-list-item__content')
-      .contains(status)
-      .click();
-
-    // write justification
-    if (justification != null && justification != '') {
-      cy.get('.v-textarea').type(justification);
+    // --------- Available Date ---------
+    if (hasAvailable) {
+      cy.contains('.v-label', 'Available Date').click({ force: true });
+      cy.wait(500);
+      if (afterAvailable)
+        cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
+      else cy.get('.mdi-chevron-left').click({ multiple: true, force: true });
+      cy.wait(500);
+      cy.get(
+        `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${availableNr}) > .v-btn`
+      )
+        .first()
+        .click({ force: true });
+      // click ok, contains('OK') doesn't work...
+      cy.get('.v-card__actions > .green--text > .v-btn__content').click({
+        multiple: true,
+        force: true
+      });
     }
+    // --------- Available Date ---------
 
-    // select evaluate button
-    cy.get('button')
-      .contains('Evaluate')
-      .click();
+    // --------- Running Date ---------
+    cy.contains('.v-label', 'Running Date').click({ force: true });
+    cy.wait(500);
+    if (afterRunning)
+      cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
+    else cy.get('.mdi-chevron-left').click({ multiple: true, force: true });
+    cy.wait(500);
+    cy.get(
+      `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${runningNr}) > .v-btn`
+    )
+      .last()
+      .click({ force: true });
+    // click ok, contains('OK') doesn't work...
+    cy.get('.v-card__actions > .green--text > .v-btn__content').click({
+      multiple: true,
+      force: true
+    });
+    // --------- Running Date ---------
+
+    // --------- Conclusion Date ---------
+    cy.contains('.v-label', 'Conclusion Date').click({ force: true });
+    cy.wait(500);
+    if (afterConclusion)
+      cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
+    else cy.get('.mdi-chevron-left').click({ multiple: true, force: true });
+    cy.wait(500);
+    cy.get(
+      `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${conclusionNr}) > .v-btn`
+    )
+      .last()
+      .click({ force: true });
+    // click ok, contains('OK') doesn't work...
+    cy.get('.v-card__actions > .green--text > .v-btn__content').click({
+      multiple: true,
+      force: true
+    });
+    // --------- Conclusion Date ---------
+
+    cy.get('[data-cy="topics"').click();
+    cy.get('[role=listbox]')
+      .children()
+      .first()
+      .click({ force: true });
+
+    cy.get('[data-cy="saveTournament"]').click();
   }
 );
 
 Cypress.Commands.add(
-  'assertStudentQuestionEvaluation',
-  (questionTitle, status, justification) => {
-    // assert status
-    cy.contains(questionTitle)
-      .parent()
-      .children()
-      .eq(3)
-      .should('have.text', status);
+  'createTournament',
+  (title, afterAvailable, afterRunning, afterConclusion, hasAvailable) => {
+    let availableNr = 1;
+    let runningNr = 2;
+    let conclusionNr = 3;
+    let nQuestions = '1';
 
-    // assert justification
-    cy.contains(questionTitle)
-      .parent()
+    cy.get('[data-cy="newTournament"]').click({ force: true });
+    // wait for dialog to open
+    cy.wait(500);
+    cy.get('[data-cy="title"]').type(title);
+    cy.get('[data-cy="numberOfQuestions"').type(nQuestions);
+
+    // --------- Available Date ---------
+    if (hasAvailable) {
+      cy.contains('.v-label', 'Available Date').click({ force: true });
+      cy.wait(500);
+      if (afterAvailable)
+        cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
+      else cy.get('.mdi-chevron-left').click({ multiple: true, force: true });
+      cy.wait(500);
+      cy.get(
+        `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${availableNr}) > .v-btn`
+      )
+        .first()
+        .click({ force: true });
+      // click ok, contains('OK') doesn't work...
+      cy.get('.v-card__actions > .green--text > .v-btn__content').click({
+        multiple: true,
+        force: true
+      });
+    }
+    // --------- Available Date ---------
+
+    // --------- Running Date ---------
+    cy.contains('.v-label', 'Running Date').click({ force: true });
+    cy.wait(500);
+    if (afterRunning)
+      cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
+    else cy.get('.mdi-chevron-left').click({ multiple: true, force: true });
+    cy.wait(500);
+    cy.get(
+      `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${runningNr}) > .v-btn`
+    )
+      .last()
+      .click({ force: true });
+    // click ok, contains('OK') doesn't work...
+    cy.get('.v-card__actions > .green--text > .v-btn__content').click({
+      multiple: true,
+      force: true
+    });
+    // --------- Running Date ---------
+
+    // --------- Conclusion Date ---------
+    cy.contains('.v-label', 'Conclusion Date').click({ force: true });
+    cy.wait(500);
+    if (afterConclusion)
+      cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
+    else cy.get('.mdi-chevron-left').click({ multiple: true, force: true });
+    cy.wait(500);
+    cy.get(
+      `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${conclusionNr}) > .v-btn`
+    )
+      .last()
+      .click({ force: true });
+    // click ok, contains('OK') doesn't work...
+    cy.get('.v-card__actions > .green--text > .v-btn__content').click({
+      multiple: true,
+      force: true
+    });
+    // --------- Conclusion Date ---------
+
+    cy.get('[data-cy="topics"').click();
+    cy.get('[role=listbox]')
       .children()
-      .eq(4)
-      .should('have.text', justification);
+      .first()
+      .next()
+      .click({ force: true });
+
+    cy.get('[data-cy="saveTournament"]').click();
   }
 );
-
-
-Cypress.Commands.add(
-    'createTournament', (title, afterAvailable, afterRunning, afterConclusion, hasAvailable) => {
-        let availableNr = 1;
-        let runningNr = 2;
-        let conclusionNr = 3;
-        let nQuestions = '1';
-
-        cy.get('[data-cy="newTournament"]').click({ force: true });
-        // wait for dialog to open
-        cy.wait(500);
-        cy.get('[data-cy="title"]').type(title);
-        cy.get('[data-cy="numberOfQuestions"').type(nQuestions);
-
-        // --------- Available Date ---------
-        if (hasAvailable){
-            cy.contains('.v-label', 'Available Date').click({ force: true });
-            cy.wait(500);
-            if (afterAvailable)
-                cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
-            else
-                cy.get('.mdi-chevron-left').click({ multiple: true, force: true });
-            cy.wait(500);
-            cy.get(
-                `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${availableNr}) > .v-btn`
-            )
-                .first()
-                .click({ force: true });
-            // click ok, contains('OK') doesn't work...
-            cy.get('.v-card__actions > .green--text > .v-btn__content').click({
-                multiple: true,
-                force: true
-            });
-        }
-        // --------- Available Date ---------
-
-        // --------- Running Date ---------
-        cy.contains('.v-label', 'Running Date').click({ force: true });
-        cy.wait(500);
-        if (afterRunning)
-            cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
-        else
-            cy.get('.mdi-chevron-left').click({ multiple: true, force: true });
-        cy.wait(500);
-        cy.get(
-            `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${runningNr}) > .v-btn`
-        )
-            .last()
-            .click({ force: true });
-        // click ok, contains('OK') doesn't work...
-        cy.get('.v-card__actions > .green--text > .v-btn__content').click({
-            multiple: true,
-            force: true
-        });
-        // --------- Running Date ---------
-
-        // --------- Conclusion Date ---------
-        cy.contains('.v-label', 'Conclusion Date').click({ force: true });
-        cy.wait(500);
-        if (afterConclusion)
-            cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
-        else
-            cy.get('.mdi-chevron-left').click({ multiple: true, force: true });
-        cy.wait(500);
-        cy.get(
-            `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${conclusionNr}) > .v-btn`
-        )
-            .last()
-            .click({ force: true });
-        // click ok, contains('OK') doesn't work...
-        cy.get('.v-card__actions > .green--text > .v-btn__content').click({
-            multiple: true,
-            force: true
-        });
-        // --------- Conclusion Date ---------
-
-        cy.get('[data-cy="topics"').click();
-        cy.get('[role=listbox]')
-            .children()
-            .first()
-            .next()
-            .click({ force: true });
-
-        cy.get('[data-cy="saveTournament"]').click();
-    }
-);
-
-
 
 Cypress.Commands.add('deleteTournament', title => {
   cy.contains(title)

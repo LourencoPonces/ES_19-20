@@ -1,6 +1,9 @@
 <template>
   <div>
-    <span v-html="convertMarkDown(studentQuestion.justification, null)" />
+    <span
+      v-html="convertMarkDown(studentQuestion.justification, null)"
+      data-cy="justification-text"
+    />
     <br />
   </div>
 </template>
