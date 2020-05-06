@@ -44,6 +44,7 @@ public class MyStats implements DomainEntity {
     public StatsVisibility getRequestsSubmitted() {
         return this.requestsSubmitted;
     }
+
     public void setRequestsSubmitted(StatsVisibility requestsSubmitted) {
         this.requestsSubmitted = requestsSubmitted;
     }
@@ -53,6 +54,7 @@ public class MyStats implements DomainEntity {
 
     // Number of submitted clarification requests that were made public
     public StatsVisibility getPublicRequests() { return this.publicRequests; }
+    
     public void setPublicRequests(StatsVisibility publicRequests) {
         this.publicRequests = publicRequests;
     }
