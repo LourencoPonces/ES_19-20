@@ -139,6 +139,7 @@ class SignUpInTournamentTest extends Specification{
         participants.size() == 2
 
         def generatedQuiz = tournamentCreated.getQuiz()
+        generatedQuiz != null
         generatedQuiz.getId() != null
         generatedQuiz.getKey() != null
         generatedQuiz.getTitle() != null
