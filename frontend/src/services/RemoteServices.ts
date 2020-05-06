@@ -399,6 +399,14 @@ export default class RemoteServices {
     }
   }
 
+  static async cancelTournament(tournament: Tournament) {
+    try {
+      await httpClient.post(`/tournaments/${tournament.id}/cancel`);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
   static getAvailableQuizzes(): Promise<StatementQuiz[]> {
     return httpClient
       .get(

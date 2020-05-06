@@ -48,162 +48,247 @@
           </v-chip-group>
         </template>
 
-        <template v-slot:item.delete-button="{ item }">
-          <v-btn
-            color="red"
-            @click="deleteTournament(item)"
-            data-cy="deleteTournament"
-            >Delete</v-btn
-          >
+
+
+        <template v-slot:item.status="{ item }">
+          <v-chip-group>
+            <v-chip>
+              {{ getStatus(item) }}
+            </v-chip>
+          </v-chip-group>
         </template>
-      </v-data-table>
-    </v-card>
-  </div>
-</template>
 
-<script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
-import Tournament from '@/models/management/Tournament';
-import RemoteServices from '@/services/RemoteServices';
-import Topic from '@/models/management/Topic';
-import EditTournamentDialog from './EditTournamentDialog.vue';
 
-@Component({
-  components: {
-    'edit-tournament-dialog': EditTournamentDialog
-  }
-})
-export default class CreatedTournamentsView extends Vue {
-  createdTournaments: Tournament[] = [];
-  currentTournament: Tournament | null = null;
-  editTournamentDialog: boolean = false;
-  topics!: Topic[];
-  search: string = '';
 
-  headers: object = [
-    {
-      text: 'Title',
-      value: 'title',
-      align: 'center',
-      width: '10%'
-    },
-    {
-      text: 'Topics',
-      value: 'topics',
-      align: 'center',
-      width: '20%',
-      sortable: false
-    },
-    {
-      text: 'Nº of Questions',
-      value: 'numberOfQuestions',
-      align: 'center',
-      width: '10%'
-    },
-    {
-      text: 'Creation Date',
-      value: 'creationDate',
-      align: 'center',
-      width: '10%'
-    },
-    {
-      text: 'Available Date',
-      value: 'availableDate',
-      align: 'center',
-      width: '10%'
-    },
-    {
-      text: 'Running Date',
-      value: 'runningDate',
-      align: 'center',
-      width: '10%'
-    },
-    {
-      text: 'Conclusion Date',
-      value: 'conclusionDate',
-      align: 'center',
-      width: '10%'
-    },
-    {
-      text: 'Participants',
-      value: 'participants.length',
-      align: 'center',
-      width: '10%'
-    },
-    {
-      value: 'delete-button',
-      align: 'center',
-      width: '5%',
-      sortable: false
-    }
-  ];
 
-  async created() {
-    await this.$store.dispatch('loading');
-    try {
-      this.topics = await RemoteServices.getTopics();
-    } catch (error) {
-      await this.$store.dispatch('error', error);
-    }
-    await this.getCreatedTournaments();
-    await this.$store.dispatch('clearLoading');
-  }
 
-  newTournament() {
-    this.currentTournament = new Tournament();
-    this.editTournamentDialog = true;
-  }
+        <template v-slot:item.action="{ item }">
 
-  @Watch('editTournamentDialog')
-  closeError() {
-    if (!this.editTournamentDialog) {
-      this.currentTournament = null;
-    }
-  }
 
-  async createdTournament() {
-    this.editTournamentDialog = false;
-    await this.$store.dispatch('loading');
-    await this.getCreatedTournaments();
-    await this.$store.dispatch('clearLoading');
-  }
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on }">
+                        <v-icon
+                                large
+                                class="mr-2"
+                                v-on="on"
+                                @click="cancelTournament(item)"
+                                color="red"
+                        >fas fa-ban</v-icon
+                        >
+                      </template>
+                      <span>Cancel Tournament</span>
+                    </v-tooltip>
 
-  async deleteTournament(tournament: Tournament) {
-    try {
-      await RemoteServices.deleteTournament(tournament);
-    } catch (error) {
-      await this.$store.dispatch('error', error);
-    }
-    await this.$store.dispatch('loading');
-    await this.getCreatedTournaments();
-    await this.$store.dispatch('clearLoading');
-  }
 
-  async getCreatedTournaments() {
-    try {
-      this.createdTournaments = await RemoteServices.getCreatedTournaments();
-    } catch (error) {
-      await this.$store.dispatch('error', error);
-    }
-  }
-}
-</script>
+                    <v-tooltip bottom><!--bottom v-if="item.isChangeable()"-->
+                      <template v-slot:activator="{ on }">
+                        <v-icon
+                                large
+                                class="mr-2"
+                                v-on="on"
+                                @click="deleteTournament(item)"
+                                data-cy="deleteTournament"
+                                color="red"
+                        >delete</v-icon
+                        >
+                      </template>
+                      <span>Delete Tournament</span>
+                    </v-tooltip>
 
-<style lang="scss" scoped>
-.container {
-  max-width: 90%;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 10px;
-  padding-right: 10px;
 
-  h2 {
-    font-size: 26px;
-    margin: 20px 0;
-    text-align: center;
-    small {
-      font-size: 0.5em;
-    }
-  }
-}
-</style>
+
+                  </template>
+
+
+
+
+
+
+                </v-data-table>
+              </v-card>
+            </div>
+          </template>
+
+          <script lang="ts">
+          import { Component, Vue, Watch } from 'vue-property-decorator';
+          import Tournament from '@/models/management/Tournament';
+          import RemoteServices from '@/services/RemoteServices';
+          import Topic from '@/models/management/Topic';
+          import EditTournamentDialog from './EditTournamentDialog.vue';
+
+          @Component({
+            components: {
+              'edit-tournament-dialog': EditTournamentDialog
+            }
+          })
+          export default class CreatedTournamentsView extends Vue {
+            createdTournaments: Tournament[] = [];
+            currentTournament: Tournament | null = null;
+            editTournamentDialog: boolean = false;
+            topics!: Topic[];
+            search: string = '';
+
+            headers: object = [
+              {
+                text: 'Title',
+                value: 'title',
+                align: 'center',
+                width: '10%'
+              },
+              {
+                text: 'Topics',
+                value: 'topics',
+                align: 'center',
+                width: '20%',
+                sortable: false
+              },
+              {
+                text: 'Nº of Questions',
+                value: 'numberOfQuestions',
+                align: 'center',
+                width: '5%'
+              },
+              {
+                text: 'Participants',
+                value: 'participants.length',
+                align: 'center',
+                width: '5%'
+              },
+              {
+                text: 'Creation Date',
+                value: 'creationDate',
+                align: 'center',
+                width: '10%'
+              },
+              {
+                text: 'Available Date',
+                value: 'availableDate',
+                align: 'center',
+                width: '10%'
+              },
+              {
+                text: 'Running Date',
+                value: 'runningDate',
+                align: 'center',
+                width: '10%'
+              },
+              {
+                text: 'Conclusion Date',
+                value: 'conclusionDate',
+                align: 'center',
+                width: '10%'
+              },
+              {
+                text: 'Status',
+                value: 'status',
+                align: 'center',
+                width: '10%'
+              },
+              {
+                text: 'Actions',
+                value: 'action',
+                align: 'center',
+                width: '10%',
+                sortable: false
+              }
+            ];
+
+            async created() {
+              await this.$store.dispatch('loading');
+              try {
+                this.topics = await RemoteServices.getTopics();
+              } catch (error) {
+                await this.$store.dispatch('error', error);
+              }
+              await this.getCreatedTournaments();
+              await this.$store.dispatch('clearLoading');
+            }
+
+            newTournament() {
+              this.currentTournament = new Tournament();
+              this.editTournamentDialog = true;
+            }
+
+            @Watch('editTournamentDialog')
+            closeError() {
+              if (!this.editTournamentDialog) {
+                this.currentTournament = null;
+              }
+            }
+
+            async createdTournament() {
+              this.editTournamentDialog = false;
+              await this.$store.dispatch('loading');
+              await this.getCreatedTournaments();
+              await this.$store.dispatch('clearLoading');
+            }
+
+            async deleteTournament(tournament: Tournament) {
+              try {
+                await RemoteServices.deleteTournament(tournament);
+              } catch (error) {
+                await this.$store.dispatch('error', error);
+              }
+              await this.$store.dispatch('loading');
+              await this.getCreatedTournaments();
+              await this.$store.dispatch('clearLoading');
+            }
+
+            async cancelTournament(tournament: Tournament) {
+              try {
+                await RemoteServices.cancelTournament(tournament);
+              } catch (error) {
+                await this.$store.dispatch('error', error);
+              }
+              await this.$store.dispatch('loading');
+              await this.getCreatedTournaments();
+              await this.$store.dispatch('clearLoading');
+            }
+
+            async getCreatedTournaments() {
+              try {
+                this.createdTournaments = await RemoteServices.getCreatedTournaments();
+              } catch (error) {
+                await this.$store.dispatch('error', error);
+              }
+            }
+
+            getStatus(tournament: Tournament) {
+              console.log('--------------------------');
+              console.log(tournament.isCancelled);
+              console.log(tournament.title);
+              console.log(tournament.numberOfQuestions);
+              console.log(tournament.participants);
+              console.log(tournament.id);
+              console.log(tournament.creator);
+              console.log(tournament.runningDate);
+              console.log(tournament.conclusionDate);
+              console.log(tournament.topics);
+              console.log(tournament.number);
+              console.log('--------------------------');
+              if (tournament.isCancelled)
+                return 'Cancelled';
+              else
+                return 'Available';
+            }
+          }
+          </script>
+
+          <style lang="scss" scoped>
+          .container {
+            max-width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 10px;
+            padding-right: 10px;
+
+            h2 {
+              font-size: 26px;
+              margin: 20px 0;
+              text-align: center;
+              small {
+                font-size: 0.5em;
+              }
+            }
+          }
+          </style>

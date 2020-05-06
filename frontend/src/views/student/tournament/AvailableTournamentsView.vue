@@ -123,8 +123,8 @@ export default class AvailableTournamentsView extends Vue {
       width: '10%'
     },
     {
-      text: 'Available Date',
-      value: 'availableDate',
+      text: 'Participants',
+      value: 'participants.length',
       align: 'center',
       width: '10%'
     },
@@ -146,12 +146,6 @@ export default class AvailableTournamentsView extends Vue {
       align: 'center',
       width: '10%',
       sortable: false
-    },
-    {
-      text: 'Participants',
-      value: 'participants.length',
-      align: 'center',
-      width: '10%'
     },
     {
       value: 'sign-up-status',
@@ -211,6 +205,8 @@ export default class AvailableTournamentsView extends Vue {
   }
 
   async deleteTournament(tournament: Tournament) {
+    console.log();
+    console.log();
     try {
       await RemoteServices.deleteTournament(tournament);
     } catch (error) {
