@@ -78,8 +78,9 @@
             </span>
             <span v-else>Make Private</span>
           </v-tooltip>
-          <div class="icon-wrapper" ref="requestsSubmitted">
+          <div class="icon-wrapper" ref="submittedQuestions">
             <animated-number
+              data-cy="submittedQuestions"
               :number="
                 myStats.getStatValue(myStats.statsNames.SUBMITTED_QUESTIONS)
               "
@@ -108,8 +109,9 @@
             </span>
             <span v-else>Make Private</span>
           </v-tooltip>
-          <div class="icon-wrapper" ref="requestsSubmitted">
+          <div class="icon-wrapper" ref="approvedQuestions">
             <animated-number
+              data-cy="approvedQuestions"
               :number="
                 myStats.getStatValue(myStats.statsNames.APPROVED_QUESTIONS)
               "
