@@ -1,8 +1,8 @@
 <template>
   <v-dialog
     :value="dialog"
-    @input="$emit('dialog', false)"
-    @keydown.esc="$emit('dialog', false)"
+    @input="$emit('close-show-student-question-dialog', false)"
+    @keydown.esc="$emit('close-show-student-question-dialog', false)"
     max-width="75%"
   >
     <v-card>
@@ -16,7 +16,10 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn dark color="blue darken-1" @click="$emit('dialog', false)"
+        <v-btn
+          dark
+          color="blue darken-1"
+          @click="$emit('close-show-student-question-dialog', false)"
           >close</v-btn
         >
       </v-card-actions>

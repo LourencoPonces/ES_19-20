@@ -1,8 +1,8 @@
 <template>
   <v-dialog
     :value="dialog"
-    @input="$emit('dialog', false)"
-    @keydown.esc="$emit('dialog', false)"
+    @input="$emit('close-edit-student-question-dialog', false)"
+    @keydown.esc="$emit('close-edit-student-question-dialog', false)"
     max-width="75%"
     max-height="95%"
     scrollable
@@ -101,7 +101,7 @@
         <v-spacer />
         <v-btn
           color="error"
-          @click="$emit('dialog', false)"
+          @click="$emit('close-edit-student-question-dialog', false)"
           data-cy="CancelStudentQuestion"
           >Cancel</v-btn
         >
