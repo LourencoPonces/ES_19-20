@@ -78,7 +78,11 @@ public class TournamentService {
 
         Tournament tournament = new Tournament(tournamentDto);
 
+        tournament.setCourseExecution(courseExecution);
+
         checkTopics(tournamentDto, courseExecution, tournament);
+
+        checkQuestions(tournament);
 
         checkCreatorCourseExecution(courseExecution, creator, tournament);
 
@@ -86,7 +90,6 @@ public class TournamentService {
 
         addCreator(tournamentDto, creator, tournament);
 
-        tournament.setCourseExecution(courseExecution);
         entityManager.persist(tournament);
 
         creator.addCreatedTournament(tournament);
@@ -215,6 +218,12 @@ public class TournamentService {
             } else {
                 tournament.addTopic(topic);
             }
+        }
+    }
+
+    private void checkQuestions(Tournament tournament) {
+        if (getValidQuestions(tournament).size() < tournament.getNumberOfQuestions()) {
+            throw new TutorException(NOT_ENOUGH_QUESTIONS);
         }
     }
 
