@@ -550,6 +550,90 @@ Cypress.Commands.add(
   }
 );
 
+Cypress.Commands.add(
+  'createTournament',
+  (title, afterAvailable, afterRunning, afterConclusion, hasAvailable) => {
+    let availableNr = 1;
+    let runningNr = 2;
+    let conclusionNr = 3;
+    let nQuestions = '1';
+
+    cy.get('[data-cy="newTournament"]').click({ force: true });
+    // wait for dialog to open
+    cy.wait(500);
+    cy.get('[data-cy="title"]').type(title);
+    cy.get('[data-cy="numberOfQuestions"').type(nQuestions);
+
+    // --------- Available Date ---------
+    if (hasAvailable) {
+      cy.contains('.v-label', 'Available Date').click({ force: true });
+      cy.wait(500);
+      if (afterAvailable)
+        cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
+      else cy.get('.mdi-chevron-left').click({ multiple: true, force: true });
+      cy.wait(500);
+      cy.get(
+        `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${availableNr}) > .v-btn`
+      )
+        .first()
+        .click({ force: true });
+      // click ok, contains('OK') doesn't work...
+      cy.get('.v-card__actions > .green--text > .v-btn__content').click({
+        multiple: true,
+        force: true
+      });
+    }
+    // --------- Available Date ---------
+
+    // --------- Running Date ---------
+    cy.contains('.v-label', 'Running Date').click({ force: true });
+    cy.wait(500);
+    if (afterRunning)
+      cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
+    else cy.get('.mdi-chevron-left').click({ multiple: true, force: true });
+    cy.wait(500);
+    cy.get(
+      `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${runningNr}) > .v-btn`
+    )
+      .last()
+      .click({ force: true });
+    // click ok, contains('OK') doesn't work...
+    cy.get('.v-card__actions > .green--text > .v-btn__content').click({
+      multiple: true,
+      force: true
+    });
+    // --------- Running Date ---------
+
+    // --------- Conclusion Date ---------
+    cy.contains('.v-label', 'Conclusion Date').click({ force: true });
+    cy.wait(500);
+    if (afterConclusion)
+      cy.get('.mdi-chevron-right').click({ multiple: true, force: true });
+    else cy.get('.mdi-chevron-left').click({ multiple: true, force: true });
+    cy.wait(500);
+    cy.get(
+      `.v-date-picker-table > table > tbody > :nth-child(3) > :nth-child(${conclusionNr}) > .v-btn`
+    )
+      .last()
+      .click({ force: true });
+    // click ok, contains('OK') doesn't work...
+    cy.get('.v-card__actions > .green--text > .v-btn__content').click({
+      multiple: true,
+      force: true
+    });
+    // --------- Conclusion Date ---------
+
+    cy.get('[data-cy="topics"').click();
+    cy.get('[role=listbox]')
+      .children()
+      .first()
+      .next()
+      .click({ force: true });
+
+    cy.get('[data-cy="saveTournament"]').click();
+  }
+);
+
 Cypress.Commands.add('deleteTournament', title => {
   cy.contains(title)
     .parent()
