@@ -69,6 +69,9 @@ public class Tournament {
     public Tournament(TournamentDto tournamentDto) {
         this.key = tournamentDto.getKey();
         setTitle(tournamentDto.getTitle());
+        this.isCancelled = false;
+        if (tournamentDto.isCancelled())
+            this.isCancelled = true;
 
         setDates(tournamentDto);
 
@@ -200,6 +203,8 @@ public class Tournament {
         else
             return Status.FINISHED;
     }
+
+    public boolean isCancelled() { return this.isCancelled; }
 
     public void cancel() {
         Status currentStatus = getStatus();

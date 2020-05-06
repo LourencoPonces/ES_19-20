@@ -4,15 +4,21 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
+import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.AnswersXmlImport
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentService
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto
@@ -55,6 +61,9 @@ class CancelTournamentTest extends Specification {
     @Autowired
     TournamentRepository tournamentRepository
 
+    @Autowired
+    QuestionRepository questionRepository
+
     def tournamentDto
     def creator
     def participant
@@ -66,6 +75,7 @@ class CancelTournamentTest extends Specification {
     def conclusionDate
     def formatter
     def topicDtoList
+    def question
 
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
@@ -90,6 +100,15 @@ class CancelTournamentTest extends Specification {
         def topic = new Topic();
         topic.setName("TOPIC")
         topic.setCourse(course)
+
+        // So that quiz generation doesn't throw exceptions
+        question = new Question()
+        question.addTopic(topic)
+        question.setTitle("question_title")
+        question.setCourse(course)
+        question.setStatus(Question.Status.AVAILABLE)
+
+        questionRepository.save(question)
         topicRepository.save(topic)
 
         def topicDto = new TopicDto(topic)
@@ -115,11 +134,12 @@ class CancelTournamentTest extends Specification {
         then:
         def tournamentCanceled = tournamentRepository.findAll().get(0)
         tournamentCanceled.getStatus() == newStatus
+        tournamentCanceled.isCancelled() == isCancelled
 
         where:
-        status                      || newStatus
-        Tournament.Status.CREATED   || Tournament.Status.CANCELLED
-        Tournament.Status.AVAILABLE || Tournament.Status.CANCELLED
+        status                      || newStatus                   || isCancelled
+        Tournament.Status.CREATED   || Tournament.Status.CANCELLED || true
+        Tournament.Status.AVAILABLE || Tournament.Status.CANCELLED || true
     }
 
     @Unroll("not allowed status: #status || #errorMessage")
@@ -134,12 +154,15 @@ class CancelTournamentTest extends Specification {
         then:
         def exception = thrown(TutorException)
         exception.getErrorMessage() == errorMessage
+        def tournamentNotCanceled = tournamentRepository.findAll().get(0)
+        tournamentNotCanceled.getStatus() == newStatus
+        tournamentNotCanceled.isCancelled() == isCancelled
 
         where:
-        status                      || errorMessage
-        Tournament.Status.RUNNING   || ErrorMessage.TOURNAMENT_CANNOT_BE_CANCELED
-        Tournament.Status.FINISHED  || ErrorMessage.TOURNAMENT_CANNOT_BE_CANCELED
-        Tournament.Status.CANCELLED || ErrorMessage.TOURNAMENT_CANNOT_BE_CANCELED
+        status                      || errorMessage                               || newStatus                   || isCancelled
+        Tournament.Status.RUNNING   || ErrorMessage.TOURNAMENT_CANNOT_BE_CANCELED || Tournament.Status.RUNNING   || false
+        Tournament.Status.FINISHED  || ErrorMessage.TOURNAMENT_CANNOT_BE_CANCELED || Tournament.Status.FINISHED  || false
+        Tournament.Status.CANCELLED || ErrorMessage.TOURNAMENT_CANNOT_BE_CANCELED || Tournament.Status.CANCELLED || true
     }
 
     def "Cancel non-existing tournament"() {
@@ -177,12 +200,17 @@ class CancelTournamentTest extends Specification {
                 conclusionDate = now.plusDays(1)
                 break;
             case Tournament.Status.FINISHED:
-            case Tournament.Status.CANCELLED:
                 creationDate = now.minusDays(4)
                 availableDate = now.minusDays(3)
                 runningDate = now.minusDays(2)
                 conclusionDate = now.minusDays(1)
                 break;
+            case Tournament.Status.CANCELLED:
+                creationDate = now.minusDays(4)
+                availableDate = now.minusDays(3)
+                runningDate = now.minusDays(2)
+                conclusionDate = now.minusDays(1)
+                tournamentDto.cancel();
         }
 
         tournamentDto.setCreationDate(creationDate.format(formatter))
@@ -197,6 +225,26 @@ class CancelTournamentTest extends Specification {
         @Bean
         TournamentService tournamentService() {
             return new TournamentService()
+        }
+
+        @Bean
+        QuizService quizService() {
+            return new QuizService()
+        }
+
+        @Bean
+        QuestionService questionService() {
+            return new QuestionService()
+        }
+
+        @Bean
+        AnswerService answerService() {
+            return new AnswerService()
+        }
+
+        @Bean
+        AnswersXmlImport answersXmlImport() {
+            return new AnswersXmlImport()
         }
     }
 }

@@ -129,6 +129,10 @@ public class TournamentDto implements Serializable {
         this.topics = topics;
     }
 
+    public boolean isCancelled() { return isCancelled; }
+
+    public void cancel() { isCancelled = true; }
+
     public String getCreationDate() {
         return creationDate;
     }
