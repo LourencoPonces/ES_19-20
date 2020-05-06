@@ -257,14 +257,6 @@
               console.log('--------------------------');
               console.log(tournament.isCancelled);
               console.log(tournament.title);
-              console.log(tournament.numberOfQuestions);
-              console.log(tournament.participants);
-              console.log(tournament.id);
-              console.log(tournament.creator);
-              console.log(tournament.runningDate);
-              console.log(tournament.conclusionDate);
-              console.log(tournament.topics);
-              console.log(tournament.number);
               console.log('--------------------------');
               if (tournament.isCancelled)
                 return 'Cancelled';

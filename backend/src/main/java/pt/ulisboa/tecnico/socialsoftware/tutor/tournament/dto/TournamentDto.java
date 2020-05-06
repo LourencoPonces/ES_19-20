@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
@@ -78,6 +79,7 @@ public class TournamentDto implements Serializable {
         this.title = title;
     }
 
+    @JsonIgnore
     public Tournament.Status getStatus() {
         if (isCancelled) return Tournament.Status.CANCELLED;
 
@@ -129,9 +131,9 @@ public class TournamentDto implements Serializable {
         this.topics = topics;
     }
 
-    public boolean isCancelled() { return isCancelled; }
+    public boolean getIsCancelled() { return isCancelled; }
 
-    public void cancel() { isCancelled = true; }
+    public void setIsCancelled() { isCancelled = true; }
 
     public String getCreationDate() {
         return creationDate;

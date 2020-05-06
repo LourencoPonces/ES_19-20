@@ -210,7 +210,7 @@ class CancelTournamentTest extends Specification {
                 availableDate = now.minusDays(3)
                 runningDate = now.minusDays(2)
                 conclusionDate = now.minusDays(1)
-                tournamentDto.cancel();
+                tournamentDto.setIsCancelled();
         }
 
         tournamentDto.setCreationDate(creationDate.format(formatter))
