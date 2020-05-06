@@ -236,6 +236,19 @@ class CreateTournamentTest extends Specification {
         tournamentRepository.count() == 0L
     }
 
+    def "create a tournament given an insufficient number of questions"() {
+        given: 'too many questions'
+        tournament.setNumberOfQuestions(1000)
+
+        when:
+        tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournament)
+
+        then:
+        def exception = thrown(TutorException)
+        exception.getErrorMessage() == ErrorMessage.NOT_ENOUGH_QUESTIONS
+        tournamentRepository.count() == 0L
+    }
+
     @Unroll("invalid dates: #availableDateDay | #runningDateDay | #conclusionDateDay || #errorMessage")
     def "invalid dates"() {
         given: "dates relative to creationDate"
