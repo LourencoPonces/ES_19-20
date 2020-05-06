@@ -36,12 +36,7 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
     static final String ACRONYM = "AS1"
     static final String ACADEMIC_TERM = "1 SEM"
     static final String CONTENT = "This is a test request."
-    static final String USERNAME_ONE = "STUDENT_ONE"
-    static final String USERNAME_TWO = "STUDENT_TWO"
-    static final String NAME = "NAME"
     static final int INEXISTENT_QUESTION_ID = -1
-    static final int KEY_ONE = 1
-    static final int KEY_TWO = 2
 
     @Autowired
     CourseRepository courseRepository
@@ -76,7 +71,7 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
     Quiz quiz
     QuizQuestion quizQuestion
     QuizAnswer quizAnswer
-    User student
+    User student, student2, teacher
     ClarificationRequestDto clarificationRequestDto
     DateTimeFormatter formatter
     int studentId
@@ -87,10 +82,12 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
 
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseExecution = createCourseExecution(course, ACRONYM, ACADEMIC_TERM)
-        quiz = createQuiz(KEY_ONE, courseExecution, "GENERATED")
-        question = createQuestion(KEY_ONE, course)
+        quiz = createQuiz(1, courseExecution, "GENERATED")
+        question = createQuestion(1, course)
         quizQuestion = new QuizQuestion(quiz, question, 1)
-        student = createStudent(KEY_ONE, NAME, USERNAME_ONE, courseExecution)
+        student = createUser(1, Role.STUDENT, "student one", courseExecution)
+        student2 = createUser(2, Role.STUDENT, "student two", courseExecution)
+        teacher = createUser(3, Role.TEACHER, "teacher", courseExecution)
         quizAnswer = new QuizAnswer(student, quiz)
 
         courseRepository.save(course)
@@ -99,20 +96,21 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         questionRepository.save(question)
         quizQuestionRepository.save(quizQuestion)
         userRepository.save(student)
+        userRepository.save(student2)
+        userRepository.save(teacher)
         quizAnswerRepository.save(quizAnswer)
-
 
         clarificationRequestDto = new ClarificationRequestDto()
         questionId = question.getId()
         studentId = student.getId()
     }
 
-    private static User createStudent(int key, String name, String username, CourseExecution courseExecution) {
+    private static User createUser(int key, User.Role role, String username, CourseExecution courseExecution) {
         def student = new User()
         student.setKey(key)
-        student.setName(name)
+        student.setName(username)
         student.setUsername(username)
-        student.setRole(Role.STUDENT)
+        student.setRole(role)
         student.getCourseExecutions().add(courseExecution)
         courseExecution.getUsers().add(student)
         return student
@@ -148,7 +146,7 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         //the clarification request is created
         when:
         clarificationRequestDto.setContent(CONTENT)
-        clarificationRequestDto = clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
+        clarificationRequestDto = clarificationService.submitClarificationRequest(questionId, student, clarificationRequestDto)
 
         then: "request is created and is in the repository"
         clarificationRequestRepository.count() == 1L
@@ -171,8 +169,8 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         clarificationDto2.setContent(CONTENT)
 
         when:
-        clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
-        clarificationService.submitClarificationRequest(questionId, studentId, clarificationDto2)
+        clarificationService.submitClarificationRequest(questionId, student, clarificationRequestDto)
+        clarificationService.submitClarificationRequest(questionId, student, clarificationDto2)
 
         then: "only the first one is saved and exception thrown"
         def exception = thrown(TutorException)
@@ -186,24 +184,27 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
 
     @Unroll("invalid arguments: #content | #is_student | #has_answered || #error_message")
     def "invalid arguments"() {
-        given:
-        def student2 = createStudent(KEY_TWO, NAME, USERNAME_TWO, courseExecution)
-        userRepository.save(student2)
-
         when:
-        changeStudentId(has_answered, student2)
-        changeQuestionId(is_question)
-        changeUserRole(is_student)
+        User user = student
+        if (!has_answered) {
+            user = student2
+        } else if (!is_student) {
+            user = teacher
+        }
+
+        int qId = questionId
+        if (!is_question) {
+            qId = INEXISTENT_QUESTION_ID
+        }
         clarificationRequestDto.setContent(content)
-        clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
+        clarificationService.submitClarificationRequest(qId, user, clarificationRequestDto)
 
         then:
         def exception = thrown(TutorException)
         exception.getErrorMessage() == error_message
         clarificationRequestRepository.count() == 0L
         and: "the clarification request wasn't added to the student"
-        def result = userRepository.findAll().get(0)
-        result.getClarificationRequests().size() == 0
+        user.getClarificationRequests().size() == 0
 
         where:
         content | is_student | is_question | has_answered || error_message
@@ -215,34 +216,12 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         CONTENT | true       | true        | false        || ErrorMessage.QUESTION_NOT_ANSWERED_BY_STUDENT
     }
 
-
-    def changeStudentId(boolean has_answered, User student2) {
-        if (!has_answered) {
-            studentId = student2.getId()
-        }
-    }
-
-    def changeQuestionId(boolean is_question) {
-        if (!is_question) {
-            questionId = INEXISTENT_QUESTION_ID
-        }
-    }
-
-    def changeUserRole(boolean is_student) {
-        if (!is_student) {
-            student.setRole(Role.TEACHER)
-        } else {
-            student.setRole(Role.STUDENT)
-        }
-        userRepository.save(student)
-    }
-
     @TestConfiguration
     static class ClarificationServiceImplTestContextConfiguration {
 
         @Bean
         ClarificationService ClarificationService() {
-            return new ClarificationService();
+            return new ClarificationService()
         }
     }
 }

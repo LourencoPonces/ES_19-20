@@ -69,10 +69,10 @@ class SubmitMessagePerformanceTest extends Specification {
     ClarificationRequestRepository clarificationRequestRepository
 
     @Autowired
-    ClarificationMessageRepository clarificationMessageRepository;
+    ClarificationMessageRepository clarificationMessageRepository
 
     @Autowired
-    QuestionAnswerRepository questionAnswerRepository;
+    QuestionAnswerRepository questionAnswerRepository
 
     @Autowired
     ClarificationService clarificationService
@@ -160,7 +160,7 @@ class SubmitMessagePerformanceTest extends Specification {
 
             def clarificationRequest = new ClarificationRequestDto()
             clarificationRequest.setContent("i need help with my performance")
-            clarificationService.submitClarificationRequest(question.getId(), student.getId(), clarificationRequest)
+            clarificationService.submitClarificationRequest(question.getId(), student, clarificationRequest)
         })
 
 
@@ -194,7 +194,7 @@ class SubmitMessagePerformanceTest extends Specification {
 
             def clarificationRequest = new ClarificationRequestDto()
             clarificationRequest.setContent("i need help with my performance")
-            clarificationRequest = clarificationService.submitClarificationRequest(question.getId(), student.getId(), clarificationRequest)
+            clarificationRequest = clarificationService.submitClarificationRequest(question.getId(), student, clarificationRequest)
 
 
         when:
@@ -214,7 +214,7 @@ class SubmitMessagePerformanceTest extends Specification {
 
         @Bean
         ClarificationService ClarificationService() {
-            return new ClarificationService();
+            return new ClarificationService()
         }
     }
 }

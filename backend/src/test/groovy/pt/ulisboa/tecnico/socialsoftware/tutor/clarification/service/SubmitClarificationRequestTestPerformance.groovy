@@ -169,7 +169,7 @@ class SubmitClarificationRequestTestPerformance extends Specification {
         when:
         1.upto(TEST_COUNT, {
             def clarificationRequestDto = createRequestDto()
-            clarificationService.submitClarificationRequest(it as int, student.getId(), clarificationRequestDto)
+            clarificationService.submitClarificationRequest(it as int, student, clarificationRequestDto)
         })
 
         then:
@@ -180,7 +180,7 @@ class SubmitClarificationRequestTestPerformance extends Specification {
         when:
         int questionId = 4   // test with number between 1 and TEST_COUNT
         def clarificationRequestDto = createRequestDto()
-        clarificationService.submitClarificationRequest(questionId, student.getId(), clarificationRequestDto)
+        clarificationService.submitClarificationRequest(questionId, student, clarificationRequestDto)
 
         then:
         true
@@ -192,7 +192,7 @@ class SubmitClarificationRequestTestPerformance extends Specification {
 
         @Bean
         ClarificationService ClarificationService() {
-            return new ClarificationService();
+            return new ClarificationService()
         }
     }
 }

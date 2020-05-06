@@ -60,7 +60,7 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
     ClarificationRequestRepository clarificationRequestRepository
 
     @Autowired
-    ClarificationMessageRepository clarificationMessageRepository;
+    ClarificationMessageRepository clarificationMessageRepository
 
     @Autowired
     ClarificationService clarificationService
@@ -96,9 +96,9 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
         userRepository.save(student)
         userRepository.save(teacher)
         quizAnswerRepository.save(quizAnswer)
-        questionId = question.getId()
-        studentId = student.getId()
-        teacherId = teacher.getId()
+        questionId = question.id
+        studentId = student.id
+        teacherId = teacher.id
     }
 
     private static User createStudent(int key, String name, String username, CourseExecution courseExecution) {
@@ -153,17 +153,17 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
         given:
         clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent(CONTENT)
-        clarificationRequestDto = clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
+        clarificationRequestDto = clarificationService.submitClarificationRequest(questionId, student, clarificationRequestDto)
 
         when:
-        def result = clarificationService.changeClarificationRequestStatus(clarificationRequestDto.getId(), ClarificationRequest.RequestStatus.PUBLIC)
+        def result = clarificationService.changeClarificationRequestStatus(clarificationRequestDto.id, ClarificationRequest.RequestStatus.PUBLIC)
 
         then:
         result != null
-        result.getContent() == CONTENT
-        result.getCreatorId() == studentId
-        result.getQuestionId() == questionId
-        result.getStatus() == ClarificationRequest.RequestStatus.PUBLIC
+        result.content == CONTENT
+        result.creatorId == studentId
+        result.questionId == questionId
+        result.status == ClarificationRequest.RequestStatus.PUBLIC
     }
 
 
@@ -171,23 +171,23 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
         given:
         clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent(CONTENT)
-        clarificationRequestDto = clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
+        clarificationRequestDto = clarificationService.submitClarificationRequest(questionId, student, clarificationRequestDto)
 
         when:
-        clarificationService.changeClarificationRequestStatus(clarificationRequestDto.getId(), ClarificationRequest.RequestStatus.PUBLIC)
-        def result = clarificationService.changeClarificationRequestStatus(clarificationRequestDto.getId(), ClarificationRequest.RequestStatus.PRIVATE)
+        clarificationService.changeClarificationRequestStatus(clarificationRequestDto.id, ClarificationRequest.RequestStatus.PUBLIC)
+        def result = clarificationService.changeClarificationRequestStatus(clarificationRequestDto.id, ClarificationRequest.RequestStatus.PRIVATE)
 
         then:
         result != null
-        result.getContent() == CONTENT
-        result.getCreatorId() == studentId
-        result.getQuestionId() == questionId
-        result.getStatus() == ClarificationRequest.RequestStatus.PRIVATE
+        result.content == CONTENT
+        result.creatorId == studentId
+        result.questionId == questionId
+        result.status == ClarificationRequest.RequestStatus.PRIVATE
     }
 
     def "clarification request doesn't exist"() {
         when:
-        clarificationService.deleteClarificationRequest(studentId, NONEXISTENT_ID)
+        clarificationService.deleteClarificationRequest(student, NONEXISTENT_ID)
 
         then:
         def exception = thrown(TutorException)
@@ -199,7 +199,7 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
 
         @Bean
         ClarificationService ClarificationService() {
-            return new ClarificationService();
+            return new ClarificationService()
         }
     }
 }

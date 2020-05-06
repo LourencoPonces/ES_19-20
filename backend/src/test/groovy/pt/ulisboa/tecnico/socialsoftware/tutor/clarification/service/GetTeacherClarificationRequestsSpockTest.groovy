@@ -106,7 +106,7 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
     }
 
     private User createUser(User.Role role, int key, String username, CourseExecution courseExecution) {
-        User user = new User();
+        User user = new User()
         user.setRole(role)
         user.setKey(key)
         user.setName(username)
@@ -186,34 +186,32 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
 
     def "the teacher can see clarification requests submitted by students taking their classes"() {
         when:
-        List<ClarificationRequestDto> requests = clarificationService.getTeacherClarificationRequests(teacher.getId())
-        requests.sort(new Comparator<ClarificationRequestDto>() {
-            @Override
-            int compare(ClarificationRequestDto o1, ClarificationRequestDto o2) {
-                int k1 = 0;
-                int k2 = 0;
-                if (o1 != null && o1.getKey() != null) k1 = o1.getKey();
-                if (o2 != null && o2.getKey() != null) k2 = o2.getKey();
-                return k1 - k2;
-            }
-        })
+        def result = clarificationService.getTeacherClarificationRequests(teacher)
+        List<ClarificationRequestDto> requests = result.requests
+        requests.sort(Comparator.comparing { r -> ((ClarificationRequestDto) r).id })
 
         then: "can only see requests from their students"
         requests.size() == 2
-        requests[0].getCreationDateDate() == clarificationRequest.getCreationDate()
-        requests[0].getContent() == clarificationRequest.getContent()
-        requests[0].getCreatorId() == clarificationRequest.getCreator().getId()
-        requests[0].getQuestionId() == clarificationRequest.getQuestion().getId()
+        requests[0].getCreationDateDate() == clarificationRequest.creationDate
+        requests[0].content == clarificationRequest.content
+        requests[0].getCreatorId() == clarificationRequest.creator.id
+        requests[0].getQuestionId() == clarificationRequest.question.id
         requests[0].getMessages() != null
         requests[0].getMessages().size() == 1
         def reply0 = requests[0].getMessages().get(0)
-        reply0.getCreationDateDate() == clarificationReply.getCreationDate()
-        reply0.getCreatorId() == clarificationReply.getCreator().getId()
-        reply0.getContent() == clarificationReply.getContent()
-        requests[1].getCreationDateDate() == clarificationRequest3.getCreationDate()
-        requests[1].getContent() == clarificationRequest3.getContent()
-        requests[1].getCreatorId() == clarificationRequest3.getCreator().getId()
-        requests[1].getQuestionId() == clarificationRequest3.getQuestion().getId()
+        reply0.getCreationDateDate() == clarificationReply.creationDate
+        reply0.getCreatorId() == clarificationReply.creator.id
+        reply0.content == clarificationReply.content
+        requests[1].getCreationDateDate() == clarificationRequest3.creationDate
+        requests[1].content == clarificationRequest3.content
+        requests[1].getCreatorId() == clarificationRequest3.creator.id
+        requests[1].getQuestionId() == clarificationRequest3.question.id
+
+        and: "user information is returned"
+        result.names.get(clarificationRequest.creator.id) == clarificationRequest.creator.name
+        result.usernames.get(clarificationRequest.creator.id) == clarificationRequest.creator.username
+        result.names.get(clarificationReply.creator.id) == clarificationReply.creator.name
+        result.usernames.get(clarificationReply.creator.id) == clarificationReply.creator.username
     }
 
     @TestConfiguration
@@ -221,7 +219,7 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
 
         @Bean
         ClarificationService ClarificationService() {
-            return new ClarificationService();
+            return new ClarificationService()
         }
     }
 }

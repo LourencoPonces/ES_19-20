@@ -87,7 +87,7 @@ class DeleteClarificationRequestServiceSpockTest extends Specification {
         studentId = student.getId()
     }
 
-    private User createStudent(int key, String name, String username, CourseExecution courseExecution) {
+    private static User createStudent(int key, String name, String username, CourseExecution courseExecution) {
         def student = new User()
         student.setKey(key)
         student.setName(name)
@@ -98,7 +98,7 @@ class DeleteClarificationRequestServiceSpockTest extends Specification {
         return student
     }
 
-    private Question createQuestion(int key, Course course) {
+    private static Question createQuestion(int key, Course course) {
         def question = new Question()
         question.setKey(key)
         question.setCourse(course)
@@ -107,7 +107,7 @@ class DeleteClarificationRequestServiceSpockTest extends Specification {
         return question
     }
 
-    private Quiz createQuiz(int key, CourseExecution courseExecution, String type) {
+    private static Quiz createQuiz(int key, CourseExecution courseExecution, String type) {
         def quiz = new Quiz()
         quiz.setKey(key)
         quiz.setType(type)
@@ -116,7 +116,7 @@ class DeleteClarificationRequestServiceSpockTest extends Specification {
         return quiz
     }
 
-    private CourseExecution createCourseExecution(Course course, String acronym, String term) {
+    private static CourseExecution createCourseExecution(Course course, String acronym, String term) {
         def courseExecution = new CourseExecution()
         courseExecution.setCourse(course)
         courseExecution.setAcronym(acronym)
@@ -129,21 +129,20 @@ class DeleteClarificationRequestServiceSpockTest extends Specification {
         given:
         clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent(CONTENT)
-        clarificationRequestDto = clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
+        clarificationRequestDto = clarificationService.submitClarificationRequest(questionId, student, clarificationRequestDto)
 
         when:
-        clarificationService.deleteClarificationRequest(studentId, clarificationRequestDto.getId())
-        def result = clarificationService.getStudentClarificationRequests(studentId)
+        clarificationService.deleteClarificationRequest(student, clarificationRequestDto.getId())
+        def result = clarificationService.getStudentClarificationRequests(student)
 
         then:
-        result != null
-        result.size() == 0
+        result.requests.size() == 0
     }
 
 
     def "clarification request doesn't exist"() {
         when:
-        clarificationService.deleteClarificationRequest(studentId, NONEXISTENT_ID)
+        clarificationService.deleteClarificationRequest(student, NONEXISTENT_ID)
 
         then:
         def exception = thrown(TutorException)
@@ -155,7 +154,7 @@ class DeleteClarificationRequestServiceSpockTest extends Specification {
 
         @Bean
         ClarificationService ClarificationService() {
-            return new ClarificationService();
+            return new ClarificationService()
         }
     }
 }

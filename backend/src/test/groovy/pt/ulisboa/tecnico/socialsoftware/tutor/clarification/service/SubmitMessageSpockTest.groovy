@@ -68,7 +68,7 @@ class SubmitMessageSpockTest extends Specification {
     ClarificationRequestRepository clarificationRequestRepository
 
     @Autowired
-    ClarificationMessageRepository clarificationMessageRepository;
+    ClarificationMessageRepository clarificationMessageRepository
 
     @Autowired
     ClarificationService clarificationService
@@ -174,7 +174,7 @@ class SubmitMessageSpockTest extends Specification {
         then: "the message was submitted"
         clarificationMessageRepository.count() == 1
         def msg = clarificationMessageRepository.findAll().get(0)
-        msg.getContent() == MESSAGE_1.getContent()
+        msg.content == MESSAGE_1.content
         msg.creator.id == user.getId()
         msg.request.id == reqId
 

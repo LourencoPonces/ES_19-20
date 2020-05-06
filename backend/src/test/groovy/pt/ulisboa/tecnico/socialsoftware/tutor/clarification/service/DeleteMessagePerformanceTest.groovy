@@ -56,7 +56,7 @@ class DeleteMessagePerformanceTest extends Specification {
     QuizAnswerRepository quizAnswerRepository
 
     @Autowired
-    QuestionAnswerRepository questionAnswerRepository;
+    QuestionAnswerRepository questionAnswerRepository
 
     @Autowired
     ClarificationService clarificationService
@@ -157,7 +157,7 @@ class DeleteMessagePerformanceTest extends Specification {
 
             def clarificationRequestDto = new ClarificationRequestDto()
             clarificationRequestDto.setContent("i need help with my performance")
-            clarificationRequestDto = clarificationService.submitClarificationRequest(i, student.getId(), clarificationRequestDto)
+            clarificationRequestDto = clarificationService.submitClarificationRequest(i, student, clarificationRequestDto)
 
             def messageDto = new ClarificationMessageDto()
             messageDto.setContent("0.75")
@@ -185,7 +185,7 @@ class DeleteMessagePerformanceTest extends Specification {
 
         @Bean
         ClarificationService ClarificationService() {
-            return new ClarificationService();
+            return new ClarificationService()
         }
     }
 }

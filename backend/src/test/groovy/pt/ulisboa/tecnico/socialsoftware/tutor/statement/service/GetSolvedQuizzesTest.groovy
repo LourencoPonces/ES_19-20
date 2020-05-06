@@ -205,7 +205,7 @@ class GetSolvedQuizzesTest extends Specification {
         and: "a clarification request about the question"
         def clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent('CONTENT')
-        clarificationService.submitClarificationRequest(question.getId(), user.getId(), clarificationRequestDto)
+        clarificationService.submitClarificationRequest(question.getId(), user, clarificationRequestDto)
 
         when:
         def solvedQuizDtos = statementService.getSolvedQuizzes(user.getId(), courseDto.getCourseExecutionId())
@@ -228,7 +228,7 @@ class GetSolvedQuizzesTest extends Specification {
         and: "a clarification request about the question"
         def clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent('CONTENT')
-        clarificationRequestDto = clarificationService.submitClarificationRequest(question.getId(), user.getId(), clarificationRequestDto)
+        clarificationRequestDto = clarificationService.submitClarificationRequest(question.getId(), user, clarificationRequestDto)
         clarificationService.changeClarificationRequestStatus(clarificationRequestDto.getId(), ClarificationRequest.RequestStatus.PUBLIC)
 
         when:
