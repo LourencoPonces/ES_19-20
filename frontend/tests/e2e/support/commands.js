@@ -474,7 +474,7 @@ Cypress.Commands.add(
         let availableNr = 1;
         let runningNr = 2;
         let conclusionNr = 3;
-        let nQuestions = '10';
+        let nQuestions = '1';
 
         cy.get('[data-cy="newTournament"]').click({ force: true });
         // wait for dialog to open
@@ -548,6 +548,7 @@ Cypress.Commands.add(
         cy.get('[role=listbox]')
             .children()
             .first()
+            .next()
             .click({ force: true });
 
         cy.get('[data-cy="saveTournament"]').click();
