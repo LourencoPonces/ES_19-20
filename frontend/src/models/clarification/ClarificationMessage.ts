@@ -1,16 +1,24 @@
 import { _ } from 'vue-underscore';
 
-export default class ClarificationRequestAnswer {
+export default class ClarificationMessage {
+  id!: number;
   requestId!: number;
-  owner!: number;
+  creatorId!: number;
   content!: string;
+  creationDate: string;
 
-  constructor(jsonObj?: ClarificationRequestAnswer) {
+  constructor(jsonObj?: ClarificationMessage) {
     if (jsonObj) {
+      this.id = jsonObj.id;
       this.requestId = jsonObj.requestId;
       this.content = jsonObj.content;
-      this.owner = jsonObj.owner;
+      this.creatorId = jsonObj.creatorId;
+      this.creationDate = jsonObj.creationDate;
     }
+  }
+
+  getId(): number {
+    return this.id;
   }
 
   setRequestId(id: number): void {
@@ -22,11 +30,11 @@ export default class ClarificationRequestAnswer {
   }
 
   setOwnerId(id: number): void {
-    this.owner = id;
+    this.creatorId = id;
   }
 
   getOwnerId(): number {
-    return this.owner;
+    return this.creatorId;
   }
 
   setContent(c: string): void {

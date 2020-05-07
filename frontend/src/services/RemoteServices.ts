@@ -16,7 +16,8 @@ import { QuizAnswers } from '@/models/management/QuizAnswers';
 import StudentQuestion from '@/models/management/StudentQuestion';
 import Tournament from '@/models/management/Tournament';
 import ClarificationRequest from '@/models/clarification/ClarificationRequest';
-import ClarificationRequestAnswer from '@/models/clarification/ClarificationRequestAnswer';
+import ClarificationMessage from '@/models/clarification/ClarificationMessage';
+import ClarificationRequestList from '@/models/clarification/ClarificationRequestList';
 
 const httpClient = axios.create();
 httpClient.defaults.timeout = 10000;
@@ -768,38 +769,31 @@ export default class RemoteServices {
     }
   }
 
-  static async submitClarificationRequestAnswer(
-    ans: ClarificationRequestAnswer
-  ): Promise<ClarificationRequestAnswer> {
-    if (ans.getContent().trim() == '') {
+  static async submitClarificationMessage(
+    msg: ClarificationMessage,
+    resolved: boolean = null
+  ): Promise<ClarificationMessage> {
+    if (msg.getContent().trim() == '') {
       // eslint-disable-next-line
       throw Error("Answer can't be empty");
     }
 
     try {
-      const response = await httpClient.put(
-        `/clarifications/${ans.getRequestId()}/answer`,
-        ans.getContent()
+      const response = await httpClient.post(
+        `/clarifications/${msg.getRequestId()}/messages`,
+        { ...msg, resolved }
       );
 
-      return new ClarificationRequestAnswer(response.data);
+      return new ClarificationMessage(response.data);
     } catch (err) {
       throw Error(await this.errorMessage(err));
     }
   }
 
-  static async getStudentClarificationRequests(): Promise<
-    ClarificationRequest[]
-  > {
-    return getAllClarificationRequests();
-  }
-
-  static async getAllClarificationRequests(): Promise<ClarificationRequest[]> {
+  static async getUserClarificationRequests(): Promise<ClarificationRequestList> {
     try {
       const response = await httpClient.get('/clarifications');
-      return response.data.map(
-        (request: any) => new ClarificationRequest(request)
-      );
+      return new ClarificationRequestList(response.data);
     } catch (error) {
       throw Error(await this.errorMessage(error));
     }
@@ -813,11 +807,11 @@ export default class RemoteServices {
       });
   }
 
-  static async deleteClarificationRequestAnswer(
-    ans: ClarificationRequestAnswer
+  static async deleteClarificationMessage(
+    msg: ClarificationMessage
   ): Promise<void> {
     try {
-      await httpClient.delete(`/clarifications/${ans.getRequestId()}/answer`);
+      await httpClient.delete(`/clarifications/messages/${msg.getId()}`);
     } catch (err) {
       throw Error(await this.errorMessage(err));
     }
