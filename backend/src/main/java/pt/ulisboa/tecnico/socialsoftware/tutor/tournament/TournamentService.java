@@ -23,6 +23,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.statement.dto.StatementQuizDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository;
@@ -199,6 +200,23 @@ public class TournamentService {
                         tournament.getCourseExecution().getId() == executionId)
                 .map(TournamentDto::new)
                 .collect(Collectors.toList());
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public StatementQuizDto getQuiz(String username, int tournamentId) {
+        User user = userRepository.findByUsername(username);
+
+        Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow(() -> new TutorException(TOURNAMENT_NOT_FOUND, tournamentId));
+
+        if (tournament.getQuiz() == null) {
+            throw new TutorException(NO_TOURNAMENT_QUIZ);
+        }
+
+        return new StatementQuizDto(tournament.getQuiz().getQuizAnswers()
+                .stream().filter(quizAnswer -> quizAnswer.getUser().equals(user)).findFirst().get());
     }
 
     private void checkKey(TournamentDto tournamentDto) {

@@ -87,6 +87,7 @@ public enum ErrorMessage {
 
     TOURNAMENT_NOT_CONSISTENT("Field %s of tournament is not consistent"),
     TOURNAMENT_NOT_AVAILABLE("There aren't any available tournaments"),
+    NO_TOURNAMENT_QUIZ("There isn't any quiz generated for this tournament"),
     USER_ALREADY_SIGNED_UP_IN_TOURNAMENT("User already signed-up in tournament"),
     TOURNAMENT_CREATED_BY_NON_STUDENT("Tournament created by non-student"),
     USER_NOT_ENROLLED_IN_COURSE_EXECUTION("User not enrolled in course execution %s"),
