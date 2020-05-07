@@ -20,6 +20,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.ImageRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.OptionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
@@ -70,6 +71,9 @@ class TeacherPromotesStudentQuestionTest extends Specification {
 
     @Autowired
     StudentQuestionRepository studentQuestionRepository
+
+    @Autowired
+    QuestionRepository questionRepository
 
     @Autowired
     UserRepository userRepository
@@ -212,6 +216,10 @@ class TeacherPromotesStudentQuestionTest extends Specification {
         def result = studentQuestionRepository.findAll().get(0)
         result.getSubmittedStatus() == StudentQuestion.SubmittedStatus.PROMOTED
         result.getJustification() == ""
+
+        // check this exists in teacher's questions
+        questionRepository.count() == 1L
+        result.equals(questionRepository.findAll().get(0))
     }
 
     def "promote existing pending question with valid justification"() {
@@ -223,6 +231,10 @@ class TeacherPromotesStudentQuestionTest extends Specification {
         def result = studentQuestionRepository.findAll().get(0)
         result.getSubmittedStatus() == StudentQuestion.SubmittedStatus.PROMOTED
         result.getJustification() == JUSTIFICATION
+
+        // check this exists in teacher's questions
+        questionRepository.count() == 1L
+        result.equals(questionRepository.findAll().get(0))
     }
 
     def "edit and promote existing student question"() {
@@ -240,6 +252,9 @@ class TeacherPromotesStudentQuestionTest extends Specification {
         result.getSubmittedStatus() == StudentQuestion.SubmittedStatus.PROMOTED
         result.getJustification() == JUSTIFICATION
 
+        // check this exists in teacher's questions
+        questionRepository.count() == 1L
+        result.equals(questionRepository.findAll().get(0))
     }
 
     def "promote existing pending question with invalid justification"() {
