@@ -81,9 +81,9 @@ class SubmitAnswerTest extends Specification {
     int reqId
 
     def setup() {
-        course = createCourse(COURSE_NAME)
+        course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseExecution = createCourseExecution(course, ACRONYM, ACADEMIC_TERM)
-        quiz = createQuiz(1, courseExecution, Quiz.QuizType.GENERATED)
+        quiz = createQuiz(1, courseExecution, "GENERATED")
         question = createQuestion(1, course)
         quizQuestion = new QuizQuestion(quiz, question, 1)
         student = createStudent(1, "STUDENT", courseExecution)
@@ -137,11 +137,12 @@ class SubmitAnswerTest extends Specification {
         def question = new Question()
         question.setKey(key)
         question.setCourse(course)
+        question.setTitle("TITLE")
         course.addQuestion(question)
         return question
     }
 
-    private Quiz createQuiz(int key, CourseExecution courseExecution, Quiz.QuizType type) {
+    private Quiz createQuiz(int key, CourseExecution courseExecution, String type) {
         def quiz = new Quiz()
         quiz.setKey(key)
         quiz.setType(type)
@@ -158,15 +159,9 @@ class SubmitAnswerTest extends Specification {
         return courseExecution
     }
 
-    private Course createCourse(String name) {
-        def course = new Course()
-        course.setName(name)
-        return course
-    }
-
     def "submit an answer"() {
         when:
-        clarificationService.submitClarificationRequestAnswer(teacherId, reqId, ANSWER_1)
+        clarificationService.submitClarificationRequestAnswer(teacher, reqId, ANSWER_1)
 
         then: "the answer was submitted"
         clarificationRequestAnswerRepository.count() == 1
@@ -178,10 +173,10 @@ class SubmitAnswerTest extends Specification {
 
     def "submit answer to already answered request"() {
         given: "a clarification request that already has an answer"
-        clarificationService.submitClarificationRequestAnswer(teacherId, reqId, ANSWER_1)
+        clarificationService.submitClarificationRequestAnswer(teacher, reqId, ANSWER_1)
 
         when:
-        clarificationService.submitClarificationRequestAnswer(teacherId, reqId, ANSWER_2)
+        clarificationService.submitClarificationRequestAnswer(teacher, reqId, ANSWER_2)
 
         then: "the answer was replaced"
         def saved_answer = clarificationRequest.getAnswer().map({a -> a.getContent()}).get()
@@ -189,22 +184,20 @@ class SubmitAnswerTest extends Specification {
     }
 
     @Unroll
-    def "validity check: (validTeacher=#validT, validRequest=#validR, answer=#answer) -> #errorMessage"() {
+    def "validity check: (validRequest=#validR, answer=#answer) -> #errorMessage"() {
         when: "submitting an answer for a null clarification request"
-        def tid = validT ? teacherId : studentId
         def rid = validR ? reqId : -1
-        clarificationService.submitClarificationRequestAnswer(tid, rid, answer)
+        clarificationService.submitClarificationRequestAnswer(teacher, rid, answer)
 
         then: "an exception"
         def exception = thrown(TutorException)
         exception.getErrorMessage() == errorMessage
 
         where:
-        validT | validR | answer     || errorMessage
-        true   | false  | ANSWER_1   || ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND
-        false  | true   | ANSWER_1   || ErrorMessage.ACCESS_DENIED
-        true   | true   | " \n  \t " || ErrorMessage.CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT
-        true   | true   | null       || ErrorMessage.CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT
+        validR | answer     || errorMessage
+        false  | ANSWER_1   || ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND
+        true   | " \n  \t " || ErrorMessage.CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT
+        true   | null       || ErrorMessage.CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT
     }
 
     @TestConfiguration

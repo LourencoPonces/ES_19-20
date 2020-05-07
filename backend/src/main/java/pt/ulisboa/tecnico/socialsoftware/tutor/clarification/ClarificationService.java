@@ -24,8 +24,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
-
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Service
@@ -43,20 +46,32 @@ public class ClarificationService {
     @PersistenceContext
     EntityManager entityManager;
 
-
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public ClarificationRequestAnswerDto getClarificationRequestAnswer(int studentId, int questionId) {
-        User student = getStudent(studentId);
+    public ClarificationRequestDto changeClarificationRequestStatus(int reqId, ClarificationRequest.RequestStatus status) {
+        ClarificationRequest req = clarificationRequestRepository.findById(reqId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND));
 
-        if (!questionRepository.existsById(questionId)) {
-            throw new TutorException(ErrorMessage.QUESTION_NOT_FOUND, questionId);
+        req.setStatus(status);
+        return new ClarificationRequestDto(req);
+    }
+
+
+    @Retryable(
+            value = {SQLException.class},
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public ClarificationRequestAnswerDto getClarificationRequestAnswer(int userId, int requestId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new TutorException(ErrorMessage.AUTHENTICATION_ERROR));
+
+        ClarificationRequest clarificationRequest = clarificationRequestRepository.findById(requestId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_SUBMITTED, user.getUsername()));
+
+        if (user.getRole() == User.Role.STUDENT && !clarificationRequest.getOwner().getId().equals(user.getId())) {
+            throw new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_SUBMITTED, user.getUsername());
         }
-
-        ClarificationRequest clarificationRequest = clarificationRequestRepository.getByStudentQuestion(studentId, questionId)
-                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_SUBMITTED, student.getUsername(), questionId));
 
         ClarificationRequestAnswer answer = clarificationRequest.getAnswer()
                 .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_UNANSWERED));
@@ -66,14 +81,12 @@ public class ClarificationService {
     }
 
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public ClarificationRequestAnswerDto submitClarificationRequestAnswer(int teacherId, int reqId, String answerText) {
-        User teacher = getTeacher(teacherId);
-
+    public ClarificationRequestAnswerDto submitClarificationRequestAnswer(User teacher, int reqId, String answerText) {
         ClarificationRequest req = clarificationRequestRepository.findById(reqId)
-                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, reqId));
+                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND));
 
         // Create/update answer
         ClarificationRequestAnswer ans = req.getAnswer().orElseGet(ClarificationRequestAnswer::new);
@@ -91,15 +104,12 @@ public class ClarificationService {
     }
 
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void removeClarificationRequestAnswer(int teacherId, int reqId) {
-        // check if user is a teacher
-        getTeacher(teacherId);
-
+    public void deleteClarificationRequestAnswer(User teacher, int reqId) {
         ClarificationRequest req = clarificationRequestRepository.findById(reqId)
-                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, reqId));
+                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND));
 
         ClarificationRequestAnswer ans = req.getAnswer().orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_UNANSWERED));
 
@@ -110,7 +120,46 @@ public class ClarificationService {
     }
 
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void deleteClarificationRequest(int userId, int reqId) {
+        User student = getStudent(userId);
+        ClarificationRequest req = clarificationRequestRepository.findById(reqId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND));
+        if (req.hasAnswer()) {
+            throw new TutorException(ErrorMessage.CLARIFICATION_REQUEST_ANSWERED);
+        }
+
+        student.removeClarificationRequest(req.getId());
+        clarificationRequestRepository.deleteById(req.getId());
+
+
+    }
+
+    @Retryable(
+            value = {SQLException.class},
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public ClarificationRequestDto updateClarificationRequest(ClarificationRequestDto clarificationRequestDto) {
+        ClarificationRequest req = clarificationRequestRepository.findById(clarificationRequestDto.getId())
+                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND));
+
+        if  (req.hasAnswer()) {
+            throw new TutorException(ErrorMessage.CLARIFICATION_REQUEST_ANSWERED);
+        }
+        else if (clarificationRequestDto.getContent().isEmpty()) {
+            throw new TutorException((ErrorMessage.CLARIFICATION_REQUEST_MISSING_CONTENT));
+        }
+
+        req.setContent(clarificationRequestDto.getContent());
+        entityManager.persist(req);
+
+        return new ClarificationRequestDto(req);
+    }
+
+    @Retryable(
+            value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public ClarificationRequestDto submitClarificationRequest(int questionId, int userId, ClarificationRequestDto clarificationRequestDto) {
@@ -133,12 +182,26 @@ public class ClarificationService {
     }
 
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<ClarificationRequestDto> getStudentClarificationRequests(int userId) {
+        User user = getStudent(userId);
+        return user.getClarificationRequests()
+                .stream()
+                .map(ClarificationRequestDto::new)
+                .sorted(Comparator.comparing(ClarificationRequestDto::getId).reversed())
+                .collect(Collectors.toList());
+    }
+
+    @Retryable(
+            value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     private ClarificationRequest createClarificationRequest(User user, Question question, ClarificationRequestDto clarificationRequestDto) {
         clarificationRequestDto.setOwner(user.getId());
         clarificationRequestDto.setQuestionId(question.getId());
+        clarificationRequestDto.setStatus(ClarificationRequest.RequestStatus.PRIVATE);
         ClarificationRequest clarificationRequest = new ClarificationRequest(user, question, clarificationRequestDto);
 
         if (clarificationRequestDto.getCreationDate() == null) {
@@ -150,7 +213,18 @@ public class ClarificationService {
     }
 
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
+            backoff = @Backoff(delay = 5000)
+    )
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<ClarificationRequestDto> getTeacherClarificationRequests(int teacherId) {
+        return clarificationRequestRepository.getTeacherRequests(teacherId)
+                .map(ClarificationRequestDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Retryable(
+            value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     private Question tryGetAnsweredQuestion(int questionId, int userId) {
@@ -166,7 +240,7 @@ public class ClarificationService {
             }
         }
         if (!answered) {
-            throw new TutorException(ErrorMessage.QUESTION_NOT_ANSWERED_BY_STUDENT, questionId, userId);
+            throw new TutorException(ErrorMessage.QUESTION_NOT_ANSWERED_BY_STUDENT);
         }
         return question;
     }
@@ -174,13 +248,13 @@ public class ClarificationService {
     private void checkIfDuplicate(int questionId, User user) {
         for (ClarificationRequest cr : user.getClarificationRequests()) {
             if (cr.getQuestion().getId() == questionId) {
-                throw new TutorException(ErrorMessage.DUPLICATE_CLARIFICATION_REQUEST, user.getUsername(), questionId);
+                throw new TutorException(ErrorMessage.DUPLICATE_CLARIFICATION_REQUEST, user.getUsername());
             }
         }
     }
 
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     private User getStudent(int userId) {
@@ -192,12 +266,11 @@ public class ClarificationService {
         return user;
     }
 
-    private User getTeacher(int userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, userId));
-
-        if (user.getRole() != User.Role.TEACHER) {
-            throw new TutorException(ErrorMessage.ACCESS_DENIED);
-        }
-        return user;
+    public Integer findClarificationRequestCourseId(int requestId) {
+        return clarificationRequestRepository.findById(requestId)
+                .map(req -> req.getQuestion().getCourse().getId())
+                .orElse(-1);
     }
+
+
 }

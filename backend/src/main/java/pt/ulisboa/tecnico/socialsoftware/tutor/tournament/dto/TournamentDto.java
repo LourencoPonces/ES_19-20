@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Transient;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
@@ -78,6 +79,7 @@ public class TournamentDto implements Serializable {
         this.title = title;
     }
 
+    @JsonIgnore
     public Tournament.Status getStatus() {
         if (isCancelled) return Tournament.Status.CANCELLED;
 
@@ -95,38 +97,6 @@ public class TournamentDto implements Serializable {
             return Tournament.Status.RUNNING;
         else
             return Tournament.Status.FINISHED;
-    }
-
-    public String getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(String creationDate) {
-        this.creationDate = creationDate;
-    }
-
-    public String getAvailableDate() {
-        return availableDate;
-    }
-
-    public void setAvailableDate(String availableDate) {
-        this.availableDate = availableDate;
-    }
-
-    public String getRunningDate() {
-        return runningDate;
-    }
-
-    public void setRunningDate(String runningDate) {
-        this.runningDate = runningDate;
-    }
-
-    public String getConclusionDate() {
-        return conclusionDate;
-    }
-
-    public void setConclusionDate(String conclusionDate) {
-        this.conclusionDate = conclusionDate;
     }
 
     public Integer getNumberOfQuestions() {
@@ -159,6 +129,42 @@ public class TournamentDto implements Serializable {
 
     public void setTopics(List<TopicDto> topics) {
         this.topics = topics;
+    }
+
+    public boolean getIsCancelled() { return isCancelled; }
+
+    public void setIsCancelled() { isCancelled = true; }
+
+    public String getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(String creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public String getAvailableDate() {
+        return availableDate;
+    }
+
+    public void setAvailableDate(String availableDate) {
+        this.availableDate = availableDate;
+    }
+
+    public String getRunningDate() {
+        return runningDate;
+    }
+
+    public void setRunningDate(String runningDate) {
+        this.runningDate = runningDate;
+    }
+
+    public String getConclusionDate() {
+        return conclusionDate;
+    }
+
+    public void setConclusionDate(String conclusionDate) {
+        this.conclusionDate = conclusionDate;
     }
 
     public LocalDateTime getCreationDateDate() {

@@ -14,11 +14,13 @@ import java.util.stream.Collectors;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CLARIFICATION_REQUEST_MISSING_CONTENT;
 
-
-
 @Entity
 @Table(name = "clarification_requests")
 public class ClarificationRequest {
+
+    public enum RequestStatus{
+        PRIVATE, PUBLIC
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,6 +45,9 @@ public class ClarificationRequest {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "request", fetch=FetchType.LAZY, orphanRemoval=true, optional=true)
     private ClarificationRequestAnswer answer;
 
+    @Enumerated(EnumType.STRING)
+    private RequestStatus status = RequestStatus.PRIVATE;
+
     public ClarificationRequest() {}
 
     public ClarificationRequest(User user, Question question, ClarificationRequestDto clarificationRequestDto) {
@@ -52,6 +57,7 @@ public class ClarificationRequest {
         this.question = question;
         this.content = clarificationRequestDto.getContent();
         this.creationDate = clarificationRequestDto.getCreationDateDate();
+        this.status = clarificationRequestDto.getStatus();
     }
 
     private void checkConsistentClarificationRequest(ClarificationRequestDto clarificationRequestDto) {
@@ -97,4 +103,7 @@ public class ClarificationRequest {
     public Optional<ClarificationRequestAnswer> getAnswer() { return Optional.ofNullable(answer); }
     public void setAnswer(ClarificationRequestAnswer a) { this.answer = a; }
     public void removeAnswer() { this.setAnswer(null); }
+    public boolean hasAnswer() {return this.answer != null; }
+    public RequestStatus getStatus() { return this.status; }
+    public void setStatus(RequestStatus status) { this.status = status; }
 }

@@ -5,9 +5,10 @@ import javax.persistence.*;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO;
-import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course;
+
+import java.util.Set;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
@@ -21,10 +22,10 @@ import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 public class StudentQuestion extends Question {
 
     public enum SubmittedStatus {
-        WAITING_FOR_APPROVAL, REJECTED, APPROVED
+        WAITING_FOR_APPROVAL, REJECTED, APPROVED, PROMOTED
     }
 
-
+    static private final int MAX_JUSTIFICATION_SIZE = 255;
 
     @Column(name="student_question_key")
     private Integer studentQuestionKey;
@@ -57,7 +58,6 @@ public class StudentQuestion extends Question {
     }
 
     public Integer getStudentQuestionKey() { return studentQuestionKey; }
-
     public void setStudentQuestionKey(Integer studentQuestionKey) { this.studentQuestionKey = studentQuestionKey; }
 
     public String getJustification() { return justification; }
@@ -67,16 +67,68 @@ public class StudentQuestion extends Question {
     public void setUser(User user) { this.user = user; }
 
     public SubmittedStatus getSubmittedStatus() { return submittedStatus; }
+    /* Only used for easy test set up. Any domain logic should use the evaluate method */
     public void setSubmittedStatus(SubmittedStatus status) { this.submittedStatus = status; }
+
+    public void evaluate(SubmittedStatus status, String newJustification) {
+       if(this.submittedStatus == SubmittedStatus.PROMOTED) {
+           throw new TutorException(CANNOT_EVALUATE_PROMOTED_QUESTION);
+       }
+
+       // assert valid justification
+       if(!this.validJustification(newJustification)) {
+           throw new TutorException(INVALID_JUSTIFICATION, newJustification);
+       }
+
+        // set status and justification
+        if(newJustification == null) newJustification = "";
+
+       if(status.equals(SubmittedStatus.REJECTED) && newJustification.isBlank()) {
+           throw new TutorException(CANNOT_REJECT_WITHOUT_JUSTIFICATION);
+       }
+
+       // TODO: REMOVE WHEN IMPLEMENTING F11 (keeping for now because i'm working in another feature)
+       if(this.submittedStatus.equals(SubmittedStatus.APPROVED) && status.equals(SubmittedStatus.REJECTED)) {
+           throw new TutorException(CANNOT_REJECT_ACCEPTED_SUGGESTION);
+       }
+
+
+       this.submittedStatus = status;
+       this.justification = newJustification;
+
+    }
+
+    private boolean validJustification(String just) {
+        return just == null || ( !just.isBlank() && just.length() <= MAX_JUSTIFICATION_SIZE);
+    }
 
     public void checkStudentQuestionConsistency(StudentQuestionDTO questionDto, User user) {
 
         if ((long) questionDto.getTopics().size() == 0) {
             throw new TutorException(NO_TOPICS);
         }
+    }
 
-        if(user.getRole() != User.Role.STUDENT) {
-            throw new TutorException(ACCESS_DENIED);
+    public void update(StudentQuestionDTO studentQuestionDTO, Set<Topic> newTopics) {
+        checkStudentQuestionConsistency(studentQuestionDTO, user);
+        super.update(studentQuestionDTO);
+        this.justification = studentQuestionDTO.getJustification();
+        setStudentQuestionKey(studentQuestionDTO.getStudentQuestionKey());
+        this.updateTopics(newTopics);
+        if(getSubmittedStatus() == SubmittedStatus.REJECTED)
+            setSubmittedStatus(SubmittedStatus.WAITING_FOR_APPROVAL);
+    }
+
+    @Override
+    public void remove() {
+        canRemoveStudentQuestion();
+        getUser().getStudentQuestions().remove(this);
+        super.remove();
+    }
+
+    public void canRemoveStudentQuestion() {
+        if(getSubmittedStatus() != SubmittedStatus.WAITING_FOR_APPROVAL) {
+            throw new TutorException(QUESTION_ALREADY_READ, getId());
         }
     }
 

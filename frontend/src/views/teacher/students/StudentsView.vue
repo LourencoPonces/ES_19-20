@@ -1,4 +1,4 @@
-<template>
+/*<template>
   <v-card class="table">
     <v-data-table
       :headers="headers"
@@ -7,7 +7,6 @@
       disable-pagination
       :hide-default-footer="true"
       :mobile-breakpoint="0"
-      multi-sort
     >
       <template v-slot:top>
         <v-card-title>

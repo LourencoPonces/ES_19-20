@@ -18,6 +18,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CANNOT_EVALUATE_PROMOTED_QUESTION
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.INVALID_JUSTIFICATION
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.STUDENT_QUESTION_NOT_FOUND
 
@@ -31,10 +32,18 @@ class TeacherApprovesStudentQuestionTest extends Specification {
 
     public static final String USER_NAME = "ist199999"
 
+    public static final String QUESTION_TITLE = "Question Title"
+    public static final String QUESTION_CONTENT = "Question Content"
+
+    public static final String OPTION_CONTENT = "Option Content"
+
     public static final Integer STUDENT_QUESTION_KEY = 1
     public static final Integer FAKE_STUDENT_QUESTION_ID = 2
 
     public static final String JUSTIFICATION = "very good question"
+    public static final String LONG_JUSTIFICATION = "very long long long long long long long long long long long " +
+            "long long long long long long long long long long long long long long long long long long long long " +
+            "long long long long long long long long long long long long long long long long long justification"
 
     @Autowired
     TeacherEvaluatesStudentQuestionService teacherEvaluatesStudentQuestionService
@@ -76,11 +85,15 @@ class TeacherApprovesStudentQuestionTest extends Specification {
 
     private StudentQuestion createStudentQuestion(User user, Course course) {
         def studentQuestion = new StudentQuestion()
+        studentQuestion.setTitle(QUESTION_TITLE)
+        studentQuestion.setContent(QUESTION_CONTENT)
         studentQuestion.addTopic(new Topic())
 
         Option o = new Option()
         o.setCorrect(true)
         o.setQuestion(studentQuestion)
+        o.setContent(OPTION_CONTENT)
+        o.setSequence(0)
         studentQuestion.addOption(o)
         studentQuestion.setKey(STUDENT_QUESTION_KEY)
         studentQuestion.setStudentQuestionKey(STUDENT_QUESTION_KEY)
@@ -101,7 +114,7 @@ class TeacherApprovesStudentQuestionTest extends Specification {
 
     def "approve existing pending question with no justification"() {
         when:
-        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(savedQuestionId, null)
+        teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(savedQuestionId, StudentQuestion.SubmittedStatus.APPROVED, null)
 
         then:
         studentQuestionRepository.count() == 1L
@@ -112,7 +125,7 @@ class TeacherApprovesStudentQuestionTest extends Specification {
 
     def "approve existing pending question with valid justification"() {
         when:
-        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(savedQuestionId, JUSTIFICATION)
+        teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(savedQuestionId, StudentQuestion.SubmittedStatus.APPROVED, JUSTIFICATION)
 
         then:
         studentQuestionRepository.count() == 1L
@@ -123,7 +136,7 @@ class TeacherApprovesStudentQuestionTest extends Specification {
 
     def "approve existing pending question with invalid justification"() {
         when:
-        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(savedQuestionId, justification)
+        teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(savedQuestionId, StudentQuestion.SubmittedStatus.APPROVED, justification)
 
         then:
         def error = thrown(TutorException)
@@ -132,9 +145,10 @@ class TeacherApprovesStudentQuestionTest extends Specification {
         // invalid justifications:
         //   empty strings or null
         where:
-        justification || result
-        "   "         || INVALID_JUSTIFICATION
-        "\n  \t"      || INVALID_JUSTIFICATION
+        justification       || result
+        "   "               || INVALID_JUSTIFICATION
+        LONG_JUSTIFICATION  || INVALID_JUSTIFICATION
+        "\n  \t"            || INVALID_JUSTIFICATION
     }
 
     def "approve already evaluated student question, #isApproved->#result"() {
@@ -145,7 +159,7 @@ class TeacherApprovesStudentQuestionTest extends Specification {
 
 
         when:
-        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(savedQuestionId, null)
+        teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(savedQuestionId, StudentQuestion.SubmittedStatus.APPROVED, null)
 
         then:
         studentQuestionRepository.findAll().get(0).getSubmittedStatus() == result
@@ -156,9 +170,24 @@ class TeacherApprovesStudentQuestionTest extends Specification {
         false      || StudentQuestion.SubmittedStatus.APPROVED
     }
 
+    def "approve already promoted student question"() {
+        given: 'pending student question'
+        studentQuestionRepository.count() == 1L
+        def question = studentQuestionRepository.findAll().get(0)
+        question.setSubmittedStatus(StudentQuestion.SubmittedStatus.PROMOTED)
+
+
+        when:
+        teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(savedQuestionId, StudentQuestion.SubmittedStatus.APPROVED, null)
+
+        then:
+        def error = thrown(TutorException)
+        error.errorMessage == CANNOT_EVALUATE_PROMOTED_QUESTION
+    }
+
     def "approve non existing student question"(){
         when:
-        teacherEvaluatesStudentQuestionService.acceptStudentQuestion(FAKE_STUDENT_QUESTION_ID, null)
+        teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(FAKE_STUDENT_QUESTION_ID, StudentQuestion.SubmittedStatus.APPROVED, null)
 
         then:
         def error = thrown(TutorException)
