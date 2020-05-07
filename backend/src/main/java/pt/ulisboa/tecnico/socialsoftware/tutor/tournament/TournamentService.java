@@ -262,6 +262,8 @@ public class TournamentService {
 
         quiz.setTitle(tournament.getTitle() + " - Quiz");
 
+        quiz.setCourseExecution(tournament.getCourseExecution());
+
         quiz.setCreationDate(tournament.getCreationDate());
         quiz.setAvailableDate(tournament.getRunningDate());
         quiz.setConclusionDate(tournament.getConclusionDate());
