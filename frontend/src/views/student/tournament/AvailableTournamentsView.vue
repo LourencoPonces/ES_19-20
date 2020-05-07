@@ -12,6 +12,7 @@
         :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
         no-data-text="No Available Tournaments"
         no-results-text="No Tournaments Found"
+        data-cy="available-tournaments"
       >
         <template v-slot:top>
           <v-card-title>
@@ -22,23 +23,8 @@
               class="mx-2"
             />
             <v-spacer />
-            <v-btn
-              color="primary"
-              dark
-              @click="newTournament"
-              data-cy="newTournament"
-              >New Tournament</v-btn
-            >
-            <edit-tournament-dialog
-              v-if="currentTournament"
-              v-model="editTournamentDialog"
-              :tournament="currentTournament"
-              :topics="topics"
-              @saveTournament="createdTournament"
-            />
           </v-card-title>
         </template>
-
         <template v-slot:item.topics="{ item }">
           <v-chip-group data-cy="topics-list">
             <v-chip v-for="topic in item.topics" :key="topic.name">
@@ -46,35 +32,33 @@
             </v-chip>
           </v-chip-group>
         </template>
-
-        <template v-slot:item.sign-up-button="{ item }">
-          <v-btn color="primary" @click="signUpInTournament(item)"
-            >Sign-up</v-btn
-          >
-        </template>
-
         <template v-slot:item.creator="{ item }">
           <span>{{ item.creator.username }}</span>
         </template>
-
         <template v-slot:item.sign-up-status="{ item }" data-cy="status">
-          <div v-if="signedUpTournaments.includes(item)">
-            <v-chip color="green" dark>{{ 'Signed-Up' }}</v-chip>
-          </div>
-          <div v-else>
-            <v-btn color="primary" @click="signUpInTournament(item)"
-              >Sign-up</v-btn
-            >
-          </div>
+          <v-simple-checkbox
+            :value="signedUpTournaments.includes(item)"
+            readonly
+            color="green"
+            :aria-label="signedUpTournaments.includes(item)"
+          />
         </template>
-
-        <template v-slot:item.delete-button="{ item }">
-          <v-btn
-            color="red"
-            @click="deleteTournament(item)"
-            data-cy="deleteTournament"
-            >Delete</v-btn
-          >
+        <template v-slot:item.action="{ item }">
+          <v-tooltip bottom>
+            <template
+              v-slot:activator="{ on }"
+              v-if="!signedUpTournaments.includes(item)"
+            >
+              <v-icon
+                large
+                class="mr-2"
+                v-on="on"
+                @click="signUpInTournament(item)"
+                >fas fa-sign-in-alt</v-icon
+              >
+            </template>
+            <span>Sign Up</span>
+          </v-tooltip>
         </template>
       </v-data-table>
     </v-card>
@@ -97,12 +81,17 @@ import EditTournamentDialog from './EditTournamentDialog.vue';
 export default class AvailableTournamentsView extends Vue {
   availableTournaments: Tournament[] = [];
   signedUpTournaments: Tournament[] = [];
-  currentTournament: Tournament | null = null;
-  editTournamentDialog: boolean = false;
   topics!: Topic[];
   search: string = '';
 
   headers: object = [
+    {
+      text: 'Actions',
+      value: 'action',
+      align: 'center',
+      width: '10%',
+      sortable: false
+    },
     {
       text: 'Title',
       value: 'title',
@@ -123,8 +112,8 @@ export default class AvailableTournamentsView extends Vue {
       width: '10%'
     },
     {
-      text: 'Available Date',
-      value: 'availableDate',
+      text: 'Participants',
+      value: 'participants.length',
       align: 'center',
       width: '10%'
     },
@@ -148,21 +137,10 @@ export default class AvailableTournamentsView extends Vue {
       sortable: false
     },
     {
-      text: 'Participants',
-      value: 'participants.length',
-      align: 'center',
-      width: '10%'
-    },
-    {
+      text: 'Signed Up',
       value: 'sign-up-status',
       align: 'center',
       width: '10%',
-      sortable: false
-    },
-    {
-      value: 'delete-button',
-      align: 'center',
-      width: '5%',
       sortable: false
     }
   ];
@@ -178,25 +156,6 @@ export default class AvailableTournamentsView extends Vue {
     await this.$store.dispatch('clearLoading');
   }
 
-  newTournament() {
-    this.currentTournament = new Tournament();
-    this.editTournamentDialog = true;
-  }
-
-  @Watch('editTournamentDialog')
-  closeError() {
-    if (!this.editTournamentDialog) {
-      this.currentTournament = null;
-    }
-  }
-
-  async createdTournament() {
-    this.editTournamentDialog = false;
-    await this.$store.dispatch('loading');
-    await this.getAvailableTournaments();
-    await this.$store.dispatch('clearLoading');
-  }
-
   async signUpInTournament(tournament: Tournament) {
     if (tournament.id)
       try {
@@ -204,19 +163,6 @@ export default class AvailableTournamentsView extends Vue {
       } catch (error) {
         await this.$store.dispatch('error', error);
       }
-
-    await this.$store.dispatch('loading');
-    await this.getAvailableTournaments();
-    await this.$store.dispatch('clearLoading');
-  }
-
-  async deleteTournament(tournament: Tournament) {
-    try {
-      await RemoteServices.deleteTournament(tournament);
-    } catch (error) {
-      await this.$store.dispatch('error', error);
-    }
-
     await this.$store.dispatch('loading');
     await this.getAvailableTournaments();
     await this.$store.dispatch('clearLoading');

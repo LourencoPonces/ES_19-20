@@ -1,4 +1,4 @@
-describe('Sign-up in Tournament', () => {
+describe('Cancel Tournament', () => {
   beforeEach(() => {
     cy.demoStudentLogin();
     cy.get('[data-cy=tournaments]').click();
@@ -16,13 +16,12 @@ describe('Sign-up in Tournament', () => {
 
     cy.createTournament(title, false, true, true, true);
     cy.wait(1000);
-    cy.get('[data-cy=tournaments]').click();
-    cy.get('[data-cy=tournaments-available]').click();
-    cy.wait(1000);
-    cy.assertSignUpTournament(title, 10, 1);
-    cy.get('[data-cy=tournaments]').click();
-    cy.get('[data-cy=tournaments-created]').click();
-    cy.wait(1000);
+
+    cy.get('[data-cy="cancelTournament"]').click({ force: true });
+    cy.contains(title)
+        .parent()
+        .find('[data-cy="status"]')
+        .should('contain', 'Cancelled')
     cy.deleteTournament(title);
     cy.wait(1000);
   });

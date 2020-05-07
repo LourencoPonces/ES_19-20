@@ -106,4 +106,16 @@ public class TournamentController {
         return tournamentService.getCreatedTournaments(user.getId());
     }
 
+    @PostMapping("/tournaments/{tournamentId}/cancel")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#tournamentId, 'TOURNAMENT.ACCESS')")
+    public void cancelTournament(Principal principal, @PathVariable int tournamentId) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        if (user == null) {
+            throw new TutorException(AUTHENTICATION_ERROR);
+        }
+
+        tournamentService.cancelTournament(user.getUsername(), tournamentId);
+    }
+
 }

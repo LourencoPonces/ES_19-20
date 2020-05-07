@@ -3,11 +3,9 @@ import Topic from '@/models/management/Topic';
 
 export default class Tournament {
   id: number | null = null;
-  number!: number; // TODO: Does this correspond to the key?
+  key!: number;
   title!: string;
   numberOfQuestions!: number;
-
-  // TODO: Why are the dates undefined (check Quiz.ts)
   creationDate!: string | undefined;
   availableDate!: string | undefined;
   runningDate!: string | undefined;
@@ -20,7 +18,7 @@ export default class Tournament {
   constructor(jsonObj?: Tournament) {
     if (jsonObj) {
       this.id = jsonObj.id;
-      this.number = jsonObj.number;
+      this.key = jsonObj.key;
       this.title = jsonObj.title;
       this.numberOfQuestions = jsonObj.numberOfQuestions;
       this.creationDate = jsonObj.creationDate;
