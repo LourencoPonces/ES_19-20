@@ -58,6 +58,10 @@ class TeacherPromotesStudentQuestionTest extends Specification {
     public static final String NEW_QUESTION_CONTENT = 'new question content'
     public static final String URL = 'URL'
 
+    public static final String LONG_JUSTIFICATION = "very long long long long long long long long long long long " +
+            "long long long long long long long long long long long long long long long long long long long long " +
+            "long long long long long long long long long long long long long long long long long justification"
+
 
     @Autowired
     TeacherEvaluatesStudentQuestionService teacherEvaluatesStudentQuestionService
@@ -268,9 +272,10 @@ class TeacherPromotesStudentQuestionTest extends Specification {
         // invalid justifications:
         //   empty strings or null
         where:
-        justification || result
-        "   "         || INVALID_JUSTIFICATION
-        "\n  \t"      || INVALID_JUSTIFICATION
+        justification       || result
+        "   "               || INVALID_JUSTIFICATION
+        LONG_JUSTIFICATION  || INVALID_JUSTIFICATION
+        "\n  \t"            || INVALID_JUSTIFICATION
     }
 
     def "promote already promoted student question"() {
