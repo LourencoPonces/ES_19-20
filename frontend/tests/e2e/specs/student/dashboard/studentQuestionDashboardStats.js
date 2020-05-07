@@ -1,6 +1,7 @@
-let APPROVED = 'Approved';
-let REJECTED = 'Rejected';
-let WAITING_FOR_APPROVAL = 'Waiting for Approval';
+const APPROVED = 'Approved';
+const REJECTED = 'Rejected';
+const WAITING_FOR_APPROVAL = 'Waiting for Approval';
+const PRIVATE = 'Private';
 
 describe('Student Question Submission', () => {
   let ts;
@@ -21,6 +22,8 @@ describe('Student Question Submission', () => {
     'New Test Option 4'
   ];
 
+  const demoStudent = 'Demo Student';
+
   beforeEach(() => {
     cy.exec('psql tutordb < ../backend/resetStudentQuestions.sql');
     cy.demoStudentLogin();
@@ -30,6 +33,32 @@ describe('Student Question Submission', () => {
     // clean exit
     cy.contains('Demo Course').click();
     cy.logout();
+  });
+
+  it('change demo student dashboard stats visibility', () => {
+    // make the 2 stats private and check
+    cy.get('[data-cy="dashboardButton"]').click();
+    const submittedQuestionsDiv = '[data-cy="submittedQuestionsDiv"]';
+    const approvedQuestionsDiv = '[data-cy="approvedQuestionsDiv"]';
+    const submittedQuestionsRow = '[data-cy="submittedQuestionsRow"]';
+    const approvedQuestionsRow = '[data-cy="approvedQuestionsRow"]';
+
+    cy.makePrivate(submittedQuestionsDiv);
+    cy.makePrivate(approvedQuestionsDiv);
+
+    cy.openDashboardStatsDialog(demoStudent);
+    cy.checkVisibility(submittedQuestionsRow, PRIVATE);
+    cy.checkVisibility(approvedQuestionsRow, PRIVATE);
+    cy.get('[data-cy="closeDashboardTable"]').click();
+
+    // make the 2 stats public and check
+    cy.makePublic(submittedQuestionsDiv);
+    cy.makePublic(approvedQuestionsDiv);
+
+    cy.openDashboardStatsDialog(demoStudent);
+    cy.checkVisibility(submittedQuestionsRow, '0');
+    cy.checkVisibility(approvedQuestionsRow, '0');
+    cy.get('[data-cy="closeDashboardTable"]').click();
   });
 
   it('check no approved and submitted questions', () => {

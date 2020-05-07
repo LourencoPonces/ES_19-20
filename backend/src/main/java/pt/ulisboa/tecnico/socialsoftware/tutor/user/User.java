@@ -397,6 +397,16 @@ public class User implements UserDetails, DomainEntity {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User))
+            return false;
+        User user = (User) o;
+        return this.id.equals(user.getId());
+    }
+
+
     public void increaseNumberOfQuizzes(Quiz.QuizType type) {
         switch (type) {
             case PROPOSED:

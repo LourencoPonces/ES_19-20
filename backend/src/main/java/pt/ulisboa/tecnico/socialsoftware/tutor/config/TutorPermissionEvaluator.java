@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseService;
+import pt.ulisboa.tecnico.socialsoftware.tutor.overviewdashboard.MyStatsService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.AssessmentService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.TopicService;
@@ -43,9 +44,13 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
     @Autowired
     private ClarificationService clarificationService;
 
+    @Autowired
+    private MyStatsService myStatsService;
+
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
-        int userId = ((User) authentication.getPrincipal()).getId();
+        User user = ((User) authentication.getPrincipal());
+        int userId = user.getId();
 
         if (targetDomainObject instanceof CourseDto) {
             CourseDto courseDto = (CourseDto) targetDomainObject;
@@ -83,6 +88,8 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
                     return userHasThisExecution(userId, tournamentService.findTournamentCourseExecution(id).getCourseExecutionId());
                 case "CLARIFICATION.ACCESS":
                     return userHasAnExecutionOfTheCourse(userId, clarificationService.findClarificationRequestCourseId(id));
+                case "STATS.ACCESS":
+                    return  user.equals(myStatsService.findOwner(id));
                 default: return false;
             }
         }
