@@ -70,10 +70,7 @@ public class Tournament {
         this.key = tournamentDto.getKey();
         setTitle(tournamentDto.getTitle());
 
-        if (tournamentDto.getIsCancelled())
-            this.isCancelled = true;
-        else
-            this.isCancelled = false;
+        this.isCancelled = tournamentDto.getIsCancelled();
 
         setDates(tournamentDto);
 
