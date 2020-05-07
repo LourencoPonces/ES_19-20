@@ -20,8 +20,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 import java.sql.SQLException;
 import java.util.Collection;
 
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.COURSE_NOT_FOUND;
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.USERNAME_NOT_FOUND;
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
 @Service
 public class MyStatsService {
@@ -30,6 +29,9 @@ public class MyStatsService {
 
     @Autowired
     private CourseRepository courseRepository;
+
+    @Autowired
+    MyStatsRepository myStatsRepository;
 
     @Autowired
     private ClarificationService clarificationService;
@@ -75,6 +77,16 @@ public class MyStatsService {
             statsDto.setApprovedQuestionsStat(calculateApprovedQuestions(user, courseId));
         
         return statsDto;
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public MyStatsDto updateVisibility(Integer myStatsId, MyStatsDto myStatsDto) {
+        MyStats myStats = myStatsRepository.findById(myStatsId).orElseThrow(() -> new TutorException(NO_MY_STATS_FOUND, myStatsId));
+        myStats.update(myStatsDto);
+        return new MyStatsDto(myStats, myStatsDto);
     }
 
     private User validateUserAndCourse(int userId, int courseId) {

@@ -45,6 +45,10 @@ public class MyStats implements DomainEntity {
         this.approvedQuestions = statsVisibility;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
     public User getUser() { return this.user; }
     public void setUser(User user) { this.user = user; }
 
@@ -92,6 +96,13 @@ public class MyStats implements DomainEntity {
 
     public boolean canSeeApprovedQuestions() {
         return this.approvedQuestions == StatsVisibility.PUBLIC;
+    }
+
+    public void update(MyStatsDto myStatsDto) {
+        setApprovedQuestions(myStatsDto.getApprovedQuestionsVisibility());
+        setSubmittedQuestions(myStatsDto.getSubmittedQuestionsVisibility());
+        setPublicRequests(myStatsDto.getPublicRequestsVisibility());
+        setRequestsSubmitted(myStatsDto.getRequestsSubmittedVisibility());
     }
 
     @Override
