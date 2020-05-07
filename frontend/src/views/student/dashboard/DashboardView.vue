@@ -3,7 +3,7 @@
     <div class="container">
       <h2>Dashboard</h2>
       <div v-if="myStats" class="dashboard-stats-container">
-        <div class="items">
+        <div class="items" data-cy="requestsSubmittedDiv">
           <v-tooltip top>
             <template v-slot:activator="{ on }">
               <v-icon
@@ -46,7 +46,7 @@
             <p>Clarification Requests Submitted</p>
           </div>
         </div>
-        <div class="items">
+        <div class="items" data-cy="publicRequestsDiv">
           <v-tooltip top>
             <template v-slot:activator="{ on }">
               <v-icon
