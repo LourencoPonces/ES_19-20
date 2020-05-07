@@ -46,7 +46,7 @@ public class ClarificationRequest {
     @Enumerated(EnumType.STRING)
     private RequestStatus status = RequestStatus.PRIVATE;
 
-    private Boolean resolved = false;
+    private Boolean resolved = Boolean.FALSE;
 
     public ClarificationRequest() {
     }

@@ -73,8 +73,6 @@ class DeleteMessageSpockTest extends Specification {
     User student
     User teacher
     ClarificationRequest clarificationRequest
-    int studentId
-    int teacherId
     int reqId
 
     def setup() {
@@ -103,8 +101,6 @@ class DeleteMessageSpockTest extends Specification {
         quizAnswerRepository.save(quizAnswer)
         clarificationRequestRepository.save(clarificationRequest)
 
-        studentId = student.getId()
-        teacherId = teacher.getId()
         reqId = clarificationRequest.getId()
     }
 
@@ -161,14 +157,10 @@ class DeleteMessageSpockTest extends Specification {
         given: "answered clarification request"
         def msgDto = new ClarificationMessageDto()
         msgDto.setContent("some answer")
-        System.out.println("Count was " + clarificationMessageRepository.count())
-        msgDto = clarificationService.submitClarificationMessage(teacher, reqId, msgDto)
-        System.out.println("Count is now " + clarificationMessageRepository.count())
+        msgDto = clarificationService.submitClarificationMessage(teacher.id, reqId, msgDto)
 
         when: "message is removed"
-        System.out.println("Count was " + clarificationMessageRepository.count())
-        clarificationService.deleteClarificationMessage(teacher, msgDto.getId())
-        System.out.println("Count is now " + clarificationMessageRepository.count())
+        clarificationService.deleteClarificationMessage(teacher.id, msgDto.id)
 
         then: "clarification request has no messages"
         clarificationRequest.getMessages().isEmpty()
@@ -186,7 +178,7 @@ class DeleteMessageSpockTest extends Specification {
 
     def "don't remove non-existent things"() {
         when: "non existent message is removed"
-        clarificationService.deleteClarificationMessage(student, 404)
+        clarificationService.deleteClarificationMessage(student.id, 404)
 
         then: "thrown exception"
         def exception = thrown(TutorException)

@@ -64,8 +64,6 @@ class DeleteClarificationRequestServiceSpockTest extends Specification {
     QuizAnswer quizAnswer
     User student
     ClarificationRequestDto clarificationRequestDto
-    int studentId
-    int questionId
 
     def setup() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -83,8 +81,6 @@ class DeleteClarificationRequestServiceSpockTest extends Specification {
         quizQuestionRepository.save(quizQuestion)
         userRepository.save(student)
         quizAnswerRepository.save(quizAnswer)
-        questionId = question.getId()
-        studentId = student.getId()
     }
 
     private static User createStudent(int key, String name, String username, CourseExecution courseExecution) {
@@ -129,11 +125,11 @@ class DeleteClarificationRequestServiceSpockTest extends Specification {
         given:
         clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent(CONTENT)
-        clarificationRequestDto = clarificationService.submitClarificationRequest(questionId, student, clarificationRequestDto)
+        clarificationRequestDto = clarificationService.submitClarificationRequest(question.id, student.id, clarificationRequestDto)
 
         when:
-        clarificationService.deleteClarificationRequest(student, clarificationRequestDto.getId())
-        def result = clarificationService.getStudentClarificationRequests(student)
+        clarificationService.deleteClarificationRequest(student.id, clarificationRequestDto.id)
+        def result = clarificationService.getStudentClarificationRequests(student.id)
 
         then:
         result.requests.size() == 0
@@ -142,7 +138,7 @@ class DeleteClarificationRequestServiceSpockTest extends Specification {
 
     def "clarification request doesn't exist"() {
         when:
-        clarificationService.deleteClarificationRequest(student, NONEXISTENT_ID)
+        clarificationService.deleteClarificationRequest(student.id, NONEXISTENT_ID)
 
         then:
         def exception = thrown(TutorException)

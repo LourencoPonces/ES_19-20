@@ -61,6 +61,7 @@ public class ClarificationMessageDto {
         this.content = s;
     }
 
+    @JsonIgnore
     public Boolean getResolved() {
         return this.resolved;
     }

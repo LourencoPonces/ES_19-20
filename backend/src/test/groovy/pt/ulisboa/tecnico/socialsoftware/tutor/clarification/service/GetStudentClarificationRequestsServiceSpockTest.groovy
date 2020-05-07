@@ -61,9 +61,6 @@ class GetStudentClarificationRequestsServiceSpockTest extends Specification {
     QuizQuestion quizQuestion
     QuizAnswer quizAnswer
     User student, student2
-    int studentId
-    int questionId
-
 
     def setup() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -83,8 +80,6 @@ class GetStudentClarificationRequestsServiceSpockTest extends Specification {
         userRepository.save(student)
         userRepository.save(student2)
         quizAnswerRepository.save(quizAnswer)
-        questionId = question.getId()
-        studentId = student.getId()
     }
 
     private static User createStudent(int key, String name, String username, CourseExecution courseExecution) {
@@ -128,10 +123,10 @@ class GetStudentClarificationRequestsServiceSpockTest extends Specification {
         given:
         def clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent(CONTENT)
-        clarificationService.submitClarificationRequest(questionId, student, clarificationRequestDto)
+        clarificationService.submitClarificationRequest(question.id, student.id, clarificationRequestDto)
 
         when:
-        def result = clarificationService.getStudentClarificationRequests(student)
+        def result = clarificationService.getStudentClarificationRequests(student.id)
         def requests = result.requests
 
         then:
@@ -139,7 +134,7 @@ class GetStudentClarificationRequestsServiceSpockTest extends Specification {
         result.requests != null
         requests.size() == 1
         ClarificationRequestDto req = requests[0]
-        req.creatorId == studentId
+        req.creatorId == student.id
         req.content == CONTENT
         req.questionId == question.id
     }
@@ -148,7 +143,7 @@ class GetStudentClarificationRequestsServiceSpockTest extends Specification {
         given: "a clarification request for one question"
         def clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent(CONTENT)
-        clarificationService.submitClarificationRequest(questionId, student, clarificationRequestDto)
+        clarificationService.submitClarificationRequest(question.id, student.id, clarificationRequestDto)
 
         and: "another answered question"
         def q = createQuestion(2, course)
@@ -163,52 +158,52 @@ class GetStudentClarificationRequestsServiceSpockTest extends Specification {
         and: "a clarification request to this question"
         def cr = new ClarificationRequestDto()
         cr.setContent(CONTENT_2)
-        clarificationService.submitClarificationRequest(q.getId(), student, cr)
+        clarificationService.submitClarificationRequest(q.getId(), student.id, cr)
 
         when:
-        def result = clarificationService.getStudentClarificationRequests(student)
+        def result = clarificationService.getStudentClarificationRequests(student.id)
         List<ClarificationRequestDto> requests = result.requests
         requests.sort(Comparator.comparing { r -> ((ClarificationRequestDto) r).id })
 
         then: "returns list ordered by request Id DSC"
         requests.size() == 2
-        requests[0].creatorId == studentId
+        requests[0].creatorId == student.id
         requests[0].content == CONTENT
-        requests[0].questionId == question.getId()
-        requests[1].creatorId == studentId
+        requests[0].questionId == question.id
+        requests[1].creatorId == student.id
         requests[1].content == CONTENT_2
-        requests[1].questionId == q.getId()
+        requests[1].questionId == q.id
 
         and: "user information is returned"
-        result.names.get(studentId) == student.name
-        result.usernames.get(studentId) == student.username
+        result.names.get(student.id) == student.name
+        result.usernames.get(student.id) == student.username
     }
 
     def "student didn't submit clarification requests"() {
         when:
-        def result = clarificationService.getStudentClarificationRequests(student)
+        def result = clarificationService.getStudentClarificationRequests(student.id)
 
         then:
         result != null
         result.requests != null
         result.requests.isEmpty()
-        result.names == null || result.names.isEmpty()
-        result.usernames == null || result.usernames.isEmpty()
+        result.names.isEmpty()
+        result.usernames.isEmpty()
     }
 
     def "student didn't submit any clarification requests but others exist"() {
         when: "another student submits a request"
         def clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent(CONTENT)
-        clarificationService.submitClarificationRequest(question.id, student, clarificationRequestDto)
-        def result = clarificationService.getStudentClarificationRequests(student2)
+        clarificationService.submitClarificationRequest(question.id, student.id, clarificationRequestDto)
+        def result = clarificationService.getStudentClarificationRequests(student2.id)
 
         then:
         result != null
         result.requests != null
         result.requests.isEmpty()
-        result.names == null || result.names.isEmpty()
-        result.usernames == null || result.usernames.isEmpty()
+        result.names.isEmpty()
+        result.usernames.isEmpty()
     }
 
     @TestConfiguration

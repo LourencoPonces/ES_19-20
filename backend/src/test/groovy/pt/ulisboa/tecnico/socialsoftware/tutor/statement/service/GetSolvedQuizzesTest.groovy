@@ -76,16 +76,16 @@ class GetSolvedQuizzesTest extends Specification {
     @Autowired
     QuestionAnswerRepository questionAnswerRepository
 
-    def user
-    def courseDto
-    def question
-    def option
-    def quiz
-    def quizQuestion
-    def quizAnswer
-    def questionAnswer
-    def course
-    def courseExecution
+    User user
+    CourseDto courseDto
+    Question question
+    Option option
+    Quiz quiz
+    QuizQuestion quizQuestion
+    QuizAnswer quizAnswer
+    QuestionAnswer questionAnswer
+    Course course
+    CourseExecution courseExecution
 
     def setup() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -205,10 +205,10 @@ class GetSolvedQuizzesTest extends Specification {
         and: "a clarification request about the question"
         def clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent('CONTENT')
-        clarificationService.submitClarificationRequest(question.getId(), user, clarificationRequestDto)
+        clarificationService.submitClarificationRequest(question.id, user.id, clarificationRequestDto)
 
         when:
-        def solvedQuizDtos = statementService.getSolvedQuizzes(user.getId(), courseDto.getCourseExecutionId())
+        def solvedQuizDtos = statementService.getSolvedQuizzes(user.id, courseDto.courseExecutionId)
 
         then:
         def statementQuizDto = solvedQuizDtos.get(0).getStatementQuiz()
@@ -228,11 +228,11 @@ class GetSolvedQuizzesTest extends Specification {
         and: "a clarification request about the question"
         def clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent('CONTENT')
-        clarificationRequestDto = clarificationService.submitClarificationRequest(question.getId(), user, clarificationRequestDto)
-        clarificationService.changeClarificationRequestStatus(clarificationRequestDto.getId(), ClarificationRequest.RequestStatus.PUBLIC)
+        clarificationRequestDto = clarificationService.submitClarificationRequest(question.id, user.id, clarificationRequestDto)
+        clarificationService.changeClarificationRequestStatus(clarificationRequestDto.id, ClarificationRequest.RequestStatus.PUBLIC)
 
         when:
-        def solvedQuizDtos = statementService.getSolvedQuizzes(user.getId(), courseDto.getCourseExecutionId())
+        def solvedQuizDtos = statementService.getSolvedQuizzes(user.id, courseDto.courseExecutionId)
 
         then:
         def statementQuizDto = solvedQuizDtos.get(0).getStatementQuiz()

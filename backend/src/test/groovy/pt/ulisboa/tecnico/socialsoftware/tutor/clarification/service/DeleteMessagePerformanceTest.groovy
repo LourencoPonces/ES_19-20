@@ -157,20 +157,19 @@ class DeleteMessagePerformanceTest extends Specification {
 
             def clarificationRequestDto = new ClarificationRequestDto()
             clarificationRequestDto.setContent("i need help with my performance")
-            clarificationRequestDto = clarificationService.submitClarificationRequest(i, student, clarificationRequestDto)
+            clarificationRequestDto = clarificationService.submitClarificationRequest(i, student.id, clarificationRequestDto)
 
             def messageDto = new ClarificationMessageDto()
             messageDto.setContent("0.75")
             messageDto.setResolved(i % 2 == 0)
-            System.out.println(messageDto.getContent())
 
-            clarificationService.submitClarificationMessage(teacher, clarificationRequestDto.getId(), messageDto)
+            clarificationService.submitClarificationMessage(teacher.id, clarificationRequestDto.id, messageDto)
         })
 
 
         when:
         1.upto(count, {
-            clarificationService.deleteClarificationMessage(teacher, it as int)
+            clarificationService.deleteClarificationMessage(teacher.id, it as int)
         })
 
         then:
@@ -182,7 +181,6 @@ class DeleteMessagePerformanceTest extends Specification {
 
     @TestConfiguration
     static class ClarificationServiceImplTestContextConfiguration {
-
         @Bean
         ClarificationService ClarificationService() {
             return new ClarificationService()

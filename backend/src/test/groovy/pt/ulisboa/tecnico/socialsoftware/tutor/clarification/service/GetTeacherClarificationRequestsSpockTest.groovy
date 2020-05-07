@@ -186,7 +186,7 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
 
     def "the teacher can see clarification requests submitted by students taking their classes"() {
         when:
-        def result = clarificationService.getTeacherClarificationRequests(teacher)
+        def result = clarificationService.getTeacherClarificationRequests(teacher.id)
         List<ClarificationRequestDto> requests = result.requests
         requests.sort(Comparator.comparing { r -> ((ClarificationRequestDto) r).id })
 

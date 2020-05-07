@@ -29,7 +29,7 @@ public class ClarificationController {
         if (student == null) {
             throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
         }
-        return clarificationService.submitClarificationRequest(questionId, student, clarificationRequestDto);
+        return clarificationService.submitClarificationRequest(questionId, student.getId(), clarificationRequestDto);
     }
 
     @DeleteMapping("/clarifications/{requestId}")
@@ -41,12 +41,12 @@ public class ClarificationController {
             throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
         }
 
-        clarificationService.deleteClarificationRequest(student, requestId);
+        clarificationService.deleteClarificationRequest(student.getId(), requestId);
     }
 
     @GetMapping("/clarifications")
     @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_STUDENT')")
-    public ClarificationRequestListDto getClarificationRequests(Principal principal) {
+    public ClarificationRequestListDto getUserClarificationRequests(Principal principal) {
         User user = (User) ((Authentication) principal).getPrincipal();
 
         if (user == null) {
@@ -54,9 +54,9 @@ public class ClarificationController {
         }
 
         if (user.getRole() == User.Role.TEACHER) {
-            return clarificationService.getTeacherClarificationRequests(user);
+            return clarificationService.getTeacherClarificationRequests(user.getId());
         } else if (user.getRole() == User.Role.STUDENT) {
-            return clarificationService.getStudentClarificationRequests(user);
+            return clarificationService.getStudentClarificationRequests(user.getId());
         } else {
             throw new TutorException(ErrorMessage.ACCESS_DENIED);
         }
@@ -71,7 +71,7 @@ public class ClarificationController {
             throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
         }
 
-        return clarificationService.submitClarificationMessage(user, requestId, messageDto);
+        return clarificationService.submitClarificationMessage(user.getId(), requestId, messageDto);
     }
 
     @DeleteMapping("/clarifications/messages/{messageId}")
@@ -82,7 +82,7 @@ public class ClarificationController {
             throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
         }
 
-        clarificationService.deleteClarificationMessage(user, messageId);
+        clarificationService.deleteClarificationMessage(user.getId(), messageId);
     }
 
     @PutMapping("/clarifications/{requestId}/status")

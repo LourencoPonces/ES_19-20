@@ -18,6 +18,7 @@ public class ClarificationRequestDto {
     private ClarificationRequest.RequestStatus status = ClarificationRequest.RequestStatus.PRIVATE;
     private Integer creatorId;
     private String content;
+    private Boolean resolved;
     private LocalDateTime creationDate;
     private final List<ClarificationMessageDto> messages;
 
@@ -35,6 +36,7 @@ public class ClarificationRequestDto {
         this.creatorId = clarificationRequest.getCreator().getId();
         this.content = clarificationRequest.getContent();
         this.creationDate = clarificationRequest.getCreationDate();
+        this.resolved = clarificationRequest.getResolved();
 
         this.messages = clarificationRequest.getMessages()
                 .stream()
@@ -88,6 +90,10 @@ public class ClarificationRequestDto {
 
     public void setStatus(ClarificationRequest.RequestStatus status) {
         this.status = status;
+    }
+
+    public Boolean getResolved() {
+        return resolved;
     }
 
     @JsonProperty

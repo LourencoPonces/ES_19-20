@@ -160,13 +160,13 @@ class SubmitMessagePerformanceTest extends Specification {
 
             def clarificationRequest = new ClarificationRequestDto()
             clarificationRequest.setContent("i need help with my performance")
-            clarificationService.submitClarificationRequest(question.getId(), student, clarificationRequest)
+            clarificationService.submitClarificationRequest(question.id, student.id, clarificationRequest)
         })
 
 
         when:
         1.upto(count, {
-            clarificationService.submitClarificationMessage(teacher, it as int, MESSAGE_1)
+            clarificationService.submitClarificationMessage(teacher.id, it as int, MESSAGE_1)
         })
 
         then:
@@ -194,12 +194,12 @@ class SubmitMessagePerformanceTest extends Specification {
 
             def clarificationRequest = new ClarificationRequestDto()
             clarificationRequest.setContent("i need help with my performance")
-            clarificationRequest = clarificationService.submitClarificationRequest(question.getId(), student, clarificationRequest)
+            clarificationRequest = clarificationService.submitClarificationRequest(question.id, student.id, clarificationRequest)
 
 
         when:
         1.upto(count, {
-            clarificationService.submitClarificationMessage(teacher, clarificationRequest.id, MESSAGE_1)
+            clarificationService.submitClarificationMessage(teacher.id, clarificationRequest.id, MESSAGE_1)
         })
 
         then:

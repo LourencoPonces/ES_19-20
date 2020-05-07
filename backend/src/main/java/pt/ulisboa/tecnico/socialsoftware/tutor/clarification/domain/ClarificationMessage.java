@@ -29,7 +29,7 @@ public class ClarificationMessage {
     private String content;
 
     @Column(name = "creation_date")
-    private LocalDateTime creationDate;
+    private LocalDateTime creationDate = LocalDateTime.now();
 
     public ClarificationMessage() {
     }

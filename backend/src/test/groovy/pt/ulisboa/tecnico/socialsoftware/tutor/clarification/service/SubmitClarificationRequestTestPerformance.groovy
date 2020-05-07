@@ -78,8 +78,6 @@ class SubmitClarificationRequestTestPerformance extends Specification {
     QuestionAnswer questionAnswer
     User student
     DateTimeFormatter formatter
-    int studentId
-    int questionId
 
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
@@ -108,9 +106,6 @@ class SubmitClarificationRequestTestPerformance extends Specification {
             questionAnswerRepository.save(questionAnswer)
 
         })
-
-        questionId = question.getId()
-        studentId = student.getId()
     }
 
     private static QuestionAnswer createQuestionAnswer(QuizAnswer quizAnswer, QuizQuestion quizQuestion) {
@@ -169,7 +164,7 @@ class SubmitClarificationRequestTestPerformance extends Specification {
         when:
         1.upto(TEST_COUNT, {
             def clarificationRequestDto = createRequestDto()
-            clarificationService.submitClarificationRequest(it as int, student, clarificationRequestDto)
+            clarificationService.submitClarificationRequest(it as int, student.id, clarificationRequestDto)
         })
 
         then:
@@ -180,7 +175,7 @@ class SubmitClarificationRequestTestPerformance extends Specification {
         when:
         int questionId = 4   // test with number between 1 and TEST_COUNT
         def clarificationRequestDto = createRequestDto()
-        clarificationService.submitClarificationRequest(questionId, student, clarificationRequestDto)
+        clarificationService.submitClarificationRequest(questionId, student.id, clarificationRequestDto)
 
         then:
         true

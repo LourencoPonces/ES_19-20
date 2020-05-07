@@ -74,8 +74,6 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
     User student, student2, teacher
     ClarificationRequestDto clarificationRequestDto
     DateTimeFormatter formatter
-    int studentId
-    int questionId
 
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
@@ -101,8 +99,6 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         quizAnswerRepository.save(quizAnswer)
 
         clarificationRequestDto = new ClarificationRequestDto()
-        questionId = question.getId()
-        studentId = student.getId()
     }
 
     private static User createUser(int key, User.Role role, String username, CourseExecution courseExecution) {
@@ -146,7 +142,7 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         //the clarification request is created
         when:
         clarificationRequestDto.setContent(CONTENT)
-        clarificationRequestDto = clarificationService.submitClarificationRequest(questionId, student, clarificationRequestDto)
+        clarificationRequestDto = clarificationService.submitClarificationRequest(question.id, student.id, clarificationRequestDto)
 
         then: "request is created and is in the repository"
         clarificationRequestRepository.count() == 1L
@@ -169,8 +165,8 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         clarificationDto2.setContent(CONTENT)
 
         when:
-        clarificationService.submitClarificationRequest(questionId, student, clarificationRequestDto)
-        clarificationService.submitClarificationRequest(questionId, student, clarificationDto2)
+        clarificationService.submitClarificationRequest(question.id, student.id, clarificationRequestDto)
+        clarificationService.submitClarificationRequest(question.id, student.id, clarificationDto2)
 
         then: "only the first one is saved and exception thrown"
         def exception = thrown(TutorException)
@@ -192,12 +188,12 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
             user = teacher
         }
 
-        int qId = questionId
+        int qId = question.id
         if (!is_question) {
             qId = INEXISTENT_QUESTION_ID
         }
         clarificationRequestDto.setContent(content)
-        clarificationService.submitClarificationRequest(qId, user, clarificationRequestDto)
+        clarificationService.submitClarificationRequest(qId, user.id, clarificationRequestDto)
 
         then:
         def exception = thrown(TutorException)

@@ -37,10 +37,14 @@ class SubmitMessageSpockTest extends Specification {
 
     static final ClarificationMessageDto MESSAGE_1 = new ClarificationMessageDto()
     static final ClarificationMessageDto MESSAGE_2 = new ClarificationMessageDto()
+    static final ClarificationMessageDto MESSAGE_3 = new ClarificationMessageDto()
 
     static {
         MESSAGE_1.setContent("some msg 1")
+        MESSAGE_1.setResolved(false)
         MESSAGE_2.setContent("some msg 2")
+        MESSAGE_2.setResolved(true)
+        MESSAGE_3.setContent("some msg 3")
     }
 
     @Autowired
@@ -82,8 +86,6 @@ class SubmitMessageSpockTest extends Specification {
     User student
     User teacher
     ClarificationRequest clarificationRequest
-    int studentId
-    int teacherId
     int reqId
 
     def setup() {
@@ -112,8 +114,6 @@ class SubmitMessageSpockTest extends Specification {
         quizAnswerRepository.save(quizAnswer)
         clarificationRequestRepository.save(clarificationRequest)
 
-        studentId = student.getId()
-        teacherId = teacher.getId()
         reqId = clarificationRequest.getId()
     }
 
@@ -169,7 +169,7 @@ class SubmitMessageSpockTest extends Specification {
     def "submit a message as #teacherOrStudent"() {
         when:
         def user = teacherOrStudent == "teacher" ? teacher : student
-        clarificationService.submitClarificationMessage(user, reqId, MESSAGE_1)
+        clarificationService.submitClarificationMessage(user.id, reqId, MESSAGE_1)
 
         then: "the message was submitted"
         clarificationMessageRepository.count() == 1
@@ -185,6 +185,9 @@ class SubmitMessageSpockTest extends Specification {
         user.getClarificationMessages().stream()
                 .anyMatch({ m -> m.content == msg.content })
 
+        and: "request resolved status is updated correctly"
+        ! clarificationRequest.resolved
+
         where:
         teacherOrStudent << ["teacher", "student"]
     }
@@ -193,20 +196,23 @@ class SubmitMessageSpockTest extends Specification {
     def "submit second message to request as #teacherOrStudent"() {
         given: "a clarification request that already has a message"
         def user = teacherOrStudent == "teacher" ? teacher : student
-        clarificationService.submitClarificationMessage(user, reqId, MESSAGE_1)
+        clarificationService.submitClarificationMessage(user.id, reqId, MESSAGE_2)
 
         when:
-        clarificationService.submitClarificationMessage(user, reqId, MESSAGE_2)
+        clarificationService.submitClarificationMessage(user.id, reqId, MESSAGE_3)
 
         then: "the new message was submitted and is associated to the request"
         clarificationRequest.messages.size() == 2
         def savedMsg = clarificationRequest.messages[1]
-        savedMsg.content == MESSAGE_2.content
+        savedMsg.content == MESSAGE_3.content
         savedMsg.creator.id == user.id
 
         and: "message is associated to user"
         user.getClarificationMessages().stream()
-                .anyMatch({ m -> m.content == MESSAGE_2.content })
+                .anyMatch({ m -> m.content == MESSAGE_3.content })
+
+        and: "request resolved status is updated correctly"
+        clarificationRequest.resolved
 
         where:
         teacherOrStudent << ["teacher", "student"]
@@ -218,7 +224,7 @@ class SubmitMessageSpockTest extends Specification {
         def rid = validR ? reqId : -1
         def msg = new ClarificationMessageDto()
         msg.setContent(msgContent)
-        clarificationService.submitClarificationMessage(teacher, rid, msg)
+        clarificationService.submitClarificationMessage(teacher.id, rid, msg)
 
         then: "an exception"
         def exception = thrown(TutorException)
