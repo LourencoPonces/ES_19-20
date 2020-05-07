@@ -15,6 +15,7 @@ describe('Teacher Clarification Requests', () => {
     cy.goToMyClarifications();
     cy.deleteAllRequests(2);
     cy.logout();
+    cy.exec('psql tutordb < ../backend/resetGeneratedQuizzes.sql');
   });
 
 

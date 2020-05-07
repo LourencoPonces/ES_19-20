@@ -21,7 +21,10 @@
             <span v-else>Make Private</span>
           </v-tooltip>
           <div class="icon-wrapper" ref="requestsSubmitted">
-            <animated-number :number="myStats.requestsSubmittedStat" />
+            <animated-number
+              data-cy="requestsSubmitted"
+              :number="myStats.requestsSubmittedStat"
+            />
           </div>
           <div class="project-name">
             <p>Clarification Requests Submitted</p>
@@ -45,7 +48,10 @@
             <span v-else>Make Private</span>
           </v-tooltip>
           <div class="icon-wrapper" ref="publicRequests">
-            <animated-number :number="myStats.publicRequestsStat" />
+            <animated-number
+              data-cy="publicRequests"
+              :number="myStats.publicRequestsStat"
+            />
           </div>
           <div class="project-name">
             <p>Public Clarification Requests</p>
