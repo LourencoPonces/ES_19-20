@@ -24,6 +24,7 @@
           </v-tooltip>
           <div class="icon-wrapper" ref="requestsSubmitted">
             <animated-number
+              data-cy="requestsSubmitted"
               :number="
                 myStats.getStatValue(myStats.statsNames.REQUESTS_SUBMITTED)
               "
@@ -52,6 +53,7 @@
           </v-tooltip>
           <div class="icon-wrapper" ref="publicRequests">
             <animated-number
+              data-cy="publicRequests"
               :number="myStats.getStatValue(myStats.statsNames.PUBLIC_REQUESTS)"
             />
           </div>
