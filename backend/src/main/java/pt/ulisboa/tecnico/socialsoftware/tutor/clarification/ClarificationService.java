@@ -46,6 +46,18 @@ public class ClarificationService {
     @PersistenceContext
     EntityManager entityManager;
 
+    @Retryable(
+            value = {SQLException.class},
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public ClarificationRequestDto changeClarificationRequestStatus(int reqId, ClarificationRequest.RequestStatus status) {
+        ClarificationRequest req = clarificationRequestRepository.findById(reqId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND));
+
+        req.setStatus(status);
+        return new ClarificationRequestDto(req);
+    }
+
 
     @Retryable(
             value = {SQLException.class},
@@ -74,7 +86,7 @@ public class ClarificationService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public ClarificationRequestAnswerDto submitClarificationRequestAnswer(User teacher, int reqId, String answerText) {
         ClarificationRequest req = clarificationRequestRepository.findById(reqId)
-                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, reqId));
+                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND));
 
         // Create/update answer
         ClarificationRequestAnswer ans = req.getAnswer().orElseGet(ClarificationRequestAnswer::new);
@@ -97,7 +109,7 @@ public class ClarificationService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void deleteClarificationRequestAnswer(User teacher, int reqId) {
         ClarificationRequest req = clarificationRequestRepository.findById(reqId)
-                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, reqId));
+                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND));
 
         ClarificationRequestAnswer ans = req.getAnswer().orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_UNANSWERED));
 
@@ -114,7 +126,7 @@ public class ClarificationService {
     public void deleteClarificationRequest(int userId, int reqId) {
         User student = getStudent(userId);
         ClarificationRequest req = clarificationRequestRepository.findById(reqId)
-                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, reqId));
+                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND));
         if (req.hasAnswer()) {
             throw new TutorException(ErrorMessage.CLARIFICATION_REQUEST_ANSWERED);
         }
@@ -131,7 +143,7 @@ public class ClarificationService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public ClarificationRequestDto updateClarificationRequest(ClarificationRequestDto clarificationRequestDto) {
         ClarificationRequest req = clarificationRequestRepository.findById(clarificationRequestDto.getId())
-                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND, clarificationRequestDto.getId()));
+                .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND));
 
         if  (req.hasAnswer()) {
             throw new TutorException(ErrorMessage.CLARIFICATION_REQUEST_ANSWERED);
@@ -189,6 +201,7 @@ public class ClarificationService {
     private ClarificationRequest createClarificationRequest(User user, Question question, ClarificationRequestDto clarificationRequestDto) {
         clarificationRequestDto.setOwner(user.getId());
         clarificationRequestDto.setQuestionId(question.getId());
+        clarificationRequestDto.setStatus(ClarificationRequest.RequestStatus.PRIVATE);
         ClarificationRequest clarificationRequest = new ClarificationRequest(user, question, clarificationRequestDto);
 
         if (clarificationRequestDto.getCreationDate() == null) {
@@ -227,7 +240,7 @@ public class ClarificationService {
             }
         }
         if (!answered) {
-            throw new TutorException(ErrorMessage.QUESTION_NOT_ANSWERED_BY_STUDENT, questionId, userId);
+            throw new TutorException(ErrorMessage.QUESTION_NOT_ANSWERED_BY_STUDENT);
         }
         return question;
     }
@@ -235,7 +248,7 @@ public class ClarificationService {
     private void checkIfDuplicate(int questionId, User user) {
         for (ClarificationRequest cr : user.getClarificationRequests()) {
             if (cr.getQuestion().getId() == questionId) {
-                throw new TutorException(ErrorMessage.DUPLICATE_CLARIFICATION_REQUEST, user.getUsername(), questionId);
+                throw new TutorException(ErrorMessage.DUPLICATE_CLARIFICATION_REQUEST, user.getUsername());
             }
         }
     }
@@ -258,4 +271,6 @@ public class ClarificationService {
                 .map(req -> req.getQuestion().getCourse().getId())
                 .orElse(-1);
     }
+
+
 }

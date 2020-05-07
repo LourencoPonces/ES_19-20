@@ -1,15 +1,17 @@
 import Question from './Question';
 
-const internalStatuses = {
+export const internalStatuses = {
   REJECTED: 'Rejected',
   APPROVED: 'Approved',
-  WAITING_FOR_APPROVAL: 'Waiting for Approval'
+  WAITING_FOR_APPROVAL: 'Waiting for Approval',
+  PROMOTED: 'Promoted'
 };
 
 const externalStatuses = {
   REJECTED: 'REJECTED',
   APPROVED: 'APPROVED',
-  WAITING_FOR_APPROVAL: 'WAITING_FOR_APPROVAL'
+  WAITING_FOR_APPROVAL: 'WAITING_FOR_APPROVAL',
+  PROMOTED: 'PROMOTED'
 };
 
 export default class StudentQuestion extends Question {
@@ -39,11 +41,14 @@ export default class StudentQuestion extends Question {
         return internalStatuses.APPROVED;
       case externalStatuses.REJECTED:
         return internalStatuses.REJECTED;
+      case externalStatuses.PROMOTED:
+        return internalStatuses.PROMOTED;
 
       // case already internal
       case internalStatuses.WAITING_FOR_APPROVAL:
       case internalStatuses.APPROVED:
       case internalStatuses.REJECTED:
+      case internalStatuses.PROMOTED:
         return status;
       default:
         throw new Error('Invalid status');
@@ -58,11 +63,14 @@ export default class StudentQuestion extends Question {
         return externalStatuses.APPROVED;
       case internalStatuses.REJECTED:
         return externalStatuses.REJECTED;
+      case internalStatuses.PROMOTED:
+        return externalStatuses.PROMOTED;
 
       // case already external
       case externalStatuses.WAITING_FOR_APPROVAL:
       case externalStatuses.APPROVED:
       case externalStatuses.REJECTED:
+      case externalStatuses.PROMOTED:
         return status;
       default:
         throw new Error('Invalid status');
@@ -77,6 +85,8 @@ export default class StudentQuestion extends Question {
         return 'green';
       case internalStatuses.REJECTED:
         return 'red';
+      case internalStatuses.PROMOTED:
+        return 'blue';
       default:
         throw new Error('Invalid status');
     }
@@ -88,7 +98,26 @@ export default class StudentQuestion extends Question {
     return req;
   }
 
+  canEvaluate(): boolean {
+    return this.submittedStatus !== internalStatuses.PROMOTED;
+  }
+
   isChangeable(): boolean {
-    return this.submittedStatus === internalStatuses.WAITING_FOR_APPROVAL;
+    return (
+      this.submittedStatus === internalStatuses.REJECTED ||
+      (this.numberOfAnswers === 0 &&
+        this.submittedStatus === internalStatuses.WAITING_FOR_APPROVAL)
+    );
+  }
+
+  // get status representation
+  static getRejected(): string {
+    return internalStatuses.REJECTED;
+  }
+  static getApproved(): string {
+    return internalStatuses.APPROVED;
+  }
+  static getWaitingForApproval(): string {
+    return internalStatuses.WAITING_FOR_APPROVAL;
   }
 }

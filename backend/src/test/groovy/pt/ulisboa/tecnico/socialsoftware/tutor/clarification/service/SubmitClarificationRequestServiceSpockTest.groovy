@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.clarification.service
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest
 import spock.lang.Specification
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
@@ -83,9 +84,9 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
 
-        course = createCourse(COURSE_NAME)
+        course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseExecution = createCourseExecution(course, ACRONYM, ACADEMIC_TERM)
-        quiz = createQuiz(KEY_ONE, courseExecution, Quiz.QuizType.GENERATED)
+        quiz = createQuiz(KEY_ONE, courseExecution, "GENERATED")
         question = createQuestion(KEY_ONE, course)
         quizQuestion = new QuizQuestion(quiz, question, 1)
         student = createStudent(new User(), KEY_ONE, NAME, USERNAME_ONE, courseExecution)
@@ -119,11 +120,12 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         question = new Question()
         question.setKey(key)
         question.setCourse(course)
+        question.setTitle("TITLE")
         course.addQuestion(question)
         return question
     }
 
-    private Quiz createQuiz(int key, CourseExecution courseExecution, Quiz.QuizType type) {
+    private Quiz createQuiz(int key, CourseExecution courseExecution, String type) {
         quiz = new Quiz()
         quiz.setKey(key)
         quiz.setType(type)
@@ -139,13 +141,13 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         courseExecution.setAcademicTerm(term)
         return courseExecution
     }
-
+/*
     private Course createCourse(String name) {
         course = new Course()
         course.setName(name)
         return course
     }
-
+*/
 
 
     def "the question has been answered and submit request"() {
@@ -161,6 +163,7 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         result.getOwner().getId() == student.getId()
         result.getQuestion().getId() == question.getId()
         result.getCreationDate() != null
+        result.getStatus() == ClarificationRequest.RequestStatus.PRIVATE
         and: "the clarification request was added to the student"
         def user = userRepository.findAll().get(0)
         user.getClarificationRequests().size() == 1

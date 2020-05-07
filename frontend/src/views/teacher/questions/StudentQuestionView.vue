@@ -23,11 +23,15 @@
         </v-card-title>
       </template>
 
-      <template v-slot:item.content="{ item }">
+      <template v-slot:item.title="{ item }">
         <p
-          v-html="convertMarkDownNoFigure(item.content, null)"
+          style="cursor: pointer"
           @click="showQuestionDialog(item)"
-      /></template>
+          @contextmenu="editStudentQuestion(item, $event)"
+        >
+          {{ item.title }}
+        </p>
+      </template>
 
       <template v-slot:item.topics="{ item }">
         <v-chip-group>
@@ -52,24 +56,20 @@
       </template>
 
       <template v-slot:item.justification="{ item }">
-        <span margin="5%">{{ item.justification }}</span>
-      </template>
-
-      <template v-slot:item.image="{ item }">
-        <v-file-input
-          show-size
-          dense
-          small-chips
-          @change="handleFileUpload($event, item)"
-          accept="image/*"
-        />
+        <p
+          @click="showEvaluateStudentQuestionDialog(item)"
+          style="cursor:pointer"
+          data-cy="showJustification"
+        >
+          {{ truncate(item.justification) }}
+        </p>
       </template>
 
       <template v-slot:item.action="{ item }">
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              small
+              large
               class="mr-2"
               v-on="on"
               @click="showQuestionDialog(item)"
@@ -78,20 +78,64 @@
           </template>
           <span>Show Question</span>
         </v-tooltip>
+        <v-tooltip bottom v-if="item.canEvaluate()">
+          <template v-slot:activator="{ on }">
+            <v-icon
+              large
+              class="mr-2"
+              v-on="on"
+              @click="showEvaluateStudentQuestionDialog(item)"
+              >fa-clipboard-check</v-icon
+            >
+          </template>
+          <span>Evaluate</span>
+        </v-tooltip>
+        <v-tooltip bottom v-if="item.canEvaluate()">
+          <template v-slot:activator="{ on }">
+            <v-icon
+              large
+              class="mr-2"
+              v-on="on"
+              @click="editStudentQuestion(item)"
+              data-cy="editStudentQuestion"
+              >edit</v-icon
+            >
+          </template>
+          <span>Edit and Promote Question</span>
+        </v-tooltip>
       </template>
     </v-data-table>
+    <footer>
+      <v-icon class="mr-2">mouse</v-icon>Left-click on question's title to view
+      it. <v-icon class="mr-2">mouse</v-icon>Right-click on question's title to
+      edit it.
+    </footer>
     <show-question-dialog
-      v-if="currentQuestion"
+      v-if="questionDialog"
       v-model="questionDialog"
-      :question="currentQuestion"
-      v-on:close-show-question-dialog="onCloseShowQuestionDialog"
+      :question="currentStudentQuestion"
+      v-on:close-show-question-dialog="onCloseDialog"
     />
     <evaluate-question-dialog
-      v-if="currentQuestion"
+      v-if="evaluateQuestion"
       v-model="evaluateQuestion"
-      :studentQuestion="currentQuestion"
-      v-on:evaluated-question="onEvaluatedQuestion"
-      v-on:cancel-evaluate="onCancelEvaluation"
+      :studentQuestion="currentStudentQuestion"
+      v-on:evaluated-question="onSaveStudentQuestion"
+      v-on:cancel-evaluate="onCloseDialog"
+    />
+    <edit-and-promote-question-dialog
+      v-if="editAndPromoteStudentQuestionDialog"
+      v-model="editAndPromoteStudentQuestionDialog"
+      :studentQuestion="currentStudentQuestion"
+      :topics="topics"
+      v-on:save-student-question="onSaveStudentQuestion"
+      v-on:cancel-evaluate="onCloseDialog"
+    />
+    <show-student-question-justification
+      v-if="studentQuestionJustification"
+      v-model="studentQuestionJustification"
+      :studentQuestion="currentStudentQuestion"
+      v-on:close-show-student-question-justification="onCloseDialog"
     />
   </v-card>
 </template>
@@ -99,62 +143,71 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
-import { convertMarkDownNoFigure } from '@/services/ConvertMarkdownService';
 import Question from '@/models/management/Question';
-import Image from '@/models/management/Image';
 import Topic from '@/models/management/Topic';
 import ShowQuestionDialog from '@/views/teacher/questions/ShowQuestionDialog.vue';
 import EvaluateQuestionDialog from '@/views/teacher/questions/EvaluateStudentQuestionDialog.vue';
 import StudentQuestion from '@/models/management/StudentQuestion';
+import EditAndPromoteStudentQuestionDialog from '@/views/teacher/questions/EditAndPromoteStudentQuestionDialog.vue';
+import ShowStudentQuestionJustification from '@/views/student/studentQuestions/ShowStudentQuestionJustification.vue';
 
 @Component({
   components: {
     'show-question-dialog': ShowQuestionDialog,
-    'evaluate-question-dialog': EvaluateQuestionDialog
+    'evaluate-question-dialog': EvaluateQuestionDialog,
+    'edit-and-promote-question-dialog': EditAndPromoteStudentQuestionDialog,
+    'show-student-question-justification': ShowStudentQuestionJustification
   }
 })
 export default class StudentQuestionsView extends Vue {
   studentQuestions: StudentQuestion[] = [];
   topics: Topic[] = [];
-  currentQuestion: StudentQuestion | null = null;
+  currentStudentQuestion: StudentQuestion | null = null;
   evaluateQuestion: boolean = false;
   questionDialog: boolean = false;
+  editAndPromoteStudentQuestionDialog: boolean = false;
+  studentQuestionJustification: boolean = false;
   search: string = '';
 
   headers: object = [
-    { text: 'Title', value: 'title', align: 'center' },
-    { text: 'Question', value: 'content', align: 'left' },
+    {
+      text: 'Actions',
+      value: 'action',
+      align: 'left',
+      width: '15%',
+      sortable: false
+    },
+    { text: 'Title', value: 'title', align: 'left', width: '20%' },
     {
       text: 'Topics',
       value: 'topics',
       align: 'center',
       sortable: false
     },
-    { text: 'Submitted Status', value: 'submittedStatus', align: 'center' },
-    { text: 'Justification', value: 'justification', align: 'center' },
+    {
+      text: 'Submitted Status',
+      value: 'submittedStatus',
+      align: 'left',
+      width: '10%'
+    },
+    {
+      text: 'Justification',
+      value: 'justification',
+      align: 'left',
+      width: '20%'
+    },
     {
       text: 'Creation Date',
       value: 'creationDate',
+      width: '10%',
       align: 'center'
-    },
-    {
-      text: 'Image',
-      value: 'image',
-      align: 'center',
-      sortable: false
-    },
-    {
-      text: 'Actions',
-      value: 'action',
-      align: 'center',
-      sortable: false
     }
   ];
 
   @Watch('evaluateQuestion')
   closeError() {
     if (!this.evaluateQuestion) {
-      this.currentQuestion = null;
+      this.currentStudentQuestion = null;
     }
   }
 
@@ -181,52 +234,55 @@ export default class StudentQuestionsView extends Vue {
     );
   }
 
-  convertMarkDownNoFigure(text: string, image: Image | null = null): string {
-    return convertMarkDownNoFigure(text, image);
-  }
+  editStudentQuestion(studentQuestion: StudentQuestion, e?: Event) {
+    if (e) e.preventDefault();
 
-  async handleFileUpload(event: File, question: Question) {
-    if (question.id) {
-      try {
-        const imageURL = await RemoteServices.uploadImage(event, question.id);
-        question.image = new Image();
-        question.image.url = imageURL;
-        confirm('Image ' + imageURL + ' was uploaded!');
-      } catch (error) {
-        await this.$store.dispatch('error', error);
-      }
+    if (!studentQuestion.canEvaluate()) {
+      // this.$store.dispatch('error', 'Cannot edit or evaluate this question');
+      this.onCloseDialog();
+      return;
     }
+
+    this.currentStudentQuestion = studentQuestion;
+    this.editAndPromoteStudentQuestionDialog = true;
   }
 
-  showQuestionDialog(question: StudentQuestion) {
-    this.currentQuestion = question;
+  showQuestionDialog(studentQuestion: StudentQuestion) {
+    this.currentStudentQuestion = studentQuestion;
     this.questionDialog = true;
   }
 
-  onCloseShowQuestionDialog() {
-    this.questionDialog = false;
-  }
-
   async showEvaluateStudentQuestionDialog(sq: StudentQuestion) {
-    this.currentQuestion = sq;
-    this.evaluateQuestion = true;
-    return;
+    this.currentStudentQuestion = sq;
+    if (!sq.canEvaluate()) {
+      this.studentQuestionJustification = true;
+    } else {
+      this.evaluateQuestion = true;
+    }
   }
 
-  onCancelEvaluation() {
-    this.evaluateQuestion = false;
+  async onSaveStudentQuestion(studentQuestion: StudentQuestion) {
+    this.studentQuestions = this.studentQuestions.filter(
+      sQ => sQ.id !== studentQuestion.id
+    );
+    this.studentQuestions.unshift(studentQuestion);
+
+    this.onCloseDialog();
   }
 
-  onEvaluatedQuestion(studentQuestion: StudentQuestion) {
-    // update evaluated question
-    this.studentQuestions.forEach(sq => {
-      if (sq.id === studentQuestion.id) {
-        sq.justification = studentQuestion.justification;
-        sq.submittedStatus = studentQuestion.submittedStatus;
-      }
-    });
+  onCloseDialog() {
+    this.currentStudentQuestion = null;
+
     this.evaluateQuestion = false;
-    this.currentQuestion = null;
+    this.questionDialog = false;
+    this.editAndPromoteStudentQuestionDialog = false;
+    this.studentQuestionJustification = false;
+  }
+
+  truncate(s: String): String {
+    s.trim();
+    const max = 35;
+    return s.length > max ? s.substr(0, max - 1) + '...' : s;
   }
 }
 </script>

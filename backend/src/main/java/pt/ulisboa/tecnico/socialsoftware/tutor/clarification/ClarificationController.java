@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestAnswerDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
@@ -103,10 +104,6 @@ public class ClarificationController {
         clarificationService.deleteClarificationRequestAnswer(user, requestId);
     }
 
-    /* ===========================================
-     * F3: Student checks Clarification Request and Answer
-     * ===========================================
-     */
 
     @GetMapping("/clarifications/{requestId}/answer")
     @PreAuthorize("(hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')) and hasPermission(#requestId, 'CLARIFICATION.ACCESS')")
@@ -118,5 +115,17 @@ public class ClarificationController {
         }
 
         return clarificationService.getClarificationRequestAnswer(user.getId(), requestId);
+    }
+
+    @PutMapping("/clarifications/{requestId}/status")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#requestId, 'CLARIFICATION.ACCESS')")
+    public ClarificationRequestDto changeClarificationRequestStatus(Principal principal, @PathVariable int requestId, @RequestBody String status) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        if (user == null) {
+            throw new TutorException(ErrorMessage.AUTHENTICATION_ERROR);
+        }
+
+        return clarificationService.changeClarificationRequestStatus(requestId, ClarificationRequest.RequestStatus.valueOf(status));
     }
 }

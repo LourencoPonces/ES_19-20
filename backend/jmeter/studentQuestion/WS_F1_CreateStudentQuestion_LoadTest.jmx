@@ -52,7 +52,7 @@
         <stringProp name="driver">org.postgresql.Driver</stringProp>
         <stringProp name="initQuery"></stringProp>
         <boolProp name="keepAlive">true</boolProp>
-        <stringProp name="password">${__P(db.pass, &quot;password&quot;)}</stringProp>
+        <stringProp name="password">${__P(db.pass, &amp;quot;password&amp;quot;)}</stringProp>
         <stringProp name="poolMax">0</stringProp>
         <boolProp name="preinit">false</boolProp>
         <stringProp name="timeout">10000</stringProp>
@@ -235,7 +235,7 @@
               <stringProp name="variableNames">title,content,student_question_key,optionsContent,correct</stringProp>
             </CSVDataSet>
             <hashTree/>
-            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request to create course execution" enabled="true">
+            <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request to create student question" enabled="true">
               <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
               <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
                 <collectionProp name="Arguments.arguments">
@@ -365,6 +365,7 @@
         <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="JDBC Request" enabled="true">
           <stringProp name="dataSource">sampleReq</stringProp>
           <stringProp name="query">DELETE FROM student_question USING questions WHERE questions.id = student_question.id and questions.title  LIKE &apos;TEST_studentQuestion%&apos;;
+DELETE FROM topics_questions WHERE topics_id = 1000;
 DELETE FROM options WHERE content LIKE &apos;Option_Content&apos;;
 DELETE FROM questions WHERE title LIKE &apos;TEST_studentQuestion%&apos;;
 DELETE FROM topics WHERE id = 1000</stringProp>

@@ -1,81 +1,84 @@
 <template>
-  <v-card class="table">
-    <h1>Available Tournaments</h1>
+  <div class="container">
+    <h2>Available Tournaments</h2>
+    <v-card class="table">
+      <v-data-table
+        :headers="headers"
+        :items="availableTournaments"
+        :search="search"
+        multi-sort
+        :mobile-breakpoint="0"
+        :items-per-page="15"
+        :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
+        no-data-text="No Available Tournaments"
+        no-results-text="No Tournaments Found"
+      >
+        <template v-slot:top>
+          <v-card-title>
+            <v-text-field
+              v-model="search"
+              append-icon="search"
+              label="Search"
+              class="mx-2"
+            />
+            <v-spacer />
+            <v-btn
+              color="primary"
+              dark
+              @click="newTournament"
+              data-cy="newTournament"
+              >New Tournament</v-btn
+            >
+            <edit-tournament-dialog
+              v-if="currentTournament"
+              v-model="editTournamentDialog"
+              :tournament="currentTournament"
+              :topics="topics"
+              @saveTournament="createdTournament"
+            />
+          </v-card-title>
+        </template>
 
-    <v-data-table
-      :headers="headers"
-      :items="availableTournaments"
-      :search="search"
-      multi-sort
-      :mobile-breakpoint="0"
-      :items-per-page="15"
-      :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
-      no-data-text="No Available Tournaments"
-      no-results-text="No Tournaments Found"
-    >
-      <template v-slot:top>
-        <v-card-title>
-          <v-text-field
-            v-model="search"
-            append-icon="search"
-            label="Search"
-            class="mx-2"
-          />
-          <v-spacer />
-          <v-btn
-            color="primary"
-            dark
-            @click="newTournament"
-            data-cy="newTournament"
-            >New Tournament</v-btn
-          >
-          <edit-tournament-dialog
-            v-if="currentTournament"
-            v-model="editTournamentDialog"
-            :tournament="currentTournament"
-            :topics="topics"
-            @saveTournament="createdTournament"
-          />
-        </v-card-title>
-      </template>
+        <template v-slot:item.topics="{ item }">
+          <v-chip-group data-cy="topics-list">
+            <v-chip v-for="topic in item.topics" :key="topic.name">
+              {{ topic.name }}
+            </v-chip>
+          </v-chip-group>
+        </template>
 
-      <template v-slot:item.topics="{ item }">
-        <v-chip-group data-cy="topics-list">
-          <v-chip v-for="topic in item.topics" :key="topic.name">
-            {{ topic.name }}
-          </v-chip>
-        </v-chip-group>
-      </template>
-
-      <template v-slot:item.sign-up-button="{ item }">
-        <v-btn color="primary" @click="signUpInTournament(item)">Sign-up</v-btn>
-      </template>
-
-      <template v-slot:item.creator="{ item }">
-        <span>{{ item.creator.username }}</span>
-      </template>
-
-      <template v-slot:item.sign-up-status="{ item }" data-cy="status">
-        <div v-if="signedUpTournaments.includes(item)">
-          <v-chip color="green" dark>{{ 'Signed-Up' }}</v-chip>
-        </div>
-        <div v-else>
+        <template v-slot:item.sign-up-button="{ item }">
           <v-btn color="primary" @click="signUpInTournament(item)"
             >Sign-up</v-btn
           >
-        </div>
-      </template>
+        </template>
 
-      <template v-slot:item.delete-button="{ item }">
-        <v-btn
-          color="red"
-          @click="deleteTournament(item)"
-          data-cy="deleteTournament"
-          >Delete</v-btn
-        >
-      </template>
-    </v-data-table>
-  </v-card>
+        <template v-slot:item.creator="{ item }">
+          <span>{{ item.creator.username }}</span>
+        </template>
+
+        <template v-slot:item.sign-up-status="{ item }" data-cy="status">
+          <div v-if="signedUpTournaments.includes(item)">
+            <v-chip color="green" dark>{{ 'Signed-Up' }}</v-chip>
+          </div>
+          <div v-else>
+            <v-btn color="primary" @click="signUpInTournament(item)"
+              >Sign-up</v-btn
+            >
+          </div>
+        </template>
+
+        <template v-slot:item.delete-button="{ item }">
+          <v-btn
+            color="red"
+            @click="deleteTournament(item)"
+            data-cy="deleteTournament"
+            >Delete</v-btn
+          >
+        </template>
+      </v-data-table>
+    </v-card>
+  </div>
 </template>
 
 <script lang="ts">
@@ -240,4 +243,21 @@ export default class AvailableTournamentsView extends Vue {
 }
 </script>
 
-<style lang="scss"></style>
+<style lang="scss" scoped>
+.container {
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  h2 {
+    font-size: 26px;
+    margin: 20px 0;
+    text-align: center;
+    small {
+      font-size: 0.5em;
+    }
+  }
+}
+</style>

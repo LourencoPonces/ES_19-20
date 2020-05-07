@@ -2,6 +2,7 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto;
 
 import org.springframework.data.annotation.Transient;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,6 +15,7 @@ public class ClarificationRequestDto {
     private String content;
     private String creationDate;
     private ClarificationRequestAnswerDto answer;
+    private ClarificationRequest.RequestStatus status;
 
     @Transient
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -26,6 +28,7 @@ public class ClarificationRequestDto {
         this.content = clarificationRequest.getContent();
         this.question = clarificationRequest.getQuestion().getId();
         this.owner = clarificationRequest.getOwner().getId();
+        this.status = clarificationRequest.getStatus();
 
         if (clarificationRequest.getCreationDate() != null)
             this.creationDate = clarificationRequest.getCreationDate().format(formatter);
@@ -95,4 +98,8 @@ public class ClarificationRequestDto {
     public ClarificationRequestAnswerDto getAnswer() {
         return answer;
     }
+
+    public ClarificationRequest.RequestStatus getStatus() { return this.status; }
+
+    public void setStatus(ClarificationRequest.RequestStatus status) { this.status = status; }
 }

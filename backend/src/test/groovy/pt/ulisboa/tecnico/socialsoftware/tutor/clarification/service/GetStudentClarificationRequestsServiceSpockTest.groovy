@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
@@ -76,9 +75,9 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
 
 
     def setup() {
-        course = createCourse(COURSE_NAME)
+        course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseExecution = createCourseExecution(course, ACRONYM, ACADEMIC_TERM)
-        quiz = createQuiz(1, courseExecution, Quiz.QuizType.GENERATED)
+        quiz = createQuiz(1, courseExecution, "GENERATED")
         question = createQuestion(1, course)
         quizQuestion = new QuizQuestion(quiz, question, 1)
         student = createStudent(new User(), 1, 'NAME', 'USERNAME_ONE', courseExecution)
@@ -109,11 +108,12 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
         def question = new Question()
         question.setKey(key)
         question.setCourse(course)
+        question.setTitle("TITLE")
         course.addQuestion(question)
         return question
     }
 
-    private Quiz createQuiz(int key, CourseExecution courseExecution, Quiz.QuizType type) {
+    private Quiz createQuiz(int key, CourseExecution courseExecution, String type) {
         def quiz = new Quiz()
         quiz.setKey(key)
         quiz.setType(type)
@@ -128,12 +128,6 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
         courseExecution.setAcronym(acronym)
         courseExecution.setAcademicTerm(term)
         return courseExecution
-    }
-
-    private Course createCourse(String name) {
-        def course = new Course()
-        course.setName(name)
-        return course
     }
 
     def "student submitted 1 clarification request"() {

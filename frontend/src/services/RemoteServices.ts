@@ -17,6 +17,7 @@ import StudentQuestion from '@/models/management/StudentQuestion';
 import Tournament from '@/models/management/Tournament';
 import ClarificationRequest from '@/models/clarification/ClarificationRequest';
 import ClarificationRequestAnswer from '@/models/clarification/ClarificationRequestAnswer';
+import DashboardStats from '@/models/statement/DashboardStats';
 
 const httpClient = axios.create();
 httpClient.defaults.timeout = 10000;
@@ -93,6 +94,21 @@ export default class RemoteServices {
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
+  }
+
+  /*
+   * Dashboard
+   */
+
+  static async getUserDashboardStats(userId: number): Promise<DashboardStats> {
+    try {
+      const response = await httpClient.get(
+        `/courses/${Store.getters.getCurrentCourse.courseId}/dashboardStats/${userId}`
+      );
+      return new DashboardStats(response.data);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
   }
 
   static async getQuestions(): Promise<Question[]> {
@@ -259,8 +275,22 @@ export default class RemoteServices {
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${questionId}/evaluate`,
         {
           evaluation: StudentQuestion.getServerStatusFormat(status),
-          justification: justification
+          justification: justification.trim() === '' ? null : justification
         }
+      );
+      return new StudentQuestion(response.data);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
+  static async editAndPromoteStudentQuestion(
+    studentQuestion: StudentQuestion
+  ): Promise<StudentQuestion> {
+    try {
+      const response = await httpClient.put(
+        `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${studentQuestion.id}/evaluate`,
+        StudentQuestion.toRequest(studentQuestion)
       );
       return new StudentQuestion(response.data);
     } catch (error) {
@@ -327,6 +357,21 @@ export default class RemoteServices {
     return httpClient
       .get(
         `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments/available`
+      )
+      .then(response => {
+        return response.data.map((tournament: any) => {
+          return new Tournament(tournament);
+        });
+      })
+      .catch(async error => {
+        console.log(this.errorMessage(error));
+      });
+  }
+
+  static async getCreatedTournaments(): Promise<Tournament[]> {
+    return httpClient
+      .get(
+        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments/created`
       )
       .then(response => {
         return response.data.map((tournament: any) => {
@@ -660,20 +705,9 @@ export default class RemoteServices {
       });
   }
 
-  static async activateCourse(course: Course): Promise<Course> {
+  static getCourses(): Promise<Course[]> {
     return httpClient
-      .post('/courses', course)
-      .then(response => {
-        return new Course(response.data);
-      })
-      .catch(async error => {
-        throw Error(await this.errorMessage(error));
-      });
-  }
-
-  static async getCourses(): Promise<Course[]> {
-    return httpClient
-      .get('/admin/courses/executions')
+      .get('/courses/executions')
       .then(response => {
         return response.data.map((course: any) => {
           return new Course(course);
@@ -684,9 +718,20 @@ export default class RemoteServices {
       });
   }
 
-  static async createCourse(course: Course): Promise<Course> {
+  static async activateCourse(course: Course): Promise<Course> {
     return httpClient
-      .post('/admin/courses/executions', course)
+      .post('/courses/activate', course)
+      .then(response => {
+        return new Course(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async createExternalCourse(course: Course): Promise<Course> {
+    return httpClient
+      .post('/courses/external', course)
       .then(response => {
         return new Course(response.data);
       })
@@ -697,7 +742,7 @@ export default class RemoteServices {
 
   static async deleteCourse(courseExecutionId: number | undefined) {
     return httpClient
-      .delete('/admin/courses/executions/' + courseExecutionId)
+      .delete(`/executions/${courseExecutionId}`)
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
@@ -830,5 +875,23 @@ export default class RemoteServices {
     } catch (err) {
       throw Error(await this.errorMessage(err));
     }
+  }
+
+  static async changeClarificationRequestStatus(
+    id: number,
+    status: string
+  ): Promise<ClarificationRequest> {
+    return httpClient
+      .put(`/clarifications/${id}/status`, status, {
+        headers: {
+          'Content-Type': 'text/plain'
+        }
+      })
+      .then(response => {
+        return new ClarificationRequest(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
   }
 }

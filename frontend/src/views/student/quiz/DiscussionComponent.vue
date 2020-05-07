@@ -1,62 +1,80 @@
 <template>
-  <v-card class="discussion" style="margin-top: 30px;" outlined>
-    <v-card-title class="title">
-      <span>Clarification Requests</span>
-      <v-spacer />
-      <v-btn
-        v-if="!creatingRequest"
-        dark
-        color="primary"
-        @click="newRequestButton()"
-        data-cy="newRequest"
-      >
-        New Request
-      </v-btn>
-    </v-card-title>
-    <v-divider></v-divider>
-    <v-card-text v-if="creatingRequest">
-      <v-textarea
-        v-model="requestContent"
-        label="Your request goes here."
-        data-cy="inputRequest"
-      ></v-textarea>
-      <v-btn
-        dark
-        color="red"
-        style="margin: 5px;"
-        @click="cancelCreateRequest()"
-      >
-        Cancel
-      </v-btn>
-      <v-btn dark color="primary" style="margin: 5px;" @click="submitRequest()">
-        Submit
-      </v-btn>
-    </v-card-text>
-
-    <v-card-text v-else-if="hasClarificationRequests()">
-      <v-expansion-panels focusable data-cy="questionRequests">
-        <v-expansion-panel
-          v-for="request in clarifications"
-          :key="request.content"
+  <div>
+    <v-card class="discussion" style="margin-top: 30px;" outlined>
+      <v-card-title class="title">
+        <span>Clarification Requests</span>
+        <v-spacer />
+        <v-btn
+          :disabled="this.alreadySubmitted()"
+          color="primary"
+          @click="newRequestButton()"
+          data-cy="newRequest"
         >
-          <v-expansion-panel-header>
-            <span class="multiline" data-cy="requestHeader">{{
-              request.content
-            }}</span>
-          </v-expansion-panel-header>
-          <v-expansion-panel-content v-if="request.hasAnswer">
-            <span class="multiline">{{ showAnswer(request) }}</span>
-          </v-expansion-panel-content>
-          <v-expansion-panel-content v-else>
-            No answer available.
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </v-expansion-panels>
-    </v-card-text>
-    <v-card-text v-else>
-      No requests available.
-    </v-card-text>
-  </v-card>
+          New Request
+        </v-btn>
+      </v-card-title>
+      <v-divider></v-divider>
+      <v-card-text v-if="hasClarificationRequests()">
+        <v-expansion-panels focusable data-cy="questionRequests">
+          <v-expansion-panel
+            v-for="request in clarifications"
+            :key="request.content"
+          >
+            <v-expansion-panel-header>
+              <span class="multiline" data-cy="requestHeader">{{
+                request.content
+              }}</span>
+            </v-expansion-panel-header>
+            <v-expansion-panel-content v-if="request.hasAnswer">
+              <span class="multiline">{{ showAnswer(request) }}</span>
+            </v-expansion-panel-content>
+            <v-expansion-panel-content v-else>
+              No answer available.
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </v-card-text>
+      <v-card-text v-else>
+        No requests available.
+      </v-card-text>
+    </v-card>
+    <template>
+      <v-row justify="center">
+        <v-dialog tile v-model="creatingRequest" persistent max-width="60%">
+          <v-card>
+            <v-card-title class="headline">
+              New Clarification Request
+            </v-card-title>
+            <v-card-text>
+              <v-textarea
+                v-model="requestContent"
+                label="Your request goes here."
+                data-cy="inputRequest"
+              ></v-textarea>
+            </v-card-text>
+            <v-card-actions>
+              <v-btn
+                dark
+                color="red"
+                style="margin: 5px;"
+                @click="cancelCreateRequest()"
+              >
+                Cancel
+              </v-btn>
+              <v-btn
+                dark
+                color="primary"
+                style="margin: 5px;"
+                @click="submitRequest()"
+              >
+                Submit
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-row>
+    </template>
+  </div>
 </template>
 
 <script lang="ts">
@@ -68,6 +86,7 @@ import ClarificationRequest from '@/models/clarification/ClarificationRequest';
 export default class DiscussionComponent extends Vue {
   @Prop(StatementQuestion) readonly question!: StatementQuestion;
   @Prop({ type: Array }) readonly clarifications!: ClarificationRequest[];
+  @Prop({ type: Array }) readonly userRequests!: ClarificationRequest[];
 
   creatingRequest: boolean = false;
   requestContent = '';
@@ -96,6 +115,17 @@ export default class DiscussionComponent extends Vue {
     this.requestContent = '';
 
     return [content, this.question.questionId.toString()];
+  }
+
+  alreadySubmitted(): boolean {
+    let submitted = false;
+    this.userRequests.forEach(req => {
+      if (req.getQuestionId() == this.question.getQuestionId()) {
+        submitted = true;
+        return;
+      }
+    });
+    return submitted;
   }
 }
 </script>
