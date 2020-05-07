@@ -63,17 +63,17 @@
         <stringProp name="connectionAge">5000</stringProp>
         <stringProp name="connectionProperties"></stringProp>
         <stringProp name="dataSource">sampleReq</stringProp>
-        <stringProp name="dbUrl">jdbc:postgresql://localhost:5432/tutordb?autoReconnect=true</stringProp>
+        <stringProp name="dbUrl">${__P(db.url, &quot;jdbc:postgresql://localhost:5432/tutordb?autoReconnect=true&quot;)}</stringProp>
         <stringProp name="driver">org.postgresql.Driver</stringProp>
         <stringProp name="initQuery"></stringProp>
         <boolProp name="keepAlive">true</boolProp>
-        <stringProp name="password">ES2020</stringProp>
+        <stringProp name="password">${__P(db.user, &quot;root&quot;)}</stringProp>
         <stringProp name="poolMax">0</stringProp>
         <boolProp name="preinit">false</boolProp>
         <stringProp name="timeout">10000</stringProp>
         <stringProp name="transactionIsolation">DEFAULT</stringProp>
         <stringProp name="trimInterval">60000</stringProp>
-        <stringProp name="username">daniel</stringProp>
+        <stringProp name="username">${__P(db.user, &quot;root&quot;)}</stringProp>
       </JDBCDataSource>
       <hashTree/>
       <SetupThreadGroup guiclass="SetupThreadGroupGui" testclass="SetupThreadGroup" testname="setUp Thread Group" enabled="true">
@@ -537,7 +537,9 @@ INSERT INTO student_question(id, user_id, submitted_status, justification, stude
 	&quot;statsValues&quot;: ${statsValues},&#xd;
 	&quot;statsVisibility&quot;: {&#xd;
 		&quot;submittedQuestions&quot;: &quot;PUBLIC&quot;,&#xd;
-		&quot;approvedQuestions&quot;: &quot;PUBLIC&quot;&#xd;
+		&quot;approvedQuestions&quot;: &quot;PUBLIC&quot;,&#xd;
+		&quot;publicRequests&quot;: &quot;PRIVATE&quot;,&#xd;
+		&quot;requestsSubmitted&quot;: &quot;PRIVATE&quot;&#xd;
 	}&#xd;
 }&#xd;
 </stringProp>
