@@ -4,9 +4,7 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.overviewdashboard;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import java.security.Principal;
@@ -27,5 +25,11 @@ public class MyStatsController {
         } else {
             return myStatsService.getOtherUserStats(userId, courseId);
         }
+    }
+
+    @PutMapping("/dashboardStats/{statsId}")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#statsId, 'STATS.ACCESS')")
+    public MyStatsDto updateDashboardStatsVisibility(@PathVariable int statsId, @RequestBody MyStatsDto myStatsDto) {
+        return this.myStatsService.updateVisibility(statsId, myStatsDto);
     }
 }

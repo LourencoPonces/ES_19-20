@@ -130,5 +130,11 @@ public class MyStatsService {
                 ).count();
     }
 
+    public Integer findOwner(int statsId) {
+        return myStatsRepository.findById(statsId)
+                .map(stats -> stats.getUser().getId())
+                .orElse(-1);
+    }
+
 
 }

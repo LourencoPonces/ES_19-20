@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseService;
+import pt.ulisboa.tecnico.socialsoftware.tutor.overviewdashboard.MyStatsService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.AssessmentService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.TopicService;
@@ -42,6 +43,9 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
 
     @Autowired
     private ClarificationService clarificationService;
+
+    @Autowired
+    private MyStatsService myStatsService;
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
@@ -83,6 +87,8 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
                     return userHasThisExecution(userId, tournamentService.findTournamentCourseExecution(id).getCourseExecutionId());
                 case "CLARIFICATION.ACCESS":
                     return userHasAnExecutionOfTheCourse(userId, clarificationService.findClarificationRequestCourseId(id));
+                case "STATS.ACCESS":
+                    return isSameUser(userId, myStatsService.findOwner(id));
                 default: return false;
             }
         }
@@ -98,6 +104,10 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
     private boolean userHasThisExecution(int userId, int courseExecutionId) {
         return userService.getCourseExecutions(userId).stream()
                 .anyMatch(course -> course.getCourseExecutionId() == courseExecutionId);
+    }
+
+    private boolean isSameUser(int userId1, int userId2 ) {
+        return userId1 == userId2;
     }
 
     @Override

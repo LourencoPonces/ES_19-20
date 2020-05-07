@@ -105,7 +105,15 @@ public class MyStatsDto implements Serializable {
         return statsValues;
     }
 
+    public void setStatsValues(Map<String, Integer> statsValues) {
+        this.statsValues = statsValues;
+    }
+
     public Map<String, MyStats.StatsVisibility> getStatsVisibility() {
         return statsVisibility;
+    }
+
+    public void setStatsVisibility(Map<String, MyStats.StatsVisibility> statsVisibility) {
+        this.statsVisibility = statsVisibility;
     }
 }
