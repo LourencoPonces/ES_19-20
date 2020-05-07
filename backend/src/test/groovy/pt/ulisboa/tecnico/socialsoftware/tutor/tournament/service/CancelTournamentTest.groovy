@@ -122,9 +122,51 @@ class CancelTournamentTest extends Specification {
         tournamentDto.setTopics(topicDtoList)
     }
 
+    def prepareStatus(TournamentDto tournamentDto, Tournament.Status status) {
+        def now = LocalDateTime.now()
+
+        switch(status) {
+            case Tournament.Status.CREATED:
+                creationDate = now.minusDays(1)
+                availableDate = now.plusDays(1)
+                runningDate = now.plusDays(2)
+                conclusionDate = now.plusDays(3)
+                break;
+            case Tournament.Status.AVAILABLE:
+                creationDate = now.minusDays(2)
+                availableDate = now.minusDays(1)
+                runningDate = now.plusDays(1)
+                conclusionDate = now.plusDays(2)
+                break;
+            case Tournament.Status.RUNNING:
+                creationDate = now.minusDays(3)
+                availableDate = now.minusDays(2)
+                runningDate = now.minusDays(1)
+                conclusionDate = now.plusDays(1)
+                break;
+            case Tournament.Status.FINISHED:
+                creationDate = now.minusDays(4)
+                availableDate = now.minusDays(3)
+                runningDate = now.minusDays(2)
+                conclusionDate = now.minusDays(1)
+                break;
+            case Tournament.Status.CANCELLED:
+                creationDate = now.minusDays(4)
+                availableDate = now.minusDays(3)
+                runningDate = now.minusDays(2)
+                conclusionDate = now.minusDays(1)
+                tournamentDto.setIsCancelled();
+        }
+
+        tournamentDto.setCreationDate(creationDate.format(formatter))
+        tournamentDto.setAvailableDate(availableDate.format(formatter))
+        tournamentDto.setRunningDate(runningDate.format(formatter))
+        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
+    }
+
     @Unroll("allowed status: #status || #newStatus")
-    def "cancel a tournament with an allowed status"() {
-        given: "a tournament with a not allowed status"
+    def "cancel a tournament with a allowed status"() {
+        given: "a tournament with a allowed status"
         prepareStatus(tournamentDto, status)
         tournamentDto = tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
 
@@ -175,48 +217,6 @@ class CancelTournamentTest extends Specification {
         then:
         def exception = thrown(TutorException)
         exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_FOUND
-    }
-
-    def prepareStatus(TournamentDto tournamentDto, Tournament.Status status) {
-        def now = LocalDateTime.now()
-
-        switch(status) {
-            case Tournament.Status.CREATED:
-                creationDate = now.minusDays(1)
-                availableDate = now.plusDays(1)
-                runningDate = now.plusDays(2)
-                conclusionDate = now.plusDays(3)
-                break;
-            case Tournament.Status.AVAILABLE:
-                creationDate = now.minusDays(2)
-                availableDate = now.minusDays(1)
-                runningDate = now.plusDays(1)
-                conclusionDate = now.plusDays(2)
-                break;
-            case Tournament.Status.RUNNING:
-                creationDate = now.minusDays(3)
-                availableDate = now.minusDays(2)
-                runningDate = now.minusDays(1)
-                conclusionDate = now.plusDays(1)
-                break;
-            case Tournament.Status.FINISHED:
-                creationDate = now.minusDays(4)
-                availableDate = now.minusDays(3)
-                runningDate = now.minusDays(2)
-                conclusionDate = now.minusDays(1)
-                break;
-            case Tournament.Status.CANCELLED:
-                creationDate = now.minusDays(4)
-                availableDate = now.minusDays(3)
-                runningDate = now.minusDays(2)
-                conclusionDate = now.minusDays(1)
-                tournamentDto.setIsCancelled();
-        }
-
-        tournamentDto.setCreationDate(creationDate.format(formatter))
-        tournamentDto.setAvailableDate(availableDate.format(formatter))
-        tournamentDto.setRunningDate(runningDate.format(formatter))
-        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
     }
 
     @TestConfiguration
