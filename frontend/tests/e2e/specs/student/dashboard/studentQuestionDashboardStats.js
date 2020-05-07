@@ -1,7 +1,7 @@
-let APPROVED = 'Approved';
-let REJECTED = 'Rejected';
-let WAITING_FOR_APPROVAL = 'Waiting for Approval';
-let PRIVATE = 'Private';
+const APPROVED = 'Approved';
+const REJECTED = 'Rejected';
+const WAITING_FOR_APPROVAL = 'Waiting for Approval';
+const PRIVATE = 'Private';
 
 describe('Student Question Submission', () => {
   let ts;
@@ -22,7 +22,7 @@ describe('Student Question Submission', () => {
     'New Test Option 4'
   ];
 
-  let demoStudent = 'Demo Student';
+  const demoStudent = 'Demo Student';
 
   beforeEach(() => {
     cy.exec('psql tutordb < ../backend/resetStudentQuestions.sql');
@@ -38,10 +38,10 @@ describe('Student Question Submission', () => {
   it('change demo student dashboard stats visibility', () => {
     // make the 2 stats private and check
     cy.get('[data-cy="dashboardButton"]').click();
-    let submittedQuestionsDiv = '[data-cy="submittedQuestionsDiv"]';
-    let approvedQuestionsDiv = '[data-cy="approvedQuestionsDiv"]';
-    let submittedQuestionsRow = '[data-cy="submittedQuestionsRow"]';
-    let approvedQuestionsRow = '[data-cy="approvedQuestionsRow"]';
+    const submittedQuestionsDiv = '[data-cy="submittedQuestionsDiv"]';
+    const approvedQuestionsDiv = '[data-cy="approvedQuestionsDiv"]';
+    const submittedQuestionsRow = '[data-cy="submittedQuestionsRow"]';
+    const approvedQuestionsRow = '[data-cy="approvedQuestionsRow"]';
 
     cy.makePrivate(submittedQuestionsDiv);
     cy.makePrivate(approvedQuestionsDiv);
