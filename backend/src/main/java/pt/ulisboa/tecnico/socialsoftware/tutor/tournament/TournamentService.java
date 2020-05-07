@@ -190,12 +190,13 @@ public class TournamentService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public List<TournamentDto> getSignedUpRunningTournaments(int userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND, userId));
+    public List<TournamentDto> getSignedUpRunningTournaments(String username, int executionId) {
+        User user = userRepository.findByUsername(username);
 
         return user.getParticipantTournaments()
                 .stream()
-                .filter(tournament -> tournament.getStatus() == Tournament.Status.RUNNING)
+                .filter(tournament -> tournament.getStatus() == Tournament.Status.RUNNING &&
+                        tournament.getCourseExecution().getId() == executionId)
                 .map(TournamentDto::new)
                 .collect(Collectors.toList());
     }

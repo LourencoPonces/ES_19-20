@@ -126,7 +126,7 @@ class GetSignedUpRunningTournamentsTest extends Specification {
         tournamentDto = tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
 
         when:
-        def tournamentList = tournamentService.getSignedUpRunningTournaments(creator.getId())
+        def tournamentList = tournamentService.getSignedUpRunningTournaments(CREATOR_USERNAME, courseExecution.getId())
 
         then:
         tournamentList.get(0).getId() == tournamentDto.getId()
@@ -139,7 +139,7 @@ class GetSignedUpRunningTournamentsTest extends Specification {
         tournamentDto = tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
 
         when:
-        def tournamentList = tournamentService.getSignedUpRunningTournaments(creator.getId())
+        def tournamentList = tournamentService.getSignedUpRunningTournaments(CREATOR_USERNAME, courseExecution.getId())
 
         then:
         tournamentList.isEmpty()
