@@ -12,6 +12,7 @@
         :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
         no-data-text="No Available Tournaments"
         no-results-text="No Tournaments Found"
+        data-cy="available-tournaments"
       >
         <template v-slot:top>
           <v-card-title>

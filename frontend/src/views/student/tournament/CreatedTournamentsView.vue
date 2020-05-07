@@ -48,19 +48,20 @@
         </template>
         <template v-slot:item.status="{ item }">
           <v-chip-group>
-            <v-chip>
+            <v-chip data-cy="status">
               {{ getStatus(item) }}
             </v-chip>
           </v-chip-group>
         </template>
         <template v-slot:item.action="{ item }">
                     <v-tooltip bottom>
-                      <template v-slot:activator="{ on }" v-if="getStatus(item) != 'Cancelled'">
+                      <template v-slot:activator="{ on }" v-if="getStatus(item) == 'Created' || getStatus(item) == 'Available' ">
                         <v-icon
                                 large
                                 class="mr-2"
                                 v-on="on"
                                 @click="cancelTournament(item)"
+                                data-cy="cancelTournament"
                                 color="red"
                         >fas fa-ban</v-icon
                         >
@@ -235,13 +236,13 @@
               let date = Date.now();
               if (tournament.isCancelled)
                 return 'Cancelled';
-              else if (date < Date.parse(tournament.creationDate))
-                return 'Created';
               else if (date < Date.parse(tournament.availableDate))
-                return 'Available';
+                return 'Created';
               else if (date < Date.parse(tournament.runningDate))
-                return 'Running';
+                return 'Available';
               else if (date < Date.parse(tournament.conclusionDate))
+                return 'Running';
+              else
                 return 'Finished';
             }
           }
