@@ -16,7 +16,7 @@
       <v-col v-else>Private</v-col>
     </v-row>
     <v-divider />
-    <v-row>
+    <v-row data-cy="submittedQuestionsRow">
       <v-col><b>Submitted Questions</b></v-col>
       <v-col v-if="stats.isPublic(stats.statsNames.SUBMITTED_QUESTIONS)">{{
         stats.getStatValue(stats.statsNames.SUBMITTED_QUESTIONS)
@@ -24,7 +24,7 @@
       <v-col v-else>Private</v-col>
     </v-row>
     <v-divider />
-    <v-row>
+    <v-row data-cy="approvedQuestionsRow">
       <v-col><b>Approved Questions</b></v-col>
       <v-col v-if="stats.isPublic(stats.statsNames.APPROVED_QUESTIONS)">{{
         stats.getStatValue(stats.statsNames.APPROVED_QUESTIONS)

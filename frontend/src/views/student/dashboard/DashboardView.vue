@@ -79,7 +79,7 @@
             <p>Public Clarification Requests</p>
           </div>
         </div>
-        <div class="items">
+        <div class="items" data-cy="submittedQuestionsDiv">
           <v-tooltip top>
             <template v-slot:activator="{ on }">
               <v-icon
@@ -122,7 +122,7 @@
             <p>Student Questions Submitted</p>
           </div>
         </div>
-        <div class="items">
+        <div class="items" data-cy="approvedQuestionsDiv">
           <v-tooltip top>
             <template v-slot:activator="{ on }">
               <v-icon
@@ -195,6 +195,7 @@
                 medium
                 class="mr-2"
                 v-on="on"
+                data-cy="showDashboardStatsButton"
                 @click="showDashboardStatsDialog(item)"
                 >visibility</v-icon
               >
@@ -298,10 +299,11 @@ export default class DashboardView extends Vue {
   }
 
   async onChangeVisibility(stat) {
-    if (this.myStats.isPublic(stat)) this.myStats.makePrivate(stat);
-    else this.myStats.makePublic(stat);
     await this.$store.dispatch('loading');
     try {
+      if (this.myStats.isPublic(stat)) this.myStats.makePrivate(stat);
+      else this.myStats.makePublic(stat);
+
       this.myStats = await RemoteServices.updateStatsVisibility(this.myStats);
     } catch (error) {
       await this.$store.dispatch('error', error);
