@@ -29,12 +29,20 @@ public class MyStats implements DomainEntity {
     @Column(name="public_requests", nullable = false)
     private StatsVisibility publicRequests;
 
+    @Column(name="submitted_questions", nullable = false)
+    private StatsVisibility submittedQuestions;
+
+    @Column(name="approved_questions", nullable = false)
+    private StatsVisibility approvedQuestions;
+
     public MyStats() {}
 
     public MyStats(User user, StatsVisibility statsVisibility) {
         this.user = user;
         this.requestsSubmitted = statsVisibility;
         this.publicRequests = statsVisibility;
+        this.submittedQuestions = statsVisibility;
+        this.approvedQuestions = statsVisibility;
     }
 
     public User getUser() { return this.user; }
@@ -62,6 +70,29 @@ public class MyStats implements DomainEntity {
         return this.publicRequests == StatsVisibility.PUBLIC;
     }
 
+    public StatsVisibility getSubmittedQuestions() {
+        return submittedQuestions;
+    }
+
+    public void setSubmittedQuestions(StatsVisibility proposedQuestions) {
+        this.submittedQuestions = proposedQuestions;
+    }
+
+    public boolean canSeeSubmittedQuestions() {
+        return this.submittedQuestions == StatsVisibility.PUBLIC;
+    }
+
+    public StatsVisibility getApprovedQuestions() {
+        return approvedQuestions;
+    }
+
+    public void setApprovedQuestions(StatsVisibility approvedQuestions) {
+        this.approvedQuestions = approvedQuestions;
+    }
+
+    public boolean canSeeApprovedQuestions() {
+        return this.approvedQuestions == StatsVisibility.PUBLIC;
+    }
 
     @Override
     public void accept(Visitor visitor) {

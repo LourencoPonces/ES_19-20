@@ -241,6 +241,7 @@
           to="/student/dashboard"
           v-if="isStudent && currentCourse"
           text
+          data-cy="dashboardButton"
           dark
         >
           Dashboard

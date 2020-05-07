@@ -7,7 +7,7 @@
           <v-tooltip top>
             <template v-slot:activator="{ on }">
               <v-icon
-                v-if="!myStats.isPublic('requestsSubmittedVisibility')"
+                v-if="!myStats.isPublic(myStats.statsNames.REQUESTS_SUBMITTED)"
                 v-on="on"
                 medium
                 class="mr-2"
@@ -15,13 +15,19 @@
               >
               <v-icon v-else v-on="on" medium class="mr-2">fas fa-eye</v-icon>
             </template>
-            <span v-if="!myStats.isPublic('requestsSubmittedVisibility')">
+            <span
+              v-if="!myStats.isPublic(myStats.statsNames.REQUESTS_SUBMITTED)"
+            >
               Make Public
             </span>
             <span v-else>Make Private</span>
           </v-tooltip>
           <div class="icon-wrapper" ref="requestsSubmitted">
-            <animated-number :number="myStats.requestsSubmittedStat" />
+            <animated-number
+              :number="
+                myStats.getStatValue(myStats.statsNames.REQUESTS_SUBMITTED)
+              "
+            />
           </div>
           <div class="project-name">
             <p>Clarification Requests Submitted</p>
@@ -31,7 +37,7 @@
           <v-tooltip top>
             <template v-slot:activator="{ on }">
               <v-icon
-                v-if="!myStats.isPublic('publicRequestsVisibility')"
+                v-if="!myStats.isPublic(myStats.statsNames.PUBLIC_REQUESTS)"
                 v-on="on"
                 medium
                 class="mr-2"
@@ -39,16 +45,80 @@
               >
               <v-icon v-else v-on="on" medium class="mr-2">fas fa-eye</v-icon>
             </template>
-            <span v-if="!myStats.isPublic('publicRequestsVisibility')">
+            <span v-if="!myStats.isPublic(myStats.statsNames.PUBLIC_REQUESTS)">
               Make Public
             </span>
             <span v-else>Make Private</span>
           </v-tooltip>
           <div class="icon-wrapper" ref="publicRequests">
-            <animated-number :number="myStats.publicRequestsStat" />
+            <animated-number
+              :number="myStats.getStatValue(myStats.statsNames.PUBLIC_REQUESTS)"
+            />
           </div>
           <div class="project-name">
             <p>Public Clarification Requests</p>
+          </div>
+        </div>
+        <div class="items">
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-icon
+                v-if="!myStats.isPublic(myStats.statsNames.SUBMITTED_QUESTIONS)"
+                v-on="on"
+                medium
+                class="mr-2"
+                >fas fa-eye-slash</v-icon
+              >
+              <v-icon v-else v-on="on" medium class="mr-2">fas fa-eye</v-icon>
+            </template>
+            <span
+              v-if="!myStats.isPublic(myStats.statsNames.SUBMITTED_QUESTIONS)"
+            >
+              Make Public
+            </span>
+            <span v-else>Make Private</span>
+          </v-tooltip>
+          <div class="icon-wrapper" ref="submittedQuestions">
+            <animated-number
+              data-cy="submittedQuestions"
+              :number="
+                myStats.getStatValue(myStats.statsNames.SUBMITTED_QUESTIONS)
+              "
+            />
+          </div>
+          <div class="project-name">
+            <p>Student Questions Submitted</p>
+          </div>
+        </div>
+        <div class="items">
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-icon
+                v-if="!myStats.isPublic(myStats.statsNames.APPROVED_QUESTIONS)"
+                v-on="on"
+                medium
+                class="mr-2"
+                >fas fa-eye-slash</v-icon
+              >
+              <v-icon v-else v-on="on" medium class="mr-2">fas fa-eye</v-icon>
+            </template>
+            <span
+              v-if="!myStats.isPublic(myStats.statsNames.APPROVED_QUESTIONS)"
+            >
+              Make Public
+            </span>
+            <span v-else>Make Private</span>
+          </v-tooltip>
+          <div class="icon-wrapper" ref="approvedQuestions">
+            <animated-number
+              data-cy="approvedQuestions"
+              :number="
+                myStats.getStatValue(myStats.statsNames.APPROVED_QUESTIONS)
+              "
+            />
+          </div>
+          <div class="project-name">
+            <p>Student Questions Submitted</p>
           </div>
         </div>
       </div>
@@ -78,7 +148,7 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <v-icon
-                small
+                medium
                 class="mr-2"
                 v-on="on"
                 @click="showDashboardStatsDialog(item)"
@@ -93,6 +163,7 @@
         v-if="dashboardUserToSee"
         v-model="dashboardStatsDialog"
         :student="dashboardUserToSee"
+        :userStats="userStats"
         v-on:close-show-dashboard-stats-dialog="onCloseShowDashboardStatsDialog"
       />
     </v-card>
@@ -122,6 +193,7 @@ export default class DashboardView extends Vue {
   search: string = '';
   dashboardStatsDialog: boolean = false;
   dashboardUserToSee: Student | null = null;
+  userStats: DashboardStats | null = null;
   headers: object = [
     { text: 'Name', value: 'name', align: 'left', width: '40%' },
     {
@@ -164,8 +236,15 @@ export default class DashboardView extends Vue {
     await this.$store.dispatch('clearLoading');
   }
 
-  showDashboardStatsDialog(student: Student) {
+  async showDashboardStatsDialog(student: Student) {
     this.dashboardUserToSee = student;
+    await this.$store.dispatch('loading');
+    try {
+      this.userStats = await RemoteServices.getUserDashboardStats(student.id);
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
+    await this.$store.dispatch('clearLoading');
     this.dashboardStatsDialog = true;
   }
 
