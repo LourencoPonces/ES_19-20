@@ -9,6 +9,7 @@ describe('Clarification Request', () => {
   });
 
   afterEach(() => {
+    cy.exec('psql tutordb < ../backend/resetGeneratedQuizzes.sql');
     cy.logout();
   });
 
