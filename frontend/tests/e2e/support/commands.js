@@ -332,6 +332,21 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add(
+    'assertQuestionExists',
+    (questionTitle) => {
+        // go to questions
+        cy.get('[data-cy="management"]').click();
+        cy.get('[data-cy="questions"]').click();
+
+        // look for question title
+        cy.get('[data-cy="search-input"]').clear().type(questionTitle);
+
+        // assert question exists
+        cy.contains(questionTitle);
+    }
+)
+
+Cypress.Commands.add(
   'studentAssertEvaluation',
   (questionTitle, status, justification) => {
     // assert status

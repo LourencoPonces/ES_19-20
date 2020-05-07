@@ -3,7 +3,7 @@ let REJECTED = 'Rejected';
 let WAITING_FOR_APPROVAL = 'Waiting for Approval';
 let PROMOTED = 'Promoted';
 
-describe('Student Question Evaluation', () => {
+describe('Student Question Promotion', () => {
     let questionTitle;
     let newQuestionTitle;
     let questionContent = 'To be or not to be?';
@@ -53,6 +53,8 @@ describe('Student Question Evaluation', () => {
             status,
             justification === null ? '' : justification
         );
+
+        cy.assertQuestionExists(questionTitle);
     });
 
     it('Edit and promote student question', () => {
@@ -77,6 +79,8 @@ describe('Student Question Evaluation', () => {
             status,
             justification === null ? '' : justification
         );
+
+        cy.assertQuestionExists(newQuestionTitle);
     });
 
     // ===================================================================
