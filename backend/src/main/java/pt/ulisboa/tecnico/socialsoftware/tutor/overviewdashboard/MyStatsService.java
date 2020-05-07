@@ -13,6 +13,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRe
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 
@@ -46,6 +47,8 @@ public class MyStatsService {
         //If it's the logged in user, calculate the stats independently of visibility
         statsDto.setRequestsSubmittedStat(calculateRequestsSubmitted(user, courseId));
         statsDto.setPublicRequestsStat(calculatePublicRequests(user, courseId));
+        statsDto.setSubmittedQuestionsStat(calculateSubmittedQuestions(user, courseId));
+        statsDto.setApprovedQuestionsStat(calculateApprovedQuestions(user, courseId));
 
         return statsDto;
     }
@@ -64,6 +67,12 @@ public class MyStatsService {
 
         if (user.getMyStats().canSeePublicRequests())
             statsDto.setPublicRequestsStat(calculatePublicRequests(user, courseId));
+
+        if (user.getMyStats().canSeeSubmittedQuestions())
+            statsDto.setSubmittedQuestionsStat(calculateSubmittedQuestions(user, courseId));
+
+        if(user.getMyStats().canSeeApprovedQuestions())
+            statsDto.setApprovedQuestionsStat(calculateApprovedQuestions(user, courseId));
         
         return statsDto;
     }
@@ -92,6 +101,21 @@ public class MyStatsService {
                         clarificationService.findClarificationRequestCourseId(req.getId()) == courseId &&
                         req.getStatus() == ClarificationRequest.RequestStatus.PUBLIC)
                 .count() ;
+    }
+
+    private Integer calculateSubmittedQuestions(User user, int courseId) {
+        return (int) user.getStudentQuestions()
+                .stream()
+                .filter(sq -> sq.getCourse().getId() == courseId)
+                .count();
+    }
+
+    private Integer calculateApprovedQuestions(User user, int courseId) {
+        return (int) user.getStudentQuestions()
+                .stream()
+                .filter(sq -> sq.getCourse().getId() == courseId &&
+                        (sq.getSubmittedStatus() == StudentQuestion.SubmittedStatus.APPROVED) // TODO: Add promoted
+                ).count();
     }
 
 

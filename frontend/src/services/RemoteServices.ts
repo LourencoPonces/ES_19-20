@@ -100,9 +100,7 @@ export default class RemoteServices {
    * Dashboard
    */
 
-  static async getUserDashboardStats(
-    userId: number
-  ): Promise<DashboardStats> {
+  static async getUserDashboardStats(userId: number): Promise<DashboardStats> {
     try {
       const response = await httpClient.get(
         `/courses/${Store.getters.getCurrentCourse.courseId}/dashboardStats/${userId}`
