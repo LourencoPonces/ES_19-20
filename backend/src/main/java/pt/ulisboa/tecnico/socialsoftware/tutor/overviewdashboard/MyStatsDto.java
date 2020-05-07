@@ -8,6 +8,7 @@ import java.util.Map;
 
 public class MyStatsDto implements Serializable {
 
+    private Integer id;
     private Map<String, Integer> statsValues = new HashMap<>();
     private Map<String, MyStats.StatsVisibility> statsVisibility = new HashMap<>();
 
@@ -19,10 +20,23 @@ public class MyStatsDto implements Serializable {
     public MyStatsDto() { }
 
     public MyStatsDto(MyStats myStats) {
-        this.statsVisibility.put(REQUESTS_SUBMITTED, myStats.getRequestsSubmitted());
-        this.statsVisibility.put(PUBLIC_REQUESTS, myStats.getPublicRequests());
-        this.statsVisibility.put(SUBMITTED_QUESTIONS, myStats.getSubmittedQuestions());
-        this.statsVisibility.put(APPROVED_QUESTIONS, myStats.getApprovedQuestions());
+        this.id = myStats.getId();
+        this.statsVisibility.put(REQUESTS_SUBMITTED, myStats.getRequestsSubmittedVisibility());
+        this.statsVisibility.put(PUBLIC_REQUESTS, myStats.getPublicRequestsVisibility());
+        this.statsVisibility.put(SUBMITTED_QUESTIONS, myStats.getSubmittedQuestionsVisibility());
+        this.statsVisibility.put(APPROVED_QUESTIONS, myStats.getApprovedQuestionsVisibility());
+    }
+
+    public MyStatsDto(MyStats myStats, MyStatsDto oldStatsDto) {
+        this(myStats);
+        setApprovedQuestionsStat(oldStatsDto.getApprovedQuestionsStat());
+        setSubmittedQuestionsStat(oldStatsDto.getSubmittedQuestionsStat());
+        setRequestsSubmittedStat(oldStatsDto.getRequestsSubmittedStat());
+        setPublicRequestsStat(oldStatsDto.getPublicRequestsStat());
+    }
+
+    public Integer getId() {
+        return id;
     }
 
     // ======================================
@@ -91,7 +105,15 @@ public class MyStatsDto implements Serializable {
         return statsValues;
     }
 
+    public void setStatsValues(Map<String, Integer> statsValues) {
+        this.statsValues = statsValues;
+    }
+
     public Map<String, MyStats.StatsVisibility> getStatsVisibility() {
         return statsVisibility;
+    }
+
+    public void setStatsVisibility(Map<String, MyStats.StatsVisibility> statsVisibility) {
+        this.statsVisibility = statsVisibility;
     }
 }

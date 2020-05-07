@@ -19,7 +19,11 @@
 
         <v-card-actions>
           <v-spacer />
-          <v-btn dark color="blue darken-1" @click="$emit('dialog')"
+          <v-btn
+            data-cy="closeDashboardTable"
+            dark
+            color="blue darken-1"
+            @click="$emit('close-show-dashboard-stats-dialog')"
             >close</v-btn
           >
         </v-card-actions>

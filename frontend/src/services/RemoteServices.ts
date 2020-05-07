@@ -111,6 +111,20 @@ export default class RemoteServices {
     }
   }
 
+  static async updateStatsVisibility(
+    stats: DashboardStats
+  ): Promise<DashboardStats> {
+    try {
+      const response = await httpClient.put(
+        `/dashboardStats/${stats.id}`,
+        stats
+      );
+      return new DashboardStats(response.data);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
   static async getQuestions(): Promise<Question[]> {
     return httpClient
       .get(`/courses/${Store.getters.getCurrentCourse.courseId}/questions`)

@@ -105,7 +105,9 @@ public enum ErrorMessage {
     CLARIFICATION_REQUEST_UNANSWERED("The clarification request wasn't answered yet"),
     CLARIFICATION_REQUEST_ANSWERED("The clarification request was answered already"),
 
-    INVALID_STUDENT_QUESTION_EVALUATION("Invalid StudentQuestion Evaluation");
+    INVALID_STUDENT_QUESTION_EVALUATION("Invalid StudentQuestion Evaluation"),
+
+    NO_MY_STATS_FOUND("No stats with id %d");
 
     public final String label;
 
