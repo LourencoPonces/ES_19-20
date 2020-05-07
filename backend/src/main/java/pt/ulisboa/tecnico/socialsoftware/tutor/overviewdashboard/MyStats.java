@@ -45,15 +45,19 @@ public class MyStats implements DomainEntity {
         this.approvedQuestions = statsVisibility;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
     public User getUser() { return this.user; }
     public void setUser(User user) { this.user = user; }
 
     // Number of clarification requests submitted
-    public StatsVisibility getRequestsSubmitted() {
+    public StatsVisibility getRequestsSubmittedVisibility() {
         return this.requestsSubmitted;
     }
 
-    public void setRequestsSubmitted(StatsVisibility requestsSubmitted) {
+    public void setRequestsSubmittedVisibility(StatsVisibility requestsSubmitted) {
         this.requestsSubmitted = requestsSubmitted;
     }
     public boolean canSeeRequestsSubmitted() {
@@ -61,20 +65,20 @@ public class MyStats implements DomainEntity {
     }
 
     // Number of submitted clarification requests that were made public
-    public StatsVisibility getPublicRequests() { return this.publicRequests; }
+    public StatsVisibility getPublicRequestsVisibility() { return this.publicRequests; }
     
-    public void setPublicRequests(StatsVisibility publicRequests) {
+    public void setPublicRequestsVisibility(StatsVisibility publicRequests) {
         this.publicRequests = publicRequests;
     }
     public boolean canSeePublicRequests() {
         return this.publicRequests == StatsVisibility.PUBLIC;
     }
 
-    public StatsVisibility getSubmittedQuestions() {
+    public StatsVisibility getSubmittedQuestionsVisibility() {
         return submittedQuestions;
     }
 
-    public void setSubmittedQuestions(StatsVisibility proposedQuestions) {
+    public void setSubmittedQuestionsVisibility(StatsVisibility proposedQuestions) {
         this.submittedQuestions = proposedQuestions;
     }
 
@@ -82,16 +86,23 @@ public class MyStats implements DomainEntity {
         return this.submittedQuestions == StatsVisibility.PUBLIC;
     }
 
-    public StatsVisibility getApprovedQuestions() {
+    public StatsVisibility getApprovedQuestionsVisibility() {
         return approvedQuestions;
     }
 
-    public void setApprovedQuestions(StatsVisibility approvedQuestions) {
+    public void setApprovedQuestionsVisibility(StatsVisibility approvedQuestions) {
         this.approvedQuestions = approvedQuestions;
     }
 
     public boolean canSeeApprovedQuestions() {
         return this.approvedQuestions == StatsVisibility.PUBLIC;
+    }
+
+    public void updateVisibility(MyStatsDto myStatsDto) {
+        setApprovedQuestionsVisibility(myStatsDto.getApprovedQuestionsVisibility());
+        setSubmittedQuestionsVisibility(myStatsDto.getSubmittedQuestionsVisibility());
+        setPublicRequestsVisibility(myStatsDto.getPublicRequestsVisibility());
+        setRequestsSubmittedVisibility(myStatsDto.getRequestsSubmittedVisibility());
     }
 
     @Override
