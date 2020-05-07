@@ -1,6 +1,6 @@
 <template>
   <div class="">
-    <v-row>
+    <v-row data-cy="requestsSubmittedRow">
       <v-col><b>Clarification Requests Submitted:</b></v-col>
       <v-col v-if="stats.isPublic(stats.statsNames.REQUESTS_SUBMITTED)">{{
         stats.getStatValue(stats.statsNames.REQUESTS_SUBMITTED)
@@ -8,7 +8,7 @@
       <v-col v-else>Private</v-col>
     </v-row>
     <v-divider />
-    <v-row>
+    <v-row data-cy="publicRequestsRow">
       <v-col><b>Public Clarification Requests:</b></v-col>
       <v-col v-if="stats.isPublic(stats.statsNames.PUBLIC_REQUESTS)">{{
         stats.getStatValue(stats.statsNames.PUBLIC_REQUESTS)
