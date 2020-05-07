@@ -194,24 +194,22 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
         requests.size() == 2
         requests[0].getCreationDateDate() == clarificationRequest.creationDate
         requests[0].content == clarificationRequest.content
-        requests[0].getCreatorId() == clarificationRequest.creator.id
+        requests[0].getCreatorUsername() == clarificationRequest.creator.username
         requests[0].getQuestionId() == clarificationRequest.question.id
         requests[0].getMessages() != null
         requests[0].getMessages().size() == 1
         def reply0 = requests[0].getMessages().get(0)
         reply0.getCreationDateDate() == clarificationReply.creationDate
-        reply0.getCreatorId() == clarificationReply.creator.id
+        reply0.getCreatorUsername() == clarificationReply.creator.username
         reply0.content == clarificationReply.content
         requests[1].getCreationDateDate() == clarificationRequest3.creationDate
         requests[1].content == clarificationRequest3.content
-        requests[1].getCreatorId() == clarificationRequest3.creator.id
+        requests[1].getCreatorUsername() == clarificationRequest3.creator.username
         requests[1].getQuestionId() == clarificationRequest3.question.id
 
         and: "user information is returned"
-        result.names.get(clarificationRequest.creator.id) == clarificationRequest.creator.name
-        result.usernames.get(clarificationRequest.creator.id) == clarificationRequest.creator.username
-        result.names.get(clarificationReply.creator.id) == clarificationReply.creator.name
-        result.usernames.get(clarificationReply.creator.id) == clarificationReply.creator.username
+        result.names.get(clarificationRequest.creator.username) == clarificationRequest.creator.name
+        result.names.get(clarificationReply.creator.username) == clarificationReply.creator.name
     }
 
     @TestConfiguration

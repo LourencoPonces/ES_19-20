@@ -134,7 +134,7 @@ class GetStudentClarificationRequestsServiceSpockTest extends Specification {
         result.requests != null
         requests.size() == 1
         ClarificationRequestDto req = requests[0]
-        req.creatorId == student.id
+        req.creatorUsername == student.username
         req.content == CONTENT
         req.questionId == question.id
     }
@@ -167,16 +167,15 @@ class GetStudentClarificationRequestsServiceSpockTest extends Specification {
 
         then: "returns list ordered by request Id DSC"
         requests.size() == 2
-        requests[0].creatorId == student.id
+        requests[0].creatorUsername == student.username
         requests[0].content == CONTENT
         requests[0].questionId == question.id
-        requests[1].creatorId == student.id
+        requests[1].creatorUsername == student.username
         requests[1].content == CONTENT_2
         requests[1].questionId == q.id
 
         and: "user information is returned"
-        result.names.get(student.id) == student.name
-        result.usernames.get(student.id) == student.username
+        result.names.get(student.username) == student.name
     }
 
     def "student didn't submit clarification requests"() {
@@ -188,7 +187,6 @@ class GetStudentClarificationRequestsServiceSpockTest extends Specification {
         result.requests != null
         result.requests.isEmpty()
         result.names.isEmpty()
-        result.usernames.isEmpty()
     }
 
     def "student didn't submit any clarification requests but others exist"() {
@@ -203,7 +201,6 @@ class GetStudentClarificationRequestsServiceSpockTest extends Specification {
         result.requests != null
         result.requests.isEmpty()
         result.names.isEmpty()
-        result.usernames.isEmpty()
     }
 
     @TestConfiguration

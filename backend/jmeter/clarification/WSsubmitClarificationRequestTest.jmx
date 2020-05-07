@@ -261,9 +261,9 @@ INSERT INTO question_answers(id, quiz_answer_id, quiz_question_id, sequence) val
               <boolProp name="ISREGEX">false</boolProp>
             </JSONPathAssertion>
             <hashTree/>
-            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert creatorId" enabled="true">
-              <stringProp name="JSON_PATH">$.creatorId</stringProp>
-              <stringProp name="EXPECTED_VALUE">676</stringProp>
+            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert creatorUsername" enabled="true">
+              <stringProp name="JSON_PATH">$.creatorUsername</stringProp>
+              <stringProp name="EXPECTED_VALUE">Demo-Student</stringProp>
               <boolProp name="JSONVALIDATION">true</boolProp>
               <boolProp name="EXPECT_NULL">false</boolProp>
               <boolProp name="INVERT">false</boolProp>

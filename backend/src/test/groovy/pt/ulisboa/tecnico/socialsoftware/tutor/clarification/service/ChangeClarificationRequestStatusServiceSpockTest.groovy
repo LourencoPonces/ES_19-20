@@ -155,7 +155,7 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
         then:
         result != null
         result.content == CONTENT
-        result.creatorId == student.id
+        result.creatorUsername == student.username
         result.questionId == question.id
         result.status == ClarificationRequest.RequestStatus.PUBLIC
     }
@@ -174,7 +174,7 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
         then:
         result != null
         result.content == CONTENT
-        result.creatorId == student.id
+        result.creatorUsername == student.username
         result.questionId == question.id
         result.status == ClarificationRequest.RequestStatus.PRIVATE
     }

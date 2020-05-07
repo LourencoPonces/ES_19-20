@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
 
 public class ClarificationMessageDto {
     private Integer id;
-    private Integer creatorId;
+    private String creatorUsername;
     private Integer requestId;
     private String content;
     private LocalDateTime creationDate;
@@ -27,7 +27,7 @@ public class ClarificationMessageDto {
     public ClarificationMessageDto(ClarificationMessage answer) {
         this.id = answer.getId();
         this.requestId = answer.getRequest().getId();
-        this.creatorId = answer.getCreator().getId();
+        this.creatorUsername = answer.getCreator().getUsername();
         this.content = answer.getContent();
         this.creationDate = answer.getCreationDate();
     }
@@ -36,12 +36,8 @@ public class ClarificationMessageDto {
         return this.id;
     }
 
-    public Integer getCreatorId() {
-        return creatorId;
-    }
-
-    public void setCreatorId(Integer id) {
-        this.creatorId = id;
+    public String getCreatorUsername() {
+        return creatorUsername;
     }
 
     public Integer getRequestId() {

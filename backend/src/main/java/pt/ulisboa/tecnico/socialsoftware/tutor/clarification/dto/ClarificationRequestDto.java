@@ -16,7 +16,7 @@ public class ClarificationRequestDto {
     private Integer key;
     private Integer questionId;
     private ClarificationRequest.RequestStatus status = ClarificationRequest.RequestStatus.PRIVATE;
-    private Integer creatorId;
+    private String creatorUsername;
     private String content;
     private Boolean resolved;
     private LocalDateTime creationDate;
@@ -33,7 +33,7 @@ public class ClarificationRequestDto {
         this.id = clarificationRequest.getId();
         this.questionId = clarificationRequest.getQuestion().getId();
         this.status = clarificationRequest.getStatus();
-        this.creatorId = clarificationRequest.getCreator().getId();
+        this.creatorUsername = clarificationRequest.getCreator().getUsername();
         this.content = clarificationRequest.getContent();
         this.creationDate = clarificationRequest.getCreationDate();
         this.resolved = clarificationRequest.getResolved();
@@ -60,8 +60,8 @@ public class ClarificationRequestDto {
         this.key = key;
     }
 
-    public Integer getCreatorId() {
-        return this.creatorId;
+    public String getCreatorUsername() {
+        return this.creatorUsername;
     }
 
     public Integer getQuestionId() {

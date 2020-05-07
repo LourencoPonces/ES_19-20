@@ -12,8 +12,7 @@ import java.util.stream.Stream;
 public class ClarificationRequestListDto {
     private final Collection<ClarificationRequestDto> requests;
 
-    private final Map<Integer, String> usernames = new HashMap<>();
-    private final Map<Integer, String> names = new HashMap<>();
+    private final Map<String, String> names = new HashMap<>();
 
     public ClarificationRequestListDto(Collection<ClarificationRequest> requests) {
         this.requests = requests.stream()
@@ -28,22 +27,17 @@ public class ClarificationRequestListDto {
                                 .map(ClarificationMessage::getCreator)
                 ))
                 .forEach(u -> {
-                    if (!names.containsKey(u.getId())) {
-                        names.put(u.getId(), u.getName());
-                        usernames.put(u.getId(), u.getUsername());
+                    if (!names.containsKey(u.getUsername())) {
+                        names.put(u.getUsername(), u.getName());
                     }
                 });
     }
 
-    public Map<Integer, String> getNames() {
+    public Map<String, String> getNames() {
         return names;
     }
 
     public Collection<ClarificationRequestDto> getRequests() {
         return requests;
-    }
-
-    public Map<Integer, String> getUsernames() {
-        return usernames;
     }
 }

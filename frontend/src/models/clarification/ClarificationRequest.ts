@@ -3,7 +3,7 @@ import ClarificationMessage from './ClarificationMessage';
 export default class ClarificationRequest {
   id!: number;
   questionId!: number;
-  creatorId!: number;
+  creatorUsername!: string;
   creationDate!: string;
   content!: string;
   messages: ClarificationMessage[];
@@ -15,7 +15,7 @@ export default class ClarificationRequest {
       this.id = jsonObj.id;
       this.questionId = jsonObj.questionId;
       this.content = jsonObj.content;
-      this.creatorId = jsonObj.creatorId;
+      this.creatorUsername = jsonObj.creatorUsername;
       this.creationDate = jsonObj.creationDate;
       this.status = jsonObj.status;
       this.messages = jsonObj.messages.map(msg => new ClarificationMessage(msg));
@@ -53,8 +53,12 @@ export default class ClarificationRequest {
     return this.questionId;
   }
 
-  setCreatorId(id: number): void {
-    this.creatorId = id;
+  getCreatorUsername(): string {
+    return this.creatorUsername;
+  }
+
+  setCreatorUsername(username: string): void {
+    this.creatorUsername = username;
   }
 
   setContent(c: string): void {

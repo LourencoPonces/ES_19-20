@@ -1,28 +1,36 @@
 import ClarificationRequest from './ClarificationRequest';
+import User from '@/models/user/User';
 
 export default class ClarificationRequestList {
-	private _requests!: ClarificationRequest[];
-	private _nameMap!: Map<number, String>;
-	private _usernameMap!: Map<number, String>;
+	private _requests: ClarificationRequest[] = [];
+	private _nameMap: {[username: string]: string} = {};
 
 	constructor(jsonObj: any) {
-		this._requests = jsonObj.requests;
-		this._nameMap = jsonObj.names;
-		this._usernameMap = jsonObj.usernames;
+		if (jsonObj) {
+			this._requests = jsonObj.requests;
+			this._nameMap = jsonObj.names;
 
-		if (!this._requests || !this._nameMap || !this._usernameMap)
-			throw new Error('invalid ClarificationRequestList response from server');
+			if (!this._requests || !this._nameMap)
+				throw new Error('invalid ClarificationRequestList response from server');
+		}
 	}
 
-	get requests() {
+	get requests(): ClarificationRequest[] {
 		return this._requests;
 	}
 
-	nameForUser(id: number): String {
-		return this._nameMap[id];
+	nameForUser(username: string): string {
+		return this._nameMap[username];
 	}
 
-	usernameForUser(id: number): String {
-		return this._usernameMap[id];
+	push(req: ClarificationRequest, user: User): void {
+		this._requests.push(req);
+
+		if (!this._nameMap[req.getCreatorUsername()]) {
+			if (req.getCreatorUsername() != user.username)
+				throw new Error('no data available for ClarificationRequest creator');
+
+			this._nameMap[user.username] = user.name;
+		}
 	}
 }
