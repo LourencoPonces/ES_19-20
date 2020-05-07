@@ -42,9 +42,6 @@ import java.util.stream.Collectors;
 @Service
 public class TournamentService {
     @Autowired
-    private CourseRepository courseRepository;
-
-    @Autowired
     private CourseExecutionRepository courseExecutionRepository;
 
     @Autowired
@@ -184,6 +181,19 @@ public class TournamentService {
                 .map(TournamentDto::new)
                 .sorted(Comparator.comparing(TournamentDto::getCreationDateDate).reversed())
                 .collect(Collectors.toList());
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void cancelTournament(String username, int tournamentId) {
+        Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow(() -> new TutorException(TOURNAMENT_NOT_FOUND, tournamentId));
+
+        if (!tournament.getCreator().getUsername().equals(username)) {
+            throw new TutorException(MISSING_TOURNAMENT_OWNERSHIP);
+        }
+        tournament.cancel();
     }
 
     private void checkKey(TournamentDto tournamentDto) {

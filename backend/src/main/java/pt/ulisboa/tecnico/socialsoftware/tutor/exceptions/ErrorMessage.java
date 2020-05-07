@@ -87,10 +87,12 @@ public enum ErrorMessage {
 
     TOURNAMENT_NOT_CONSISTENT("Field %s of tournament is not consistent"),
     TOURNAMENT_NOT_AVAILABLE("There aren't any available tournaments"),
+    TOURNAMENT_CANNOT_BE_CANCELED("Tournament with %s status cannot be canceled"),
     USER_ALREADY_SIGNED_UP_IN_TOURNAMENT("User already signed-up in tournament"),
     TOURNAMENT_CREATED_BY_NON_STUDENT("Tournament created by non-student"),
     USER_NOT_ENROLLED_IN_COURSE_EXECUTION("User not enrolled in course execution %s"),
     MISSING_TOURNAMENT_OWNERSHIP("User did not create this tournament"),
+
 
 
     ACCESS_DENIED("You do not have permission to view this resource"),

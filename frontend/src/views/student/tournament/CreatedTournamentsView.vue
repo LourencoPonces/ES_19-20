@@ -39,7 +39,6 @@
             />
           </v-card-title>
         </template>
-
         <template v-slot:item.topics="{ item }">
           <v-chip-group data-cy="topics-list">
             <v-chip v-for="topic in item.topics" :key="topic.name">
@@ -47,14 +46,47 @@
             </v-chip>
           </v-chip-group>
         </template>
-
-        <template v-slot:item.delete-button="{ item }">
-          <v-btn
-            color="red"
-            @click="deleteTournament(item)"
-            data-cy="deleteTournament"
-            >Delete</v-btn
-          >
+        <template v-slot:item.status="{ item }">
+          <v-chip-group>
+            <v-chip data-cy="status">
+              {{ getStatus(item) }}
+            </v-chip>
+          </v-chip-group>
+        </template>
+        <template v-slot:item.action="{ item }">
+          <v-tooltip bottom>
+            <template
+              v-slot:activator="{ on }"
+              v-if="
+                getStatus(item) == 'Created' || getStatus(item) == 'Available'
+              "
+            >
+              <v-icon
+                large
+                class="mr-2"
+                v-on="on"
+                @click="cancelTournament(item)"
+                data-cy="cancelTournament"
+                color="red"
+                >fas fa-ban</v-icon
+              >
+            </template>
+            <span>Cancel Tournament</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-icon
+                large
+                class="mr-2"
+                v-on="on"
+                @click="deleteTournament(item)"
+                data-cy="deleteTournament"
+                color="red"
+                >delete</v-icon
+              >
+            </template>
+            <span>Delete Tournament</span>
+          </v-tooltip>
         </template>
       </v-data-table>
     </v-card>
@@ -82,6 +114,13 @@ export default class CreatedTournamentsView extends Vue {
 
   headers: object = [
     {
+      text: 'Actions',
+      value: 'action',
+      align: 'center',
+      width: '10%',
+      sortable: false
+    },
+    {
       text: 'Title',
       value: 'title',
       align: 'center',
@@ -98,7 +137,13 @@ export default class CreatedTournamentsView extends Vue {
       text: 'Nº of Questions',
       value: 'numberOfQuestions',
       align: 'center',
-      width: '10%'
+      width: '5%'
+    },
+    {
+      text: 'Participants',
+      value: 'participants.length',
+      align: 'center',
+      width: '5%'
     },
     {
       text: 'Creation Date',
@@ -125,16 +170,10 @@ export default class CreatedTournamentsView extends Vue {
       width: '10%'
     },
     {
-      text: 'Participants',
-      value: 'participants.length',
+      text: 'Status',
+      value: 'status',
       align: 'center',
       width: '10%'
-    },
-    {
-      value: 'delete-button',
-      align: 'center',
-      width: '5%',
-      sortable: false
     }
   ];
 
@@ -179,12 +218,32 @@ export default class CreatedTournamentsView extends Vue {
     await this.$store.dispatch('clearLoading');
   }
 
+  async cancelTournament(tournament: Tournament) {
+    try {
+      await RemoteServices.cancelTournament(tournament);
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
+    await this.$store.dispatch('loading');
+    await this.getCreatedTournaments();
+    await this.$store.dispatch('clearLoading');
+  }
+
   async getCreatedTournaments() {
     try {
       this.createdTournaments = await RemoteServices.getCreatedTournaments();
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
+  }
+
+  getStatus(tournament: Tournament) {
+    let date = Date.now();
+    if (tournament.isCancelled) return 'Cancelled';
+    else if (date < Date.parse(tournament.availableDate)) return 'Created';
+    else if (date < Date.parse(tournament.runningDate)) return 'Available';
+    else if (date < Date.parse(tournament.conclusionDate)) return 'Running';
+    else return 'Finished';
   }
 }
 </script>
