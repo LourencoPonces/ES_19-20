@@ -22,12 +22,8 @@
               class="mx-2"
             />
             <v-spacer />
-
-
-
           </v-card-title>
         </template>
-
         <template v-slot:item.topics="{ item }">
           <v-chip-group data-cy="topics-list">
             <v-chip v-for="topic in item.topics" :key="topic.name">
@@ -35,58 +31,31 @@
             </v-chip>
           </v-chip-group>
         </template>
-
-
-
-
-
-
-
-
-
-        <template v-slot:item.sign-up-button="{ item }">
-          <v-btn color="primary" @click="signUpInTournament(item)"
-            >Sign-up</v-btn
-          >
-        </template>
-
         <template v-slot:item.creator="{ item }">
           <span>{{ item.creator.username }}</span>
         </template>
-
         <template v-slot:item.sign-up-status="{ item }" data-cy="status">
-          <div v-if="signedUpTournaments.includes(item)">
-            <v-chip color="green" dark>{{ 'Signed-Up' }}</v-chip>
-          </div>
-          <div v-else>
-            <v-btn color="primary" @click="signUpInTournament(item)"
-              >Sign-up</v-btn
-            >
-          </div>
+          <v-simple-checkbox
+                  :value="signedUpTournaments.includes(item)"
+                  readonly
+                  color="green"
+                  :aria-label="signedUpTournaments.includes(item)"
+          />
         </template>
-
-
         <template v-slot:item.action="{ item }">
           <v-tooltip bottom>
-            <template v-slot:activator="{ on }"> <!---v-if="getStatus(item) != 'Cancelled'"-->
+            <template v-slot:activator="{ on }" v-if="!signedUpTournaments.includes(item)">
               <v-icon
                       large
                       class="mr-2"
                       v-on="on"
                       @click="signUpInTournament(item)"
-                      color="red"
-              >fas fa-ban</v-icon
+              >fas fa-sign-in-alt</v-icon
               >
             </template>
             <span>Sign Up</span>
           </v-tooltip>
         </template>
-
-
-
-
-
-
       </v-data-table>
     </v-card>
   </div>
@@ -164,6 +133,7 @@ export default class AvailableTournamentsView extends Vue {
       sortable: false
     },
     {
+      text: 'Signed Up',
       value: 'sign-up-status',
       align: 'center',
       width: '10%',
