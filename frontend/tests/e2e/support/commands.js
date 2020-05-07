@@ -657,3 +657,36 @@ Cypress.Commands.add('assertAvailableTournaments', (title, col, topics) => {
 Cypress.Commands.add('assertSignUpTournament', title => {
   cy.contains('Signed-Up');
 });
+
+// DASHBOARD COMMANDS
+Cypress.Commands.add('makePrivate', dataCy => {
+  cy.get(dataCy)
+    .find('button')
+    .then($btn => {
+      if ($btn.hasClass('fas fa-eye')) {
+        $btn.click();
+      }
+    });
+});
+
+Cypress.Commands.add('makePublic', dataCy => {
+  cy.get(dataCy)
+    .find('button')
+    .then($btn => {
+      if ($btn.hasClass('fas fa-eye-slash')) {
+        $btn.click();
+      }
+    });
+});
+
+Cypress.Commands.add('openDashboardStatsDialog', student => {
+  cy.contains(student)
+    .parents('tr')
+    .eq(0)
+    .find('[data-cy="showDashboardStatsButton"]')
+    .click();
+});
+
+Cypress.Commands.add('checkVisibility', (statRow, content) => {
+  cy.get(statRow).contains(content);
+});

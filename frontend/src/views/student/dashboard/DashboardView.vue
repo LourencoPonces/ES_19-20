@@ -10,10 +10,22 @@
                 v-if="!myStats.isPublic(myStats.statsNames.REQUESTS_SUBMITTED)"
                 v-on="on"
                 medium
+                @click="
+                  onChangeVisibility(myStats.statsNames.REQUESTS_SUBMITTED)
+                "
                 class="mr-2"
                 >fas fa-eye-slash</v-icon
               >
-              <v-icon v-else v-on="on" medium class="mr-2">fas fa-eye</v-icon>
+              <v-icon
+                v-else
+                @click="
+                  onChangeVisibility(myStats.statsNames.REQUESTS_SUBMITTED)
+                "
+                v-on="on"
+                medium
+                class="mr-2"
+                >fas fa-eye</v-icon
+              >
             </template>
             <span
               v-if="!myStats.isPublic(myStats.statsNames.REQUESTS_SUBMITTED)"
@@ -41,10 +53,18 @@
                 v-if="!myStats.isPublic(myStats.statsNames.PUBLIC_REQUESTS)"
                 v-on="on"
                 medium
+                @click="onChangeVisibility(myStats.statsNames.PUBLIC_REQUESTS)"
                 class="mr-2"
                 >fas fa-eye-slash</v-icon
               >
-              <v-icon v-else v-on="on" medium class="mr-2">fas fa-eye</v-icon>
+              <v-icon
+                v-else
+                @click="onChangeVisibility(myStats.statsNames.PUBLIC_REQUESTS)"
+                v-on="on"
+                medium
+                class="mr-2"
+                >fas fa-eye</v-icon
+              >
             </template>
             <span v-if="!myStats.isPublic(myStats.statsNames.PUBLIC_REQUESTS)">
               Make Public
@@ -61,17 +81,29 @@
             <p>Public Clarification Requests</p>
           </div>
         </div>
-        <div class="items">
+        <div class="items" data-cy="submittedQuestionsDiv">
           <v-tooltip top>
             <template v-slot:activator="{ on }">
               <v-icon
                 v-if="!myStats.isPublic(myStats.statsNames.SUBMITTED_QUESTIONS)"
                 v-on="on"
                 medium
+                @click="
+                  onChangeVisibility(myStats.statsNames.SUBMITTED_QUESTIONS)
+                "
                 class="mr-2"
                 >fas fa-eye-slash</v-icon
               >
-              <v-icon v-else v-on="on" medium class="mr-2">fas fa-eye</v-icon>
+              <v-icon
+                v-else
+                @click="
+                  onChangeVisibility(myStats.statsNames.SUBMITTED_QUESTIONS)
+                "
+                v-on="on"
+                medium
+                class="mr-2"
+                >fas fa-eye</v-icon
+              >
             </template>
             <span
               v-if="!myStats.isPublic(myStats.statsNames.SUBMITTED_QUESTIONS)"
@@ -92,17 +124,29 @@
             <p>Student Questions Submitted</p>
           </div>
         </div>
-        <div class="items">
+        <div class="items" data-cy="approvedQuestionsDiv">
           <v-tooltip top>
             <template v-slot:activator="{ on }">
               <v-icon
                 v-if="!myStats.isPublic(myStats.statsNames.APPROVED_QUESTIONS)"
                 v-on="on"
                 medium
+                @click="
+                  onChangeVisibility(myStats.statsNames.APPROVED_QUESTIONS)
+                "
                 class="mr-2"
                 >fas fa-eye-slash</v-icon
               >
-              <v-icon v-else v-on="on" medium class="mr-2">fas fa-eye</v-icon>
+              <v-icon
+                v-else
+                @click="
+                  onChangeVisibility(myStats.statsNames.APPROVED_QUESTIONS)
+                "
+                v-on="on"
+                medium
+                class="mr-2"
+                >fas fa-eye</v-icon
+              >
             </template>
             <span
               v-if="!myStats.isPublic(myStats.statsNames.APPROVED_QUESTIONS)"
@@ -153,6 +197,7 @@
                 medium
                 class="mr-2"
                 v-on="on"
+                data-cy="showDashboardStatsButton"
                 @click="showDashboardStatsDialog(item)"
                 >visibility</v-icon
               >
@@ -252,7 +297,18 @@ export default class DashboardView extends Vue {
 
   onCloseShowDashboardStatsDialog() {
     this.dashboardStatsDialog = false;
-    this.dashboardUserToSee = null;
+  }
+
+  async onChangeVisibility(stat) {
+    await this.$store.dispatch('loading');
+    try {
+      this.myStats.toggle(stat);
+
+      this.myStats = await RemoteServices.updateStatsVisibility(this.myStats);
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
+    await this.$store.dispatch('clearLoading');
   }
 }
 </script>
