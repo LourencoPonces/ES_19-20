@@ -36,21 +36,24 @@
         </template>
         <template v-slot:item.sign-up-status="{ item }" data-cy="status">
           <v-simple-checkbox
-                  :value="signedUpTournaments.includes(item)"
-                  readonly
-                  color="green"
-                  :aria-label="signedUpTournaments.includes(item)"
+            :value="signedUpTournaments.includes(item)"
+            readonly
+            color="green"
+            :aria-label="signedUpTournaments.includes(item)"
           />
         </template>
         <template v-slot:item.action="{ item }">
           <v-tooltip bottom>
-            <template v-slot:activator="{ on }" v-if="!signedUpTournaments.includes(item)">
+            <template
+              v-slot:activator="{ on }"
+              v-if="!signedUpTournaments.includes(item)"
+            >
               <v-icon
-                      large
-                      class="mr-2"
-                      v-on="on"
-                      @click="signUpInTournament(item)"
-              >fas fa-sign-in-alt</v-icon
+                large
+                class="mr-2"
+                v-on="on"
+                @click="signUpInTournament(item)"
+                >fas fa-sign-in-alt</v-icon
               >
             </template>
             <span>Sign Up</span>
