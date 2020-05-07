@@ -8,8 +8,8 @@
     >
       <v-card>
         <v-card-title>
-          <span class="headline"
-            ><b>{{ student.name }}</b></span
+          <span class="headline">
+            <b>{{ student.name }}</b></span
           >
         </v-card-title>
 
@@ -61,3 +61,4 @@ export default class ShowDashboardStatsDialog extends Vue {
   }
 }
 </script>
+<style lang="scss" scoped></style>

@@ -1,9 +1,9 @@
-let APPROVED = 'Approved'
-let REJECTED = 'Rejected'
-let WAITING_FOR_APPROVAL = 'Waiting for Approval'
+let APPROVED = 'Approved';
+let REJECTED = 'Rejected';
+let WAITING_FOR_APPROVAL = 'Waiting for Approval';
 
 describe('Student Question Evaluation', () => {
-  let questionTitle = 'Question #' + Date.now().toString();
+  let questionTitle;
   let questionContent = 'To be or not to be?';
   let topics = ['Adventure Builder'];
   let options = ['AAAA', 'BBBB', 'CCCC', 'DDDD'];
@@ -16,13 +16,9 @@ describe('Student Question Evaluation', () => {
     // create student question
     cy.get('[data-cy="my-area"]').click();
     cy.get('[data-cy="student-questions"]').click();
-    cy.createStudentQuestion(
-      questionTitle,
-      questionContent,
-      topics,
-      options,
-      [1]
-    );
+    cy.createStudentQuestion(questionTitle, questionContent, topics, options, [
+      1
+    ]);
 
     cy.logout();
 

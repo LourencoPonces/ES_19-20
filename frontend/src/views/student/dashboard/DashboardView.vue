@@ -235,5 +235,4 @@ export default class DashboardView extends Vue {
   transform: translateY(0px);
   transition: all 0.5s;
 }
-
 </style>
