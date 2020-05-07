@@ -54,215 +54,215 @@
           </v-chip-group>
         </template>
         <template v-slot:item.action="{ item }">
-                    <v-tooltip bottom>
-                      <template v-slot:activator="{ on }" v-if="getStatus(item) == 'Created' || getStatus(item) == 'Available' ">
-                        <v-icon
-                                large
-                                class="mr-2"
-                                v-on="on"
-                                @click="cancelTournament(item)"
-                                data-cy="cancelTournament"
-                                color="red"
-                        >fas fa-ban</v-icon
-                        >
-                      </template>
-                      <span>Cancel Tournament</span>
-                    </v-tooltip>
-                    <v-tooltip bottom>
-                      <template v-slot:activator="{ on }">
-                        <v-icon
-                                large
-                                class="mr-2"
-                                v-on="on"
-                                @click="deleteTournament(item)"
-                                data-cy="deleteTournament"
-                                color="red"
-                        >delete</v-icon
-                        >
-                      </template>
-                      <span>Delete Tournament</span>
-                    </v-tooltip>
-                  </template>
-                </v-data-table>
-              </v-card>
-            </div>
-          </template>
+          <v-tooltip bottom>
+            <template
+              v-slot:activator="{ on }"
+              v-if="
+                getStatus(item) == 'Created' || getStatus(item) == 'Available'
+              "
+            >
+              <v-icon
+                large
+                class="mr-2"
+                v-on="on"
+                @click="cancelTournament(item)"
+                data-cy="cancelTournament"
+                color="red"
+                >fas fa-ban</v-icon
+              >
+            </template>
+            <span>Cancel Tournament</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-icon
+                large
+                class="mr-2"
+                v-on="on"
+                @click="deleteTournament(item)"
+                data-cy="deleteTournament"
+                color="red"
+                >delete</v-icon
+              >
+            </template>
+            <span>Delete Tournament</span>
+          </v-tooltip>
+        </template>
+      </v-data-table>
+    </v-card>
+  </div>
+</template>
 
-          <script lang="ts">
-          import { Component, Vue, Watch } from 'vue-property-decorator';
-          import Tournament from '@/models/management/Tournament';
-          import RemoteServices from '@/services/RemoteServices';
-          import Topic from '@/models/management/Topic';
-          import EditTournamentDialog from './EditTournamentDialog.vue';
+<script lang="ts">
+import { Component, Vue, Watch } from 'vue-property-decorator';
+import Tournament from '@/models/management/Tournament';
+import RemoteServices from '@/services/RemoteServices';
+import Topic from '@/models/management/Topic';
+import EditTournamentDialog from './EditTournamentDialog.vue';
 
-          @Component({
-            components: {
-              'edit-tournament-dialog': EditTournamentDialog
-            }
-          })
-          export default class CreatedTournamentsView extends Vue {
-            createdTournaments: Tournament[] = [];
-            currentTournament: Tournament | null = null;
-            editTournamentDialog: boolean = false;
-            topics!: Topic[];
-            search: string = '';
+@Component({
+  components: {
+    'edit-tournament-dialog': EditTournamentDialog
+  }
+})
+export default class CreatedTournamentsView extends Vue {
+  createdTournaments: Tournament[] = [];
+  currentTournament: Tournament | null = null;
+  editTournamentDialog: boolean = false;
+  topics!: Topic[];
+  search: string = '';
 
-            headers: object = [
-              {
-                text: 'Actions',
-                value: 'action',
-                align: 'center',
-                width: '10%',
-                sortable: false
-              },
-              {
-                text: 'Title',
-                value: 'title',
-                align: 'center',
-                width: '10%'
-              },
-              {
-                text: 'Topics',
-                value: 'topics',
-                align: 'center',
-                width: '20%',
-                sortable: false
-              },
-              {
-                text: 'Nº of Questions',
-                value: 'numberOfQuestions',
-                align: 'center',
-                width: '5%'
-              },
-              {
-                text: 'Participants',
-                value: 'participants.length',
-                align: 'center',
-                width: '5%'
-              },
-              {
-                text: 'Creation Date',
-                value: 'creationDate',
-                align: 'center',
-                width: '10%'
-              },
-              {
-                text: 'Available Date',
-                value: 'availableDate',
-                align: 'center',
-                width: '10%'
-              },
-              {
-                text: 'Running Date',
-                value: 'runningDate',
-                align: 'center',
-                width: '10%'
-              },
-              {
-                text: 'Conclusion Date',
-                value: 'conclusionDate',
-                align: 'center',
-                width: '10%'
-              },
-              {
-                text: 'Status',
-                value: 'status',
-                align: 'center',
-                width: '10%'
-              }
-            ];
+  headers: object = [
+    {
+      text: 'Actions',
+      value: 'action',
+      align: 'center',
+      width: '10%',
+      sortable: false
+    },
+    {
+      text: 'Title',
+      value: 'title',
+      align: 'center',
+      width: '10%'
+    },
+    {
+      text: 'Topics',
+      value: 'topics',
+      align: 'center',
+      width: '20%',
+      sortable: false
+    },
+    {
+      text: 'Nº of Questions',
+      value: 'numberOfQuestions',
+      align: 'center',
+      width: '5%'
+    },
+    {
+      text: 'Participants',
+      value: 'participants.length',
+      align: 'center',
+      width: '5%'
+    },
+    {
+      text: 'Creation Date',
+      value: 'creationDate',
+      align: 'center',
+      width: '10%'
+    },
+    {
+      text: 'Available Date',
+      value: 'availableDate',
+      align: 'center',
+      width: '10%'
+    },
+    {
+      text: 'Running Date',
+      value: 'runningDate',
+      align: 'center',
+      width: '10%'
+    },
+    {
+      text: 'Conclusion Date',
+      value: 'conclusionDate',
+      align: 'center',
+      width: '10%'
+    },
+    {
+      text: 'Status',
+      value: 'status',
+      align: 'center',
+      width: '10%'
+    }
+  ];
 
-            async created() {
-              await this.$store.dispatch('loading');
-              try {
-                this.topics = await RemoteServices.getTopics();
-              } catch (error) {
-                await this.$store.dispatch('error', error);
-              }
-              await this.getCreatedTournaments();
-              await this.$store.dispatch('clearLoading');
-            }
+  async created() {
+    await this.$store.dispatch('loading');
+    try {
+      this.topics = await RemoteServices.getTopics();
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
+    await this.getCreatedTournaments();
+    await this.$store.dispatch('clearLoading');
+  }
 
-            newTournament() {
-              this.currentTournament = new Tournament();
-              this.editTournamentDialog = true;
-            }
+  newTournament() {
+    this.currentTournament = new Tournament();
+    this.editTournamentDialog = true;
+  }
 
-            @Watch('editTournamentDialog')
-            closeError() {
-              if (!this.editTournamentDialog) {
-                this.currentTournament = null;
-              }
-            }
+  @Watch('editTournamentDialog')
+  closeError() {
+    if (!this.editTournamentDialog) {
+      this.currentTournament = null;
+    }
+  }
 
-            async createdTournament() {
-              this.editTournamentDialog = false;
-              await this.$store.dispatch('loading');
-              await this.getCreatedTournaments();
-              await this.$store.dispatch('clearLoading');
-            }
+  async createdTournament() {
+    this.editTournamentDialog = false;
+    await this.$store.dispatch('loading');
+    await this.getCreatedTournaments();
+    await this.$store.dispatch('clearLoading');
+  }
 
-            async deleteTournament(tournament: Tournament) {
-              try {
-                await RemoteServices.deleteTournament(tournament);
-              } catch (error) {
-                await this.$store.dispatch('error', error);
-              }
-              await this.$store.dispatch('loading');
-              await this.getCreatedTournaments();
-              await this.$store.dispatch('clearLoading');
-            }
+  async deleteTournament(tournament: Tournament) {
+    try {
+      await RemoteServices.deleteTournament(tournament);
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
+    await this.$store.dispatch('loading');
+    await this.getCreatedTournaments();
+    await this.$store.dispatch('clearLoading');
+  }
 
-            async cancelTournament(tournament: Tournament) {
-              try {
-                await RemoteServices.cancelTournament(tournament);
-              } catch (error) {
-                await this.$store.dispatch('error', error);
-              }
-              await this.$store.dispatch('loading');
-              await this.getCreatedTournaments();
-              await this.$store.dispatch('clearLoading');
-            }
+  async cancelTournament(tournament: Tournament) {
+    try {
+      await RemoteServices.cancelTournament(tournament);
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
+    await this.$store.dispatch('loading');
+    await this.getCreatedTournaments();
+    await this.$store.dispatch('clearLoading');
+  }
 
-            async getCreatedTournaments() {
-              try {
-                this.createdTournaments = await RemoteServices.getCreatedTournaments();
-              } catch (error) {
-                await this.$store.dispatch('error', error);
-              }
-            }
+  async getCreatedTournaments() {
+    try {
+      this.createdTournaments = await RemoteServices.getCreatedTournaments();
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
+  }
 
-            getStatus(tournament: Tournament) {
-              let date = Date.now();
-              if (tournament.isCancelled)
-                return 'Cancelled';
-              else if (date < Date.parse(tournament.availableDate))
-                return 'Created';
-              else if (date < Date.parse(tournament.runningDate))
-                return 'Available';
-              else if (date < Date.parse(tournament.conclusionDate))
-                return 'Running';
-              else
-                return 'Finished';
-            }
-          }
-          </script>
+  getStatus(tournament: Tournament) {
+    let date = Date.now();
+    if (tournament.isCancelled) return 'Cancelled';
+    else if (date < Date.parse(tournament.availableDate)) return 'Created';
+    else if (date < Date.parse(tournament.runningDate)) return 'Available';
+    else if (date < Date.parse(tournament.conclusionDate)) return 'Running';
+    else return 'Finished';
+  }
+}
+</script>
 
-          <style lang="scss" scoped>
-          .container {
-            max-width: 90%;
-            margin-left: auto;
-            margin-right: auto;
-            padding-left: 10px;
-            padding-right: 10px;
+<style lang="scss" scoped>
+.container {
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 10px;
+  padding-right: 10px;
 
-            h2 {
-              font-size: 26px;
-              margin: 20px 0;
-              text-align: center;
-              small {
-                font-size: 0.5em;
-              }
-            }
-          }
-          </style>
+  h2 {
+    font-size: 26px;
+    margin: 20px 0;
+    text-align: center;
+    small {
+      font-size: 0.5em;
+    }
+  }
+}
+</style>
