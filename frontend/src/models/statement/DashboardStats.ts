@@ -3,22 +3,30 @@ const visibility = {
   PRIVATE: 'PRIVATE'
 };
 
+enum StatsNames {
+  SUBMITTED_QUESTIONS = 'submittedQuestions',
+  APPROVED_QUESTIONS = 'approvedQuestions',
+  REQUESTS_SUBMITTED = 'requestsSubmitted',
+  PUBLIC_REQUESTS = 'publicRequests'
+}
+
 export default class DashboardStats {
-  requestsSubmittedVisibility: string = visibility.PRIVATE;
-  requestsSubmittedStat: number = 0;
-  publicRequestsVisibility: string = visibility.PRIVATE;
-  publicRequestsStat: number = 0;
+  statsValues;
+  statsVisibility;
+  statsNames = StatsNames;
 
   constructor(jsonObj?: DashboardStats) {
     if (jsonObj) {
-      this.requestsSubmittedVisibility = jsonObj.requestsSubmittedVisibility;
-      this.requestsSubmittedStat = jsonObj.requestsSubmittedStat;
-      this.publicRequestsVisibility = jsonObj.publicRequestsVisibility;
-      this.publicRequestsStat = jsonObj.publicRequestsStat;
+      this.statsValues = jsonObj.statsValues;
+      this.statsVisibility = jsonObj.statsVisibility;
     }
   }
 
-  isPublic(stat: string): boolean {
-    return stat === visibility.PUBLIC;
+  isPublic(stat: StatsNames): boolean {
+    return this.statsVisibility[stat] === visibility.PUBLIC;
+  }
+
+  getStatValue(stat: StatsNames): number {
+    return this.statsValues[stat];
   }
 }
