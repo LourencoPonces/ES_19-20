@@ -186,6 +186,20 @@ public class TournamentService {
                 .collect(Collectors.toList());
     }
 
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<TournamentDto> getSignedUpRunningTournaments(int userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND, userId));
+
+        return user.getParticipantTournaments()
+                .stream()
+                .filter(tournament -> tournament.getStatus() == Tournament.Status.RUNNING)
+                .map(TournamentDto::new)
+                .collect(Collectors.toList());
+    }
+
     private void checkKey(TournamentDto tournamentDto) {
         if (tournamentDto.getKey() == null) {
             int maxQuestionNumber = tournamentRepository.getMaxTournamentKey() != null ?
