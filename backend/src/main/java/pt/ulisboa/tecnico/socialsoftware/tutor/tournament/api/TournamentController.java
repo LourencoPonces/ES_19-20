@@ -106,4 +106,16 @@ public class TournamentController {
         return tournamentService.getCreatedTournaments(user.getId());
     }
 
+    @GetMapping("/executions/{executionId}/tournaments/running/signed-up")
+    @PreAuthorize("hasRole('ROLE_STUDENT') and hasPermission(#executionId, 'EXECUTION.ACCESS')")
+    public List<TournamentDto> getSignedUpRunningTournaments(Principal principal, @PathVariable int executionId) {
+        User user = (User) ((Authentication) principal).getPrincipal();
+
+        if (user == null) {
+            throw new TutorException(AUTHENTICATION_ERROR);
+        }
+
+        return tournamentService.getSignedUpRunningTournaments(user.getUsername(), executionId);
+    }
+
 }
