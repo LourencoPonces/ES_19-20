@@ -100,12 +100,24 @@ export default class RemoteServices {
    * Dashboard
    */
 
-  static async getUserDashboardStats(
-    userId: number
-  ): Promise<DashboardStats> {
+  static async getUserDashboardStats(userId: number): Promise<DashboardStats> {
     try {
       const response = await httpClient.get(
         `/courses/${Store.getters.getCurrentCourse.courseId}/dashboardStats/${userId}`
+      );
+      return new DashboardStats(response.data);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
+  static async updateStatsVisibility(
+    stats: DashboardStats
+  ): Promise<DashboardStats> {
+    try {
+      const response = await httpClient.put(
+        `/dashboardStats/${stats.id}`,
+        stats
       );
       return new DashboardStats(response.data);
     } catch (error) {
@@ -277,8 +289,22 @@ export default class RemoteServices {
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${questionId}/evaluate`,
         {
           evaluation: StudentQuestion.getServerStatusFormat(status),
-          justification: justification
+          justification: justification.trim() === '' ? null : justification
         }
+      );
+      return new StudentQuestion(response.data);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
+  static async editAndPromoteStudentQuestion(
+    studentQuestion: StudentQuestion
+  ): Promise<StudentQuestion> {
+    try {
+      const response = await httpClient.put(
+        `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${studentQuestion.id}/evaluate`,
+        StudentQuestion.toRequest(studentQuestion)
       );
       return new StudentQuestion(response.data);
     } catch (error) {

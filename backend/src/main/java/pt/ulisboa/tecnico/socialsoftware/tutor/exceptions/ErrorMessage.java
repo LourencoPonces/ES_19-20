@@ -37,6 +37,8 @@ public enum ErrorMessage {
 
     INVALID_JUSTIFICATION("The justification \"%s\" is invalid"),
     CANNOT_REJECT_ACCEPTED_SUGGESTION("Cannot reject already accepted suggestion"),
+    CANNOT_REJECT_WITHOUT_JUSTIFICATION("You must justify why the question is rejected"),
+    CANNOT_EVALUATE_PROMOTED_QUESTION("Cannot evaluate promoted question"),
     INVALID_STATUS("Non existing status %s"),
     QUIZ_ANSWER_NOT_FOUND("Quiz answer not found with id %d"),
     QUIZ_NOT_FOUND("Quiz not found with id %d"),
@@ -105,7 +107,9 @@ public enum ErrorMessage {
     CLARIFICATION_REQUEST_UNANSWERED("The clarification request wasn't answered yet"),
     CLARIFICATION_REQUEST_ANSWERED("The clarification request was answered already"),
 
-    INVALID_STUDENT_QUESTION_EVALUATION("Invalid StudentQuestion Evaluation");
+    INVALID_STUDENT_QUESTION_EVALUATION("Invalid StudentQuestion Evaluation"),
+
+    NO_MY_STATS_FOUND("No stats with id %d");
 
     public final String label;
 

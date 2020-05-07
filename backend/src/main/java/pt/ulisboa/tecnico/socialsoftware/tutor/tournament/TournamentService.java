@@ -134,7 +134,7 @@ public class TournamentService {
         user.addParticipantTournament(tournament);
 
         if (tournament.getQuiz() == null) {
-            if (tournament.getParticipants().size() == 2)
+            if (tournament.getParticipants().size() >= 2)
                 generateQuiz(tournament);
         } else {
             entityManager.persist(new QuizAnswer(user, tournament.getQuiz()));

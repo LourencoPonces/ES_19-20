@@ -47,31 +47,29 @@ describe('Student Question Submission', () => {
       1
     ]);
 
-    // verifications
-    cy.contains(questionTitle)
-      .parent()
-      .children()
-      .should('have.length', 7);
-
     for (topictoAdd of topics)
-      cy.get('[data-cy=questionTopics')
+      cy.contains(questionTitle) // get question title
+        .parents('tr') // get question row
+        .eq(0) // make sure closest row
+        .find('[data-cy=questionTopics]')
         .children()
         .contains(topictoAdd);
 
     cy.contains(questionTitle)
-      .parent()
-      .children()
-      .eq(3)
+      .parents('tr')
+      .eq(0)
+      .find('[data-cy=showStatus]')
       .should('have.text', WAITING_FOR_APPROVAL);
 
     // delete created question
     cy.contains(questionTitle)
-      .parent()
-      .within(() => {
-        cy.get('[data-cy="deleteStudentQuestion"]').click();
-      });
+      .parents('tr')
+      .eq(0)
+      .find('[data-cy="deleteStudentQuestion"]')
+      .click();
   });
 
+  // Test 2
   it('Fail to create an invalid question', () => {
     cy.get('[data-cy="my-area"]').click();
     cy.get('[data-cy="student-questions"]').click();
@@ -105,8 +103,7 @@ describe('Student Question Submission', () => {
       0
     ]);
     cy.errorMessageClose(
-      // eslint-disable-next-line prettier/prettier
-        'Error: The question doesn\'t have any correct options'
+      "Error: The question doesn't have any correct options"
     );
     cy.get('[data-cy="CancelStudentQuestion"]').click();
 
@@ -129,7 +126,6 @@ describe('Student Question Submission', () => {
     ]);
 
     cy.editStudentQuestion(
-      'edit',
       questionTitle,
       newQuestionTitle,
       newQuestionContent,
@@ -138,30 +134,26 @@ describe('Student Question Submission', () => {
       newOptions
     );
 
-    // verifications
-    cy.contains(newQuestionTitle)
-      .parent()
-      .children()
-      .should('have.length', 7);
-
-    for (let newTopic of newTopics) {
-      cy.get('[data-cy=questionTopics')
+    for (topictoAdd of topics)
+      cy.contains(questionTitle) // get question title
+        .parents('tr') // get question row
+        .eq(0) // make sure closest row
+        .find('[data-cy=questionTopics]')
         .children()
-        .contains(newTopic);
-    }
+        .contains(topictoAdd);
 
     cy.contains(questionTitle)
-      .parent()
-      .children()
-      .eq(3)
+      .parents('tr')
+      .eq(0)
+      .find('[data-cy=showStatus]')
       .should('have.text', WAITING_FOR_APPROVAL);
 
     // delete the question
-    cy.contains(newQuestionTitle)
-      .parent()
-      .within(() => {
-        cy.get('[data-cy="deleteStudentQuestion"]').click();
-      });
+    cy.contains(questionTitle)
+      .parents('tr')
+      .eq(0)
+      .find('[data-cy="deleteStudentQuestion"]')
+      .click();
   });
 
   // Test 4
@@ -200,7 +192,6 @@ describe('Student Question Submission', () => {
     cy.get('[data-cy="student-questions"]').click();
 
     cy.editStudentQuestion(
-      'edit',
       questionTitle,
       newQuestionTitle,
       newQuestionContent,
@@ -209,30 +200,26 @@ describe('Student Question Submission', () => {
       newOptions
     );
 
-    // verifications
-    cy.contains(newQuestionTitle)
-      .parent()
-      .children()
-      .should('have.length', 7);
-
-    for (let newTopic of newTopics) {
-      cy.get('[data-cy=questionTopics')
+    for (topictoAdd of newTopics)
+      cy.contains(questionTitle) // get question title
+        .parents('tr') // get question row
+        .eq(0) // make sure closest row
+        .find('[data-cy=questionTopics]')
         .children()
-        .contains(newTopic);
-    }
+        .contains(topictoAdd);
 
-    cy.contains(questionTitle)
-      .parent()
-      .children()
-      .eq(3)
+    cy.contains(newQuestionTitle)
+      .parents('tr')
+      .eq(0)
+      .find('[data-cy=showStatus]')
       .should('have.text', WAITING_FOR_APPROVAL);
 
     // delete the question
-    cy.contains(newQuestionTitle)
-      .parent()
-      .within(() => {
-        cy.get('[data-cy="deleteStudentQuestion"]').click();
-      });
+    cy.contains(questionTitle)
+      .parents('tr')
+      .eq(0)
+      .find('[data-cy="deleteStudentQuestion"]')
+      .click();
   });
 
   // Test 5
@@ -244,8 +231,7 @@ describe('Student Question Submission', () => {
       1
     ]);
 
-    cy.editStudentQuestion(
-      'duplicate',
+    cy.duplicateStudentQuestion(
       questionTitle,
       newQuestionTitle,
       newQuestionContent,
@@ -254,17 +240,17 @@ describe('Student Question Submission', () => {
       newOptions
     );
 
-    // verification and deletion
+    // delete the question
     cy.contains(questionTitle)
-      .parent()
-      .children()
-      .contains('delete')
+      .parents('tr')
+      .eq(0)
+      .find('[data-cy="deleteStudentQuestion"]')
       .click();
 
     cy.contains(newQuestionTitle)
-      .parent()
-      .children()
-      .contains('delete')
+      .parents('tr')
+      .eq(0)
+      .find('[data-cy="deleteStudentQuestion"]')
       .click();
   });
 });
