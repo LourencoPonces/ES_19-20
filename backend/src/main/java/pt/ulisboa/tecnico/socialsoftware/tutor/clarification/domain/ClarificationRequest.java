@@ -35,8 +35,10 @@ public class ClarificationRequest {
     @JoinColumn(name = "creator_id", nullable = false)
     private User creator;
 
+    @Column(nullable = false)
     private LocalDateTime creationDate = LocalDateTime.now();
 
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "request", orphanRemoval = true)
@@ -44,8 +46,10 @@ public class ClarificationRequest {
     private List<ClarificationMessage> messages = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private RequestStatus status = RequestStatus.PRIVATE;
 
+    @Column(nullable = false)
     private Boolean resolved = Boolean.FALSE;
 
     public ClarificationRequest() {

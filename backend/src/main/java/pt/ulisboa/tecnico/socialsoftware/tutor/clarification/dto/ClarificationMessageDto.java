@@ -21,16 +21,15 @@ public class ClarificationMessageDto {
     @Transient
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    public ClarificationMessageDto() {}
+    public ClarificationMessageDto() {
+    }
 
     public ClarificationMessageDto(ClarificationMessage answer) {
         this.id = answer.getId();
         this.requestId = answer.getRequest().getId();
         this.creatorId = answer.getCreator().getId();
         this.content = answer.getContent();
-
-        if (answer.getCreationDate() != null)
-            this.creationDate = answer.getCreationDate();
+        this.creationDate = answer.getCreationDate();
     }
 
     public Integer getId() {
@@ -61,7 +60,6 @@ public class ClarificationMessageDto {
         this.content = s;
     }
 
-    @JsonIgnore
     public Boolean getResolved() {
         return this.resolved;
     }
