@@ -635,6 +635,11 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add('deleteTournament', title => {
+  cy.get('[data-cy=tournaments]').click();
+  cy.get('[data-cy=tournaments-created]').click();
+  // Wait for fetching topics data
+  cy.wait(1000);
+
   cy.contains(title)
     .parent()
     .find('[data-cy="deleteTournament"]')
