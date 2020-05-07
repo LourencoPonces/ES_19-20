@@ -162,7 +162,7 @@
             />
           </div>
           <div class="project-name">
-            <p>Student Questions Submitted</p>
+            <p>Student Questions Approved</p>
           </div>
         </div>
       </div>
