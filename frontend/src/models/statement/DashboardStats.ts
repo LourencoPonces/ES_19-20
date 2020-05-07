@@ -11,12 +11,14 @@ enum StatsNames {
 }
 
 export default class DashboardStats {
+  id: number;
   statsValues;
   statsVisibility;
   statsNames = StatsNames;
 
   constructor(jsonObj?: DashboardStats) {
     if (jsonObj) {
+      this.id = jsonObj.id;
       this.statsValues = jsonObj.statsValues;
       this.statsVisibility = jsonObj.statsVisibility;
     }
@@ -28,5 +30,13 @@ export default class DashboardStats {
 
   getStatValue(stat: StatsNames): number {
     return this.statsValues[stat];
+  }
+
+  makePublic(stat: StatsNames) {
+    this.statsVisibility[stat] = visibility.PUBLIC;
+  }
+
+  makePrivate(stat: StatsNames) {
+    this.statsVisibility[stat] = visibility.PRIVATE;
   }
 }
