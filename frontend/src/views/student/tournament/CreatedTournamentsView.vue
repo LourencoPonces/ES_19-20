@@ -39,7 +39,6 @@
             />
           </v-card-title>
         </template>
-
         <template v-slot:item.topics="{ item }">
           <v-chip-group data-cy="topics-list">
             <v-chip v-for="topic in item.topics" :key="topic.name">
@@ -47,9 +46,6 @@
             </v-chip>
           </v-chip-group>
         </template>
-
-
-
         <template v-slot:item.status="{ item }">
           <v-chip-group>
             <v-chip>
@@ -57,16 +53,9 @@
             </v-chip>
           </v-chip-group>
         </template>
-
-
-
-
-
         <template v-slot:item.action="{ item }">
-
-
                     <v-tooltip bottom>
-                      <template v-slot:activator="{ on }">
+                      <template v-slot:activator="{ on }" v-if="getStatus(item) != 'Cancelled'">
                         <v-icon
                                 large
                                 class="mr-2"
@@ -78,9 +67,7 @@
                       </template>
                       <span>Cancel Tournament</span>
                     </v-tooltip>
-
-
-                    <v-tooltip bottom><!--bottom v-if="item.isChangeable()"-->
+                    <v-tooltip bottom>
                       <template v-slot:activator="{ on }">
                         <v-icon
                                 large
@@ -94,16 +81,7 @@
                       </template>
                       <span>Delete Tournament</span>
                     </v-tooltip>
-
-
-
                   </template>
-
-
-
-
-
-
                 </v-data-table>
               </v-card>
             </div>
@@ -129,6 +107,13 @@
             search: string = '';
 
             headers: object = [
+              {
+                text: 'Actions',
+                value: 'action',
+                align: 'center',
+                width: '10%',
+                sortable: false
+              },
               {
                 text: 'Title',
                 value: 'title',
@@ -183,13 +168,6 @@
                 value: 'status',
                 align: 'center',
                 width: '10%'
-              },
-              {
-                text: 'Actions',
-                value: 'action',
-                align: 'center',
-                width: '10%',
-                sortable: false
               }
             ];
 
@@ -257,10 +235,14 @@
               let date = Date.now();
               if (tournament.isCancelled)
                 return 'Cancelled';
-              else if (date < tournament.availableDate)
+              else if (date < Date.parse(tournament.creationDate))
                 return 'Created';
-              else if (date < tournament.availableDate)
+              else if (date < Date.parse(tournament.availableDate))
                 return 'Available';
+              else if (date < Date.parse(tournament.runningDate))
+                return 'Running';
+              else if (date < Date.parse(tournament.conclusionDate))
+                return 'Finished';
             }
           }
           </script>
