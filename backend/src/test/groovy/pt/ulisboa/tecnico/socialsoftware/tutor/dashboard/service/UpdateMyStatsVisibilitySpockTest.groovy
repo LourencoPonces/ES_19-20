@@ -126,7 +126,7 @@ class UpdateMyStatsVisibilitySpockTest extends Specification {
         studentQuestion.setTopics(topicList)
     }
 
-    def "change submitted and approved questions visibility"() {
+    def "change submitted and approved questions visibility to public"() {
         given: "2 studentQuestions"
         def studentQuestion1 = createStudentQuestion(student, course, 1)
         student.addStudentQuestion(studentQuestion1)
@@ -156,7 +156,37 @@ class UpdateMyStatsVisibilitySpockTest extends Specification {
 
     }
 
-    def "get stats with non existing id"() {
+    def "change submitted and approved questions visibility to private"() {
+        given: "2 studentQuestions"
+        def studentQuestion1 = createStudentQuestion(student, course, 1)
+        student.addStudentQuestion(studentQuestion1)
+        def studentQuestion2 = createStudentQuestion(student, course, 2)
+        student.addStudentQuestion(studentQuestion2)
+
+        and: "one of them approved"
+        studentQuestion2.setSubmittedStatus(StudentQuestion.SubmittedStatus.APPROVED)
+        studentQuestionRepository.save(studentQuestion1)
+        studentQuestionRepository.save(studentQuestion2)
+
+        and: "the stats changed to private"
+        MyStatsDto myStatsDto = myStatsService.getMyStats(student.getId(), courseId)
+        myStatsDto.setApprovedQuestionsVisibility(MyStats.StatsVisibility.PRIVATE)
+        myStatsDto.setSubmittedQuestionsVisibility(MyStats.StatsVisibility.PRIVATE)
+
+        when:
+        def result = myStatsService.updateVisibility(myStatsDto.getId(), myStatsDto)
+
+
+        then:
+        result != null
+        result.getSubmittedQuestionsStat() == 2
+        result.getApprovedQuestionsStat() == 1
+        result.getApprovedQuestionsVisibility() == MyStats.StatsVisibility.PRIVATE
+        result.getSubmittedQuestionsVisibility() == MyStats.StatsVisibility.PRIVATE
+
+    }
+
+    def "try to get stats that don't exist"() {
         def nonExistingMyStatsId = 100000
         def emptyDto = new MyStatsDto()
 

@@ -3,13 +3,11 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.overviewdashboard;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest;
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
@@ -18,7 +16,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 
 import java.sql.SQLException;
-import java.util.Collection;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
@@ -85,7 +82,7 @@ public class MyStatsService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public MyStatsDto updateVisibility(Integer myStatsId, MyStatsDto myStatsDto) {
         MyStats myStats = myStatsRepository.findById(myStatsId).orElseThrow(() -> new TutorException(NO_MY_STATS_FOUND, myStatsId));
-        myStats.update(myStatsDto);
+        myStats.updateVisibility(myStatsDto);
         return new MyStatsDto(myStats, myStatsDto);
     }
 

@@ -21,10 +21,10 @@ public class MyStatsDto implements Serializable {
 
     public MyStatsDto(MyStats myStats) {
         this.id = myStats.getId();
-        this.statsVisibility.put(REQUESTS_SUBMITTED, myStats.getRequestsSubmitted());
-        this.statsVisibility.put(PUBLIC_REQUESTS, myStats.getPublicRequests());
-        this.statsVisibility.put(SUBMITTED_QUESTIONS, myStats.getSubmittedQuestions());
-        this.statsVisibility.put(APPROVED_QUESTIONS, myStats.getApprovedQuestions());
+        this.statsVisibility.put(REQUESTS_SUBMITTED, myStats.getRequestsSubmittedVisibility());
+        this.statsVisibility.put(PUBLIC_REQUESTS, myStats.getPublicRequestsVisibility());
+        this.statsVisibility.put(SUBMITTED_QUESTIONS, myStats.getSubmittedQuestionsVisibility());
+        this.statsVisibility.put(APPROVED_QUESTIONS, myStats.getApprovedQuestionsVisibility());
     }
 
     public MyStatsDto(MyStats myStats, MyStatsDto oldStatsDto) {

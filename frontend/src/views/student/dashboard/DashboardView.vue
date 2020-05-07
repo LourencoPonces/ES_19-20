@@ -295,14 +295,12 @@ export default class DashboardView extends Vue {
 
   onCloseShowDashboardStatsDialog() {
     this.dashboardStatsDialog = false;
-    this.dashboardUserToSee = null;
   }
 
   async onChangeVisibility(stat) {
     await this.$store.dispatch('loading');
     try {
-      if (this.myStats.isPublic(stat)) this.myStats.makePrivate(stat);
-      else this.myStats.makePublic(stat);
+      this.myStats.toggle(stat);
 
       this.myStats = await RemoteServices.updateStatsVisibility(this.myStats);
     } catch (error) {

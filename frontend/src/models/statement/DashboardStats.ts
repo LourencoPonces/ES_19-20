@@ -32,11 +32,8 @@ export default class DashboardStats {
     return this.statsValues[stat];
   }
 
-  makePublic(stat: StatsNames) {
-    this.statsVisibility[stat] = visibility.PUBLIC;
-  }
-
-  makePrivate(stat: StatsNames) {
-    this.statsVisibility[stat] = visibility.PRIVATE;
+  toggle(stat: StatsNames) {
+    if (this.isPublic(stat)) this.statsVisibility[stat] = visibility.PRIVATE;
+    else this.statsVisibility[stat] = visibility.PUBLIC;
   }
 }

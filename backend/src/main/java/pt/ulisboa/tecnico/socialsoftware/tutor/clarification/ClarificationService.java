@@ -88,7 +88,7 @@ public class ClarificationService {
         ClarificationRequest req = clarificationRequestRepository.findById(reqId)
                 .orElseThrow(() -> new TutorException(ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND));
 
-        // Create/update answer
+        // Create/updateVisibility answer
         ClarificationRequestAnswer ans = req.getAnswer().orElseGet(ClarificationRequestAnswer::new);
         ans.setContent(answerText);
         ans.setCreationDate(LocalDateTime.now());

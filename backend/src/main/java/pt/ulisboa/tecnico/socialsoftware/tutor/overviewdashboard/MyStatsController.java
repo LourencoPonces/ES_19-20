@@ -23,7 +23,7 @@ public class MyStatsController {
         if (loggedInUser.getId() == userId) {
             return myStatsService.getMyStats(loggedInUser.getId(), courseId);
         } else {
-            return myStatsService.getOtherUserStats(userId, courseId);
+            return this.myStatsService.getOtherUserStats(userId, courseId);
         }
     }
 

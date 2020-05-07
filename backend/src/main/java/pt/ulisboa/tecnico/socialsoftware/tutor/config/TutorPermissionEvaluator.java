@@ -88,7 +88,7 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
                 case "CLARIFICATION.ACCESS":
                     return userHasAnExecutionOfTheCourse(userId, clarificationService.findClarificationRequestCourseId(id));
                 case "STATS.ACCESS":
-                    return isSameUser(userId, myStatsService.findOwner(id));
+                    return userId == myStatsService.findOwner(id);
                 default: return false;
             }
         }
@@ -104,10 +104,6 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
     private boolean userHasThisExecution(int userId, int courseExecutionId) {
         return userService.getCourseExecutions(userId).stream()
                 .anyMatch(course -> course.getCourseExecutionId() == courseExecutionId);
-    }
-
-    private boolean isSameUser(int userId1, int userId2 ) {
-        return userId1 == userId2;
     }
 
     @Override

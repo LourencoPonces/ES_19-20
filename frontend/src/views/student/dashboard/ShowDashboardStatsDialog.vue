@@ -23,7 +23,7 @@
             data-cy="closeDashboardTable"
             dark
             color="blue darken-1"
-            @click="$emit('dialog')"
+            @click="$emit('close-show-dashboard-stats-dialog')"
             >close</v-btn
           >
         </v-card-actions>
