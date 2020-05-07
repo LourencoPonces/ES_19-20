@@ -49,7 +49,8 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
-        int userId = ((User) authentication.getPrincipal()).getId();
+        User user = ((User) authentication.getPrincipal());
+        int userId = user.getId();
 
         if (targetDomainObject instanceof CourseDto) {
             CourseDto courseDto = (CourseDto) targetDomainObject;
@@ -88,7 +89,7 @@ public class TutorPermissionEvaluator implements PermissionEvaluator {
                 case "CLARIFICATION.ACCESS":
                     return userHasAnExecutionOfTheCourse(userId, clarificationService.findClarificationRequestCourseId(id));
                 case "STATS.ACCESS":
-                    return userId == myStatsService.findOwner(id);
+                    return  user.equals(myStatsService.findOwner(id));
                 default: return false;
             }
         }

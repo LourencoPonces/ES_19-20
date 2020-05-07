@@ -138,7 +138,7 @@ public class StudentQuestionController {
     }
 
     /* ==================================================
-     * F5: Teacher can updateVisibility a question before approving
+     * F5: Teacher can update a question before approving
      * ==================================================
      */
 

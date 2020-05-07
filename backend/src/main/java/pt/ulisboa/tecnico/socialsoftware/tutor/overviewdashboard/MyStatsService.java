@@ -127,10 +127,10 @@ public class MyStatsService {
                 ).count();
     }
 
-    public Integer findOwner(int statsId) {
+    public User findOwner(int statsId) {
         return myStatsRepository.findById(statsId)
-                .map(stats -> stats.getUser().getId())
-                .orElse(-1);
+                .map(MyStats::getUser)
+                .orElseThrow(() -> new TutorException(USER_NOT_FOUND));
     }
 
 

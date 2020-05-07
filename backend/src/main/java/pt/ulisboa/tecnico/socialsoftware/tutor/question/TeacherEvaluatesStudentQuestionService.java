@@ -74,7 +74,7 @@ public class TeacherEvaluatesStudentQuestionService {
         TopicDto[] topicArray = new TopicDto[changedStudentQuestionDTO.getTopics().size()];
         Set<Topic> newTopics = Arrays.stream(changedStudentQuestionDTO.getTopics().toArray(topicArray)).map(topicDto -> topicRepository.findTopicByName(courseId, topicDto.getName())).collect(Collectors.toSet());
 
-        // updateVisibility question
+        // update question
         studentQuestion.update(changedStudentQuestionDTO, newTopics);
 
         // evaluate
