@@ -145,7 +145,7 @@ class GetCreatedTournamentsTest extends Specification {
         tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
 
         when:
-        def tournamentsList = tournamentService.getCreatedTournaments(creator.getId())
+        def tournamentsList = tournamentService.getCreatedTournaments(creator.getId(), courseExecution.getId())
 
         then: "there are only one tournament in the list"
         tournamentsList.size() == 1
@@ -166,7 +166,7 @@ class GetCreatedTournamentsTest extends Specification {
 
     def "get the created tournaments, although there are not any"() {
         when:
-        def tournamentsList = tournamentService.getCreatedTournaments(creator.getId());
+        def tournamentsList = tournamentService.getCreatedTournaments(creator.getId(), courseExecution.getId())
 
         then: "There are no tournaments"
         tournamentsList.size() == 0
@@ -178,7 +178,7 @@ class GetCreatedTournamentsTest extends Specification {
         def badUserId = 12345678
 
         when:
-        tournamentService.getCreatedTournaments(badUserId)
+        tournamentService.getCreatedTournaments(badUserId, courseExecution.getId())
 
         then: ""
         def exception = thrown(TutorException)
