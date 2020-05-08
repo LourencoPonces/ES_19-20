@@ -17,7 +17,7 @@ import StudentQuestion from '@/models/management/StudentQuestion';
 import Tournament from '@/models/management/Tournament';
 import ClarificationRequest from '@/models/clarification/ClarificationRequest';
 import ClarificationMessage from '@/models/clarification/ClarificationMessage';
-import ClarificationRequestList from '@/models/clarification/ClarificationRequestList';
+import UserNameCacheService from './UserNameCacheService';
 
 const httpClient = axios.create();
 httpClient.defaults.timeout = 10000;
@@ -43,7 +43,9 @@ export default class RemoteServices {
     return httpClient
       .get(`/auth/fenix?code=${code}`)
       .then(response => {
-        return new AuthDto(response.data);
+        const res = new AuthDto(response.data);
+        UserNameCacheService.addUser(res.user);
+        return res;
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
@@ -54,7 +56,9 @@ export default class RemoteServices {
     return httpClient
       .get('/auth/demo/student')
       .then(response => {
-        return new AuthDto(response.data);
+        const res = new AuthDto(response.data);
+        UserNameCacheService.addUser(res.user);
+        return res;
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
@@ -65,7 +69,9 @@ export default class RemoteServices {
     return httpClient
       .get('/auth/demo/teacher')
       .then(response => {
-        return new AuthDto(response.data);
+        const res = new AuthDto(response.data);
+        UserNameCacheService.addUser(res.user);
+        return res;
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
@@ -76,7 +82,9 @@ export default class RemoteServices {
     return httpClient
       .get('/auth/demo/admin')
       .then(response => {
-        return new AuthDto(response.data);
+        const res = new AuthDto(response.data);
+        UserNameCacheService.addUser(res.user);
+        return res;
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
@@ -758,30 +766,20 @@ export default class RemoteServices {
       });
   }
 
-  static async getClarificationRequests(): Promise<ClarificationRequest[]> {
-    try {
-      const response = await httpClient.get('/clarifications');
-      return response.data.map(
-        (req: ClarificationRequest) => new ClarificationRequest(req)
-      );
-    } catch (err) {
-      throw Error(await this.errorMessage(err));
-    }
-  }
-
   static async submitClarificationMessage(
-    msg: ClarificationMessage,
+    reqId: number,
+    content: string,
     resolved: boolean = null
   ): Promise<ClarificationMessage> {
-    if (msg.getContent().trim() == '') {
+    if (content.trim() == '') {
       // eslint-disable-next-line
       throw Error("Answer can't be empty");
     }
 
     try {
       const response = await httpClient.post(
-        `/clarifications/${msg.getRequestId()}/messages`,
-        { ...msg, resolved }
+        `/clarifications/${reqId}/messages`,
+        { content, resolved }
       );
 
       return new ClarificationMessage(response.data);
@@ -790,21 +788,24 @@ export default class RemoteServices {
     }
   }
 
-  static async getUserClarificationRequests(): Promise<ClarificationRequestList> {
+  static async getUserClarificationRequests(): Promise<ClarificationRequest[]> {
     try {
       const response = await httpClient.get('/clarifications');
-      return new ClarificationRequestList(response.data);
+
+      UserNameCacheService.bulkAdd(response.data.names);
+
+      return response.data.requests.map(
+        (req: ClarificationRequest) => new ClarificationRequest(req)
+      );
     } catch (error) {
       throw Error(await this.errorMessage(error));
     }
   }
 
   static async deleteClarificationRequest(id: number) {
-    return httpClient
-      .delete(`/clarifications/${id}`)
-      .catch(async error => {
-        throw Error(await this.errorMessage(error));
-      });
+    return httpClient.delete(`/clarifications/${id}`).catch(async error => {
+      throw Error(await this.errorMessage(error));
+    });
   }
 
   static async deleteClarificationMessage(

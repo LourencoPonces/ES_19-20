@@ -18,7 +18,9 @@ export default class ClarificationRequest {
       this.creatorUsername = jsonObj.creatorUsername;
       this.creationDate = jsonObj.creationDate;
       this.status = jsonObj.status;
-      this.messages = jsonObj.messages.map(msg => new ClarificationMessage(msg));
+      this.messages = jsonObj.messages.map(
+        msg => new ClarificationMessage(msg)
+      );
       this.resolved = jsonObj.resolved;
     }
   }
@@ -41,8 +43,13 @@ export default class ClarificationRequest {
     return this.messages;
   }
 
-  addMessage(msg: ClarificationMessage) {
+  addMessage(msg: ClarificationMessage): void {
     this.messages.push(msg);
+  }
+
+  removeMessage(msg: ClarificationMessage): void {
+    const idx = this.messages.indexOf(msg);
+    this.messages.splice(idx, 1);
   }
 
   setQuestionId(id: number): void {
@@ -79,5 +86,13 @@ export default class ClarificationRequest {
 
   getStatus(): string {
     return this.status;
+  }
+
+  setResolved(r: boolean): void {
+    this.resolved = r;
+  }
+
+  getResolved(): boolean {
+    return this.resolved;
   }
 }
