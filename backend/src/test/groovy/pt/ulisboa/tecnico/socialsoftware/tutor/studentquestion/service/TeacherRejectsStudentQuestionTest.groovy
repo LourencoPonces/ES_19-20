@@ -158,8 +158,7 @@ class TeacherRejectsStudentQuestionTest extends Specification {
         teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(savedQuestionId, StudentQuestion.SubmittedStatus.REJECTED, VALID_JUSTIFICATION)
 
         then:
-        def error = thrown(TutorException)
-        error.errorMessage == CANNOT_REJECT_ACCEPTED_SUGGESTION
+        studentQuestionRepository.findAll().get(0).getSubmittedStatus() == StudentQuestion.SubmittedStatus.REJECTED
     }
 
     def "reject already rejected student question"() {
