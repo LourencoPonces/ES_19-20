@@ -116,6 +116,13 @@ export default class ClarificationsView extends Vue {
 
   headers: object = [
     {
+      text: 'Actions',
+      value: 'action',
+      align: 'center',
+      sortable: false,
+      width: '100px'
+    },
+    {
       text: 'Request',
       value: 'content',
       align: 'left'
@@ -139,13 +146,6 @@ export default class ClarificationsView extends Vue {
       value: 'creationDate',
       align: 'center',
       width: '150px'
-    },
-    {
-      text: 'Actions',
-      value: 'action',
-      align: 'center',
-      sortable: false,
-      width: '100px'
     }
   ];
 

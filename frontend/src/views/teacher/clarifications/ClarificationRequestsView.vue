@@ -106,18 +106,22 @@ export default class ClarificationRequestsView extends Vue {
   questionCache: Record<number, Question> = {};
   search: string = '';
   headers: object = [
-    { text: 'Clarification Request', value: 'content', align: 'left' },
+    {
+      text: 'Clarification Request',
+      value: 'content',
+      align: 'left'
+    },
     {
       text: 'Visibility',
       value: 'status',
       align: 'center',
-      width: '60px',
+      width: '100px',
       sortable: false
     },
     {
       text: 'Resolved',
       value: 'resolved',
-      width: '114px'
+      width: '100px'
     },
     {
       text: 'Creation Date',
