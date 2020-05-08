@@ -45,6 +45,10 @@ class TeacherRejectsStudentQuestionTest extends Specification {
 
     public static final String VALID_JUSTIFICATION = "irrelevant question"
 
+    public static final String LONG_JUSTIFICATION = "very long long long long long long long long long long long " +
+            "long long long long long long long long long long long long long long long long long long long long " +
+            "long long long long long long long long long long long long long long long long long justification"
+
     @Autowired
     TeacherEvaluatesStudentQuestionService teacherEvaluatesStudentQuestionService
 
@@ -139,6 +143,7 @@ class TeacherRejectsStudentQuestionTest extends Specification {
         ""            || INVALID_JUSTIFICATION
         "   "         || INVALID_JUSTIFICATION
         "\n  \t"      || INVALID_JUSTIFICATION
+        LONG_JUSTIFICATION  || INVALID_JUSTIFICATION
         null          || CANNOT_REJECT_WITHOUT_JUSTIFICATION
     }
 
@@ -153,8 +158,7 @@ class TeacherRejectsStudentQuestionTest extends Specification {
         teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(savedQuestionId, StudentQuestion.SubmittedStatus.REJECTED, VALID_JUSTIFICATION)
 
         then:
-        def error = thrown(TutorException)
-        error.errorMessage == CANNOT_REJECT_ACCEPTED_SUGGESTION
+        studentQuestionRepository.findAll().get(0).getSubmittedStatus() == StudentQuestion.SubmittedStatus.REJECTED
     }
 
     def "reject already rejected student question"() {

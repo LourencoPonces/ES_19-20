@@ -141,13 +141,6 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         courseExecution.setAcademicTerm(term)
         return courseExecution
     }
-/*
-    private Course createCourse(String name) {
-        course = new Course()
-        course.setName(name)
-        return course
-    }
-*/
 
 
     def "the question has been answered and submit request"() {

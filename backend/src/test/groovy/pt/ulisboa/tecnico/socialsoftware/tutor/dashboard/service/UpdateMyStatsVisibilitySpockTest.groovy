@@ -4,7 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuestionAnswerRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
@@ -23,6 +30,10 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizQuestionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
@@ -36,8 +47,10 @@ class UpdateMyStatsVisibilitySpockTest extends Specification {
 
     public static final String OPTION_CONTENT = "optionId content"
     public static final String TOPIC_NAME = "topic name"
-    public static final String QUESTION_TITLE = 'question title'
-    public static final String QUESTION_CONTENT = 'question content'
+    public static final String QUESTION_TITLE = "question title"
+    public static final String QUESTION_CONTENT = "question content"
+
+    static final String REQUEST_CONTENT = "request Content"
 
 
     @Autowired
@@ -56,25 +69,56 @@ class UpdateMyStatsVisibilitySpockTest extends Specification {
     StudentQuestionRepository studentQuestionRepository
 
     @Autowired
+    QuizRepository quizRepository
+
+
+    @Autowired
+    QuizQuestionRepository quizQuestionRepository
+
+    @Autowired
+    QuizAnswerRepository quizAnswerRepository
+
+    @Autowired
+    ClarificationRequestRepository clarificationRequestRepository
+
+    @Autowired
     UserRepository userRepository
+
+    @Autowired
+    ClarificationService clarificationService
 
     @Autowired
     MyStatsService myStatsService
 
     Course course
     CourseExecution courseExecution
+    Quiz quiz
     User student
+    Question question1
+    Question question2
     int studentId
     int courseId
 
     def setup() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseExecution = createCourseExecution(course, ACRONYM, ACADEMIC_TERM)
+        quiz = createQuiz(1, courseExecution, "GENERATED")
+        question1 = createQuestion(1, course)
+        question2 = createQuestion(2, course)
+        QuizQuestion quizQuestion1 = new QuizQuestion(quiz, question1, 1)
+        QuizQuestion quizQuestion2 = new QuizQuestion(quiz, question2, 2)
         student = createUser(courseExecution, User.Role.STUDENT, USERNAME_1, 1)
+        QuizAnswer quizAnswer = new QuizAnswer(student, quiz)
 
         courseRepository.save(course)
         courseExecutionRepository.save(courseExecution)
+        quizRepository.save(quiz)
+        questionRepository.save(question1)
+        questionRepository.save(question2)
+        quizQuestionRepository.save(quizQuestion1)
+        quizQuestionRepository.save(quizQuestion2)
         userRepository.save(student)
+        quizAnswerRepository.save(quizAnswer)
         studentId = student.getId()
         courseId = course.getId()
 
@@ -86,6 +130,24 @@ class UpdateMyStatsVisibilitySpockTest extends Specification {
         courseExecution.setAcronym(acronym)
         courseExecution.setAcademicTerm(term)
         return courseExecution
+    }
+
+    private Question createQuestion(int key, Course course) {
+        def question = new Question()
+        question.setKey(key)
+        question.setCourse(course)
+        question.setTitle("TITLE")
+        course.addQuestion(question)
+        return question
+    }
+
+    private Quiz createQuiz(int key, CourseExecution courseExecution, String type) {
+        def quiz = new Quiz()
+        quiz.setKey(key)
+        quiz.setType(type)
+        quiz.setCourseExecution(courseExecution)
+        courseExecution.addQuiz(quiz)
+        return quiz
     }
 
     private User createUser(CourseExecution courseExecution, User.Role role, String username, int key) {
@@ -126,7 +188,65 @@ class UpdateMyStatsVisibilitySpockTest extends Specification {
         studentQuestion.setTopics(topicList)
     }
 
-    def "change submitted and approved questions visibility to public"() {
+    private ClarificationRequestDto createClarificationRequestDto(String content) {
+        def clarificationRequestDto = new ClarificationRequestDto()
+        clarificationRequestDto.setContent(content)
+        return clarificationRequestDto
+
+    }
+    def "change submitted and public requests' visibility to public"() {
+        given: "1 private clarification request"
+        def req1 = createClarificationRequestDto(REQUEST_CONTENT)
+        clarificationService.submitClarificationRequest(question1.getId(), studentId, req1)
+
+        and: "1 public clarification request"
+        def req2 = createClarificationRequestDto(REQUEST_CONTENT)
+        req2 = clarificationService.submitClarificationRequest(question2.getId(), studentId, req2)
+        clarificationService.changeClarificationRequestStatus(req2.getId(), ClarificationRequest.RequestStatus.PUBLIC)
+
+        and: "the stats changed to public"
+        MyStatsDto myStatsDto = myStatsService.getMyStats(student.getId(), courseId)
+        myStatsDto.setRequestsSubmittedVisibility(MyStats.StatsVisibility.PUBLIC)
+        myStatsDto.setPublicRequestsVisibility(MyStats.StatsVisibility.PUBLIC)
+
+        when:
+        def result = myStatsService.updateVisibility(myStatsDto.getId(), myStatsDto)
+
+        then:
+        result != null
+        result.getRequestsSubmittedStat() == 2
+        result.getPublicRequestsStat() == 1
+        result.getRequestsSubmittedVisibility() == MyStats.StatsVisibility.PUBLIC
+        result.getPublicRequestsVisibility() == MyStats.StatsVisibility.PUBLIC
+    }
+
+    def "change submitted and public requests' visibility to private"() {
+        given: "1 private clarification request"
+        def req1 = createClarificationRequestDto(REQUEST_CONTENT)
+        clarificationService.submitClarificationRequest(question1.getId(), studentId, req1)
+
+        and: "1 public clarification request"
+        def req2 = createClarificationRequestDto(REQUEST_CONTENT)
+        req2 = clarificationService.submitClarificationRequest(question2.getId(), studentId, req2)
+        clarificationService.changeClarificationRequestStatus(req2.getId(), ClarificationRequest.RequestStatus.PUBLIC)
+
+        and: "the stats changed to private"
+        MyStatsDto myStatsDto = myStatsService.getMyStats(student.getId(), courseId)
+        myStatsDto.setRequestsSubmittedVisibility(MyStats.StatsVisibility.PRIVATE)
+        myStatsDto.setPublicRequestsVisibility(MyStats.StatsVisibility.PRIVATE)
+
+        when:
+        def result = myStatsService.updateVisibility(myStatsDto.getId(), myStatsDto)
+
+        then:
+        result != null
+        result.getRequestsSubmittedStat() == 2
+        result.getPublicRequestsStat() == 1
+        result.getRequestsSubmittedVisibility() == MyStats.StatsVisibility.PRIVATE
+        result.getPublicRequestsVisibility() == MyStats.StatsVisibility.PRIVATE
+    }
+
+    def "change submitted and approved questions' visibility to public"() {
         given: "2 studentQuestions"
         def studentQuestion1 = createStudentQuestion(student, course, 1)
         student.addStudentQuestion(studentQuestion1)
