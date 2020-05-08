@@ -80,10 +80,10 @@
           </v-tooltip>
         </template>
 
-        <template v-slot:expanded-item="{ item }">
+        <template v-slot:expanded-item="{ headers, item }">
           <td :colspan="headers.length" class="clarification-expand-container">
             <h2>Clarification Request:</h2>
-            <span class="multiline">{{ item.content }}</span>
+            <div class="multiline msg-content">{{ item.content }}</div>
 
             <h3>Messages:</h3>
             <clarification-thread :request="item"></clarification-thread>
@@ -191,6 +191,26 @@ export default class ClarificationsView extends Vue {
     small {
       font-size: 0.5em;
     }
+  }
+}
+
+.clarification-expand-container {
+  text-align: left;
+  padding: 20px;
+
+  h2,
+  h3 {
+    margin: 10px 0;
+    font-size: initial;
+    text-align: left;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  .msg-content {
+    margin-bottom: 10px;
   }
 }
 

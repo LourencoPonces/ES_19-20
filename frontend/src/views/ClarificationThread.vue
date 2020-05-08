@@ -41,7 +41,7 @@
       </v-container>
     </v-card>
     <span v-if="!request.hasMessages">No messages (yet)</span>
-    <v-container fluid>
+    <v-container fluid class="new-msg-container">
       <v-row>
         <v-textarea
           label="Message Content"
@@ -126,14 +126,25 @@ export default class ClarificationThread extends Vue {
 
 <style scoped lang="scss">
 .container {
-  padding: 10px;
+  /*
+    scoped styles dont' seem to work with sass very well
+    ClarificationsView stuff is bleeding through
+    this resets things to normal
+  */
+  max-width: initial !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
+
 .message {
   padding: 10px;
   margin-bottom: 20px;
   margin-top: 20px;
 }
-.message-content {
-  margin: 10px;
+
+.new-msg-container > * {
+  /* negative margins in v-row mess up styles */
+  margin-left: 0;
+  margin-right: 0;
 }
 </style>
