@@ -188,6 +188,7 @@ public class User implements UserDetails, DomainEntity {
     public Set<ClarificationRequest> getClarificationRequests() {
         return clarificationRequests;
     }
+
     public void removeClarificationRequest(int reqId) {
         for (ClarificationRequest req : clarificationRequests) {
             if (req.getId() == reqId) {
@@ -366,7 +367,6 @@ public class User implements UserDetails, DomainEntity {
 
         return numberOfCorrectStudentAnswers;
     }
-
 
     public void setNumberOfCorrectStudentAnswers(Integer numberOfCorrectStudentAnswers) {
         this.numberOfCorrectStudentAnswers = numberOfCorrectStudentAnswers;
