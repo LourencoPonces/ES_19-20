@@ -36,6 +36,12 @@
         <template v-slot:item.creator="{ item }">
           <span>{{ item.creator.username }}</span>
         </template>
+
+        <template v-slot:item.solve-quiz-button="{ item }">
+          <v-btn color="primary" @click="solveTournamentQuiz(item)"
+            >Solve</v-btn
+          >
+        </template>
       </v-data-table>
     </v-card>
   </div>
@@ -47,6 +53,7 @@ import Store from '@/store';
 import Tournament from '@/models/management/Tournament';
 import RemoteServices from '@/services/RemoteServices';
 import Topic from '@/models/management/Topic';
+import StatementManager from '@/models/statement/StatementManager';
 
 @Component
 export default class RunningTournamentsView extends Vue {
@@ -97,6 +104,12 @@ export default class RunningTournamentsView extends Vue {
       value: 'participants.length',
       align: 'center',
       width: '10%'
+    },
+    {
+      value: 'solve-quiz-button',
+      align: 'center',
+      width: '10%',
+      sortable: false
     }
   ];
 
@@ -108,6 +121,18 @@ export default class RunningTournamentsView extends Vue {
       await this.$store.dispatch('error', error);
     }
     await this.$store.dispatch('clearLoading');
+  }
+
+  async solveTournamentQuiz(tournament: Tournament) {
+    try {
+      let quiz = await RemoteServices.getTournamentQuiz(tournament);
+      let statementManager: StatementManager = StatementManager.getInstance;
+      statementManager.statementQuiz = quiz;
+      alert(JSON.stringify(quiz));
+      await this.$router.push({ name: 'solve-quiz' });
+    } catch (error) {
+      await this.$store.dispatch('error', error);
+    }
   }
 }
 </script>

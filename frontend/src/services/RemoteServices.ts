@@ -428,6 +428,16 @@ export default class RemoteServices {
     }
   }
 
+  static async getTournamentQuiz(
+    tournament: Tournament
+  ): Promise<StatementQuiz> {
+    try {
+      return (await httpClient.get(`/tournaments/${tournament.id}/quiz`)).data;
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
   static getAvailableQuizzes(): Promise<StatementQuiz[]> {
     return httpClient
       .get(

@@ -202,6 +202,10 @@ public class TournamentService {
                 .stream()
                 .filter(tournament -> tournament.getStatus() == Tournament.Status.RUNNING &&
                         tournament.getCourseExecution().getId() == executionId)
+                .filter(tournament -> tournament.getQuiz() == null ||
+                        !tournament.getQuiz().getQuizAnswers()
+                                .stream().filter(quizAnswer -> quizAnswer.getUser()
+                                        .equals(user)).findFirst().get().isCompleted())
                 .map(TournamentDto::new)
                 .collect(Collectors.toList());
     }
@@ -282,7 +286,7 @@ public class TournamentService {
         quiz.setKey(quizService.getMaxQuizKey() + 1);
         quiz.setType(Quiz.QuizType.TOURNAMENT.toString());
 
-        quiz.setTitle(tournament.getTitle() + " - Quiz");
+        quiz.setTitle(tournament.getTitle() + " [Tournament]");
 
         quiz.setCourseExecution(tournament.getCourseExecution());
 
