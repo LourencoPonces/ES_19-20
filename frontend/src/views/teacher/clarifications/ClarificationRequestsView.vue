@@ -107,11 +107,6 @@ export default class ClarificationRequestsView extends Vue {
   search: string = '';
   headers: object = [
     {
-      text: 'Clarification Request',
-      value: 'content',
-      align: 'left'
-    },
-    {
       text: 'Visibility',
       value: 'status',
       align: 'center',
@@ -119,9 +114,14 @@ export default class ClarificationRequestsView extends Vue {
       sortable: false
     },
     {
+      text: 'Clarification Request',
+      value: 'content',
+      align: 'left'
+    },
+    {
       text: 'Resolved',
       value: 'resolved',
-      width: '100px'
+      width: '110px'
     },
     {
       text: 'Creation Date',

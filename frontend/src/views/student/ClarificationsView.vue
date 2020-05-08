@@ -123,6 +123,13 @@ export default class ClarificationsView extends Vue {
       width: '100px'
     },
     {
+      text: 'Visibility',
+      value: 'status',
+      align: 'center',
+      sortable: false,
+      width: '100px'
+    },
+    {
       text: 'Request',
       value: 'content',
       align: 'left'
@@ -132,14 +139,7 @@ export default class ClarificationsView extends Vue {
       value: 'resolved',
       align: 'center',
       sortable: false,
-      width: '100px'
-    },
-    {
-      text: 'Visibility',
-      value: 'status',
-      align: 'center',
-      sortable: false,
-      width: '100px'
+      width: '110px'
     },
     {
       text: 'Creation Date',
