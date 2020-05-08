@@ -51,7 +51,7 @@
       <v-row>
         <v-switch v-model="newMessageResolvedState" label="Resolved" />
         <v-spacer />
-        <v-btn primary @click="submitMessage()">
+        <v-btn primary dark color="blue" @click="submitMessage()">
           Submit Message
         </v-btn>
       </v-row>
