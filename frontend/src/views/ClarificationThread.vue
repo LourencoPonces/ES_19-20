@@ -91,6 +91,8 @@ export default class ClarificationThread extends Vue {
       );
       this.request.addMessage(msg);
       this.request.resolved = this.newMessageResolvedState;
+
+      this.newMessageContent = '';
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
