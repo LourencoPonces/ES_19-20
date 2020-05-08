@@ -112,9 +112,12 @@ public class TournamentService {
     public List<TournamentDto> getAvailableTournaments(int executionId) {
         getCourseExecution(executionId);
 
-        List<TournamentDto> availableTournaments = tournamentRepository.findAvailableTournaments(executionId).stream().map(TournamentDto::new).collect(Collectors.toList());
-
-        return availableTournaments;
+        return tournamentRepository.findAll()
+                .stream()
+                .filter(tournament -> tournament.getStatus() == Tournament.Status.AVAILABLE &&
+                        tournament.getCourseExecution().getId() == executionId)
+                .map(TournamentDto::new)
+                .collect(Collectors.toList());
     }
 
     @Retryable(

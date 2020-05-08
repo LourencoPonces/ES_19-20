@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
@@ -141,7 +142,7 @@ public class Tournament {
     public Status getStatus() {
         if (isCancelled) return Status.CANCELLED;
 
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = DateHandler.now();
         if (now.isAfter(creationDate) && now.isBefore(availableDate))
             return Status.CREATED;
         else if (now.isAfter(availableDate) && now.isBefore(runningDate))
@@ -266,10 +267,10 @@ public class Tournament {
 
     private void setDates(TournamentDto tournamentDto) {
         this.creationDate = tournamentDto.getCreationDateDate();
-        if (this.creationDate == null) this.creationDate = LocalDateTime.now();
+        if (this.creationDate == null) this.creationDate = DateHandler.now();
 
         this.availableDate = tournamentDto.getAvailableDateDate();
-        if (this.availableDate == null) this.availableDate = creationDate;
+        if (this.availableDate == null) this.availableDate = DateHandler.now();
 
         this.runningDate = tournamentDto.getRunningDateDate();
         this.conclusionDate = tournamentDto.getConclusionDateDate();
