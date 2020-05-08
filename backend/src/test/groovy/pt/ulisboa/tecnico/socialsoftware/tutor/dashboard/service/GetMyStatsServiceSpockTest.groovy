@@ -284,12 +284,12 @@ class GetMyStatsServiceSpockTest extends Specification {
     static class ClarificationServiceImplTestContextConfiguration {
 
         @Bean
-        MyStatsService MyStatsService() {
+        MyStatsService myStatsService() {
             return new MyStatsService();
         }
 
         @Bean
-        ClarificationService ClarificationService() {
+        ClarificationService clarificationService() {
             return new ClarificationService();
         }
 
