@@ -68,7 +68,7 @@
             <template v-slot:activator="{ on }">
               <v-icon
                 :disabled="item.hasMessages"
-                small
+                large
                 class="mr-2"
                 v-on="on"
                 @click="deleteRequest(item)"
