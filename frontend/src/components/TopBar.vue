@@ -190,6 +190,17 @@
               </v-list-item-content>
             </v-list-item>
             <v-list-item
+              to="/student/tournaments-running"
+              data-cy="tournaments-running"
+            >
+              <v-list-item-action>
+                <v-icon>fa-users</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Running</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item
               to="/student/tournaments-created"
               data-cy="tournaments-created"
             >

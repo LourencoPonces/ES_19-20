@@ -23,6 +23,7 @@ import DashboardView from './views/student/dashboard/DashboardView.vue';
 import ScanView from './views/student/ScanView.vue';
 import ClarificationsStudentView from './views/student/ClarificationsView.vue';
 import StudentQuestionView from './views/student/studentQuestions/StudentQuestionView.vue';
+import RunningTournamentsView from '@/views/student/tournament/RunningTournamentsView.vue';
 import AvailableTournamentsView from '@/views/student/tournament/AvailableTournamentsView.vue';
 import CreatedTournamentsView from '@/views/student/tournament/CreatedTournamentsView.vue';
 
@@ -216,6 +217,15 @@ let router = new Router({
           component: DashboardView,
           meta: {
             title: process.env.VUE_APP_NAME + ' - Dashboard',
+            requiredAuth: 'Student'
+          }
+        },
+        {
+          path: 'tournaments-running',
+          name: 'tournaments-running',
+          component: RunningTournamentsView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - Running Tournaments',
             requiredAuth: 'Student'
           }
         },

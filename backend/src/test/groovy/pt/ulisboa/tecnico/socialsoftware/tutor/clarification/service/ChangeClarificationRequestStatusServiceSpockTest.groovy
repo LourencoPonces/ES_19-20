@@ -9,7 +9,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepos
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestAnswerRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationMessageRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
@@ -60,7 +60,7 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
     ClarificationRequestRepository clarificationRequestRepository
 
     @Autowired
-    ClarificationRequestAnswerRepository clarificationRequestAnswerRepository;
+    ClarificationMessageRepository clarificationMessageRepository
 
     @Autowired
     ClarificationService clarificationService
@@ -74,9 +74,6 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
     User student
     User teacher
     ClarificationRequestDto clarificationRequestDto
-    int studentId
-    int questionId
-    int teacherId
 
     def setup() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -84,7 +81,7 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
         quiz = createQuiz(1, courseExecution, "GENERATED")
         question = createQuestion(1, course)
         quizQuestion = new QuizQuestion(quiz, question, 1)
-        student = createStudent(new User(), 1, 'NAME', 'USERNAME_ONE', courseExecution)
+        student = createStudent(1, 'NAME', 'USERNAME_ONE', courseExecution)
         teacher = createTeacher(2, 'NAME', courseExecution)
         quizAnswer = new QuizAnswer(student, quiz)
 
@@ -96,12 +93,10 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
         userRepository.save(student)
         userRepository.save(teacher)
         quizAnswerRepository.save(quizAnswer)
-        questionId = question.getId()
-        studentId = student.getId()
-        teacherId = teacher.getId()
     }
 
-    private User createStudent(User student, int key, String name, String username, CourseExecution courseExecution) {
+    private static User createStudent(int key, String name, String username, CourseExecution courseExecution) {
+        def student = new User()
         student.setKey(key)
         student.setName(name)
         student.setUsername(username)
@@ -111,7 +106,7 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
         return student
     }
 
-    private User createTeacher(int key, String name, CourseExecution courseExecution) {
+    private static User createTeacher(int key, String name, CourseExecution courseExecution) {
         def u = new User()
         u.setKey(key)
         u.setName(name)
@@ -122,7 +117,7 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
         return u
     }
 
-    private Question createQuestion(int key, Course course) {
+    private static Question createQuestion(int key, Course course) {
         def question = new Question()
         question.setKey(key)
         question.setCourse(course)
@@ -131,7 +126,7 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
         return question
     }
 
-    private Quiz createQuiz(int key, CourseExecution courseExecution, String type) {
+    private static Quiz createQuiz(int key, CourseExecution courseExecution, String type) {
         def quiz = new Quiz()
         quiz.setKey(key)
         quiz.setType(type)
@@ -140,7 +135,7 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
         return quiz
     }
 
-    private CourseExecution createCourseExecution(Course course, String acronym, String term) {
+    private static CourseExecution createCourseExecution(Course course, String acronym, String term) {
         def courseExecution = new CourseExecution()
         courseExecution.setCourse(course)
         courseExecution.setAcronym(acronym)
@@ -152,17 +147,17 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
         given:
         clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent(CONTENT)
-        clarificationRequestDto = clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
+        clarificationRequestDto = clarificationService.submitClarificationRequest(question.id, student.id, clarificationRequestDto)
 
         when:
-        def result = clarificationService.changeClarificationRequestStatus(clarificationRequestDto.getId(), ClarificationRequest.RequestStatus.PUBLIC)
+        def result = clarificationService.changeClarificationRequestStatus(clarificationRequestDto.id, ClarificationRequest.RequestStatus.PUBLIC)
 
         then:
         result != null
-        result.getContent() == CONTENT
-        result.getOwner() == studentId
-        result.getQuestionId() == questionId
-        result.getStatus() == ClarificationRequest.RequestStatus.PUBLIC
+        result.content == CONTENT
+        result.creatorUsername == student.username
+        result.questionId == question.id
+        result.status == ClarificationRequest.RequestStatus.PUBLIC
     }
 
 
@@ -170,23 +165,23 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
         given:
         clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent(CONTENT)
-        clarificationRequestDto = clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
+        clarificationRequestDto = clarificationService.submitClarificationRequest(question.id, student.id, clarificationRequestDto)
 
         when:
-        clarificationService.changeClarificationRequestStatus(clarificationRequestDto.getId(), ClarificationRequest.RequestStatus.PUBLIC)
-        def result = clarificationService.changeClarificationRequestStatus(clarificationRequestDto.getId(), ClarificationRequest.RequestStatus.PRIVATE)
+        clarificationService.changeClarificationRequestStatus(clarificationRequestDto.id, ClarificationRequest.RequestStatus.PUBLIC)
+        def result = clarificationService.changeClarificationRequestStatus(clarificationRequestDto.id, ClarificationRequest.RequestStatus.PRIVATE)
 
         then:
         result != null
-        result.getContent() == CONTENT
-        result.getOwner() == studentId
-        result.getQuestionId() == questionId
-        result.getStatus() == ClarificationRequest.RequestStatus.PRIVATE
+        result.content == CONTENT
+        result.creatorUsername == student.username
+        result.questionId == question.id
+        result.status == ClarificationRequest.RequestStatus.PRIVATE
     }
 
     def "clarification request doesn't exist"() {
         when:
-        clarificationService.deleteClarificationRequest(studentId, NONEXISTENT_ID)
+        clarificationService.deleteClarificationRequest(student.id, NONEXISTENT_ID)
 
         then:
         def exception = thrown(TutorException)
@@ -198,7 +193,7 @@ class ChangeClarificationRequestStatusServiceSpockTest extends Specification {
 
         @Bean
         ClarificationService ClarificationService() {
-            return new ClarificationService();
+            return new ClarificationService()
         }
     }
 }

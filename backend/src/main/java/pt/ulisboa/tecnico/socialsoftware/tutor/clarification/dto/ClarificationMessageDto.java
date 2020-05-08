@@ -3,35 +3,41 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Transient;
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequestAnswer;
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationMessage;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class ClarificationRequestAnswerDto {
-    private Integer creatorId;
+public class ClarificationMessageDto {
+    private Integer id;
+    private String creatorUsername;
     private Integer requestId;
     private String content;
     private LocalDateTime creationDate;
 
+    // to set request resolved property when submitting a reply
+    private Boolean resolved;
+
     @Transient
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-    public ClarificationRequestAnswerDto(ClarificationRequestAnswer answer) {
+    public ClarificationMessageDto() {
+    }
+
+    public ClarificationMessageDto(ClarificationMessage answer) {
+        this.id = answer.getId();
         this.requestId = answer.getRequest().getId();
-        this.creatorId = answer.getCreator().getId();
+        this.creatorUsername = answer.getCreator().getUsername();
         this.content = answer.getContent();
-
-        if (answer.getCreationDate() != null)
-            this.creationDate = answer.getCreationDate();
+        this.creationDate = answer.getCreationDate();
     }
 
-    public Integer getCreatorId() {
-        return creatorId;
+    public Integer getId() {
+        return this.id;
     }
 
-    public void setCreatorId(Integer id) {
-        this.creatorId = id;
+    public String getCreatorUsername() {
+        return creatorUsername;
     }
 
     public Integer getRequestId() {
@@ -48,6 +54,14 @@ public class ClarificationRequestAnswerDto {
 
     public void setContent(String s) {
         this.content = s;
+    }
+
+    public Boolean getResolved() {
+        return this.resolved;
+    }
+
+    public void setResolved(Boolean resolved) {
+        this.resolved = resolved;
     }
 
     @JsonProperty

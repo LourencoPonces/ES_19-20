@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jmeterTestPlan version="1.2" properties="5.0" jmeter="5.2.1">
   <hashTree>
-    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test WS submitClarificationRequest" enabled="true">
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test WS deleteClarificationMessage" enabled="true">
       <stringProp name="TestPlan.comments"></stringProp>
       <boolProp name="TestPlan.functional_mode">false</boolProp>
       <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
@@ -26,7 +26,7 @@
           </elementProp>
           <elementProp name="questionId" elementType="Argument">
             <stringProp name="Argument.name">questionId</stringProp>
-            <stringProp name="Argument.value">2000</stringProp>
+            <stringProp name="Argument.value">9000</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="studentId" elementType="Argument">
@@ -34,14 +34,19 @@
             <stringProp name="Argument.value">676</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
-          <elementProp name="testHome" elementType="Argument">
-            <stringProp name="Argument.name">testHome</stringProp>
-            <stringProp name="Argument.value">${__BeanShell(import org.apache.jmeter.services.FileServer; FileServer.getFileServer().getBaseDir();)}</stringProp>
+          <elementProp name="teacherId" elementType="Argument">
+            <stringProp name="Argument.name">teacherId</stringProp>
+            <stringProp name="Argument.value">677</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="requestId" elementType="Argument">
             <stringProp name="Argument.name">requestId</stringProp>
-            <stringProp name="Argument.value">1</stringProp>
+            <stringProp name="Argument.value">9000</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="testHome" elementType="Argument">
+            <stringProp name="Argument.name">testHome</stringProp>
+            <stringProp name="Argument.value">${__BeanShell(import org.apache.jmeter.services.FileServer; FileServer.getFileServer().getBaseDir();)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -80,30 +85,16 @@
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
       </SetupThreadGroup>
       <hashTree>
-        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
-          <collectionProp name="HeaderManager.headers">
-            <elementProp name="" elementType="Header">
-              <stringProp name="Header.name">Authorization</stringProp>
-              <stringProp name="Header.value">${token}</stringProp>
-            </elementProp>
-            <elementProp name="" elementType="Header">
-              <stringProp name="Header.name">Content-Type</stringProp>
-              <stringProp name="Header.value">application/json</stringProp>
-            </elementProp>
-          </collectionProp>
-        </HeaderManager>
-        <hashTree/>
         <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="JDBC Request" enabled="true">
           <stringProp name="dataSource">sampleReq</stringProp>
           <stringProp name="queryType">Update Statement</stringProp>
-          <stringProp name="query">INSERT INTO questions(id, title, status, course_id, key) values(2000, &apos;test_title&apos;, &apos;AVAILABLE&apos;, 2, 2000);
-INSERT INTO quizzes(id, title, course_execution_id, key) values (6000, &apos;test_title&apos;, 11, 6000);
-INSERT INTO quiz_questions(id, sequence, question_id, quiz_id) values (41000, 0, 2000, 6000);
-INSERT INTO quiz_answers(id, completed, quiz_id, user_id, used_in_statistics) values (9000, &apos;t&apos;, 6000, 676, &apos;f&apos;);
-INSERT INTO question_answers(id, quiz_answer_id, quiz_question_id, sequence) values (6700, 9000, 41000, 0);
-INSERT INTO clarification_requests(id, user_id, question_id) VALUES (${requestId}, ${studentId}, ${questionId});
-INSERT INTO clarification_request_answers(request_id, content, creator_id, submission_date) VALUES (${requestId}, &apos;test_content&apos;, ${studentId}, &apos;2020-03-27 17:23&apos;);
-</stringProp>
+          <stringProp name="query">INSERT INTO questions(id, title, status, course_id, key) VALUES (2000, &apos;test_title&apos;, &apos;AVAILABLE&apos;, 2, 2000);
+INSERT INTO quizzes(id, title, course_execution_id, key) VALUES (6000, &apos;test_title&apos;, 11, 6000);
+INSERT INTO quiz_questions(id, sequence, question_id, quiz_id) VALUES (41000, 0, 2000, 6000);
+INSERT INTO quiz_answers(id, completed, quiz_id, user_id, used_in_statistics) VALUES (9000, &apos;t&apos;, 6000, ${studentId}, &apos;f&apos;);
+INSERT INTO question_answers(id, quiz_answer_id, quiz_question_id, sequence) VALUES (6700, 9000, 41000, 0);
+INSERT INTO clarification_requests(id, key, creator_id, question_id, content, creation_date, status, resolved) VALUES (${requestId}, ${requestId}, ${studentId}, 2000, &apos;TEST_REQUEST_CONTENT&apos;, &apos;2020-05-07 21:45&apos;, &apos;PRIVATE&apos;, FALSE);
+INSERT INTO clarification_messages(id, request_id, creator_id, content, creation_date) VALUES (${requestId}, ${requestId}, ${teacherId}, &apos;TEST_ANSWER_CONTENT&apos;, &apos;2020-05-07 21:45&apos;);</stringProp>
           <stringProp name="queryArguments"></stringProp>
           <stringProp name="queryArgumentsTypes"></stringProp>
           <stringProp name="variableNames"></stringProp>
@@ -165,7 +156,7 @@ INSERT INTO clarification_request_answers(request_id, content, creator_id, submi
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
       </ThreadGroup>
       <hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Login as Demo Student" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Login as Demo Teacher" enabled="true">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments"/>
           </elementProp>
@@ -173,7 +164,7 @@ INSERT INTO clarification_request_answers(request_id, content, creator_id, submi
           <stringProp name="HTTPSampler.port">${port}</stringProp>
           <stringProp name="HTTPSampler.protocol"></stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-          <stringProp name="HTTPSampler.path">/auth/demo/student</stringProp>
+          <stringProp name="HTTPSampler.path">/auth/demo/teacher</stringProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -190,43 +181,6 @@ INSERT INTO clarification_request_answers(request_id, content, creator_id, submi
             <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
           </JSONPostProcessor>
           <hashTree/>
-          <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
-            <boolProp name="ResultCollector.error_logging">false</boolProp>
-            <objProp>
-              <name>saveConfig</name>
-              <value class="SampleSaveConfiguration">
-                <time>true</time>
-                <latency>true</latency>
-                <timestamp>true</timestamp>
-                <success>true</success>
-                <label>true</label>
-                <code>true</code>
-                <message>true</message>
-                <threadName>true</threadName>
-                <dataType>true</dataType>
-                <encoding>false</encoding>
-                <assertions>true</assertions>
-                <subresults>true</subresults>
-                <responseData>false</responseData>
-                <samplerData>false</samplerData>
-                <xml>false</xml>
-                <fieldNames>true</fieldNames>
-                <responseHeaders>false</responseHeaders>
-                <requestHeaders>false</requestHeaders>
-                <responseDataOnError>false</responseDataOnError>
-                <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
-                <assertionsResultsToSave>0</assertionsResultsToSave>
-                <bytes>true</bytes>
-                <sentBytes>true</sentBytes>
-                <url>true</url>
-                <threadCounts>true</threadCounts>
-                <idleTime>true</idleTime>
-                <connectTime>true</connectTime>
-              </value>
-            </objProp>
-            <stringProp name="filename"></stringProp>
-          </ResultCollector>
-          <hashTree/>
         </hashTree>
         <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Authenticated Requests" enabled="true"/>
         <hashTree>
@@ -236,14 +190,10 @@ INSERT INTO clarification_request_answers(request_id, content, creator_id, submi
                 <stringProp name="Header.name">Authorization</stringProp>
                 <stringProp name="Header.value">${token}</stringProp>
               </elementProp>
-              <elementProp name="" elementType="Header">
-                <stringProp name="Header.name">Content-Type</stringProp>
-                <stringProp name="Header.value">application/json</stringProp>
-              </elementProp>
             </collectionProp>
           </HeaderManager>
           <hashTree/>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request to get request&apos;s answer" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request to delete clarification request message" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
               <collectionProp name="Arguments.arguments"/>
             </elementProp>
@@ -251,8 +201,8 @@ INSERT INTO clarification_request_answers(request_id, content, creator_id, submi
             <stringProp name="HTTPSampler.port">${port}</stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/clarifications/${requestId}/answer</stringProp>
-            <stringProp name="HTTPSampler.method">GET</stringProp>
+            <stringProp name="HTTPSampler.path">/clarifications/messages/${requestId}</stringProp>
+            <stringProp name="HTTPSampler.method">DELETE</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
             <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
@@ -261,44 +211,7 @@ INSERT INTO clarification_request_answers(request_id, content, creator_id, submi
             <stringProp name="HTTPSampler.connect_timeout"></stringProp>
             <stringProp name="HTTPSampler.response_timeout"></stringProp>
           </HTTPSamplerProxy>
-          <hashTree>
-            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert requestId" enabled="true">
-              <stringProp name="JSON_PATH">$.requestId</stringProp>
-              <stringProp name="EXPECTED_VALUE">${requestId}</stringProp>
-              <boolProp name="JSONVALIDATION">true</boolProp>
-              <boolProp name="EXPECT_NULL">false</boolProp>
-              <boolProp name="INVERT">false</boolProp>
-              <boolProp name="ISREGEX">false</boolProp>
-            </JSONPathAssertion>
-            <hashTree/>
-            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert creatorId" enabled="true">
-              <stringProp name="JSON_PATH">$.creatorId</stringProp>
-              <stringProp name="EXPECTED_VALUE">${studentId}</stringProp>
-              <boolProp name="JSONVALIDATION">true</boolProp>
-              <boolProp name="EXPECT_NULL">false</boolProp>
-              <boolProp name="INVERT">false</boolProp>
-              <boolProp name="ISREGEX">false</boolProp>
-            </JSONPathAssertion>
-            <hashTree/>
-            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert content" enabled="true">
-              <stringProp name="JSON_PATH">$.content</stringProp>
-              <stringProp name="EXPECTED_VALUE">test_content</stringProp>
-              <boolProp name="JSONVALIDATION">true</boolProp>
-              <boolProp name="EXPECT_NULL">false</boolProp>
-              <boolProp name="INVERT">false</boolProp>
-              <boolProp name="ISREGEX">false</boolProp>
-            </JSONPathAssertion>
-            <hashTree/>
-            <JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="Assert creationDate" enabled="true">
-              <stringProp name="JSON_PATH">$.creationDate</stringProp>
-              <stringProp name="EXPECTED_VALUE">2020-03-27 17:23</stringProp>
-              <boolProp name="JSONVALIDATION">true</boolProp>
-              <boolProp name="EXPECT_NULL">false</boolProp>
-              <boolProp name="INVERT">false</boolProp>
-              <boolProp name="ISREGEX">false</boolProp>
-            </JSONPathAssertion>
-            <hashTree/>
-          </hashTree>
+          <hashTree/>
         </hashTree>
         <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
@@ -391,13 +304,13 @@ INSERT INTO clarification_request_answers(request_id, content, creator_id, submi
       <hashTree>
         <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="JDBC Request" enabled="true">
           <stringProp name="dataSource">sampleReq</stringProp>
-          <stringProp name="query">DELETE FROM clarification_request_answers;
-DELETE FROM clarification_requests;
+          <stringProp name="query">DELETE FROM clarification_messages WHERE request_id = ${requestId};
+DELETE FROM clarification_requests WHERE id = ${requestId};
 DELETE FROM question_answers WHERE id = 6700;
-DELETE FROM quiz_answers where id = 9000;
-DELETE FROM quiz_questions where id = 41000;
-DELETE FROM quizzes where title = &apos;test_title&apos;;
-DELETE FROM questions where title = &apos;test_title&apos;;</stringProp>
+DELETE FROM quiz_answers WHERE id = 9000;
+DELETE FROM quiz_questions WHERE id = 41000;
+DELETE FROM quizzes WHERE title = &apos;test_title&apos;;
+DELETE FROM questions WHERE title = &apos;test_title&apos;;</stringProp>
           <stringProp name="queryArguments"></stringProp>
           <stringProp name="queryArgumentsTypes"></stringProp>
           <stringProp name="queryTimeout"></stringProp>
