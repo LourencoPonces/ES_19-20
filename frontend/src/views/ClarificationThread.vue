@@ -40,6 +40,7 @@
         </v-row>
       </v-container>
     </v-card>
+    <span v-if="!request.hasMessages">No messages (yet)</span>
     <v-container fluid>
       <v-row>
         <v-textarea
