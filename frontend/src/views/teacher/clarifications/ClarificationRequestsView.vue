@@ -25,7 +25,12 @@
       </template>
 
       <template v-slot:item.content="{ item }">
-        <div class="short-content">{{ item.content }}</div>
+        <div
+          class="short-content"
+          :data-cy="'req-' + item.content.slice(0, 15)"
+        >
+          {{ item.content }}
+        </div>
       </template>
 
       <template v-slot:item.resolved="{ item }">

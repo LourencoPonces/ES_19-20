@@ -126,78 +126,55 @@ Cypress.Commands.add('submitClarificationRequest', (content, n) => {
   }
 });
 
-Cypress.Commands.add('goToMyClarifications', () => {
+Cypress.Commands.add('goToMyClarificationsStudent', () => {
   cy.get('[data-cy="my-area"]').click();
   cy.get('[data-cy="clarifications"]').click();
 });
 
-Cypress.Commands.add('deleteAllRequests', n => {
-  if (n > 0) {
-    for (i = 0; i < n; i++) {
-      cy.wait(500);
-      cy.get('[data-cy="table"]')
-        .find('tbody')
-        .children()
-        .should('have.length', n - i)
-        .first();
-
-      cy.get('[data-cy="delete"]')
-        .first()
-        .click();
-    }
-  }
-});
-
-Cypress.Commands.add('editClarificationRequest', content => {
-  cy.wait(500);
-  cy.get('[data-cy="edit"]')
-    .first()
-    .click();
-
-  cy.get('.v-dialog')
-    .get('[data-cy="inputNewContent"]')
-    .type(content);
-
-  cy.get('.v-dialog')
-    .get('[data-cy="actions"]')
-    .children()
-    .last()
-    .click();
-
-  cy.get('[data-cy="table"]')
-    .find('tbody')
-    .children()
-    .should('have.length', 1)
-    .first()
-    .should('contain.text', content);
-});
-
-Cypress.Commands.add(
-  'answerClarificationRequest',
-  (requestText, answerText) => {
-    cy.get('[data-cy="management"]').click();
-    cy.get('[data-cy="teacherClarifications"]').click();
-    cy.get(
-      `[data-cy^="answerClarification-${requestText.slice(0, 15)}"]`
-    ).click();
-    cy.get('[data-cy="answerField"]').type(answerText);
-    cy.get('[data-cy="answerSubmit"]').click();
-  }
-);
-
-Cypress.Commands.add('deleteClarificationMessage', requestText => {
+Cypress.Commands.add('goToMyClarificationsTeacher', () => {
   cy.get('[data-cy="management"]').click();
   cy.get('[data-cy="teacherClarifications"]').click();
-  cy.get(
-    `[data-cy^="answerClarification-${requestText.slice(0, 15)}"]`
-  ).click();
+});
 
-  cy.get('[data-cy="answerDelete"]').click();
+Cypress.Commands.add('deleteClarificationRequest', requestText => {
+  cy.get(`[data-cy="req-${requestText.slice(0, 15)}"]`)
+    .first()
+    .parent()
+    .parent()
+    .find('[data-cy="deleteRequest"]')
+    .click();
+});
+
+Cypress.Commands.add('expandClarificationRequest', requestText => {
+  cy.get(`[data-cy="req-${requestText.slice(0, 15)}"]`)
+    .first()
+    .parent()
+    .parent()
+    .find('button.mdi-chevron-down')
+    .click();
+});
+
+Cypress.Commands.add('messageClarificationRequest', (msgText, resolved) => {
+  cy.get('[data-cy="newMessageContent"]').type(msgText);
+
+  if (resolved) {
+    cy.get('input[data-cy="newMessageUpdateResolved"]').check({
+      force: true
+    }); /* ripple may be covering stuff */
+  } else {
+    cy.get('input[data-cy="newMessageUpdateResolved"]').uncheck({
+      force: true
+    }); /* ripple may be covering stuff */
+  }
+
+  cy.get('[data-cy="newMessageSubmit"]').click();
+});
+
+Cypress.Commands.add('deleteClarificationMessage', msgText => {
+  cy.get(`[data-cy="deleteMessage-${msgText.slice(0, 15)}"]`).click();
 });
 
 Cypress.Commands.add('changeClarificationRequestStatus', requestText => {
-  cy.get('[data-cy="management"]').click();
-  cy.get('[data-cy="teacherClarifications"]').click();
   cy.get(`[data-cy^="private-${requestText.slice(0, 15)}"]`)
     .first()
     .should('exist');
@@ -463,21 +440,13 @@ Cypress.Commands.add(
       .find('i')
       .click();
 
-    if (newTitle != null && newTitle.length > 0) {
-      cy.get('[data-cy="StudentQuestionTitle"]')
-        .clear()
-        .type(newTitle);
-    } else {
-      cy.get('[data-cy="StudentQuestionTitle"]').clear();
-    }
+    cy.get('[data-cy="StudentQuestionTitle"]')
+      .clear()
+      .type(newTitle);
 
-    if (newContent != null && newContent.length > 0) {
-      cy.get('[data-cy="StudentQuestionContent"]')
-        .clear()
-        .type(newContent);
-    } else {
-      cy.get('[data-cy="StudentQuestionContent"]').clear();
-    }
+    cy.get('[data-cy="StudentQuestionContent"]')
+      .clear()
+      .type(newContent);
 
     for (let i = 1; i < newOptions.length + 1; i++) {
       cy.get(`[data-cy=Option${i}]`)
