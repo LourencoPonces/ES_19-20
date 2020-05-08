@@ -31,6 +31,7 @@
       }}</v-col>
       <v-col v-else>Private</v-col>
     </v-row>
+    <v-divider />
     <v-row data-cy="tournamentsParticipatedRow">
       <v-col><b>Tournaments Participated:</b></v-col>
       <v-col v-if="stats.isPublic(stats.statsNames.TOURNAMENTS_PARTICIPATED)">{{
@@ -38,6 +39,7 @@
         }}</v-col>
       <v-col v-else>Private</v-col>
     </v-row>
+    <v-divider />
     <v-row data-cy="requestsSubmittedRow">
       <v-col><b>Tournaments Score:</b></v-col>
       <v-col v-if="stats.isPublic(stats.statsNames.TOURNAMENTS_SCORE)">{{
