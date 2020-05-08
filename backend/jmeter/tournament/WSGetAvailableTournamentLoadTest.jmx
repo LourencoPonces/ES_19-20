@@ -324,10 +324,10 @@
 	&quot;title&quot;: &quot;TEST_TOURNAMENT${tournamentIndexTitle}&quot;,&#xd;
 	&quot;numberOfQuestions&quot;: 1,&#xd;
 	&quot;topics&quot;: ${topics},&#xd;
-	&quot;creationDate&quot;: &quot;2010-01-01 00:00&quot;,&#xd;
-	&quot;availableDate&quot;: &quot;2010-01-02 00:00&quot;,&#xd;
-	&quot;runningDate&quot;: &quot;2030-01-01 00:00&quot;,&#xd;
-	&quot;conclusionDate&quot;: &quot;2030-01-02 00:00&quot;&#xd;
+	&quot;creationDate&quot;: &quot;2010-01-01T23:00:00.000Z&quot;,&#xd;
+	&quot;availableDate&quot;: &quot;2010-01-02T2300:00.000Z&quot;,&#xd;
+	&quot;runningDate&quot;: &quot;2030-01-01T23:00:00.000Z&quot;,&#xd;
+	&quot;conclusionDate&quot;: &quot;2030-01-02T23:00:00.000Z&quot;&#xd;
 }&#xd;
 </stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>

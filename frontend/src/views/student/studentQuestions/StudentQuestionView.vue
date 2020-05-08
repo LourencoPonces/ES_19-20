@@ -22,6 +22,7 @@
               v-model="search"
               append-icon="search"
               label="Search"
+              data-cy="search-input"
               class="mx-2"
             />
 

@@ -314,7 +314,7 @@
 	&quot;topics&quot;: ${topics},&#xd;
 	&quot;creationDate&quot;: &quot;2010-01-01T23:00:00.000Z&quot;,&#xd;
 	&quot;availableDate&quot;: &quot;2010-01-02T23:00:00.000Z&quot;,&#xd;
-	&quot;runningDate&quot;: &quot;2030-01-01T23:00:00.000Z&quot;,&#xd;
+	&quot;runningDate&quot;: &quot;2010-01-03T23:00:00.000Z&quot;,&#xd;
 	&quot;conclusionDate&quot;: &quot;2030-01-02T23:00:00.000Z&quot;&#xd;
 }&#xd;
 </stringProp>
@@ -375,7 +375,7 @@
             </ResultCollector>
             <hashTree/>
           </hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get Created Tournaments" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Get Signed-up Running Tournaments" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
               <collectionProp name="Arguments.arguments"/>
             </elementProp>
@@ -383,7 +383,7 @@
             <stringProp name="HTTPSampler.port"></stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">/executions/${courseExecutionId}/tournaments/created</stringProp>
+            <stringProp name="HTTPSampler.path">/executions/${courseExecutionId}/tournaments/running/signed-up</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>

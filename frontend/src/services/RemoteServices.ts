@@ -382,6 +382,21 @@ export default class RemoteServices {
       });
   }
 
+  static async getSignedUpRunningTournaments(): Promise<Tournament[]> {
+    return httpClient
+      .get(
+        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments/running/signed-up`
+      )
+      .then(response => {
+        return response.data.map((tournament: any) => {
+          return new Tournament(tournament);
+        });
+      })
+      .catch(async error => {
+        console.log(this.errorMessage(error));
+      });
+  }
+
   static async getCreatedTournaments(): Promise<Tournament[]> {
     return httpClient
       .get(
@@ -420,6 +435,16 @@ export default class RemoteServices {
   static async deleteTournament(tournament: Tournament) {
     try {
       await httpClient.delete(`/tournaments/${tournament.id}`);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
+  static async getTournamentQuiz(
+    tournament: Tournament
+  ): Promise<StatementQuiz> {
+    try {
+      return (await httpClient.get(`/tournaments/${tournament.id}/quiz`)).data;
     } catch (error) {
       throw Error(await this.errorMessage(error));
     }
