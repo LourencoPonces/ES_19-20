@@ -198,8 +198,8 @@
 	&quot;title&quot;: &quot;TEST_TOURNAMENT&quot;,&#xd;
 	&quot;numberOfQuestions&quot;: 1,&#xd;
 	&quot;topics&quot;: ${topics},&#xd;
-	&quot;runningDate&quot;: &quot;2030-01-02 00:00&quot;,&#xd;
-	&quot;conclusionDate&quot;: &quot;2030-01-03 00:00&quot;&#xd;
+	&quot;runningDate&quot;: &quot;2030-01-02T23:00:00.000Z&quot;,&#xd;
+	&quot;conclusionDate&quot;: &quot;2030-01-03T23:00:00.000Z&quot;&#xd;
 }&#xd;
 </stringProp>
                     <stringProp name="Argument.metadata">=</stringProp>
