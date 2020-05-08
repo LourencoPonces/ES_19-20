@@ -62,6 +62,12 @@ export default class RunningTournamentsView extends Vue {
 
   headers: object = [
     {
+      value: 'solve-quiz-button',
+      align: 'center',
+      width: '10%',
+      sortable: false
+    },
+    {
       text: 'Title',
       value: 'title',
       align: 'center',
@@ -104,12 +110,6 @@ export default class RunningTournamentsView extends Vue {
       value: 'participants.length',
       align: 'center',
       width: '10%'
-    },
-    {
-      value: 'solve-quiz-button',
-      align: 'center',
-      width: '10%',
-      sortable: false
     }
   ];
 
