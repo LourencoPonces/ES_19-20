@@ -9,7 +9,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepos
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
@@ -64,9 +63,6 @@ class GetOtherUserStatsServiceSpockTest extends Specification {
 
     @Autowired
     ClarificationRequestRepository clarificationRequestRepository
-
-    @Autowired
-    ClarificationRequestAnswerRepository clarificationRequestAnswerRepository
 
     @Autowired
     MyStatsService myStatsService
@@ -185,9 +181,9 @@ class GetOtherUserStatsServiceSpockTest extends Specification {
         exception.getErrorMessage() == error_message
 
         where:
-        isUserId | isCourseId  || error_message
-        false    | true        || ErrorMessage.USER_NOT_FOUND
-        true     | false       || ErrorMessage.COURSE_NOT_FOUND
+        isUserId | isCourseId || error_message
+        false    | true       || ErrorMessage.USER_NOT_FOUND
+        true     | false      || ErrorMessage.COURSE_NOT_FOUND
     }
 
     private int getUserId(boolean isUserId) {
