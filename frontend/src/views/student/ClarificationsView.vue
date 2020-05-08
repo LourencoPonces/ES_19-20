@@ -66,7 +66,7 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <v-icon
-                :disabled="item.hasAnswer"
+                :disabled="item.hasMessages"
                 small
                 class="mr-2"
                 v-on="on"

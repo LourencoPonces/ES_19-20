@@ -1,35 +1,58 @@
 <template>
-  <div>
+  <div class="container">
     <v-card v-for="msg in request.messages" v-bind:key="msg.id" class="message">
-      <v-avatar :size="AVATAR_SIZE + 'px'">
-        <img :src="imgForUsername(msg.creatorUsername)" alt="avatar" />
-      </v-avatar>
-      <v-tooltip bottom>
-        <template v-slot:activator="{ on }">
-          <v-icon
-            small
-            class="mr-2"
-            v-on="on"
-            @click="deleteMessage(msg)"
-            color="red"
-            :data-cy="'deleteMessage-' + msg.content.slice(0, 15)"
-            >delete</v-icon
-          >
-        </template>
-      </v-tooltip>
-      <div>{{ msg.creationDate }}</div>
-      <div>{{ msg.content }}</div>
+      <v-container fluid>
+        <v-row class="align-center">
+          <v-col cols="auto">
+            <v-avatar :size="AVATAR_SIZE + 'px'">
+              <img :src="imgForUsername(msg.creatorUsername)" alt="avatar" />
+            </v-avatar>
+          </v-col>
+          <v-col cols="auto">
+            <v-container fluid>
+              <div>{{ nameForUsername(msg.creatorUsername) }}</div>
+              <div>{{ msg.creationDate }}</div>
+            </v-container>
+          </v-col>
+          <v-col class="ml-auto" cols="auto">
+            <v-tooltip bottom v-if="messageIsMine(msg)">
+              <template v-slot:activator="{ on }">
+                <v-icon
+                  small
+                  class="mr-2"
+                  v-on="on"
+                  @click="deleteMessage(msg)"
+                  color="red"
+                  :data-cy="'deleteMessage-' + msg.content.slice(0, 15)"
+                  aria-label="delete message"
+                  >delete</v-icon
+                >
+              </template>
+              Delete Message
+            </v-tooltip>
+          </v-col>
+        </v-row>
+        <v-row class="message-content">
+          {{ msg.content }}
+        </v-row>
+      </v-container>
     </v-card>
-    <div>
-      <v-textarea
-        v-model="newMessageContent"
-        data-cy="newMessageContent"
-      ></v-textarea>
-      <v-checkbox v-model="newMessageResolvedState"></v-checkbox>
-      <v-btn primary @click="submitMessage()">
-        Submit Answer
-      </v-btn>
-    </div>
+    <v-container fluid>
+      <v-row>
+        <v-textarea
+          label="Message Content"
+          v-model="newMessageContent"
+          data-cy="newMessageContent"
+        />
+      </v-row>
+      <v-row>
+        <v-switch v-model="newMessageResolvedState" label="Resolved" />
+        <v-spacer />
+        <v-btn primary @click="submitMessage()">
+          Submit Message
+        </v-btn>
+      </v-row>
+    </v-container>
   </div>
 </template>
 
@@ -47,10 +70,13 @@ export default class ClarificationThread extends Vue {
   newMessageContent: string = '';
   newMessageResolvedState: boolean = false;
 
+  myUsername: string = '';
+
   readonly AVATAR_SIZE: number = 52;
 
-  attached() {
+  beforeMount() {
     this.newMessageResolvedState = this.request.getResolved();
+    this.myUsername = this.$store.getters.getUser.username;
   }
 
   async submitMessage(): Promise<void> {
@@ -76,6 +102,10 @@ export default class ClarificationThread extends Vue {
     }
   }
 
+  messageIsMine(msg: ClarificationMessage): boolean {
+    return msg.getCreatorUsername() == this.myUsername;
+  }
+
   imgForUsername(username: string): string {
     if (username.startsWith('ist')) {
       return `https://fenix.tecnico.ulisboa.pt/user/photo/${username}?size=${this.AVATAR_SIZE}`;
@@ -91,8 +121,15 @@ export default class ClarificationThread extends Vue {
 </script>
 
 <style scoped lang="scss">
+.container {
+  padding: 10px;
+}
 .message {
+  padding: 10px;
   margin-bottom: 20px;
   margin-top: 20px;
+}
+.message-content {
+  margin: 10px;
 }
 </style>
