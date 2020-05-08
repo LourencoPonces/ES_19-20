@@ -7,8 +7,10 @@ import org.springframework.context.annotation.Bean
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationMessageDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestAnswerRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationMessageRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
@@ -27,13 +29,10 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
 @DataJpaTest
-class UpdateClarificationRequestServiceSpockTest extends Specification {
+class DeleteMessageSpockTest extends Specification {
     static final String COURSE_NAME = "Software Architecture"
     static final String ACRONYM = "AS1"
     static final String ACADEMIC_TERM = "1 SEM"
-    static final String CONTENT = "Test Content"
-    static final String NEW_CONTENT = "Edited Content"
-    static final int NONEXISTENT_ID = 5000
 
     @Autowired
     CourseRepository courseRepository
@@ -60,7 +59,7 @@ class UpdateClarificationRequestServiceSpockTest extends Specification {
     ClarificationRequestRepository clarificationRequestRepository
 
     @Autowired
-    ClarificationRequestAnswerRepository clarificationRequestAnswerRepository;
+    ClarificationMessageRepository clarificationMessageRepository
 
     @Autowired
     ClarificationService clarificationService
@@ -72,18 +71,25 @@ class UpdateClarificationRequestServiceSpockTest extends Specification {
     QuizQuestion quizQuestion
     QuizAnswer quizAnswer
     User student
-    ClarificationRequestDto clarificationRequestDto
-    int studentId
-    int questionId
-    
+    User teacher
+    ClarificationRequest clarificationRequest
+    int reqId
+
     def setup() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseExecution = createCourseExecution(course, ACRONYM, ACADEMIC_TERM)
         quiz = createQuiz(1, courseExecution, "GENERATED")
         question = createQuestion(1, course)
         quizQuestion = new QuizQuestion(quiz, question, 1)
-        student = createStudent(new User(), 1, 'NAME', 'USERNAME_ONE', courseExecution)
+        student = createStudent(1, "STUDENT", courseExecution)
+        teacher = createTeacher(2, "TEACHER", courseExecution)
         quizAnswer = new QuizAnswer(student, quiz)
+
+        def dto = new ClarificationRequestDto()
+        dto.setKey(1)
+        dto.setContent("some request")
+        clarificationRequest = new ClarificationRequest(question, student, dto)
+        student.addClarificationRequest(clarificationRequest)
 
         courseRepository.save(course)
         courseExecutionRepository.save(courseExecution)
@@ -91,22 +97,36 @@ class UpdateClarificationRequestServiceSpockTest extends Specification {
         questionRepository.save(question)
         quizQuestionRepository.save(quizQuestion)
         userRepository.save(student)
+        userRepository.save(teacher)
         quizAnswerRepository.save(quizAnswer)
-        questionId = question.getId()
-        studentId = student.getId()
+        clarificationRequestRepository.save(clarificationRequest)
+
+        reqId = clarificationRequest.getId()
     }
 
-    private User createStudent(User student, int key, String name, String username, CourseExecution courseExecution) {
-        student.setKey(key)
-        student.setName(name)
-        student.setUsername(username)
-        student.setRole(User.Role.STUDENT)
-        student.getCourseExecutions().add(courseExecution)
-        courseExecution.getUsers().add(student)
-        return student
+    private static User createStudent(int key, String name, CourseExecution courseExecution) {
+        def u = new User()
+        u.setKey(key)
+        u.setName(name)
+        u.setUsername(name)
+        u.setRole(User.Role.STUDENT)
+        u.getCourseExecutions().add(courseExecution)
+        courseExecution.getUsers().add(u)
+        return u
     }
 
-    private Question createQuestion(int key, Course course) {
+    private static User createTeacher(int key, String name, CourseExecution courseExecution) {
+        def u = new User()
+        u.setKey(key)
+        u.setName(name)
+        u.setUsername(name)
+        u.setRole(User.Role.TEACHER)
+        u.getCourseExecutions().add(courseExecution)
+        courseExecution.getUsers().add(u)
+        return u
+    }
+
+    private static Question createQuestion(int key, Course course) {
         def question = new Question()
         question.setKey(key)
         question.setCourse(course)
@@ -115,7 +135,7 @@ class UpdateClarificationRequestServiceSpockTest extends Specification {
         return question
     }
 
-    private Quiz createQuiz(int key, CourseExecution courseExecution, String type) {
+    private static Quiz createQuiz(int key, CourseExecution courseExecution, String type) {
         def quiz = new Quiz()
         quiz.setKey(key)
         quiz.setType(type)
@@ -124,7 +144,7 @@ class UpdateClarificationRequestServiceSpockTest extends Specification {
         return quiz
     }
 
-    private CourseExecution createCourseExecution(Course course, String acronym, String term) {
+    private static CourseExecution createCourseExecution(Course course, String acronym, String term) {
         def courseExecution = new CourseExecution()
         courseExecution.setCourse(course)
         courseExecution.setAcronym(acronym)
@@ -132,31 +152,37 @@ class UpdateClarificationRequestServiceSpockTest extends Specification {
         return courseExecution
     }
 
-    def "student updates submitted clarification request"() {
-        given:
-        clarificationRequestDto = new ClarificationRequestDto()
-        clarificationRequestDto.setContent(CONTENT)
-        clarificationRequestDto = clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
-        clarificationRequestDto.setContent(NEW_CONTENT)
 
-        when:
-        clarificationService.updateClarificationRequest(clarificationRequestDto)
-        def result = clarificationService.getStudentClarificationRequests(studentId)
+    def "remove an answer"() {
+        given: "answered clarification request"
+        def msgDto = new ClarificationMessageDto()
+        msgDto.setContent("some answer")
+        msgDto = clarificationService.submitClarificationMessage(teacher.id, reqId, msgDto)
 
-        then:
-        result != null
-        result.size() == 1
-        result[0].getContent() == NEW_CONTENT
+        when: "message is removed"
+        clarificationService.deleteClarificationMessage(teacher.id, msgDto.id)
+
+        then: "clarification request has no messages"
+        clarificationRequest.getMessages().isEmpty()
+
+        and: "message was deleted"
+        clarificationMessageRepository.count() == 0
+
+        and: "user doesn't have the message"
+        teacher.getClarificationMessages().stream()
+                .noneMatch({ m -> m.content == msgDto.content })
+
+        and: "clarification request still exists"
+        clarificationRequestRepository.count() == 1
     }
 
+    def "don't remove non-existent things"() {
+        when: "non existent message is removed"
+        clarificationService.deleteClarificationMessage(student.id, 404)
 
-    def "clarification request doesn't exist"() {
-        when:
-        clarificationService.deleteClarificationRequest(studentId, NONEXISTENT_ID)
-
-        then:
+        then: "thrown exception"
         def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.CLARIFICATION_REQUEST_NOT_FOUND
+        exception.getErrorMessage() == ErrorMessage.CLARIFICATION_MESSAGE_NOT_FOUND
     }
 
     @TestConfiguration
@@ -164,7 +190,7 @@ class UpdateClarificationRequestServiceSpockTest extends Specification {
 
         @Bean
         ClarificationService ClarificationService() {
-            return new ClarificationService();
+            return new ClarificationService()
         }
     }
 }

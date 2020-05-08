@@ -1,5 +1,5 @@
 <template>
-  <v-card class="table">
+  <v-card>
     <v-data-table
       :headers="headers"
       :custom-filter="customFilter"
@@ -7,6 +7,9 @@
       :search="search"
       :mobile-breakpoint="0"
       :items-per-page="50"
+      show-expand
+      single-expand
+      class="table"
       :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
     >
       <template v-slot:top>
@@ -20,14 +23,18 @@
           />
         </v-card-title>
       </template>
+
       <template v-slot:item.content="{ item }">
-        <span style="white-space: pre;">{{ item.content }}</span>
+        <div class="short-content">{{ item.content }}</div>
       </template>
-      <template v-slot:item.hasAnswer="{ item }">
+
+      <template v-slot:item.resolved="{ item }">
         <v-simple-checkbox
-          :value="item.hasAnswer"
+          :value="item.resolved"
           readonly
-          :aria-label="item.hasAnswer"
+          :aria-label="
+            item.resolved ? 'request was resolved' : 'request was not resolved'
+          "
         />
       </template>
 
@@ -39,6 +46,7 @@
               text
               @click="changeRequestStatus(item)"
               :data-cy="'changeStatus-' + item.content.slice(0, 15)"
+              :aria-label="item.isPrivate() ? 'Make Public' : 'Make Private'"
             >
               <v-icon
                 v-if="item.isPrivate()"
@@ -61,73 +69,19 @@
         </v-tooltip>
       </template>
 
-      <template v-slot:item.actions="{ item }">
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
-            <v-btn
-              v-on="on"
-              text
-              @click="openAnswerDialog(item)"
-              :data-cy="'answerClarification-' + item.content.slice(0, 15)"
-            >
-              <v-icon small class="mr-2">forum</v-icon>
-            </v-btn>
-          </template>
-          <span>Manage Answer</span>
-        </v-tooltip>
+      <template v-slot:expanded-item="{ headers, item }">
+        <td :colspan="headers.length" class="clarification-expand-container">
+          <h2>Question:</h2>
+          <show-question :question="questionCache[item.questionId]" />
+
+          <h2>Clarification Request:</h2>
+          <div class="multiline msg-content">{{ item.content }}</div>
+
+          <h3>Messages:</h3>
+          <clarification-thread :request="item"></clarification-thread>
+        </td>
       </template>
     </v-data-table>
-    <v-dialog v-model="answerDialog" max-width="75%">
-      <v-card>
-        <v-card-title>
-          <span class="headline">Answer Question</span>
-        </v-card-title>
-
-        <v-card-text width="100%">
-          <div v-if="answerDialog" class="answer-context">
-            <h2>Question:</h2>
-            <show-question :question="questionForRequestBeingAnswered" />
-
-            <h2>Clarification Request:</h2>
-            <span class="multiline">{{ requestBeingAnswered.content }}</span>
-          </div>
-
-          <v-textarea
-            v-model="answerInCreation.content"
-            label="Answer"
-            data-cy="answerField"
-          />
-        </v-card-text>
-
-        <v-card-actions>
-          <v-spacer />
-          <v-btn color="secondary" @click="closeDialogue">Cancel</v-btn>
-          <v-btn
-            id="delete-btn"
-            color="red"
-            @click="deleteAnswer"
-            v-if="!isNewAnswer"
-            data-cy="answerDelete"
-            >Delete Answer</v-btn
-          >
-
-          <v-btn
-            color="primary"
-            @click="submitAnswer"
-            v-if="isNewAnswer"
-            data-cy="answerSubmit"
-            >Submit Answer</v-btn
-          >
-          <v-btn
-            color="primary"
-            @click="submitAnswer"
-            v-else
-            data-cy="answerSubmit"
-            >Update Answer</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </v-card>
 </template>
 
@@ -135,64 +89,76 @@
 import { Component, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import ClarificationRequest from '@/models/clarification/ClarificationRequest';
-import ClarificationRequestAnswer from '@/models/clarification/ClarificationRequestAnswer';
+import ClarificationMessage from '@/models/clarification/ClarificationMessage';
 import ShowQuestion from '../questions/ShowQuestion.vue';
 import Question from '../../../models/management/Question';
 import User from '../../../models/user/User';
+import ClarificationThread from '../../ClarificationThread.vue';
 
 @Component({
-  components: { 'show-question': ShowQuestion }
+  components: {
+    'show-question': ShowQuestion,
+    'clarification-thread': ClarificationThread
+  }
 })
 export default class ClarificationRequestsView extends Vue {
   clarifications: ClarificationRequest[] = [];
-  expand: boolean = false;
-  answerDialog: boolean = false;
-  requestBeingAnswered: ClarificationRequest = new ClarificationRequest();
-  questionForRequestBeingAnswered: Question = new Question();
-  answerInCreation: ClarificationRequestAnswer = new ClarificationRequestAnswer();
-  isNewAnswer: boolean = false;
   questionCache: Record<number, Question> = {};
-  userCache: Record<number, User> = {};
   search: string = '';
   headers: object = [
-    { text: 'Clarification Request', value: 'content', align: 'left' },
-
     {
       text: 'Visibility',
       value: 'status',
       align: 'center',
-      width: '60px',
+      width: '100px',
       sortable: false
     },
     {
-      text: 'Answered',
-      value: 'hasAnswer',
-      width: '114px'
+      text: 'Clarification Request',
+      value: 'content',
+      align: 'left'
+    },
+    {
+      text: 'Resolved',
+      value: 'resolved',
+      width: '110px'
     },
     {
       text: 'Creation Date',
       value: 'creationDate',
       align: 'center',
       width: '150px'
-    },
-    {
-      text: 'Actions',
-      value: 'actions',
-      align: 'center',
-      width: '33px',
-      sortable: false
     }
   ];
 
   async created(): Promise<void> {
     await this.$store.dispatch('loading');
     try {
-      this.clarifications = await RemoteServices.getClarificationRequests();
+      this.clarifications = await RemoteServices.getUserClarificationRequests();
+
+      this.questionCache = await this.loadQuestions(this.clarifications);
     } catch (error) {
       await this.$store.dispatch('error', error);
     } finally {
       await this.$store.dispatch('clearLoading');
     }
+  }
+
+  private async loadQuestions(
+    requests: ClarificationRequest[]
+  ): Promise<Record<number, Question>> {
+    // TODO: include question in clarificationrequest, avoid this ugly, potientially slow, code
+    const questions: Record<number, Question> = {};
+
+    for (const req of requests) {
+      if (!questions[req.questionId]) {
+        questions[req.questionId] = await RemoteServices.getQuestionById(
+          req.questionId
+        );
+      }
+    }
+
+    return questions;
   }
 
   customFilter(value: string, search: string): boolean {
@@ -202,73 +168,6 @@ export default class ClarificationRequestsView extends Vue {
       typeof value === 'string' &&
       value.toLocaleLowerCase().indexOf(search.toLocaleLowerCase()) !== -1
     );
-  }
-
-  async openAnswerDialog(req: ClarificationRequest): Promise<void> {
-    try {
-      this.questionForRequestBeingAnswered = await RemoteServices.getQuestionById(
-        req.getQuestionId()
-      );
-    } catch (error) {
-      await this.$store.dispatch('error', error);
-      return;
-    }
-
-    if (req.hasAnswer) {
-      this.answerInCreation = req.getAnswer();
-      this.isNewAnswer = false;
-    } else {
-      this.answerInCreation = req.newAnswer();
-      this.isNewAnswer = true;
-    }
-    this.requestBeingAnswered = req;
-    this.answerDialog = true;
-  }
-
-  closeDialogue(): void {
-    this.answerDialog = false;
-  }
-
-  async submitAnswer(): Promise<void> {
-    const answerInCreation = this
-      .answerInCreation as ClarificationRequestAnswer;
-
-    await this.$store.dispatch('loading');
-    try {
-      // publish answer
-      const ans = await RemoteServices.submitClarificationRequestAnswer(
-        answerInCreation
-      );
-
-      // save change locally
-      this.requestBeingAnswered.setAnswer(ans);
-
-      this.closeDialogue();
-    } catch (err) {
-      await this.$store.dispatch('error', err);
-    } finally {
-      await this.$store.dispatch('clearLoading');
-    }
-  }
-
-  async deleteAnswer(): Promise<void> {
-    const answerInCreation = this
-      .answerInCreation as ClarificationRequestAnswer;
-
-    await this.$store.dispatch('loading');
-    try {
-      // publish answer
-      await RemoteServices.deleteClarificationRequestAnswer(answerInCreation);
-
-      // save change locally
-      this.requestBeingAnswered.setAnswer(null);
-
-      this.closeDialogue();
-    } catch (err) {
-      await this.$store.dispatch('error', err);
-    } finally {
-      await this.$store.dispatch('clearLoading');
-    }
   }
 
   async changeRequestStatus(req: ClarificationRequest): Promise<void> {
@@ -301,7 +200,42 @@ export default class ClarificationRequestsView extends Vue {
   }
 }
 
+.clarification-expand-container {
+  text-align: left;
+  padding: 20px;
+
+  h2,
+  h3 {
+    margin: 10px 0;
+    font-size: initial;
+    text-align: left;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  .msg-content {
+    margin-bottom: 10px;
+  }
+}
+
 #delete-btn {
   color: #ffffff;
+}
+
+.multiline {
+  white-space: pre-wrap;
+}
+
+.short-content {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+::v-deep .table table {
+  table-layout: fixed;
+  min-width: 600px;
 }
 </style>

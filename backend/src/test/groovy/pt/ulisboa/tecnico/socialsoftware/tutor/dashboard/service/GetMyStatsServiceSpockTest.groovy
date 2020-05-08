@@ -10,7 +10,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepos
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
@@ -96,9 +95,6 @@ class GetMyStatsServiceSpockTest extends Specification {
 
     @Autowired
     ClarificationRequestRepository clarificationRequestRepository
-
-    @Autowired
-    ClarificationRequestAnswerRepository clarificationRequestAnswerRepository
 
     @Autowired
     MyStatsService myStatsService
@@ -381,13 +377,13 @@ class GetMyStatsServiceSpockTest extends Specification {
     static class ClarificationServiceImplTestContextConfiguration {
 
         @Bean
-        MyStatsService myStatsService() {
-            return new MyStatsService();
+        MyStatsService MyStatsService() {
+            return new MyStatsService()
         }
 
         @Bean
-        ClarificationService clarificationService() {
-            return new ClarificationService();
+        ClarificationService ClarificationService() {
+            return new ClarificationService()
         }
 
         @Bean

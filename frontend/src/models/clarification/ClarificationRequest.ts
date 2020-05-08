@@ -1,50 +1,55 @@
-import ClarificationRequestAnswer from './ClarificationRequestAnswer';
+import ClarificationMessage from './ClarificationMessage';
 
 export default class ClarificationRequest {
   id!: number;
   questionId!: number;
-  owner!: number;
+  creatorUsername!: string;
   creationDate!: string;
   content!: string;
-  answer: ClarificationRequestAnswer | null = null;
+  messages: ClarificationMessage[];
   status!: string;
+  resolved!: boolean;
 
   constructor(jsonObj?: ClarificationRequest) {
     if (jsonObj) {
       this.id = jsonObj.id;
       this.questionId = jsonObj.questionId;
       this.content = jsonObj.content;
-      this.owner = jsonObj.owner;
+      this.creatorUsername = jsonObj.creatorUsername;
       this.creationDate = jsonObj.creationDate;
       this.status = jsonObj.status;
-
-      if (jsonObj.answer) {
-        this.answer = new ClarificationRequestAnswer(jsonObj.answer);
-      }
+      this.messages = jsonObj.messages.map(
+        msg => new ClarificationMessage(msg)
+      );
+      this.resolved = jsonObj.resolved;
     }
   }
 
-  newAnswer(): ClarificationRequestAnswer {
-    const answer = new ClarificationRequestAnswer();
-    answer.setRequestId(this.id);
-    return answer;
+  newMessage(): ClarificationMessage {
+    const message = new ClarificationMessage();
+    message.setRequestId(this.id);
+    return message;
   }
 
-  get hasAnswer(): boolean {
-    return this.answer != null;
+  get hasMessages(): boolean {
+    return this.messages.length > 0;
   }
 
   getId(): number {
     return this.id;
   }
 
-  getAnswer(): ClarificationRequestAnswer {
-    if (!this.answer) throw Error('answer unavailable');
-    return this.answer as ClarificationRequestAnswer;
+  getMessages(): ClarificationMessage[] {
+    return this.messages;
   }
 
-  setAnswer(answer: ClarificationRequestAnswer | null) {
-    this.answer = answer;
+  addMessage(msg: ClarificationMessage): void {
+    this.messages.push(msg);
+  }
+
+  removeMessage(msg: ClarificationMessage): void {
+    const idx = this.messages.indexOf(msg);
+    this.messages.splice(idx, 1);
   }
 
   setQuestionId(id: number): void {
@@ -55,8 +60,12 @@ export default class ClarificationRequest {
     return this.questionId;
   }
 
-  setOwnerId(id: number): void {
-    this.owner = id;
+  getCreatorUsername(): string {
+    return this.creatorUsername;
+  }
+
+  setCreatorUsername(username: string): void {
+    this.creatorUsername = username;
   }
 
   setContent(c: string): void {
@@ -65,10 +74,6 @@ export default class ClarificationRequest {
 
   getContent(): string {
     return this.content;
-  }
-
-  getAnswerContent(): string | void {
-    return this.answer?.getContent();
   }
 
   isPrivate(): boolean {
@@ -81,5 +86,13 @@ export default class ClarificationRequest {
 
   getStatus(): string {
     return this.status;
+  }
+
+  setResolved(r: boolean): void {
+    this.resolved = r;
+  }
+
+  getResolved(): boolean {
+    return this.resolved;
   }
 }

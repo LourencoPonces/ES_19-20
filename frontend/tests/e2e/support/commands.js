@@ -185,7 +185,7 @@ Cypress.Commands.add(
   }
 );
 
-Cypress.Commands.add('deleteClarificationRequestAnswer', requestText => {
+Cypress.Commands.add('deleteClarificationMessage', requestText => {
   cy.get('[data-cy="management"]').click();
   cy.get('[data-cy="teacherClarifications"]').click();
   cy.get(
