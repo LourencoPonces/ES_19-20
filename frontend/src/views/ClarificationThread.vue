@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card v-for="msg in request.messages" v-bind:key="msg.id">
+    <v-card v-for="msg in request.messages" v-bind:key="msg.id" class="message">
       <v-avatar :size="AVATAR_SIZE + 'px'">
         <img :src="imgForUsername(msg.creatorUsername)" alt="avatar" />
       </v-avatar>
@@ -90,4 +90,9 @@ export default class ClarificationThread extends Vue {
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.message {
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+</style>

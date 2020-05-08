@@ -68,14 +68,17 @@
         </v-tooltip>
       </template>
 
-      <template v-slot:expanded-item="{ item }">
-        <h2>Question:</h2>
-        <show-question :question="questionCache[item.questionId]" />
+      <template v-slot:expanded-item="{ headers, item }">
+        <td :colspan="headers.length" class="clarification-expand-container">
+          <h2>Question:</h2>
+          <show-question :question="questionCache[item.questionId]" />
 
-        <h2>Clarification Request:</h2>
-        <span class="multiline">{{ item.content }}</span>
+          <h2>Clarification Request:</h2>
+          <span class="multiline">{{ item.content }}</span>
 
-        <clarification-thread :request="item"></clarification-thread>
+          <h3>Messages:</h3>
+          <clarification-thread :request="item"></clarification-thread>
+        </td>
       </template>
     </v-data-table>
   </v-card>
@@ -189,6 +192,18 @@ export default class ClarificationRequestsView extends Vue {
   h2 {
     margin-top: 10px;
     margin-bottom: 10px;
+  }
+}
+
+.clarification-expand-container {
+  text-align: left;
+  padding: 10px;
+  padding-bottom: 20px;
+
+  h2,
+  h3 {
+    margin-top: 5px;
+    margin-bottom: 5px;
   }
 }
 

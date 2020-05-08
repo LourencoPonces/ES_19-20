@@ -81,8 +81,13 @@
         </template>
 
         <template v-slot:expanded-item="{ item }">
-          <div class="multiline">{{ item.content }}</div>
-          <clarification-thread :request="item"></clarification-thread>
+          <td :colspan="headers.length" class="clarification-expand-container">
+            <h2>Clarification Request:</h2>
+            <span class="multiline">{{ item.content }}</span>
+
+            <h3>Messages:</h3>
+            <clarification-thread :request="item"></clarification-thread>
+          </td>
         </template>
       </v-data-table>
     </v-card>
