@@ -287,14 +287,6 @@ public class TournamentService {
         quiz.setConclusionDate(tournament.getConclusionDate());
         quiz.setResultsDate(tournament.getConclusionDate());
 
-        entityManager.persist(quiz);
-
-        // Add quiz answers to the first two signed-up students
-        for (User user: tournament.getParticipants()) {
-            QuizAnswer quizAnswer = new QuizAnswer(user, quiz);
-            entityManager.persist(quizAnswer);
-        }
-
         ArrayList<Question> validQuestions = getValidQuestions(tournament);
         Random rand = new Random(System.currentTimeMillis());
 
@@ -306,6 +298,14 @@ public class TournamentService {
                 quiz.getQuizQuestions().add(new QuizQuestion(quiz, validQuestions.get(next),
                         quiz.getQuizQuestions().size()));
             }
+        }
+
+        entityManager.persist(quiz);
+
+        // Add quiz answers to the first two signed-up students
+        for (User user: tournament.getParticipants()) {
+            QuizAnswer quizAnswer = new QuizAnswer(user, quiz);
+            entityManager.persist(quizAnswer);
         }
 
         tournament.setQuiz(quiz);
