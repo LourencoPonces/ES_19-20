@@ -143,6 +143,7 @@ export default class ClarificationThread extends Vue {
 
 .message-content {
   padding: 0 12px;
+  white-space: pre-wrap;
 }
 
 .new-msg-container > * {

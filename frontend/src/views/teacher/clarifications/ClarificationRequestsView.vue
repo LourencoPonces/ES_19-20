@@ -221,7 +221,7 @@ export default class ClarificationRequestsView extends Vue {
 }
 
 .multiline {
-  white-space: pre;
+  white-space: pre-wrap;
 }
 
 .short-content {

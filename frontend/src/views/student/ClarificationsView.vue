@@ -216,11 +216,10 @@ export default class ClarificationsView extends Vue {
 }
 
 .multiline {
-  white-space: pre;
+  white-space: pre-wrap;
 }
 
 .short-content {
-  min-width: 100px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
