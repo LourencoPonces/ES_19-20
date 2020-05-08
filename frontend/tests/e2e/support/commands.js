@@ -300,6 +300,10 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   'assertStudentQuestionEvaluation',
   (questionTitle, status, justification) => {
+    cy.get('[data-cy="search-input"]')
+      .clear()
+      .type(questionTitle);
+
     // assert status
     cy.contains(questionTitle)
       .parents('tr')
