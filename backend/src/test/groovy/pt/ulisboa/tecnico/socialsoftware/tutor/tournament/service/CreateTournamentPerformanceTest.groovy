@@ -5,6 +5,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
@@ -70,8 +71,6 @@ class CreateTournamentPerformanceTest extends Specification {
     def topicDtoList
 
     def setup() {
-        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-
         (courseExecution, course) = setupCourse()
 
         UserDto creatorDto = setupCreator(courseExecution)
@@ -123,15 +122,15 @@ class CreateTournamentPerformanceTest extends Specification {
     private void setupTournament(UserDto creatorDto, DateTimeFormatter formatter, ArrayList<TopicDto> topicDtoList) {
         tournament = new TournamentDto()
         tournament.setTitle(TOURNAMENT_TITLE)
-        creationDate = LocalDateTime.now()
+        creationDate = DateHandler.now()
         availableDate = creationDate.plusDays(1)
         runningDate = creationDate.plusDays(2)
         conclusionDate = creationDate.plusDays(3)
         tournament.setNumberOfQuestions(1)
-        tournament.setCreationDate(creationDate.format(formatter))
-        tournament.setAvailableDate(availableDate.format(formatter))
-        tournament.setRunningDate(runningDate.format(formatter))
-        tournament.setConclusionDate(conclusionDate.format(formatter))
+        tournament.setCreationDate(DateHandler.toISOString(creationDate))
+        tournament.setAvailableDate(DateHandler.toISOString(availableDate))
+        tournament.setRunningDate(DateHandler.toISOString(runningDate))
+        tournament.setConclusionDate(DateHandler.toISOString(conclusionDate))
         tournament.setTopics(topicDtoList)
     }
 

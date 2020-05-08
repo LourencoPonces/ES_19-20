@@ -11,9 +11,6 @@ import java.util.List;
 @Repository
 @Transactional
 public interface TournamentRepository extends JpaRepository<Tournament, Integer> {
-    @Query(value = "SELECT * FROM tournaments t WHERE t.course_execution_id = :executionId AND t.available_date <= now() AND now() < t.running_date AND NOT t.is_cancelled", nativeQuery = true)
-    List<Tournament> findAvailableTournaments(int executionId);
-
     @Query(value = "SELECT MAX(key) FROM tournaments", nativeQuery = true)
     Integer getMaxTournamentKey();
 }
