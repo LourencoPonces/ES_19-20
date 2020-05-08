@@ -167,6 +167,102 @@
             <p>Student Questions Approved</p>
           </div>
         </div>
+        <div class="items" data-cy="tournamentsParticipatedDiv">
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-icon
+                v-if="
+                  !myStats.isPublic(myStats.statsNames.TOURNAMENTS_PARTICIPATED)
+                "
+                v-on="on"
+                medium
+                @click="
+                  onChangeVisibility(
+                    myStats.statsNames.TOURNAMENTS_PARTICIPATED
+                  )
+                "
+                class="mr-2"
+                >fas fa-eye-slash</v-icon
+              >
+              <v-icon
+                v-else
+                @click="
+                  onChangeVisibility(
+                    myStats.statsNames.TOURNAMENTS_PARTICIPATED
+                  )
+                "
+                v-on="on"
+                medium
+                class="mr-2"
+                >fas fa-eye</v-icon
+              >
+            </template>
+            <span
+              v-if="
+                !myStats.isPublic(myStats.statsNames.TOURNAMENTS_PARTICIPATED)
+              "
+            >
+              Make Public
+            </span>
+            <span v-else>Make Private</span>
+          </v-tooltip>
+          <div class="icon-wrapper" ref="tournamentsParticipated">
+            <animated-number
+              data-cy="tournamentsParticipated"
+              :number="
+                myStats.getStatValue(
+                  myStats.statsNames.TOURNAMENTS_PARTICIPATED
+                )
+              "
+            />
+          </div>
+          <div class="project-name">
+            <p>Tournaments Participated</p>
+          </div>
+        </div>
+        <div class="items" data-cy="tournamentsScoreDiv">
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-icon
+                v-if="!myStats.isPublic(myStats.statsNames.TOURNAMENTS_SCORE)"
+                v-on="on"
+                medium
+                @click="
+                  onChangeVisibility(myStats.statsNames.TOURNAMENTS_SCORE)
+                "
+                class="mr-2"
+                >fas fa-eye-slash</v-icon
+              >
+              <v-icon
+                v-else
+                @click="
+                  onChangeVisibility(myStats.statsNames.TOURNAMENTS_SCORE)
+                "
+                v-on="on"
+                medium
+                class="mr-2"
+                >fas fa-eye</v-icon
+              >
+            </template>
+            <span
+              v-if="!myStats.isPublic(myStats.statsNames.TOURNAMENTS_SCORE)"
+            >
+              Make Public
+            </span>
+            <span v-else>Make Private</span>
+          </v-tooltip>
+          <div class="icon-wrapper" ref="tournamentsScore">
+            <animated-number
+              data-cy="tournamentsScore"
+              :number="
+                myStats.getStatValue(myStats.statsNames.TOURNAMENTS_SCORE)
+              "
+            />
+          </div>
+          <div class="project-name">
+            <p>Tournaments Score</p>
+          </div>
+        </div>
       </div>
     </div>
     <v-card class="table">
