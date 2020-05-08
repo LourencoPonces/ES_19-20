@@ -121,7 +121,7 @@ public class TournamentController {
             throw new TutorException(AUTHENTICATION_ERROR);
         }
 
-        return tournamentService.getCreatedTournaments(user.getId());
+        return tournamentService.getCreatedTournaments(user.getId(), executionId);
     }
 
     @GetMapping("/executions/{executionId}/tournaments/running/signed-up")

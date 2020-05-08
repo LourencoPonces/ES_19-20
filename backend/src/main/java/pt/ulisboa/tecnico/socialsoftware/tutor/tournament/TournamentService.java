@@ -177,11 +177,12 @@ public class TournamentService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public List<TournamentDto> getCreatedTournaments(int userId) {
+    public List<TournamentDto> getCreatedTournaments(int userId, int executionId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND, userId));
 
         return user.getCreatedTournaments()
                 .stream()
+                .filter(tournament -> tournament.getCourseExecution().getId() == executionId)
                 .map(TournamentDto::new)
                 .sorted(Comparator.comparing(TournamentDto::getCreationDateDate).reversed())
                 .collect(Collectors.toList());
