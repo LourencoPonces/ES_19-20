@@ -134,7 +134,7 @@ public class TournamentDto implements Serializable {
     public boolean getIsCancelled() { return isCancelled; }
 
     public void setIsCancelled() { isCancelled = true; }
-
+    
     public String getCreationDate() {
         return creationDate;
     }
