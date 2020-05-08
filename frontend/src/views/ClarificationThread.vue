@@ -10,8 +10,11 @@
           </v-col>
           <v-col cols="auto">
             <v-container fluid>
-              <div>{{ nameForUsername(msg.creatorUsername) }}</div>
-              <div>{{ msg.creationDate }}</div>
+              <v-row>
+                {{ nameForUsername(msg.creatorUsername) }}
+                <b v-if="messageIsMine(msg)">(me)</b>
+              </v-row>
+              <v-row>{{ msg.creationDate }}</v-row>
             </v-container>
           </v-col>
           <v-col class="ml-auto" cols="auto">
