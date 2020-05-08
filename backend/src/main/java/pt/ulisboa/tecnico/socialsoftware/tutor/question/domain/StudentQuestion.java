@@ -87,11 +87,6 @@ public class StudentQuestion extends Question {
            throw new TutorException(CANNOT_REJECT_WITHOUT_JUSTIFICATION);
        }
 
-       // TODO: REMOVE WHEN IMPLEMENTING F11 (keeping for now because i'm working in another feature)
-       if(this.submittedStatus.equals(SubmittedStatus.APPROVED) && status.equals(SubmittedStatus.REJECTED)) {
-           throw new TutorException(CANNOT_REJECT_ACCEPTED_SUGGESTION);
-       }
-
 
        this.submittedStatus = status;
        this.justification = newJustification;
