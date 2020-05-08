@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto;
@@ -74,6 +75,7 @@ public class TournamentDto implements Serializable {
         this.title = title;
     }
 
+    @JsonIgnore
     public Tournament.Status getStatus() {
         if (isCancelled) return Tournament.Status.CANCELLED;
 
@@ -125,6 +127,10 @@ public class TournamentDto implements Serializable {
         this.topics = topics;
     }
 
+    public boolean getIsCancelled() { return isCancelled; }
+
+    public void setIsCancelled() { isCancelled = true; }
+    
     public String getCreationDate() {
         return creationDate;
     }

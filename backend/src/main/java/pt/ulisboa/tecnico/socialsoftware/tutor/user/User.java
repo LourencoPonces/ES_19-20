@@ -188,6 +188,7 @@ public class User implements UserDetails, DomainEntity {
     public Set<ClarificationRequest> getClarificationRequests() {
         return clarificationRequests;
     }
+
     public void removeClarificationRequest(int reqId) {
         for (ClarificationRequest req : clarificationRequests) {
             if (req.getId() == reqId) {
@@ -367,7 +368,6 @@ public class User implements UserDetails, DomainEntity {
         return numberOfCorrectStudentAnswers;
     }
 
-
     public void setNumberOfCorrectStudentAnswers(Integer numberOfCorrectStudentAnswers) {
         this.numberOfCorrectStudentAnswers = numberOfCorrectStudentAnswers;
     }
@@ -396,6 +396,16 @@ public class User implements UserDetails, DomainEntity {
                 ", lastAccess=" + lastAccess +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User))
+            return false;
+        User user = (User) o;
+        return this.id.equals(user.getId());
+    }
+
 
     public void increaseNumberOfQuizzes(Quiz.QuizType type) {
         switch (type) {

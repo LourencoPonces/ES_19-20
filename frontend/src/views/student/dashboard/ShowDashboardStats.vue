@@ -1,17 +1,49 @@
 <template>
   <div class="">
-    <v-row>
+    <v-row data-cy="requestsSubmittedRow">
       <v-col><b>Clarification Requests Submitted:</b></v-col>
-      <v-col v-if="stats.isPublic('requestsSubmittedVisibility')">{{
-        stats.requestsSubmittedStat
+      <v-col v-if="stats.isPublic(stats.statsNames.REQUESTS_SUBMITTED)">{{
+        stats.getStatValue(stats.statsNames.REQUESTS_SUBMITTED)
       }}</v-col>
       <v-col v-else>Private</v-col>
     </v-row>
     <v-divider />
-    <v-row>
+    <v-row data-cy="publicRequestsRow">
       <v-col><b>Public Clarification Requests:</b></v-col>
-      <v-col v-if="stats.isPublic('publicRequestsVisibility')">{{
-        stats.publicRequestsStat
+      <v-col v-if="stats.isPublic(stats.statsNames.PUBLIC_REQUESTS)">{{
+        stats.getStatValue(stats.statsNames.PUBLIC_REQUESTS)
+      }}</v-col>
+      <v-col v-else>Private</v-col>
+    </v-row>
+    <v-divider />
+    <v-row data-cy="submittedQuestionsRow">
+      <v-col><b>Submitted Questions</b></v-col>
+      <v-col v-if="stats.isPublic(stats.statsNames.SUBMITTED_QUESTIONS)">{{
+        stats.getStatValue(stats.statsNames.SUBMITTED_QUESTIONS)
+      }}</v-col>
+      <v-col v-else>Private</v-col>
+    </v-row>
+    <v-divider />
+    <v-row data-cy="approvedQuestionsRow">
+      <v-col><b>Approved Questions</b></v-col>
+      <v-col v-if="stats.isPublic(stats.statsNames.APPROVED_QUESTIONS)">{{
+        stats.getStatValue(stats.statsNames.APPROVED_QUESTIONS)
+      }}</v-col>
+      <v-col v-else>Private</v-col>
+    </v-row>
+    <v-divider />
+    <v-row data-cy="tournamentsParticipatedRow">
+      <v-col><b>Tournaments Participated:</b></v-col>
+      <v-col v-if="stats.isPublic(stats.statsNames.TOURNAMENTS_PARTICIPATED)">{{
+        stats.getStatValue(stats.statsNames.TOURNAMENTS_PARTICIPATED)
+      }}</v-col>
+      <v-col v-else>Private</v-col>
+    </v-row>
+    <v-divider />
+    <v-row data-cy="tournamentsScoreRow">
+      <v-col><b>Tournaments Score:</b></v-col>
+      <v-col v-if="stats.isPublic(stats.statsNames.TOURNAMENTS_SCORE)">{{
+        stats.getStatValue(stats.statsNames.TOURNAMENTS_SCORE)
       }}</v-col>
       <v-col v-else>Private</v-col>
     </v-row>

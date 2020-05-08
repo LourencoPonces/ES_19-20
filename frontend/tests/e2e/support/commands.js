@@ -300,6 +300,10 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   'assertStudentQuestionEvaluation',
   (questionTitle, status, justification) => {
+    cy.get('[data-cy="search-input"]')
+      .clear()
+      .type(questionTitle);
+
     // assert status
     cy.contains(questionTitle)
       .parents('tr')
@@ -330,6 +334,20 @@ Cypress.Commands.add(
     }
   }
 );
+
+Cypress.Commands.add('assertQuestionExists', questionTitle => {
+  // go to questions
+  cy.get('[data-cy="management"]').click();
+  cy.get('[data-cy="questions"]').click();
+
+  // look for question title
+  cy.get('[data-cy="search-input"]')
+    .clear()
+    .type(questionTitle);
+
+  // assert question exists
+  cy.contains(questionTitle);
+});
 
 Cypress.Commands.add(
   'studentAssertEvaluation',
@@ -449,13 +467,21 @@ Cypress.Commands.add(
       .find('i')
       .click();
 
-    cy.get('[data-cy="StudentQuestionTitle"]')
-      .clear()
-      .type(newTitle);
+    if (newTitle != null && newTitle.length > 0) {
+      cy.get('[data-cy="StudentQuestionTitle"]')
+        .clear()
+        .type(newTitle);
+    } else {
+      cy.get('[data-cy="StudentQuestionTitle"]').clear();
+    }
 
-    cy.get('[data-cy="StudentQuestionContent"]')
-      .clear()
-      .type(newContent);
+    if (newContent != null && newContent.length > 0) {
+      cy.get('[data-cy="StudentQuestionContent"]')
+        .clear()
+        .type(newContent);
+    } else {
+      cy.get('[data-cy="StudentQuestionContent"]').clear();
+    }
 
     for (let i = 1; i < newOptions.length + 1; i++) {
       cy.get(`[data-cy=Option${i}]`)
@@ -646,19 +672,67 @@ Cypress.Commands.add('deleteTournament', title => {
     .click();
 });
 
-Cypress.Commands.add('assertAvailableTournaments', (title, col, topics) => {
-  cy.contains(title)
-    .parent()
-    .should('have.length', 1)
-    .children()
-    .should('have.length', col);
+Cypress.Commands.add('assertTournaments', (title, number, col, topics) => {
+  if (number == 0) {
+    cy.get('tr')
+      .get('td')
+      .should('contain', 'No Available Tournaments');
+  } else {
+    cy.contains(title)
+      .parent()
+      .children()
+      .should('have.length', col);
 
-  cy.contains(title)
-    .parent()
-    .find('[data-cy="topics-list"]')
-    .should('have.length', topics);
+    cy.contains(title)
+      .parent()
+      .find('[data-cy="topics-list"]')
+      .should('have.length', topics);
+
+    cy.get('table')
+      .get('tbody')
+      .children()
+      .should('have.length', number);
+  }
 });
 
 Cypress.Commands.add('assertSignUpTournament', title => {
-  cy.contains('Signed-Up');
+  cy.get('table')
+    .get('tbody')
+    .get('tr')
+    .get('td')
+    .eq(8)
+    .get('div[aria-label="true"]');
+});
+
+// DASHBOARD COMMANDS
+Cypress.Commands.add('makePrivate', dataCy => {
+  cy.get(dataCy)
+    .find('button')
+    .then($btn => {
+      if ($btn.hasClass('fas fa-eye')) {
+        $btn.click();
+      }
+    });
+});
+
+Cypress.Commands.add('makePublic', dataCy => {
+  cy.get(dataCy)
+    .find('button')
+    .then($btn => {
+      if ($btn.hasClass('fas fa-eye-slash')) {
+        $btn.click();
+      }
+    });
+});
+
+Cypress.Commands.add('openDashboardStatsDialog', student => {
+  cy.contains(student)
+    .parents('tr')
+    .eq(0)
+    .find('[data-cy="showDashboardStatsButton"]')
+    .click();
+});
+
+Cypress.Commands.add('checkVisibility', (statRow, content) => {
+  cy.get(statRow).contains(content);
 });

@@ -100,12 +100,24 @@ export default class RemoteServices {
    * Dashboard
    */
 
-  static async getUserDashboardStats(
-    userId: number
-  ): Promise<DashboardStats> {
+  static async getUserDashboardStats(userId: number): Promise<DashboardStats> {
     try {
       const response = await httpClient.get(
         `/courses/${Store.getters.getCurrentCourse.courseId}/dashboardStats/${userId}`
+      );
+      return new DashboardStats(response.data);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
+  static async updateStatsVisibility(
+    stats: DashboardStats
+  ): Promise<DashboardStats> {
+    try {
+      const response = await httpClient.put(
+        `/dashboardStats/${stats.id}`,
+        stats
       );
       return new DashboardStats(response.data);
     } catch (error) {
@@ -433,6 +445,14 @@ export default class RemoteServices {
   ): Promise<StatementQuiz> {
     try {
       return (await httpClient.get(`/tournaments/${tournament.id}/quiz`)).data;
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
+  static async cancelTournament(tournament: Tournament) {
+    try {
+      await httpClient.post(`/tournaments/${tournament.id}/cancel`);
     } catch (error) {
       throw Error(await this.errorMessage(error));
     }

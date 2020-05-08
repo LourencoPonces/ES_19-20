@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
@@ -17,14 +18,18 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
+import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.AnswersXmlImport
 import pt.ulisboa.tecnico.socialsoftware.tutor.overviewdashboard.MyStats
 import pt.ulisboa.tecnico.socialsoftware.tutor.overviewdashboard.MyStatsService
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizQuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentService
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
@@ -37,6 +42,7 @@ class GetOtherUserStatsServiceSpockTest extends Specification {
     static final String ACADEMIC_TERM = "1 SEM"
     static final String CONTENT = "Test Content"
     static final String USERNAME_1 = "USERNAME_ONE"
+    static final String USERNAME_2 = "USERNAME_TWO"
     static final int INVALID_USER_ID = 50
     static final int INVALID_COURSE_ID = 50
 
@@ -75,6 +81,7 @@ class GetOtherUserStatsServiceSpockTest extends Specification {
 
 
     Course course
+    CourseExecution courseExecution
     Question question
     Quiz quiz
     User student
@@ -83,28 +90,60 @@ class GetOtherUserStatsServiceSpockTest extends Specification {
 
     def setup() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
-        def courseExecution = createCourseExecution(course, ACRONYM, ACADEMIC_TERM)
-        createQuiz(1, courseExecution, "GENERATED")
-        question = createQuestion(1, course)
-        def quizQuestion = new QuizQuestion(quiz, question, 1)
-        createStudent(courseExecution)
-        def quizAnswer = new QuizAnswer(student, quiz)
+        courseExecution = createCourseExecution(course, ACRONYM, ACADEMIC_TERM)
 
+        student = createUser(courseExecution, User.Role.STUDENT, USERNAME_1, 1)
         courseRepository.save(course)
         courseExecutionRepository.save(courseExecution)
-        quizRepository.save(quiz)
-        questionRepository.save(question)
-        quizQuestionRepository.save(quizQuestion)
         userRepository.save(student)
-        quizAnswerRepository.save(quizAnswer)
         studentId = student.getId()
         courseId = course.getId()
     }
 
-    private void createStudent(CourseExecution courseExecution) {
-        student = new User('NAME', USERNAME_1, 1, User.Role.STUDENT)
-        student.getCourseExecutions().add(courseExecution)
-        courseExecution.getUsers().add(student)
+    def clarificationRequestSetup() {
+        createQuiz(1, courseExecution, "GENERATED")
+        question = createQuestion(1, course)
+        def quizQuestion = new QuizQuestion(quiz, question, 1)
+        def quizAnswer = new QuizAnswer(student, quiz)
+
+        quizRepository.save(quiz)
+        questionRepository.save(question)
+        quizQuestionRepository.save(quizQuestion)
+        quizAnswerRepository.save(quizAnswer)
+    }
+
+    def TournamentSetup() {
+
+
+
+
+
+        createQuiz(1, courseExecution, "GENERATED")
+        question = createQuestion(1, course)
+        def quizQuestion = new QuizQuestion(quiz, question, 1)
+        def quizAnswer = new QuizAnswer(student, quiz)
+
+        quizRepository.save(quiz)
+        questionRepository.save(question)
+        quizQuestionRepository.save(quizQuestion)
+        quizAnswerRepository.save(quizAnswer)
+
+
+
+
+
+
+
+
+
+
+    }
+
+    private User createUser(CourseExecution courseExecution, User.Role role, String username, int key) {
+        def user = new User('NAME', username, key, role)
+        user.getCourseExecutions().add(courseExecution)
+        courseExecution.getUsers().add(user)
+        return user
     }
 
     private Question createQuestion(int key, Course course) {
@@ -134,6 +173,7 @@ class GetOtherUserStatsServiceSpockTest extends Specification {
 
 
     def "get other user's dashboard stats"() {
+        clarificationRequestSetup()
         given: "a public clarification request by the first student"
         def request = new ClarificationRequestDto()
         request.setContent(CONTENT)
@@ -148,6 +188,46 @@ class GetOtherUserStatsServiceSpockTest extends Specification {
         result.getRequestsSubmittedStat() == null
         result.getPublicRequestsStat() == null
     }
+
+    def "get other user's student question dashboard stats"() {
+        given: "a new student"
+        def newStudent = createUser(courseExecution, User.Role.STUDENT, USERNAME_2, 2)
+        userRepository.save(newStudent)
+
+        when:
+        def result = myStatsService.getOtherUserStats(student.getId(), courseId)
+
+        then:
+        result != null
+        result.getSubmittedQuestionsVisibility() == MyStats.StatsVisibility.PRIVATE
+        result.getSubmittedQuestionsStat() == null
+        result.getApprovedQuestionsVisibility() == MyStats.StatsVisibility.PRIVATE
+        result.getApprovedQuestionsStat() == null
+    }
+
+    def "get other user's tournaments stats"() {
+
+
+
+
+        clarificationRequestSetup()
+        given: "a public clarification request by the first student"
+        def request = new ClarificationRequestDto()
+        request.setContent(CONTENT)
+        request = clarificationService.submitClarificationRequest(question.getId(), studentId, request)
+        clarificationService.changeClarificationRequestStatus(request.getId(), ClarificationRequest.RequestStatus.PUBLIC)
+
+        when:
+        def result = myStatsService.getOtherUserStats(student.getId(), courseId)
+
+        then:
+        result != null
+        result.getRequestsSubmittedStat() == null
+        result.getPublicRequestsStat() == null
+    }
+
+
+
 
     @Unroll("invalid arguments: #isUserId | #isCourseid || #error_message")
     def "invalid arguments"() {
@@ -180,13 +260,38 @@ class GetOtherUserStatsServiceSpockTest extends Specification {
     static class ClarificationServiceImplTestContextConfiguration {
 
         @Bean
-        MyStatsService MyStatsService() {
+        MyStatsService myStatsService() {
             return new MyStatsService();
         }
 
         @Bean
-        ClarificationService ClarificationService() {
+        ClarificationService clarificationService() {
             return new ClarificationService();
+        }
+
+        @Bean
+        TournamentService tournamentService() {
+            return new TournamentService()
+        }
+
+        @Bean
+        QuizService quizService() {
+            return new QuizService()
+        }
+
+        @Bean
+        QuestionService questionService() {
+            return new QuestionService()
+        }
+
+        @Bean
+        AnswerService answerService() {
+            return new AnswerService()
+        }
+
+        @Bean
+        AnswersXmlImport answersXmlImport() {
+            return new AnswersXmlImport()
         }
     }
 }

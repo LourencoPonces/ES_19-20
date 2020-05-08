@@ -9,17 +9,12 @@ function teacherEvaluates(questionTitle, prevStatus, status, justification) {
   cy.get('[data-cy="management"]').click();
   cy.get('[data-cy="student-questions"]').click();
 
-  cy.evaluateStudentQuestion(
-      questionTitle,
-      prevStatus,
-      status,
-      justification
-  );
+  cy.evaluateStudentQuestion(questionTitle, prevStatus, status, justification);
 
   cy.assertStudentQuestionEvaluation(
-      questionTitle,
-      status,
-      justification === null ? '' : justification
+    questionTitle,
+    status,
+    justification === null ? '' : justification
   );
   cy.logout();
 }
@@ -38,13 +33,9 @@ describe('Student Question Verification', () => {
     // create student question
     cy.get('[data-cy="my-area"]').click();
     cy.get('[data-cy="student-questions"]').click();
-    cy.createStudentQuestion(
-      questionTitle,
-      questionContent,
-      topics,
-      options,
-      [1]
-    );
+    cy.createStudentQuestion(questionTitle, questionContent, topics, options, [
+      1
+    ]);
 
     cy.logout();
   });
@@ -79,7 +70,6 @@ describe('Student Question Verification', () => {
     cy.demoStudentLogin();
     cy.get('[data-cy="my-area"]').click();
     cy.get('[data-cy="student-questions"]').click();
-
 
     cy.studentAssertEvaluation(questionTitle, status, justification);
   });

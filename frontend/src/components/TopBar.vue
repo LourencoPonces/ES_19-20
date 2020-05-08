@@ -58,7 +58,9 @@
                 <v-icon>question_answer</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>Questions</v-list-item-title>
+                <v-list-item-title data-cy="questions"
+                  >Questions</v-list-item-title
+                >
               </v-list-item-content>
             </v-list-item>
             <v-list-item
@@ -252,6 +254,7 @@
           to="/student/dashboard"
           v-if="isStudent && currentCourse"
           text
+          data-cy="dashboardButton"
           dark
         >
           Dashboard
