@@ -38,7 +38,10 @@
         </template>
 
         <template v-slot:item.solve-quiz-button="{ item }">
-          <v-btn color="primary" @click="solveTournamentQuiz(item)"
+          <v-btn
+            color="primary"
+            data-cy="solveTournament"
+            @click="solveTournamentQuiz(item)"
             >Solve</v-btn
           >
         </template>
