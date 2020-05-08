@@ -12,6 +12,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentService;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository;
 
@@ -33,6 +34,9 @@ public class MyStatsService {
     @Autowired
     private ClarificationService clarificationService;
 
+    @Autowired
+    private TournamentService tournamentService;
+
 
     @Retryable(
             value = { SQLException.class },
@@ -48,6 +52,8 @@ public class MyStatsService {
         statsDto.setPublicRequestsStat(calculatePublicRequests(user, courseId));
         statsDto.setSubmittedQuestionsStat(calculateSubmittedQuestions(user, courseId));
         statsDto.setApprovedQuestionsStat(calculateApprovedQuestions(user, courseId));
+        statsDto.setTournamentsParticipatedStat(calculateTournamentsParticipated(user, courseId));
+        statsDto.setTournamentsScoreStat(calculateTournamentsScore(user, courseId));
 
         return statsDto;
     }
@@ -70,8 +76,14 @@ public class MyStatsService {
         if (user.getMyStats().canSeeSubmittedQuestions())
             statsDto.setSubmittedQuestionsStat(calculateSubmittedQuestions(user, courseId));
 
-        if(user.getMyStats().canSeeApprovedQuestions())
+        if (user.getMyStats().canSeeApprovedQuestions())
             statsDto.setApprovedQuestionsStat(calculateApprovedQuestions(user, courseId));
+
+        if (user.getMyStats().canSeeTournamentsParticipated())
+            statsDto.setTournamentsParticipatedStat(calculateTournamentsParticipated(user, courseId));
+
+        if (user.getMyStats().canSeeTournamentsScore())
+            statsDto.setTournamentsScoreStat(calculateTournamentsScore(user, courseId));
         
         return statsDto;
     }
@@ -90,9 +102,8 @@ public class MyStatsService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND, userId));
 
-        if (!courseRepository.existsById(courseId)) {
+        if (!courseRepository.existsById(courseId))
             throw new TutorException(COURSE_NOT_FOUND);
-        }
         return user;
     }
 
@@ -125,6 +136,18 @@ public class MyStatsService {
                 .filter(sq -> sq.getCourse().getId() == courseId &&
                         (sq.getSubmittedStatus() == StudentQuestion.SubmittedStatus.APPROVED) // TODO: Add promoted
                 ).count();
+    }
+
+    private Integer calculateTournamentsParticipated(User user, int courseId) {
+        return (int) user.getParticipantTournaments()
+                .stream()
+                .filter(t -> tournamentService.findTournamentCourseExecution(t.getId()).getCourseId() == courseId)
+                .count();
+    }
+
+    private Integer calculateTournamentsScore(User user, int courseId) {
+        // TODO: Must do after F6.1
+        return -1;
     }
 
     public User findOwner(int statsId) {

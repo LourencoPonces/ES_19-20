@@ -35,6 +35,12 @@ public class MyStats implements DomainEntity {
     @Column(name="approved_questions", nullable = false)
     private StatsVisibility approvedQuestions;
 
+    @Column(name="tournaments_participated", nullable = false)
+    private StatsVisibility tournamentsParticipated;
+
+    @Column(name="tournaments_score", nullable = false)
+    private StatsVisibility tournamentsScore;
+
     public MyStats() {}
 
     public MyStats(User user, StatsVisibility statsVisibility) {
@@ -43,6 +49,8 @@ public class MyStats implements DomainEntity {
         this.publicRequests = statsVisibility;
         this.submittedQuestions = statsVisibility;
         this.approvedQuestions = statsVisibility;
+        this.tournamentsParticipated = statsVisibility;
+        this.tournamentsScore = statsVisibility;
     }
 
     public Integer getId() {
@@ -50,6 +58,7 @@ public class MyStats implements DomainEntity {
     }
 
     public User getUser() { return this.user; }
+
     public void setUser(User user) { this.user = user; }
 
     // Number of clarification requests submitted
@@ -57,9 +66,8 @@ public class MyStats implements DomainEntity {
         return this.requestsSubmitted;
     }
 
-    public void setRequestsSubmittedVisibility(StatsVisibility requestsSubmitted) {
-        this.requestsSubmitted = requestsSubmitted;
-    }
+    public void setRequestsSubmittedVisibility(StatsVisibility requestsSubmitted) { this.requestsSubmitted = requestsSubmitted; }
+
     public boolean canSeeRequestsSubmitted() {
         return this.requestsSubmitted == StatsVisibility.PUBLIC;
     }
@@ -70,6 +78,7 @@ public class MyStats implements DomainEntity {
     public void setPublicRequestsVisibility(StatsVisibility publicRequests) {
         this.publicRequests = publicRequests;
     }
+
     public boolean canSeePublicRequests() {
         return this.publicRequests == StatsVisibility.PUBLIC;
     }
@@ -78,9 +87,7 @@ public class MyStats implements DomainEntity {
         return submittedQuestions;
     }
 
-    public void setSubmittedQuestionsVisibility(StatsVisibility proposedQuestions) {
-        this.submittedQuestions = proposedQuestions;
-    }
+    public void setSubmittedQuestionsVisibility(StatsVisibility proposedQuestions) { this.submittedQuestions = proposedQuestions; }
 
     public boolean canSeeSubmittedQuestions() {
         return this.submittedQuestions == StatsVisibility.PUBLIC;
@@ -90,19 +97,32 @@ public class MyStats implements DomainEntity {
         return approvedQuestions;
     }
 
-    public void setApprovedQuestionsVisibility(StatsVisibility approvedQuestions) {
-        this.approvedQuestions = approvedQuestions;
-    }
+    public void setApprovedQuestionsVisibility(StatsVisibility approvedQuestions) { this.approvedQuestions = approvedQuestions; }
 
     public boolean canSeeApprovedQuestions() {
         return this.approvedQuestions == StatsVisibility.PUBLIC;
     }
+
+    public StatsVisibility getTournamentsParticipated() { return this.tournamentsParticipated; }
+
+    public void setTournamentsParticipated(StatsVisibility tournamentsParticipated) { this.tournamentsParticipated = tournamentsParticipated; }
+
+    public boolean canSeeTournamentsParticipated() { return this.tournamentsParticipated == StatsVisibility.PUBLIC; }
+
+    public StatsVisibility getTournamentsScore() { return this.getTournamentsScore(); }
+
+    public void setTournamentsScore(StatsVisibility tournamentsScore) { this.tournamentsScore = tournamentsScore; }
+
+    public boolean canSeeTournamentsScore() { return this.tournamentsScore == StatsVisibility.PUBLIC; }
+
 
     public void updateVisibility(MyStatsDto myStatsDto) {
         setApprovedQuestionsVisibility(myStatsDto.getApprovedQuestionsVisibility());
         setSubmittedQuestionsVisibility(myStatsDto.getSubmittedQuestionsVisibility());
         setPublicRequestsVisibility(myStatsDto.getPublicRequestsVisibility());
         setRequestsSubmittedVisibility(myStatsDto.getRequestsSubmittedVisibility());
+        setTournamentsParticipated(myStatsDto.getTournamentsParticipatedVisibility());
+        setTournamentsScore(myStatsDto.getTournamentsScoreVisibility());
     }
 
     @Override
