@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <h2>Clarification Requests</h2>
-    <v-card class="table">
+    <v-card>
       <v-data-table
         :headers="headers"
         :items="requests"
@@ -12,6 +12,7 @@
         :mobile-breakpoint="0"
         :items-per-page="15"
         :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
+        class="table"
         data-cy="table"
       >
         <template v-slot:top>
@@ -29,10 +30,6 @@
           </v-card-title>
         </template>
 
-        <template v-slot:item.content="{ item }">
-          <span class="multiline ellipsis">{{ item.content }}</span>
-        </template>
-
         <template v-slot:item.status="{ item }">
           <v-icon
             v-if="item.isPrivate()"
@@ -48,6 +45,10 @@
             :data-cy="'public-' + item.content.slice(0, 15)"
             >fas fa-eye</v-icon
           >
+        </template>
+
+        <template v-slot:item.content="{ item }">
+          <div class="short-content">{{ item.content }}</div>
         </template>
 
         <template v-slot:item.resolved="{ item }">
@@ -117,14 +118,14 @@ export default class ClarificationsView extends Vue {
     {
       text: 'Request',
       value: 'content',
-      align: 'left',
-      sortable: false
+      align: 'left'
     },
     {
       text: 'Resolved',
       value: 'resolved',
       align: 'center',
-      sortable: false
+      sortable: false,
+      width: '100px'
     },
     {
       text: 'Visibility',
@@ -218,7 +219,15 @@ export default class ClarificationsView extends Vue {
   white-space: pre;
 }
 
-.ellipsis {
+.short-content {
+  min-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
+}
+
+::v-deep .table table {
+  table-layout: fixed;
+  min-width: 600px;
 }
 </style>

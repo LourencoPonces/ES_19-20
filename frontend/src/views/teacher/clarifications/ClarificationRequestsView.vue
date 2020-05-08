@@ -1,5 +1,5 @@
 <template>
-  <v-card class="table">
+  <v-card>
     <v-data-table
       :headers="headers"
       :custom-filter="customFilter"
@@ -9,6 +9,7 @@
       :items-per-page="50"
       show-expand
       single-expand
+      class="table"
       :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
     >
       <template v-slot:top>
@@ -24,7 +25,7 @@
       </template>
 
       <template v-slot:item.content="{ item }">
-        <span class="multiline ellipsis">{{ item.content }}</span>
+        <div class="short-content">{{ item.content }}</div>
       </template>
 
       <template v-slot:item.resolved="{ item }">
@@ -223,7 +224,14 @@ export default class ClarificationRequestsView extends Vue {
   white-space: pre;
 }
 
-.ellipsis {
+.short-content {
+  white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
+}
+
+::v-deep .table table {
+  table-layout: fixed;
+  min-width: 600px;
 }
 </style>
