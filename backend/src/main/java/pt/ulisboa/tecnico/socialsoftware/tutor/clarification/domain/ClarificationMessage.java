@@ -1,51 +1,54 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain;
 
 
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestAnswerDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationMessageDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT;
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CLARIFICATION_MESSAGE_MISSING_CONTENT;
 
 @Entity
-@Table(name = "clarification_request_answers")
-public class ClarificationRequestAnswer {
+@Table(name = "clarification_messages")
+public class ClarificationMessage {
     @Id
-    @Column(name = "request_id")
-    private Integer requestId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-    @OneToOne
-    @JoinColumn(name = "request_id")
-    @MapsId
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "request_id", nullable = false)
     private ClarificationRequest request;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false)
     private User creator;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    @Column
-    private LocalDateTime submissionDate;
+    @Column(name = "creation_date", nullable = false)
+    private LocalDateTime creationDate = LocalDateTime.now();
 
-    public ClarificationRequestAnswer() {
+    public ClarificationMessage() {
     }
 
-    public ClarificationRequestAnswer(ClarificationRequest req, User creator, ClarificationRequestAnswerDto dto) {
+    public ClarificationMessage(ClarificationRequest req, User creator, ClarificationMessageDto dto) {
         this.creator = creator;
         this.request = req;
         this.content = dto.getContent();
-        this.submissionDate = dto.getCreationDateDate();
+
         this.ensureConsistent();
     }
 
     private void ensureConsistent() {
         if (this.content == null || this.content.isBlank())
-            throw new TutorException(CLARIFICATION_REQUEST_ANSWER_MISSING_CONTENT);
+            throw new TutorException(CLARIFICATION_MESSAGE_MISSING_CONTENT);
+    }
+
+    public Integer getId() {
+        return this.id;
     }
 
     public User getCreator() {
@@ -74,10 +77,10 @@ public class ClarificationRequestAnswer {
     }
 
     public LocalDateTime getCreationDate() {
-        return submissionDate;
+        return creationDate;
     }
 
     public void setCreationDate(LocalDateTime date) {
-        this.submissionDate = date;
+        this.creationDate = date;
     }
 }

@@ -246,9 +246,9 @@
 	&quot;numberOfQuestions&quot;: 1,&#xd;
 	&quot;key&quot;: ${key},&#xd;
 	&quot;topics&quot;: ${__property(topics)},&#xd;
-	&quot;availableDate&quot;: &quot;2030-01-01 00:00&quot;,&#xd;
-	&quot;runningDate&quot;: &quot;2030-01-02 00:00&quot;,&#xd;
-	&quot;conclusionDate&quot;: &quot;2030-01-03 00:00&quot;&#xd;
+	&quot;availableDate&quot;: &quot;2030-01-01T23:00:00.000Z&quot;,&#xd;
+	&quot;runningDate&quot;: &quot;2030-01-02T23:00:00.000Z&quot;,&#xd;
+	&quot;conclusionDate&quot;: &quot;2030-01-03T23:00:00.000Z&quot;&#xd;
 }&#xd;
 </stringProp>
                     <stringProp name="Argument.metadata">=</stringProp>

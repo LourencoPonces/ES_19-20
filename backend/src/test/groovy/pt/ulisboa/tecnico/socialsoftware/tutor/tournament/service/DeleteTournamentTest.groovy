@@ -5,6 +5,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
@@ -115,10 +116,10 @@ class DeleteTournamentTest extends Specification {
         tournamentDto.setTopics(topicDtoList)
 
         def now = LocalDateTime.now()
-        tournamentDto.setCreationDate(now.minusDays(2).format(formatter))
-        tournamentDto.setAvailableDate(now.minusDays(1).format(formatter))
-        tournamentDto.setRunningDate(now.plusDays(1).format(formatter))
-        tournamentDto.setConclusionDate(now.plusDays(2).format(formatter))
+        tournamentDto.setCreationDate(DateHandler.toISOString(now.minusDays(2)))
+        tournamentDto.setAvailableDate(DateHandler.toISOString(now.minusDays(1)))
+        tournamentDto.setRunningDate(DateHandler.toISOString(now.plusDays(1)))
+        tournamentDto.setConclusionDate(DateHandler.toISOString(now.plusDays(2)))
 
         tournamentDto = tournamentService.createTournament(creator.getUsername(), courseExecution.getId(), tournamentDto);
         tournament = tournamentRepository.findById(tournamentDto.getId()).get()

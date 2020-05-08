@@ -17,6 +17,7 @@
           <v-text-field
             v-model="search"
             append-icon="search"
+            data-cy="search-input"
             label="Search"
             class="mx-2"
           />

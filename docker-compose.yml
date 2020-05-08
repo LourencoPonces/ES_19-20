@@ -33,14 +33,14 @@ services:
       - ./data/env/backend.dev.env
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/tutordb
- 
+
   frontend:
     build:
       context:  ./frontend/
       dockerfile: Dockerfile
       args:
         NODE_ENV: dev
-    image: tutor-frontend                                                     
+    image: tutor-frontend
     container_name: frontend
     depends_on:
       - backend

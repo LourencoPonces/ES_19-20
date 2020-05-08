@@ -10,8 +10,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
-import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
-import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.AnswersXmlImport
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
@@ -21,28 +19,24 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepos
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentService
-import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto
 import spock.lang.Specification
-import spock.lang.Unroll
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @DataJpaTest
-class CancelTournamentTest extends Specification {
+class GetSignedUpRunningTournamentsTest extends Specification {
     public static final String COURSE_NAME = "Software Architecture"
     public static final String ACRONYM = "AS1"
     public static final String ACADEMIC_TERM = "1 SEM"
     public static final String TOURNAMENT_TITLE = "tournament title"
     public static final String CREATOR_NAME = "user"
     public static final String CREATOR_USERNAME = "username"
-    public static final String PARTICIPANT_NAME = "participant"
-    public static final String PARTICIPANT_USERNAME = "participant username"
 
     @Autowired
     TournamentService tournamentService
@@ -67,9 +61,9 @@ class CancelTournamentTest extends Specification {
 
     def tournamentDto
     def creator
-    def participant
     def course
     def courseExecution
+    def now
     def creationDate
     def availableDate
     def runningDate
@@ -93,16 +87,10 @@ class CancelTournamentTest extends Specification {
         userRepository.save(creator)
         def creatorDto = new UserDto(creator)
 
-        participant = new User(PARTICIPANT_NAME, PARTICIPANT_USERNAME, 2, User.Role.STUDENT)
-        participant.getCourseExecutions().add(courseExecution)
-        courseExecution.getUsers().add(participant)
-        userRepository.save(participant)
-
         def topic = new Topic();
         topic.setName("TOPIC")
         topic.setCourse(course)
 
-        // So that quiz generation doesn't throw exceptions
         question = new Question()
         question.addTopic(topic)
         question.setTitle("question_title")
@@ -121,105 +109,41 @@ class CancelTournamentTest extends Specification {
         tournamentDto.setKey(1)
         tournamentDto.setNumberOfQuestions(1)
         tournamentDto.setTopics(topicDtoList)
-    }
 
-    def prepareStatus(TournamentDto tournamentDto, Tournament.Status status) {
-        def now = DateHandler.now()
-
-        switch(status) {
-            case Tournament.Status.CREATED:
-                creationDate = now.minusDays(1)
-                availableDate = now.plusDays(1)
-                runningDate = now.plusDays(2)
-                conclusionDate = now.plusDays(3)
-                break;
-            case Tournament.Status.AVAILABLE:
-                creationDate = now.minusDays(2)
-                availableDate = now.minusDays(1)
-                runningDate = now.plusDays(1)
-                conclusionDate = now.plusDays(2)
-                break;
-            case Tournament.Status.RUNNING:
-                creationDate = now.minusDays(3)
-                availableDate = now.minusDays(2)
-                runningDate = now.minusDays(1)
-                conclusionDate = now.plusDays(1)
-                break;
-            case Tournament.Status.FINISHED:
-                creationDate = now.minusDays(4)
-                availableDate = now.minusDays(3)
-                runningDate = now.minusDays(2)
-                conclusionDate = now.minusDays(1)
-                break;
-            case Tournament.Status.CANCELLED:
-                creationDate = now.minusDays(2)
-                availableDate = now.minusDays(1)
-                runningDate = now.plusDays(1)
-                conclusionDate = now.plusDays(2)
-        }
-
+        now = DateHandler.now()
+        creationDate = now.minusDays(3)
+        availableDate = now.minusDays(2)
+        runningDate = now.minusDays(1)
+        conclusionDate = now.plusDays(2)
         tournamentDto.setCreationDate(DateHandler.toISOString(creationDate))
         tournamentDto.setAvailableDate(DateHandler.toISOString(availableDate))
         tournamentDto.setRunningDate(DateHandler.toISOString(runningDate))
         tournamentDto.setConclusionDate(DateHandler.toISOString(conclusionDate))
     }
 
-    @Unroll("allowed status: #status || #newStatus")
-    def "cancel a tournament with a allowed status"() {
-        given: "a tournament with a allowed status"
-        prepareStatus(tournamentDto, status)
+
+    def "Get signed-up running tournaments"() {
+        given: "A running tournament"
         tournamentDto = tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
 
         when:
-        tournamentService.cancelTournament(creator.getUsername(), tournamentDto.getId());
+        def tournamentList = tournamentService.getSignedUpRunningTournaments(CREATOR_USERNAME, courseExecution.getId())
 
         then:
-        def tournamentCanceled = tournamentRepository.findAll().get(0)
-        tournamentCanceled.getStatus() == newStatus
-        tournamentCanceled.isCancelled() == isCancelled
-
-        where:
-        status                      || newStatus                   || isCancelled
-        Tournament.Status.CREATED   || Tournament.Status.CANCELLED || true
-        Tournament.Status.AVAILABLE || Tournament.Status.CANCELLED || true
+        tournamentList.get(0).getId() == tournamentDto.getId()
     }
 
-    @Unroll("not allowed status: #status || #errorMessage")
-    def "cancel a tournament with a not allowed status"() {
-        given: "a tournament with a not allowed status"
-        prepareStatus(tournamentDto, status)
+    def "Signed-up non-running tournament"() {
+        given: "An available tournament"
+        runningDate = now.plusDays(1)
+        tournamentDto.setRunningDate(DateHandler.toISOString(runningDate))
         tournamentDto = tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
 
-        if (status == Tournament.Status.CANCELLED)
-            tournamentRepository.findById(tournamentDto.getId()).get().cancel()
-
         when:
-        tournamentService.cancelTournament(creator.getUsername(), tournamentDto.getId());
+        def tournamentList = tournamentService.getSignedUpRunningTournaments(CREATOR_USERNAME, courseExecution.getId())
 
         then:
-        def exception = thrown(TutorException)
-        exception.getErrorMessage() == errorMessage
-        def tournamentNotCanceled = tournamentRepository.findAll().get(0)
-        tournamentNotCanceled.getStatus() == newStatus
-        tournamentNotCanceled.isCancelled() == isCancelled
-
-        where:
-        status                      || errorMessage                               || newStatus                   || isCancelled
-        Tournament.Status.RUNNING   || ErrorMessage.TOURNAMENT_CANNOT_BE_CANCELED || Tournament.Status.RUNNING   || false
-        Tournament.Status.FINISHED  || ErrorMessage.TOURNAMENT_CANNOT_BE_CANCELED || Tournament.Status.FINISHED  || false
-        Tournament.Status.CANCELLED || ErrorMessage.TOURNAMENT_CANNOT_BE_CANCELED || Tournament.Status.CANCELLED || true
-    }
-
-    def "Cancel non-existing tournament"() {
-        given:
-        int badId = 1000
-
-        when:
-        tournamentService.cancelTournament(creator.getUsername(), badId)
-
-        then:
-        def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_FOUND
+        tournamentList.isEmpty()
     }
 
     @TestConfiguration

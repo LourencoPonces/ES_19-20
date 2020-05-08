@@ -10,8 +10,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepos
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
@@ -96,9 +96,6 @@ class GetMyStatsServiceSpockTest extends Specification {
 
     @Autowired
     ClarificationRequestRepository clarificationRequestRepository
-
-    @Autowired
-    ClarificationRequestAnswerRepository clarificationRequestAnswerRepository
 
     @Autowired
     MyStatsService myStatsService
@@ -259,15 +256,15 @@ class GetMyStatsServiceSpockTest extends Specification {
         tournamentDto = new TournamentDto()
         tournamentDto.setTitle(TOURNAMENT_TITLE)
         tournamentDto.setKey(1)
-        def creationDate = LocalDateTime.now().minusDays(1)
-        def availableDate = LocalDateTime.now()
-        def runningDate = LocalDateTime.now().plusDays(1)
-        def conclusionDate = LocalDateTime.now().plusDays(2)
+        def creationDate = DateHandler.now().minusDays(1)
+        def availableDate = DateHandler.now()
+        def runningDate = DateHandler.now().plusDays(1)
+        def conclusionDate = DateHandler.now().plusDays(2)
         tournamentDto.setNumberOfQuestions(1)
-        tournamentDto.setCreationDate(creationDate.format(formatter))
-        tournamentDto.setAvailableDate(availableDate.format(formatter))
-        tournamentDto.setRunningDate(runningDate.format(formatter))
-        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
+        tournamentDto.setCreationDate(DateHandler.toISOString(creationDate))
+        tournamentDto.setAvailableDate(DateHandler.toISOString(availableDate))
+        tournamentDto.setRunningDate(DateHandler.toISOString(runningDate))
+        tournamentDto.setConclusionDate(DateHandler.toISOString(conclusionDate))
         tournamentDto.setTopics(topicDtoList)
     }
 
@@ -381,13 +378,13 @@ class GetMyStatsServiceSpockTest extends Specification {
     static class ClarificationServiceImplTestContextConfiguration {
 
         @Bean
-        MyStatsService myStatsService() {
-            return new MyStatsService();
+        MyStatsService MyStatsService() {
+            return new MyStatsService()
         }
 
         @Bean
-        ClarificationService clarificationService() {
-            return new ClarificationService();
+        ClarificationService ClarificationService() {
+            return new ClarificationService()
         }
 
         @Bean
