@@ -21,7 +21,6 @@
             <v-tooltip bottom v-if="messageIsMine(msg)">
               <template v-slot:activator="{ on }">
                 <v-icon
-                  small
                   class="mr-2"
                   v-on="on"
                   @click="deleteMessage(msg)"
@@ -140,6 +139,10 @@ export default class ClarificationThread extends Vue {
   padding: 10px;
   margin-bottom: 20px;
   margin-top: 20px;
+}
+
+.message-content {
+  padding: 0 12px;
 }
 
 .new-msg-container > * {
