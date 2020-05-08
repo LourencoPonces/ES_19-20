@@ -474,6 +474,9 @@ INSERT INTO users_course_executions(users_id, course_executions_id) SELECT id, $
         <JDBCSampler guiclass="TestBeanGUI" testclass="JDBCSampler" testname="Delete Tournament" enabled="true">
           <stringProp name="dataSource">sampleReq</stringProp>
           <stringProp name="query">DELETE FROM topics_tournaments WHERE tournaments_id IN (SELECT id FROM tournaments WHERE title LIKE &apos;TEST%&apos;);
+DELETE FROM quiz_questions WHERE id IN (SELECT Q.id FROM quizzes Q WHERE Q.id IN (SELECT T.id FROM tournaments T WHERE T.title LIKE &apos;TEST%&apos;));
+DELETE FROM quiz_answers WHERE id IN (SELECT Q.id FROM quizzes Q WHERE Q.id IN (SELECT T.id FROM tournaments T WHERE T.title LIKE &apos;TEST%&apos;));
+DELETE FROM quizzes Q WHERE Q.id IN (SELECT T.id FROM tournaments T WHERE T.title LIKE &apos;TEST%&apos;); 
 DELETE FROM users_participant_tournaments WHERE participant_tournaments_id IN (SELECT id FROM tournaments WHERE title LIKE &apos;TEST%&apos;);
 DELETE FROM tournaments WHERE title LIKE &apos;TEST%&apos;;</stringProp>
           <stringProp name="queryArguments"></stringProp>
@@ -490,7 +493,8 @@ DELETE FROM tournaments WHERE title LIKE &apos;TEST%&apos;;</stringProp>
           <stringProp name="dataSource">sampleReq</stringProp>
           <stringProp name="queryType">Callable Statement</stringProp>
           <stringProp name="query">DELETE FROM users_course_executions WHERE users_id IN (SELECT id FROM users WHERE username LIKE &apos;TEST%&apos;);
-DELETE FROM users_course_executions WHERE users_id IN (SELECT id FROM users WHERE username LIKE &apos;TEST%&apos;);
+DELETE FROM question_answers WHERE quiz_answer_id IN (SELECT quiz_answers.id FROM quiz_answers WHERE user_id IN (SELECT id FROM users WHERE username LIKE &apos;TEST%&apos;));
+DELETE FROM quiz_answers WHERE user_id IN (SELECT id FROM users WHERE username LIKE &apos;TEST%&apos;);
 DELETE FROM users WHERE username LIKE &apos;TEST%&apos;;</stringProp>
           <stringProp name="queryArguments"></stringProp>
           <stringProp name="queryArgumentsTypes"></stringProp>
