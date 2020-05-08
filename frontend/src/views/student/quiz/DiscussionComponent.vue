@@ -25,8 +25,8 @@
                 request.content
               }}</span>
             </v-expansion-panel-header>
-            <v-expansion-panel-content v-if="request.hasAnswer">
-              <span class="multiline">{{ showAnswer(request) }}</span>
+            <v-expansion-panel-content v-if="request.hasMessages">
+              <clarification-thread :request="request"></clarification-thread>
             </v-expansion-panel-content>
             <v-expansion-panel-content v-else>
               No answer available.
@@ -81,8 +81,13 @@
 import { Vue, Prop, Emit, Component } from 'vue-property-decorator';
 import StatementQuestion from '@/models/statement/StatementQuestion';
 import ClarificationRequest from '@/models/clarification/ClarificationRequest';
+import ClarificationThread from '../../ClarificationThread.vue';
 
-@Component
+@Component({
+  components: {
+    'clarification-thread': ClarificationThread
+  }
+})
 export default class DiscussionComponent extends Vue {
   @Prop(StatementQuestion) readonly question!: StatementQuestion;
   @Prop({ type: Array }) readonly clarifications!: ClarificationRequest[];
@@ -90,10 +95,6 @@ export default class DiscussionComponent extends Vue {
 
   creatingRequest: boolean = false;
   requestContent = '';
-
-  showAnswer(request: ClarificationRequest): string | void {
-    return request.getAnswerContent();
-  }
 
   newRequestButton(): void {
     this.creatingRequest = true;

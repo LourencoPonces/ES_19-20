@@ -10,9 +10,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuestionAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationMessageDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestAnswerRepository
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
@@ -30,13 +29,10 @@ import spock.lang.Unroll
 
 @DataJpaTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class SubmitAnswerPerformanceTest extends Specification {
+class DeleteMessagePerformanceTest extends Specification {
     static final String COURSE_NAME = "Software Architecture"
     static final String ACRONYM = "AS1"
     static final String ACADEMIC_TERM = "1 SEM"
-
-    static final String ANSWER_1 = "some answer 1"
-    static final String ANSWER_2 = "some answer 2"
 
     @Autowired
     CourseRepository courseRepository
@@ -60,13 +56,7 @@ class SubmitAnswerPerformanceTest extends Specification {
     QuizAnswerRepository quizAnswerRepository
 
     @Autowired
-    ClarificationRequestRepository clarificationRequestRepository
-
-    @Autowired
-    ClarificationRequestAnswerRepository clarificationRequestAnswerRepository;
-
-    @Autowired
-    QuestionAnswerRepository questionAnswerRepository;
+    QuestionAnswerRepository questionAnswerRepository
 
     @Autowired
     ClarificationService clarificationService
@@ -79,8 +69,8 @@ class SubmitAnswerPerformanceTest extends Specification {
     def setup() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseExecution = createCourseExecution(course, ACRONYM, ACADEMIC_TERM)
-        student = createUser(User.Role.STUDENT, 1, "STUDENT", courseExecution)
-        teacher = createUser(User.Role.TEACHER, 2, "TEACHER", courseExecution)
+        student = createStudent(1, "STUDENT", courseExecution)
+        teacher = createTeacher(2, "TEACHER", courseExecution)
 
         courseRepository.save(course)
         courseExecutionRepository.save(courseExecution)
@@ -89,12 +79,23 @@ class SubmitAnswerPerformanceTest extends Specification {
 
     }
 
-    private static User createUser(User.Role role, int key, String name, CourseExecution courseExecution) {
+    private static User createStudent(int key, String name, CourseExecution courseExecution) {
         def u = new User()
         u.setKey(key)
         u.setName(name)
         u.setUsername(name)
-        u.setRole(role)
+        u.setRole(User.Role.STUDENT)
+        u.getCourseExecutions().add(courseExecution)
+        courseExecution.getUsers().add(u)
+        return u
+    }
+
+    private static User createTeacher(int key, String name, CourseExecution courseExecution) {
+        def u = new User()
+        u.setKey(key)
+        u.setName(name)
+        u.setUsername(name)
+        u.setRole(User.Role.TEACHER)
         u.getCourseExecutions().add(courseExecution)
         courseExecution.getUsers().add(u)
         return u
@@ -117,6 +118,7 @@ class SubmitAnswerPerformanceTest extends Specification {
         return questionAnswer
     }
 
+
     private static Quiz createQuiz(int key, CourseExecution courseExecution, String type) {
         def quiz = new Quiz()
         quiz.setKey(key)
@@ -136,8 +138,8 @@ class SubmitAnswerPerformanceTest extends Specification {
 
 
     @Unroll
-    def "submit #count answers for different requests (for the first time)"() {
-        given: "#count unanswered clarification requests"
+    def "remove #count clarification request answers"() {
+        given:
         1.upto(count, {
             int i = it as int
 
@@ -153,52 +155,21 @@ class SubmitAnswerPerformanceTest extends Specification {
             quizAnswerRepository.save(quizAnswer)
             questionAnswerRepository.save(questionAnswer)
 
-            def clarificationRequest = new ClarificationRequestDto()
-            clarificationRequest.setContent("i need help with my performance")
-            clarificationService.submitClarificationRequest(question.getId(), student.getId(), clarificationRequest)
+            def clarificationRequestDto = new ClarificationRequestDto()
+            clarificationRequestDto.setContent("i need help with my performance")
+            clarificationRequestDto = clarificationService.submitClarificationRequest(i, student.id, clarificationRequestDto)
+
+            def messageDto = new ClarificationMessageDto()
+            messageDto.setContent("0.75")
+            messageDto.setResolved(i % 2 == 0)
+
+            clarificationService.submitClarificationMessage(teacher.id, clarificationRequestDto.id, messageDto)
         })
 
 
         when:
         1.upto(count, {
-            clarificationService.submitClarificationRequestAnswer(teacher, it as int, ANSWER_1)
-        })
-
-        then:
-        true
-
-        where:
-        count = 1 // set to a big number like 1000 for a proper test
-    }
-
-    @Unroll
-    def "submit #count answers to different requests for the second time (update)"() {
-        given: "#count already answered clarification requests"
-        1.upto(count, {
-            int i = it as int
-
-            def question = createQuestion(course)
-            def quiz = createQuiz(i, courseExecution, "GENERATED")
-            def quizQuestion = new QuizQuestion(quiz, question, 1)
-            def quizAnswer = new QuizAnswer(student, quiz)
-            def questionAnswer = createQuestionAnswer(quizAnswer, quizQuestion)
-
-            questionRepository.save(question)
-            quizRepository.save(quiz)
-            quizQuestionRepository.save(quizQuestion)
-            quizAnswerRepository.save(quizAnswer)
-            questionAnswerRepository.save(questionAnswer)
-
-            def clarificationRequest = new ClarificationRequestDto()
-            clarificationRequest.setContent("i need help with my performance")
-            clarificationService.submitClarificationRequest(question.getId(), student.getId(), clarificationRequest)
-            clarificationService.submitClarificationRequestAnswer(teacher, i, ANSWER_1)
-        })
-
-
-        when:
-        1.upto(count, {
-            clarificationService.submitClarificationRequestAnswer(teacher, it as int, ANSWER_2)
+            clarificationService.deleteClarificationMessage(teacher.id, it as int)
         })
 
         then:
@@ -210,10 +181,9 @@ class SubmitAnswerPerformanceTest extends Specification {
 
     @TestConfiguration
     static class ClarificationServiceImplTestContextConfiguration {
-
         @Bean
         ClarificationService ClarificationService() {
-            return new ClarificationService();
+            return new ClarificationService()
         }
     }
 }

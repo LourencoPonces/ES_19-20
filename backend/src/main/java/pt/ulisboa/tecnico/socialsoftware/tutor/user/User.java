@@ -4,6 +4,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest;
 import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
@@ -76,8 +77,11 @@ public class User implements UserDetails, DomainEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Tournament> createdTournaments = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator", fetch = FetchType.LAZY)
     private Set<ClarificationRequest> clarificationRequests = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator", fetch = FetchType.LAZY)
+    private Set<ClarificationMessage> clarificationMessages = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Set<StudentQuestion> studentQuestions = new HashSet<>();
@@ -145,6 +149,20 @@ public class User implements UserDetails, DomainEntity {
         return enrolledCoursesAcronyms;
     }
 
+    public void removeClarificationMessage(int messageId) {
+        ClarificationMessage toRemove = null;
+        for (ClarificationMessage msg : clarificationMessages) {
+            if (msg.getId() == messageId) {
+                toRemove = msg;
+                break;
+            }
+        }
+
+        if (toRemove != null) {
+            clarificationMessages.remove(toRemove);
+        }
+    }
+
     public void setEnrolledCoursesAcronyms(String enrolledCoursesAcronyms) {
         this.enrolledCoursesAcronyms = enrolledCoursesAcronyms;
     }
@@ -189,13 +207,8 @@ public class User implements UserDetails, DomainEntity {
         return clarificationRequests;
     }
 
-    public void removeClarificationRequest(int reqId) {
-        for (ClarificationRequest req : clarificationRequests) {
-            if (req.getId() == reqId) {
-                clarificationRequests.remove(req);
-                break;
-            }
-        }
+    public Set<ClarificationMessage> getClarificationMessages() {
+        return clarificationMessages;
     }
 
     public void addCreatedTournament(Tournament newCreatedTournament) {
