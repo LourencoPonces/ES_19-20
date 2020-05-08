@@ -102,7 +102,7 @@ class TeacherEvaluatesStudentQuestionProfilingTest extends Specification {
      */
     def "performance testing to evaluate 10000 student questions"() {
         def limit = 1  // USE 10000
-        List<Integer> studentQuestions =new LinkedList<Integer>();
+        List<Integer> studentQuestions = new LinkedList<Integer>();
 
         Random random = new Random()
 
@@ -119,9 +119,9 @@ class TeacherEvaluatesStudentQuestionProfilingTest extends Specification {
         when:
         for(Integer i : studentQuestions) {
             if(random.nextBoolean()) {
-                teacherEvaluatesStudentQuestionService.acceptStudentQuestion(i, "")
+                teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(i, StudentQuestion.SubmittedStatus.APPROVED, null)
             } else {
-                teacherEvaluatesStudentQuestionService.rejectStudentQuestion(i, "Bad question >:c")
+                teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(i, StudentQuestion.SubmittedStatus.REJECTED, "Bad question >:c")
             }
         }
 

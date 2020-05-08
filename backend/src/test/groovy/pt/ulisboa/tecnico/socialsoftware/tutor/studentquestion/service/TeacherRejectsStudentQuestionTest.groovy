@@ -18,8 +18,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
-import javax.management.Query
-
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CANNOT_REJECT_WITHOUT_JUSTIFICATION
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CANNOT_EVALUATE_PROMOTED_QUESTION
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.INVALID_JUSTIFICATION
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CANNOT_REJECT_ACCEPTED_SUGGESTION
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.STUDENT_QUESTION_NOT_FOUND
@@ -44,6 +44,10 @@ class TeacherRejectsStudentQuestionTest extends Specification {
     public static final Integer FAKE_STUDENT_QUESTION_ID = 2
 
     public static final String VALID_JUSTIFICATION = "irrelevant question"
+
+    public static final String LONG_JUSTIFICATION = "very long long long long long long long long long long long " +
+            "long long long long long long long long long long long long long long long long long long long long " +
+            "long long long long long long long long long long long long long long long long long justification"
 
     @Autowired
     TeacherEvaluatesStudentQuestionService teacherEvaluatesStudentQuestionService
@@ -113,7 +117,7 @@ class TeacherRejectsStudentQuestionTest extends Specification {
 
     def "reject student question with valid justification"() {
         when:
-        teacherEvaluatesStudentQuestionService.rejectStudentQuestion(savedQuestionId, VALID_JUSTIFICATION)
+        teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(savedQuestionId, StudentQuestion.SubmittedStatus.REJECTED, VALID_JUSTIFICATION)
 
         then:
         studentQuestionRepository.count() == 1L
@@ -125,7 +129,7 @@ class TeacherRejectsStudentQuestionTest extends Specification {
     // impossible to reject question with no justification parameter
     def "reject student question with invalid justification"() {
         when:
-        teacherEvaluatesStudentQuestionService.rejectStudentQuestion(savedQuestionId, justification)
+        teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(savedQuestionId, StudentQuestion.SubmittedStatus.REJECTED, justification)
 
         then:
         def error = thrown(TutorException)
@@ -139,7 +143,8 @@ class TeacherRejectsStudentQuestionTest extends Specification {
         ""            || INVALID_JUSTIFICATION
         "   "         || INVALID_JUSTIFICATION
         "\n  \t"      || INVALID_JUSTIFICATION
-        null          || INVALID_JUSTIFICATION
+        LONG_JUSTIFICATION  || INVALID_JUSTIFICATION
+        null          || CANNOT_REJECT_WITHOUT_JUSTIFICATION
     }
 
     def "reject already accepted student question"() {
@@ -150,7 +155,7 @@ class TeacherRejectsStudentQuestionTest extends Specification {
 
 
         when:
-        teacherEvaluatesStudentQuestionService.rejectStudentQuestion(savedQuestionId, VALID_JUSTIFICATION)
+        teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(savedQuestionId, StudentQuestion.SubmittedStatus.REJECTED, VALID_JUSTIFICATION)
 
         then:
         def error = thrown(TutorException)
@@ -165,15 +170,30 @@ class TeacherRejectsStudentQuestionTest extends Specification {
 
 
         when:
-        teacherEvaluatesStudentQuestionService.rejectStudentQuestion(savedQuestionId, VALID_JUSTIFICATION)
+        teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(savedQuestionId, StudentQuestion.SubmittedStatus.REJECTED, VALID_JUSTIFICATION)
 
         then:
         studentQuestionRepository.findAll().get(0).getSubmittedStatus() == StudentQuestion.SubmittedStatus.REJECTED
     }
 
+    def "reject already promoted student question"() {
+        given: 'pending student question'
+        studentQuestionRepository.count() == 1L
+        def question = studentQuestionRepository.findAll().get(0)
+        question.setSubmittedStatus(StudentQuestion.SubmittedStatus.PROMOTED)
+
+
+        when:
+        teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(savedQuestionId, StudentQuestion.SubmittedStatus.REJECTED, null)
+
+        then:
+        def error = thrown(TutorException)
+        error.errorMessage == CANNOT_EVALUATE_PROMOTED_QUESTION
+    }
+
     def "reject non existing student question"() {
         when:
-        teacherEvaluatesStudentQuestionService.rejectStudentQuestion(FAKE_STUDENT_QUESTION_ID, VALID_JUSTIFICATION)
+        teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(FAKE_STUDENT_QUESTION_ID, StudentQuestion.SubmittedStatus.REJECTED, VALID_JUSTIFICATION)
 
         then:
         def error = thrown(TutorException)

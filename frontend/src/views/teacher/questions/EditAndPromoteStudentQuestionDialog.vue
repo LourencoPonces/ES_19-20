@@ -10,11 +10,7 @@
     <v-card>
       <v-card-title>
         <span class="headline">
-          {{
-            editStudentQuestion && editStudentQuestion.id === null
-              ? 'New Student Question'
-              : 'Edit Student Question'
-          }}
+          Promote Student Question
         </span>
       </v-card-title>
 
@@ -100,17 +96,18 @@
       <v-card-actions>
         <v-spacer />
         <v-btn
-          color="blue darken-1"
-          @click="$emit('dialog', false)"
+          color="error"
+          @click="$emit('cancel-evaluate', false)"
           data-cy="CancelStudentQuestion"
           >Cancel</v-btn
         >
         <v-btn
-          color="blue darken-1"
-          @click="saveStudentQuestion"
+          color="primary"
+          dark
+          @click="promoteStudentQuestion"
           data-cy="SaveStudentQuestion"
         >
-          Save
+          Promote
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -124,7 +121,7 @@ import Topic from '@/models/management/Topic';
 import RemoteServices from '@/services/RemoteServices';
 
 @Component
-export default class EditStudentQuestionDialog extends Vue {
+export default class EditAndPromoteStudentQuestionDialog extends Vue {
   @Model('dialog', Boolean) dialog!: boolean;
   @Prop({ type: StudentQuestion, required: true })
   studentQuestion!: StudentQuestion;
@@ -140,12 +137,21 @@ export default class EditStudentQuestionDialog extends Vue {
     this.editStudentQuestion = new StudentQuestion(this.studentQuestion);
   }
 
-  async saveStudentQuestion() {
+  async promoteStudentQuestion() {
+    // this should not happen.
+    // Specifying this behaviour anyways
+    if (!this.editStudentQuestion) {
+      await this.$store.dispatch(
+        'error',
+        'Lost track of student question. Aborting...'
+      );
+      this.$emit('dialog', false);
+    }
+
     if (
-      this.editStudentQuestion &&
-      (!this.editStudentQuestion.title ||
-        !this.editStudentQuestion.content ||
-        !this.studentQuestionTopics)
+      !this.editStudentQuestion.title ||
+      !this.editStudentQuestion.content ||
+      !this.studentQuestionTopics
     ) {
       await this.$store.dispatch(
         'error',
@@ -153,27 +159,28 @@ export default class EditStudentQuestionDialog extends Vue {
       );
       return;
     }
-    this.editStudentQuestion.topics = this.studentQuestionTopics;
 
-    if (this.editStudentQuestion && this.editStudentQuestion.id != null) {
-      try {
-        const result = await RemoteServices.updateStudentQuestion(
-          this.editStudentQuestion
-        );
-        this.$emit('save-student-question', result);
-      } catch (error) {
-        await this.$store.dispatch('error', error);
-      }
-    } else if (this.editStudentQuestion) {
-      try {
-        const result = await RemoteServices.createStudentQuestion(
-          this.editStudentQuestion
-        );
-        this.$emit('save-student-question', result);
-      } catch (error) {
-        await this.$store.dispatch('error', error);
-      }
+    // *sigh*... prettier...
+    if (
+      !confirm(
+        'Are you sure you want to promote this question? This action cannot be undone'
+      )
+    )
+      return;
+
+    this.editStudentQuestion.topics = this.studentQuestionTopics;
+    this.editStudentQuestion.justification = 'Question edited by teacher';
+
+    await this.$store.dispatch('loading');
+    try {
+      const result = await RemoteServices.editAndPromoteStudentQuestion(
+        this.editStudentQuestion
+      );
+      this.$emit('save-student-question', result);
+    } catch (error) {
+      await this.$store.dispatch('error', error);
     }
+    await this.$store.dispatch('clearLoading');
   }
 
   removeTopic(topic: Topic) {

@@ -58,7 +58,9 @@
                 <v-icon>question_answer</v-icon>
               </v-list-item-action>
               <v-list-item-content>
-                <v-list-item-title>Questions</v-list-item-title>
+                <v-list-item-title data-cy="questions"
+                  >Questions</v-list-item-title
+                >
               </v-list-item-content>
             </v-list-item>
             <v-list-item
@@ -172,7 +174,7 @@
           <template v-slot:activator="{ on }">
             <v-btn v-on="on" text dark data-cy="tournaments">
               Tournaments
-              <v-icon>fas fa-file-alt</v-icon>
+              <v-icon>fas fa-trophy</v-icon>
             </v-btn>
           </template>
           <v-list dense>
@@ -185,6 +187,17 @@
               </v-list-item-action>
               <v-list-item-content>
                 <v-list-item-title>Available</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item
+              to="/student/tournaments-created"
+              data-cy="tournaments-created"
+            >
+              <v-list-item-action>
+                <v-icon>create</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Created</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -224,6 +237,17 @@
         <v-btn to="/student/stats" v-if="isStudent && currentCourse" text dark>
           Stats
           <v-icon>fas fa-user</v-icon>
+        </v-btn>
+
+        <v-btn
+          to="/student/dashboard"
+          v-if="isStudent && currentCourse"
+          text
+          data-cy="dashboardButton"
+          dark
+        >
+          Dashboard
+          <v-icon>fas fa-address-card</v-icon>
         </v-btn>
 
         <v-btn
@@ -411,9 +435,16 @@
 
           <v-list-item to="/student/tournaments-available">
             <v-list-item-action>
-              <v-icon>fas fa-trophy</v-icon>
+              <v-icon>assignment</v-icon>
             </v-list-item-action>
             <v-list-item-content>Available Tournaments</v-list-item-content>
+          </v-list-item>
+
+          <v-list-item to="/student/tournaments-created">
+            <v-list-item-action>
+              <v-icon>create</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>Created Tournaments</v-list-item-content>
           </v-list-item>
 
           <v-list-item to="/student/stats">
@@ -421,6 +452,17 @@
               <v-icon>fas fa-user</v-icon>
             </v-list-item-action>
             <v-list-item-content>Stats</v-list-item-content>
+          </v-list-item>
+          <v-list-item
+            to="/student/dashboard"
+            v-if="isStudent && currentCourse"
+            text
+            dark
+          >
+            <v-list-item-action>
+              <v-icon>fas fa-address-card</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>Dashboard</v-list-item-content>
           </v-list-item>
         </v-list-group>
 

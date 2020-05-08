@@ -18,6 +18,7 @@ import Tournament from '@/models/management/Tournament';
 import ClarificationRequest from '@/models/clarification/ClarificationRequest';
 import ClarificationMessage from '@/models/clarification/ClarificationMessage';
 import UserNameCacheService from './UserNameCacheService';
+import DashboardStats from '@/models/statement/DashboardStats';
 
 const httpClient = axios.create();
 httpClient.defaults.timeout = 10000;
@@ -102,6 +103,35 @@ export default class RemoteServices {
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
+  }
+
+  /*
+   * Dashboard
+   */
+
+  static async getUserDashboardStats(userId: number): Promise<DashboardStats> {
+    try {
+      const response = await httpClient.get(
+        `/courses/${Store.getters.getCurrentCourse.courseId}/dashboardStats/${userId}`
+      );
+      return new DashboardStats(response.data);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
+  static async updateStatsVisibility(
+    stats: DashboardStats
+  ): Promise<DashboardStats> {
+    try {
+      const response = await httpClient.put(
+        `/dashboardStats/${stats.id}`,
+        stats
+      );
+      return new DashboardStats(response.data);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
   }
 
   static async getQuestions(): Promise<Question[]> {
@@ -268,8 +298,22 @@ export default class RemoteServices {
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${questionId}/evaluate`,
         {
           evaluation: StudentQuestion.getServerStatusFormat(status),
-          justification: justification
+          justification: justification.trim() === '' ? null : justification
         }
+      );
+      return new StudentQuestion(response.data);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
+  static async editAndPromoteStudentQuestion(
+    studentQuestion: StudentQuestion
+  ): Promise<StudentQuestion> {
+    try {
+      const response = await httpClient.put(
+        `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${studentQuestion.id}/evaluate`,
+        StudentQuestion.toRequest(studentQuestion)
       );
       return new StudentQuestion(response.data);
     } catch (error) {
@@ -347,6 +391,21 @@ export default class RemoteServices {
       });
   }
 
+  static async getCreatedTournaments(): Promise<Tournament[]> {
+    return httpClient
+      .get(
+        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments/created`
+      )
+      .then(response => {
+        return response.data.map((tournament: any) => {
+          return new Tournament(tournament);
+        });
+      })
+      .catch(async error => {
+        console.log(this.errorMessage(error));
+      });
+  }
+
   static async createTournament(tournament: Tournament): Promise<Tournament> {
     try {
       const response = await httpClient.post(
@@ -370,6 +429,14 @@ export default class RemoteServices {
   static async deleteTournament(tournament: Tournament) {
     try {
       await httpClient.delete(`/tournaments/${tournament.id}`);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
+  static async cancelTournament(tournament: Tournament) {
+    try {
+      await httpClient.post(`/tournaments/${tournament.id}/cancel`);
     } catch (error) {
       throw Error(await this.errorMessage(error));
     }
@@ -773,7 +840,7 @@ export default class RemoteServices {
   ): Promise<ClarificationMessage> {
     if (content.trim() == '') {
       // eslint-disable-next-line
-      throw Error("Answer can't be empty");
+      throw Error("Message can't be empty");
     }
 
     try {

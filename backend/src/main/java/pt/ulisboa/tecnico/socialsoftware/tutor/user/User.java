@@ -12,6 +12,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
+import pt.ulisboa.tecnico.socialsoftware.tutor.overviewdashboard.MyStats;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
@@ -84,6 +85,11 @@ public class User implements UserDetails, DomainEntity {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Set<StudentQuestion> studentQuestions = new HashSet<>();
+
+    @OneToOne(fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            mappedBy = "user")
+    private MyStats myStats = new MyStats(this, MyStats.StatsVisibility.PRIVATE);
 
     public User() {
     }
@@ -228,8 +234,8 @@ public class User implements UserDetails, DomainEntity {
     }
 
     public void removeParticipantTournament(Integer participantTournamentId) {
-        Tournament createdTournament = getCreatedTournament(participantTournamentId);
-        createdTournaments.remove(participantTournamentId);
+        Tournament participantTournament = getParticipantTournament(participantTournamentId);
+        participantTournaments.remove(participantTournament);
     }
 
     public Set<Tournament> getParticipantTournaments() {
@@ -380,6 +386,8 @@ public class User implements UserDetails, DomainEntity {
         this.numberOfCorrectStudentAnswers = numberOfCorrectStudentAnswers;
     }
 
+    public MyStats getMyStats() {return this.myStats;}
+
     @Override
     public String toString() {
         return "User{" +
@@ -402,6 +410,16 @@ public class User implements UserDetails, DomainEntity {
                 ", lastAccess=" + lastAccess +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User))
+            return false;
+        User user = (User) o;
+        return this.id.equals(user.getId());
+    }
+
 
     public void increaseNumberOfQuizzes(Quiz.QuizType type) {
         switch (type) {

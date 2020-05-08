@@ -37,6 +37,8 @@ public enum ErrorMessage {
 
     INVALID_JUSTIFICATION("The justification \"%s\" is invalid"),
     CANNOT_REJECT_ACCEPTED_SUGGESTION("Cannot reject already accepted suggestion"),
+    CANNOT_REJECT_WITHOUT_JUSTIFICATION("You must justify why the question is rejected"),
+    CANNOT_EVALUATE_PROMOTED_QUESTION("Cannot evaluate promoted question"),
     INVALID_STATUS("Non existing status %s"),
     QUIZ_ANSWER_NOT_FOUND("Quiz answer not found with id %d"),
     QUIZ_NOT_FOUND("Quiz not found with id %d"),
@@ -85,10 +87,12 @@ public enum ErrorMessage {
 
     TOURNAMENT_NOT_CONSISTENT("Field %s of tournament is not consistent"),
     TOURNAMENT_NOT_AVAILABLE("There aren't any available tournaments"),
+    TOURNAMENT_CANNOT_BE_CANCELED("Tournament with %s status cannot be canceled"),
     USER_ALREADY_SIGNED_UP_IN_TOURNAMENT("User already signed-up in tournament"),
     TOURNAMENT_CREATED_BY_NON_STUDENT("Tournament created by non-student"),
     USER_NOT_ENROLLED_IN_COURSE_EXECUTION("User not enrolled in course execution %s"),
     MISSING_TOURNAMENT_OWNERSHIP("User did not create this tournament"),
+
 
 
     ACCESS_DENIED("You do not have permission to view this resource"),
@@ -103,7 +107,9 @@ public enum ErrorMessage {
     CLARIFICATION_MESSAGE_MISSING_CONTENT("Missing content of clarification request answer"),
     CLARIFICATION_MESSAGE_NOT_FOUND("Clarification Message not found"),
 
-    INVALID_STUDENT_QUESTION_EVALUATION("Invalid StudentQuestion Evaluation");
+    INVALID_STUDENT_QUESTION_EVALUATION("Invalid StudentQuestion Evaluation"),
+
+    NO_MY_STATS_FOUND("No stats with id %d");
 
     public final String label;
 
