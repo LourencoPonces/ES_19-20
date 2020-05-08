@@ -3,7 +3,7 @@ import { _ } from 'vue-underscore';
 export default class ClarificationMessage {
   id!: number;
   requestId!: number;
-  creatorId!: number;
+  creatorUsername!: string;
   content!: string;
   creationDate: string;
 
@@ -12,7 +12,7 @@ export default class ClarificationMessage {
       this.id = jsonObj.id;
       this.requestId = jsonObj.requestId;
       this.content = jsonObj.content;
-      this.creatorId = jsonObj.creatorId;
+      this.creatorUsername = jsonObj.creatorUsername;
       this.creationDate = jsonObj.creationDate;
     }
   }
@@ -29,12 +29,12 @@ export default class ClarificationMessage {
     return this.requestId;
   }
 
-  setOwnerId(id: number): void {
-    this.creatorId = id;
+  setCreatorUsername(u: string): void {
+    this.creatorUsername = u;
   }
 
-  getOwnerId(): number {
-    return this.creatorId;
+  getCreatorUsername(): string {
+    return this.creatorUsername;
   }
 
   setContent(c: string): void {
