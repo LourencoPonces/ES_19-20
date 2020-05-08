@@ -147,7 +147,7 @@ public class MyStatsService {
 
     private Integer calculateTournamentsScore(User user, int courseId) {
         // TODO: Must do after F6.1
-        return -1;
+        return 0;
     }
 
     public User findOwner(int statsId) {

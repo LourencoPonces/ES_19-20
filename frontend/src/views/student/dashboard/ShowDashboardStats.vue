@@ -40,7 +40,7 @@
       <v-col v-else>Private</v-col>
     </v-row>
     <v-divider />
-    <v-row data-cy="requestsSubmittedRow">
+    <v-row data-cy="tournamentsScoreRow">
       <v-col><b>Tournaments Score:</b></v-col>
       <v-col v-if="stats.isPublic(stats.statsNames.TOURNAMENTS_SCORE)">{{
         stats.getStatValue(stats.statsNames.TOURNAMENTS_SCORE)
