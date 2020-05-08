@@ -381,7 +381,6 @@ public class User implements UserDetails, DomainEntity {
         return numberOfCorrectStudentAnswers;
     }
 
-
     public void setNumberOfCorrectStudentAnswers(Integer numberOfCorrectStudentAnswers) {
         this.numberOfCorrectStudentAnswers = numberOfCorrectStudentAnswers;
     }

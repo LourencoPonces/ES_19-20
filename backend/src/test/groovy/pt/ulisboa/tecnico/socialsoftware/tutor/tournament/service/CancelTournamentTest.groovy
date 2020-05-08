@@ -151,11 +151,10 @@ class CancelTournamentTest extends Specification {
                 conclusionDate = now.minusDays(1)
                 break;
             case Tournament.Status.CANCELLED:
-                creationDate = now.minusDays(4)
-                availableDate = now.minusDays(3)
-                runningDate = now.minusDays(2)
-                conclusionDate = now.minusDays(1)
-                tournamentDto.setIsCancelled();
+                creationDate = now.minusDays(2)
+                availableDate = now.minusDays(1)
+                runningDate = now.plusDays(1)
+                conclusionDate = now.plusDays(2)
         }
 
         tournamentDto.setCreationDate(creationDate.format(formatter))
@@ -189,6 +188,9 @@ class CancelTournamentTest extends Specification {
         given: "a tournament with a not allowed status"
         prepareStatus(tournamentDto, status)
         tournamentDto = tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
+
+        if (status == Tournament.Status.CANCELLED)
+            tournamentRepository.findById(tournamentDto.getId()).get().cancel()
 
         when:
         tournamentService.cancelTournament(creator.getUsername(), tournamentDto.getId());
