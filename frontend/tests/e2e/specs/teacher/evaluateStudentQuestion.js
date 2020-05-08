@@ -1,9 +1,9 @@
-let APPROVED = 'Approved'
-let REJECTED = 'Rejected'
-let WAITING_FOR_APPROVAL = 'Waiting for Approval'
+let APPROVED = 'Approved';
+let REJECTED = 'Rejected';
+let WAITING_FOR_APPROVAL = 'Waiting for Approval';
 
 describe('Student Question Evaluation', () => {
-  let questionTitle = 'Question #' + Date.now().toString();
+  let questionTitle;
   let questionContent = 'To be or not to be?';
   let topics = ['Adventure Builder'];
   let options = ['AAAA', 'BBBB', 'CCCC', 'DDDD'];
@@ -16,13 +16,9 @@ describe('Student Question Evaluation', () => {
     // create student question
     cy.get('[data-cy="my-area"]').click();
     cy.get('[data-cy="student-questions"]').click();
-    cy.createStudentQuestion(
-      questionTitle,
-      questionContent,
-      topics,
-      options,
-      [1]
-    );
+    cy.createStudentQuestion(questionTitle, questionContent, topics, options, [
+      1
+    ]);
 
     cy.logout();
 
@@ -123,6 +119,26 @@ describe('Student Question Evaluation', () => {
     }
   });
 
+  it('Reject an approved student question with justification', () => {
+    let status = [WAITING_FOR_APPROVAL, APPROVED, REJECTED];
+    let justification = "Miss click. Horrible question :'(";
+
+    cy.get('[data-cy="management"]').click();
+    cy.get('[data-cy="student-questions"]').click();
+
+    cy.evaluateStudentQuestion(questionTitle, status[0], status[1], null);
+    cy.assertStudentQuestionEvaluation(questionTitle, status[1], '');
+
+    cy.evaluateStudentQuestion(
+      questionTitle,
+      status[1],
+      status[2],
+      justification
+    );
+
+    cy.assertStudentQuestionEvaluation(questionTitle, status[2], justification);
+  });
+
   // ===================================================================
   //  Invalid evaluations
   // ===================================================================
@@ -135,10 +151,10 @@ describe('Student Question Evaluation', () => {
     cy.get('[data-cy="student-questions"]').click();
 
     cy.evaluateStudentQuestion(
-        questionTitle,
-        prevStatus,
-        status,
-        justification
+      questionTitle,
+      prevStatus,
+      status,
+      justification
     );
 
     cy.errorMessageClose('You must approve or reject the question');
@@ -163,36 +179,6 @@ describe('Student Question Evaluation', () => {
 
     cy.errorMessageClose('Rejected questions must be justified');
 
-    cy.get('[data-cy="CancelEvaluation"]').click();
-  });
-
-  it('Reject an approved student question with justification', () => {
-    let status = [WAITING_FOR_APPROVAL, APPROVED, REJECTED];
-    let justification = "Miss click. Horrible question :'(";
-
-    cy.get('[data-cy="management"]').click();
-    cy.get('[data-cy="student-questions"]').click();
-
-    cy.evaluateStudentQuestion(
-      questionTitle,
-      status[0],
-      status[1],
-      null
-    );
-    cy.assertStudentQuestionEvaluation(
-        questionTitle,
-        status[1],
-        ''
-    );
-
-    cy.evaluateStudentQuestion(
-      questionTitle,
-      status[1],
-      status[2],
-      justification
-    );
-
-    cy.errorMessageClose('Cannot reject already accepted suggestion');
     cy.get('[data-cy="CancelEvaluation"]').click();
   });
 });

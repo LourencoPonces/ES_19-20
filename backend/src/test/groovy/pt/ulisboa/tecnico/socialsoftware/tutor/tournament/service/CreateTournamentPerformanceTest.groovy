@@ -4,13 +4,20 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.AnswersXmlImport
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentService
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto
@@ -49,6 +56,9 @@ class CreateTournamentPerformanceTest extends Specification {
     @Autowired
     TournamentRepository tournamentRepository
 
+    @Autowired
+    QuestionRepository questionRepository
+
     def tournament
     def creator
     def course
@@ -61,8 +71,6 @@ class CreateTournamentPerformanceTest extends Specification {
     def topicDtoList
 
     def setup() {
-        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-
         (courseExecution, course) = setupCourse()
 
         UserDto creatorDto = setupCreator(courseExecution)
@@ -94,6 +102,15 @@ class CreateTournamentPerformanceTest extends Specification {
         def topic = new Topic();
         topic.setName("TOPIC")
         topic.setCourse(course)
+
+        // So that quiz generation doesn't throw exceptions
+        def question = new Question()
+        question.addTopic(topic)
+        question.setTitle("question_title")
+        question.setCourse(course)
+        question.setStatus(Question.Status.AVAILABLE)
+
+        questionRepository.save(question)
         topicRepository.save(topic)
 
         def topicDto = new TopicDto(topic)
@@ -105,15 +122,15 @@ class CreateTournamentPerformanceTest extends Specification {
     private void setupTournament(UserDto creatorDto, DateTimeFormatter formatter, ArrayList<TopicDto> topicDtoList) {
         tournament = new TournamentDto()
         tournament.setTitle(TOURNAMENT_TITLE)
-        creationDate = LocalDateTime.now()
+        creationDate = DateHandler.now()
         availableDate = creationDate.plusDays(1)
         runningDate = creationDate.plusDays(2)
         conclusionDate = creationDate.plusDays(3)
         tournament.setNumberOfQuestions(1)
-        tournament.setCreationDate(creationDate.format(formatter))
-        tournament.setAvailableDate(availableDate.format(formatter))
-        tournament.setRunningDate(runningDate.format(formatter))
-        tournament.setConclusionDate(conclusionDate.format(formatter))
+        tournament.setCreationDate(DateHandler.toISOString(creationDate))
+        tournament.setAvailableDate(DateHandler.toISOString(availableDate))
+        tournament.setRunningDate(DateHandler.toISOString(runningDate))
+        tournament.setConclusionDate(DateHandler.toISOString(conclusionDate))
         tournament.setTopics(topicDtoList)
     }
 
@@ -138,6 +155,26 @@ class CreateTournamentPerformanceTest extends Specification {
         @Bean
         TournamentService tournamentService() {
             return new TournamentService()
+        }
+
+        @Bean
+        QuizService quizService() {
+            return new QuizService()
+        }
+
+        @Bean
+        QuestionService questionService() {
+            return new QuestionService()
+        }
+
+        @Bean
+        AnswerService answerService() {
+            return new AnswerService()
+        }
+
+        @Bean
+        AnswersXmlImport answersXmlImport() {
+            return new AnswersXmlImport()
         }
     }
 }

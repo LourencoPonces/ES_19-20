@@ -8,8 +8,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestAnswerRepository
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
@@ -56,12 +54,6 @@ class DeleteClarificationRequestServiceSpockTest extends Specification {
     QuizAnswerRepository quizAnswerRepository
 
     @Autowired
-    ClarificationRequestRepository clarificationRequestRepository
-
-    @Autowired
-    ClarificationRequestAnswerRepository clarificationRequestAnswerRepository;
-
-    @Autowired
     ClarificationService clarificationService
 
     Course course
@@ -72,16 +64,14 @@ class DeleteClarificationRequestServiceSpockTest extends Specification {
     QuizAnswer quizAnswer
     User student
     ClarificationRequestDto clarificationRequestDto
-    int studentId
-    int questionId
 
     def setup() {
-        course = createCourse(COURSE_NAME)
+        course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseExecution = createCourseExecution(course, ACRONYM, ACADEMIC_TERM)
-        quiz = createQuiz(1, courseExecution, Quiz.QuizType.GENERATED)
+        quiz = createQuiz(1, courseExecution, "GENERATED")
         question = createQuestion(1, course)
         quizQuestion = new QuizQuestion(quiz, question, 1)
-        student = createStudent(new User(), 1, 'NAME', 'USERNAME_ONE', courseExecution)
+        student = createStudent(1, 'NAME', 'USERNAME_ONE', courseExecution)
         quizAnswer = new QuizAnswer(student, quiz)
 
         courseRepository.save(course)
@@ -91,11 +81,10 @@ class DeleteClarificationRequestServiceSpockTest extends Specification {
         quizQuestionRepository.save(quizQuestion)
         userRepository.save(student)
         quizAnswerRepository.save(quizAnswer)
-        questionId = question.getId()
-        studentId = student.getId()
     }
 
-    private User createStudent(User student, int key, String name, String username, CourseExecution courseExecution) {
+    private static User createStudent(int key, String name, String username, CourseExecution courseExecution) {
+        def student = new User()
         student.setKey(key)
         student.setName(name)
         student.setUsername(username)
@@ -105,15 +94,16 @@ class DeleteClarificationRequestServiceSpockTest extends Specification {
         return student
     }
 
-    private Question createQuestion(int key, Course course) {
+    private static Question createQuestion(int key, Course course) {
         def question = new Question()
         question.setKey(key)
         question.setCourse(course)
+        question.setTitle("TITLE")
         course.addQuestion(question)
         return question
     }
 
-    private Quiz createQuiz(int key, CourseExecution courseExecution, Quiz.QuizType type) {
+    private static Quiz createQuiz(int key, CourseExecution courseExecution, String type) {
         def quiz = new Quiz()
         quiz.setKey(key)
         quiz.setType(type)
@@ -122,7 +112,7 @@ class DeleteClarificationRequestServiceSpockTest extends Specification {
         return quiz
     }
 
-    private CourseExecution createCourseExecution(Course course, String acronym, String term) {
+    private static CourseExecution createCourseExecution(Course course, String acronym, String term) {
         def courseExecution = new CourseExecution()
         courseExecution.setCourse(course)
         courseExecution.setAcronym(acronym)
@@ -130,31 +120,25 @@ class DeleteClarificationRequestServiceSpockTest extends Specification {
         return courseExecution
     }
 
-    private Course createCourse(String name) {
-        def course = new Course()
-        course.setName(name)
-        return course
-    }
 
     def "student submitted 1 clarification request"() {
         given:
         clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent(CONTENT)
-        clarificationRequestDto = clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
+        clarificationRequestDto = clarificationService.submitClarificationRequest(question.id, student.id, clarificationRequestDto)
 
         when:
-        clarificationService.deleteClarificationRequest(studentId, clarificationRequestDto.getId())
-        def result = clarificationService.getStudentClarificationRequests(studentId)
+        clarificationService.deleteClarificationRequest(student.id, clarificationRequestDto.id)
+        def result = clarificationService.getStudentClarificationRequests(student.id)
 
         then:
-        result != null
-        result.size() == 0
+        result.requests.size() == 0
     }
 
 
     def "clarification request doesn't exist"() {
         when:
-        clarificationService.deleteClarificationRequest(studentId, NONEXISTENT_ID)
+        clarificationService.deleteClarificationRequest(student.id, NONEXISTENT_ID)
 
         then:
         def exception = thrown(TutorException)
@@ -166,7 +150,7 @@ class DeleteClarificationRequestServiceSpockTest extends Specification {
 
         @Bean
         ClarificationService ClarificationService() {
-            return new ClarificationService();
+            return new ClarificationService()
         }
     }
 }

@@ -4,15 +4,23 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
+import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.AnswersXmlImport
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentService
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament
@@ -55,6 +63,9 @@ class SignUpInTournamentTest extends Specification{
     @Autowired
     TournamentRepository tournamentRepository
 
+    @Autowired
+    QuestionRepository questionRepository
+
     def tournamentDto
     def creator
     def participant
@@ -66,6 +77,7 @@ class SignUpInTournamentTest extends Specification{
     def conclusionDate
     def formatter
     def topicDtoList
+    def question
 
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
@@ -90,6 +102,15 @@ class SignUpInTournamentTest extends Specification{
         def topic = new Topic();
         topic.setName("TOPIC")
         topic.setCourse(course)
+
+        // So that quiz generation doesn't throw exceptions
+        question = new Question()
+        question.addTopic(topic)
+        question.setTitle("question_title")
+        question.setCourse(course)
+        question.setStatus(Question.Status.AVAILABLE)
+
+        questionRepository.save(question)
         topicRepository.save(topic)
 
         def topicDto = new TopicDto(topic)
@@ -117,6 +138,18 @@ class SignUpInTournamentTest extends Specification{
         def tournamentCreated = tournamentRepository.findAll().get(0)
         def participants = tournamentCreated.getParticipants()
         participants.size() == 2
+
+        def generatedQuiz = tournamentCreated.getQuiz()
+        generatedQuiz != null
+        generatedQuiz.getId() != null
+        generatedQuiz.getKey() != null
+        generatedQuiz.getTitle() != null
+        generatedQuiz.getType() == Quiz.QuizType.TOURNAMENT
+        generatedQuiz.getCreationDate().equals(tournamentCreated.getCreationDate())
+        generatedQuiz.getAvailableDate().equals(tournamentCreated.getRunningDate())
+        generatedQuiz.getConclusionDate().equals(tournamentCreated.getConclusionDate())
+        generatedQuiz.getResultsDate().equals(tournamentCreated.getConclusionDate())
+        generatedQuiz.getQuizQuestions().first().getId() == question.getId()
     }
 
     def "sign-up in a tournament although there aren't tournaments"() {
@@ -193,18 +226,22 @@ class SignUpInTournamentTest extends Specification{
                 conclusionDate = now.plusDays(1)
                 break;
             case Tournament.Status.FINISHED:
-            case Tournament.Status.CANCELLED:
                 creationDate = now.minusDays(4)
                 availableDate = now.minusDays(3)
                 runningDate = now.minusDays(2)
                 conclusionDate = now.minusDays(1)
                 break;
+            case Tournament.Status.CANCELLED:
+                creationDate = now.minusDays(2)
+                availableDate = now.minusDays(1)
+                runningDate = now.plusDays(1)
+                conclusionDate = now.plusDays(2)
         }
 
-        tournamentDto.setCreationDate(creationDate.format(formatter))
-        tournamentDto.setAvailableDate(availableDate.format(formatter))
-        tournamentDto.setRunningDate(runningDate.format(formatter))
-        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
+        tournamentDto.setCreationDate(DateHandler.toISOString(creationDate))
+        tournamentDto.setAvailableDate(DateHandler.toISOString(availableDate))
+        tournamentDto.setRunningDate(DateHandler.toISOString(runningDate))
+        tournamentDto.setConclusionDate(DateHandler.toISOString(conclusionDate))
     }
 
     @TestConfiguration
@@ -213,6 +250,26 @@ class SignUpInTournamentTest extends Specification{
         @Bean
         TournamentService tournamentService() {
             return new TournamentService()
+        }
+
+        @Bean
+        QuizService quizService() {
+            return new QuizService()
+        }
+
+        @Bean
+        QuestionService questionService() {
+            return new QuestionService()
+        }
+
+        @Bean
+        AnswerService answerService() {
+            return new AnswerService()
+        }
+
+        @Bean
+        AnswersXmlImport answersXmlImport() {
+            return new AnswersXmlImport()
         }
     }
 }

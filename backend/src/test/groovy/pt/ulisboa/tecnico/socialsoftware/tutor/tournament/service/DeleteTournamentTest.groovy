@@ -4,15 +4,22 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
+import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.AnswersXmlImport
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentService
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto
@@ -53,6 +60,9 @@ class DeleteTournamentTest extends Specification {
     @Autowired
     TournamentRepository tournamentRepository
 
+    @Autowired
+    QuestionRepository questionRepository
+
     Tournament tournament
     TournamentDto tournamentDto
     User creator
@@ -84,6 +94,15 @@ class DeleteTournamentTest extends Specification {
         def topic = new Topic();
         topic.setName("TOPIC")
         topic.setCourse(course)
+
+        // So that quiz generation doesn't throw exceptions
+        def question = new Question()
+        question.addTopic(topic)
+        question.setTitle("question_title")
+        question.setCourse(course)
+        question.setStatus(Question.Status.AVAILABLE)
+
+        questionRepository.save(question)
         topicRepository.save(topic)
 
         def topicDto = new TopicDto(topic)
@@ -97,10 +116,10 @@ class DeleteTournamentTest extends Specification {
         tournamentDto.setTopics(topicDtoList)
 
         def now = LocalDateTime.now()
-        tournamentDto.setCreationDate(now.minusDays(2).format(formatter))
-        tournamentDto.setAvailableDate(now.minusDays(1).format(formatter))
-        tournamentDto.setRunningDate(now.plusDays(1).format(formatter))
-        tournamentDto.setConclusionDate(now.plusDays(2).format(formatter))
+        tournamentDto.setCreationDate(DateHandler.toISOString(now.minusDays(2)))
+        tournamentDto.setAvailableDate(DateHandler.toISOString(now.minusDays(1)))
+        tournamentDto.setRunningDate(DateHandler.toISOString(now.plusDays(1)))
+        tournamentDto.setConclusionDate(DateHandler.toISOString(now.plusDays(2)))
 
         tournamentDto = tournamentService.createTournament(creator.getUsername(), courseExecution.getId(), tournamentDto);
         tournament = tournamentRepository.findById(tournamentDto.getId()).get()
@@ -143,6 +162,26 @@ class DeleteTournamentTest extends Specification {
         @Bean
         TournamentService tournamentService() {
             return new TournamentService()
+        }
+
+        @Bean
+        QuizService quizService() {
+            return new QuizService()
+        }
+
+        @Bean
+        QuestionService questionService() {
+            return new QuestionService()
+        }
+
+        @Bean
+        AnswerService answerService() {
+            return new AnswerService()
+        }
+
+        @Bean
+        AnswersXmlImport answersXmlImport() {
+            return new AnswersXmlImport()
         }
     }
 }

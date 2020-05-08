@@ -4,12 +4,15 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest;
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
+import pt.ulisboa.tecnico.socialsoftware.tutor.overviewdashboard.MyStats;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
@@ -74,11 +77,19 @@ public class User implements UserDetails, DomainEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Tournament> createdTournaments = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator", fetch = FetchType.LAZY)
     private Set<ClarificationRequest> clarificationRequests = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator", fetch = FetchType.LAZY)
+    private Set<ClarificationMessage> clarificationMessages = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Set<StudentQuestion> studentQuestions = new HashSet<>();
+
+    @OneToOne(fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            mappedBy = "user")
+    private MyStats myStats = new MyStats(this, MyStats.StatsVisibility.PRIVATE);
 
     public User() {
     }
@@ -88,7 +99,7 @@ public class User implements UserDetails, DomainEntity {
         setUsername(username);
         this.key = key;
         this.role = role;
-        this.creationDate = LocalDateTime.now();
+        this.creationDate = DateHandler.now();
         this.numberOfTeacherQuizzes = 0;
         this.numberOfInClassQuizzes = 0;
         this.numberOfStudentQuizzes = 0;
@@ -107,10 +118,6 @@ public class User implements UserDetails, DomainEntity {
 
     public Integer getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public Integer getKey() {
@@ -140,6 +147,20 @@ public class User implements UserDetails, DomainEntity {
 
     public String getEnrolledCoursesAcronyms() {
         return enrolledCoursesAcronyms;
+    }
+
+    public void removeClarificationMessage(int messageId) {
+        ClarificationMessage toRemove = null;
+        for (ClarificationMessage msg : clarificationMessages) {
+            if (msg.getId() == messageId) {
+                toRemove = msg;
+                break;
+            }
+        }
+
+        if (toRemove != null) {
+            clarificationMessages.remove(toRemove);
+        }
     }
 
     public void setEnrolledCoursesAcronyms(String enrolledCoursesAcronyms) {
@@ -185,13 +206,9 @@ public class User implements UserDetails, DomainEntity {
     public Set<ClarificationRequest> getClarificationRequests() {
         return clarificationRequests;
     }
-    public void removeClarificationRequest(int reqId) {
-        for (ClarificationRequest req : clarificationRequests) {
-            if (req.getId() == reqId) {
-                clarificationRequests.remove(req);
-                break;
-            }
-        }
+
+    public Set<ClarificationMessage> getClarificationMessages() {
+        return clarificationMessages;
     }
 
     public void addCreatedTournament(Tournament newCreatedTournament) {
@@ -217,8 +234,8 @@ public class User implements UserDetails, DomainEntity {
     }
 
     public void removeParticipantTournament(Integer participantTournamentId) {
-        Tournament createdTournament = getCreatedTournament(participantTournamentId);
-        createdTournaments.remove(participantTournamentId);
+        Tournament participantTournament = getParticipantTournament(participantTournamentId);
+        participantTournaments.remove(participantTournament);
     }
 
     public Set<Tournament> getParticipantTournaments() {
@@ -364,10 +381,44 @@ public class User implements UserDetails, DomainEntity {
         return numberOfCorrectStudentAnswers;
     }
 
-
     public void setNumberOfCorrectStudentAnswers(Integer numberOfCorrectStudentAnswers) {
         this.numberOfCorrectStudentAnswers = numberOfCorrectStudentAnswers;
     }
+
+    public MyStats getMyStats() {return this.myStats;}
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", key=" + key +
+                ", role=" + role +
+                ", username='" + username + '\'' +
+                ", name='" + name + '\'' +
+                ", enrolledCoursesAcronyms='" + enrolledCoursesAcronyms + '\'' +
+                ", numberOfTeacherQuizzes=" + numberOfTeacherQuizzes +
+                ", numberOfStudentQuizzes=" + numberOfStudentQuizzes +
+                ", numberOfInClassQuizzes=" + numberOfInClassQuizzes +
+                ", numberOfTeacherAnswers=" + numberOfTeacherAnswers +
+                ", numberOfInClassAnswers=" + numberOfInClassAnswers +
+                ", numberOfStudentAnswers=" + numberOfStudentAnswers +
+                ", numberOfCorrectTeacherAnswers=" + numberOfCorrectTeacherAnswers +
+                ", numberOfCorrectInClassAnswers=" + numberOfCorrectInClassAnswers +
+                ", numberOfCorrectStudentAnswers=" + numberOfCorrectStudentAnswers +
+                ", creationDate=" + creationDate +
+                ", lastAccess=" + lastAccess +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User))
+            return false;
+        User user = (User) o;
+        return this.id.equals(user.getId());
+    }
+
 
     public void increaseNumberOfQuizzes(Quiz.QuizType type) {
         switch (type) {

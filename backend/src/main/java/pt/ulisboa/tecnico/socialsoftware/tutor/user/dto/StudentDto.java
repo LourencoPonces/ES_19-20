@@ -1,11 +1,12 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.user.dto;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import java.io.Serializable;
-import java.time.format.DateTimeFormatter;
 
 public class StudentDto implements Serializable {
+    private int id;
     private String username;
     private String name;
     private Integer numberOfTeacherQuizzes;
@@ -23,17 +24,18 @@ public class StudentDto implements Serializable {
     private String lastAccess;
 
     public StudentDto(User user) {
+        this.id = user.getId();
         this.username = user.getUsername();
         this.name = user.getName();
-
         this.numberOfTeacherQuizzes = user.getNumberOfTeacherQuizzes();
         this.numberOfInClassQuizzes = user.getNumberOfInClassQuizzes();
         this.numberOfStudentQuizzes = user.getNumberOfStudentQuizzes();
-
         this.numberOfAnswers = user.getNumberOfTeacherAnswers() + user.getNumberOfInClassAnswers() + user.getNumberOfStudentAnswers();
         this.numberOfTeacherAnswers = user.getNumberOfTeacherAnswers();
         this.numberOfInClassAnswers = user.getNumberOfInClassAnswers();
         this.numberOfStudentAnswers = user.getNumberOfStudentAnswers();
+        this.lastAccess = DateHandler.toISOString(user.getLastAccess());
+        this.creationDate = DateHandler.toISOString(user.getCreationDate());
 
         if (this.numberOfTeacherAnswers != 0)
             this.percentageOfCorrectTeacherAnswers = user.getNumberOfCorrectTeacherAnswers() * 100 / this.numberOfTeacherAnswers;
@@ -44,11 +46,11 @@ public class StudentDto implements Serializable {
         if (this.numberOfAnswers != 0)
             this.percentageOfCorrectAnswers = (user.getNumberOfCorrectTeacherAnswers() + user.getNumberOfCorrectInClassAnswers() + user.getNumberOfCorrectStudentAnswers())  * 100 / this.numberOfAnswers;
 
-        if (user.getLastAccess() != null)
-            this.lastAccess = user.getLastAccess().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-        if (user.getCreationDate() != null)
-            this.creationDate = user.getCreationDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
     }
+
+    public int getId() { return id; }
+
+    public void setId(int id) { this.id = id; }
 
     public String getUsername() {
         return username;

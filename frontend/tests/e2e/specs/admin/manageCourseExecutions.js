@@ -1,6 +1,9 @@
 describe('Administration walkthrough', () => {
   beforeEach(() => {
     cy.demoAdminLogin();
+
+    cy.get('[data-cy="administrationMenuButton"]').click();
+    cy.get('[data-cy="manageCoursesMenuButton"]').click();
   });
 
   afterEach(() => {

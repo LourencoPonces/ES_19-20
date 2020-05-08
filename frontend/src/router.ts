@@ -19,10 +19,13 @@ import SolvedQuizzesView from './views/student/SolvedQuizzesView.vue';
 import QuizView from './views/student/quiz/QuizView.vue';
 import ResultsView from './views/student/quiz/ResultsView.vue';
 import StatsView from './views/student/StatsView.vue';
+import DashboardView from './views/student/dashboard/DashboardView.vue';
 import ScanView from './views/student/ScanView.vue';
 import ClarificationsStudentView from './views/student/ClarificationsView.vue';
-import StudentQuestionView from './views/student/StudentQuestionView.vue';
+import StudentQuestionView from './views/student/studentQuestions/StudentQuestionView.vue';
+import RunningTournamentsView from '@/views/student/tournament/RunningTournamentsView.vue';
 import AvailableTournamentsView from '@/views/student/tournament/AvailableTournamentsView.vue';
+import CreatedTournamentsView from '@/views/student/tournament/CreatedTournamentsView.vue';
 
 import AdminManagementView from '@/views/admin/AdminManagementView.vue';
 import NotFoundView from '@/views/NotFoundView.vue';
@@ -209,11 +212,38 @@ let router = new Router({
           }
         },
         {
+          path: 'dashboard',
+          name: 'dasboard',
+          component: DashboardView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - Dashboard',
+            requiredAuth: 'Student'
+          }
+        },
+        {
+          path: 'tournaments-running',
+          name: 'tournaments-running',
+          component: RunningTournamentsView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - Running Tournaments',
+            requiredAuth: 'Student'
+          }
+        },
+        {
           path: 'tournaments-available',
           name: 'tournaments-available',
           component: AvailableTournamentsView,
           meta: {
             title: process.env.VUE_APP_NAME + ' - Available Tournaments',
+            requiredAuth: 'Student'
+          }
+        },
+        {
+          path: 'tournaments-created',
+          name: 'tournaments-created',
+          component: CreatedTournamentsView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - Created Tournaments',
             requiredAuth: 'Student'
           }
         },

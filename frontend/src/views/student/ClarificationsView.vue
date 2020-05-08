@@ -1,15 +1,18 @@
 <template>
   <div class="container">
     <h2>Clarification Requests</h2>
-    <v-card class="table">
+    <v-card>
       <v-data-table
         :headers="headers"
         :items="requests"
         :search="search"
         multi-sort
+        show-expand
+        single-expand
         :mobile-breakpoint="0"
         :items-per-page="15"
         :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
+        class="table"
         data-cy="table"
       >
         <template v-slot:top>
@@ -27,90 +30,72 @@
           </v-card-title>
         </template>
 
-        <template v-slot:item.content="{ item }">
-          <span style="white-space: pre;">{{ item.content }}</span>
+        <template v-slot:item.status="{ item }">
+          <v-icon
+            v-if="item.isPrivate()"
+            small
+            class="mr-2"
+            :data-cy="'private-' + item.content.slice(0, 15)"
+            >fas fa-eye-slash</v-icon
+          >
+          <v-icon
+            v-else
+            small
+            class="mr-2"
+            :data-cy="'public-' + item.content.slice(0, 15)"
+            >fas fa-eye</v-icon
+          >
         </template>
 
-        <template v-slot:item.answer="{ item }">
-          <span style="white-space: pre;">{{ showAnswer(item) }}</span>
+        <template v-slot:item.content="{ item }">
+          <div
+            class="short-content"
+            :data-cy="'req-' + item.content.slice(0, 15)"
+          >
+            {{ item.content }}
+          </div>
+        </template>
+
+        <template v-slot:item.resolved="{ item }">
+          <v-simple-checkbox
+            :value="item.resolved"
+            readonly
+            :aria-label="
+              item.resolved
+                ? 'request was resolved'
+                : 'request was not resolved'
+            "
+          />
         </template>
 
         <template v-slot:item.action="{ item }">
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <v-icon
-                :disabled="item.hasAnswer"
-                small
-                class="mr-2"
-                v-on="on"
-                @click="startEditRequest(item)"
-                data-cy="edit"
-                >edit</v-icon
-              >
-            </template>
-            <span>Edit Request</span>
-          </v-tooltip>
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
-              <v-icon
-                :disabled="item.hasAnswer"
-                small
+                :disabled="item.hasMessages"
+                large
                 class="mr-2"
                 v-on="on"
                 @click="deleteRequest(item)"
                 color="red"
-                data-cy="delete"
+                data-cy="deleteRequest"
                 >delete</v-icon
               >
             </template>
             <span>Delete Request</span>
           </v-tooltip>
         </template>
-      </v-data-table>
 
-      <template>
-        <v-row justify="center">
-          <v-dialog tile v-model="dialog" persistent max-width="60%">
-            <v-card>
-              <v-card-title class="headline">
-                Edit Clarification Request
-              </v-card-title>
-              <v-card-text>
-                <v-textarea
-                  v-model="newContent"
-                  label="Your request goes here."
-                  data-cy="inputNewContent"
-                >
-                </v-textarea>
-              </v-card-text>
-              <v-card-actions data-cy="actions">
-                <v-spacer></v-spacer>
-                <v-btn
-                  dark
-                  color="red"
-                  @click="
-                    dialog = false;
-                    stopEditRequest();
-                  "
-                >
-                  Cancel
-                </v-btn>
-                <v-btn
-                  dark
-                  color="primary"
-                  @click="
-                    dialog = false;
-                    editRequest();
-                  "
-                  data_cy="submitEdition"
-                >
-                  Edit
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-        </v-row>
-      </template>
+        <template v-slot:expanded-item="{ headers, item }">
+          <td :colspan="headers.length" class="clarification-expand-container">
+            <h2>Clarification Request:</h2>
+            <div class="multiline msg-content">{{ item.content }}</div>
+
+            <h3>Messages:</h3>
+            <clarification-thread :request="item"></clarification-thread>
+          </td>
+        </template>
+      </v-data-table>
     </v-card>
   </div>
 </template>
@@ -120,8 +105,13 @@ import { Component, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import ClarificationRequest from '@/models/clarification/ClarificationRequest';
 import Question from '@/models/management/Question';
+import ClarificationThread from '../ClarificationThread.vue';
 
-@Component
+@Component({
+  components: {
+    'clarification-thread': ClarificationThread
+  }
+})
 export default class ClarificationsView extends Vue {
   requests: ClarificationRequest[] = [];
   search: string = '';
@@ -130,24 +120,48 @@ export default class ClarificationsView extends Vue {
   dialog: boolean = false;
 
   headers: object = [
-    { text: 'Request', value: 'content', align: 'center', sortable: false },
-    { text: 'Answer', value: 'answer', align: 'center', sortable: false },
-    { text: 'Submission Date', value: 'creationDate', align: 'center' },
-    { text: 'Actions', value: 'action', align: 'center', sortable: false }
+    {
+      text: 'Actions',
+      value: 'action',
+      align: 'center',
+      sortable: false,
+      width: '100px'
+    },
+    {
+      text: 'Visibility',
+      value: 'status',
+      align: 'center',
+      sortable: false,
+      width: '100px'
+    },
+    {
+      text: 'Request',
+      value: 'content',
+      align: 'left'
+    },
+    {
+      text: 'Resolved',
+      value: 'resolved',
+      align: 'center',
+      sortable: false,
+      width: '110px'
+    },
+    {
+      text: 'Creation Date',
+      value: 'creationDate',
+      align: 'center',
+      width: '150px'
+    }
   ];
 
   async created() {
     await this.$store.dispatch('loading');
     try {
-      this.requests = await RemoteServices.getStudentClarificationRequests();
+      this.requests = await RemoteServices.getUserClarificationRequests();
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
     await this.$store.dispatch('clearLoading');
-  }
-
-  showAnswer(request: ClarificationRequest): string | void {
-    return request.getAnswerContent();
   }
 
   async deleteRequest(req: ClarificationRequest) {
@@ -164,33 +178,6 @@ export default class ClarificationsView extends Vue {
       await this.$store.dispatch('error', error);
     }
     await this.$store.dispatch('clearLoading');
-  }
-
-  startEditRequest(request: ClarificationRequest): void {
-    this.editingItem = request;
-    this.newContent = request.getContent();
-    this.dialog = true;
-  }
-
-  stopEditRequest(): void {
-    this.editingItem = null;
-    this.newContent = '';
-  }
-
-  async editRequest() {
-    await this.$store.dispatch('loading');
-    if (this.editingItem) {
-      this.editingItem.setContent(this.newContent);
-      try {
-        this.editingItem = await RemoteServices.editClarificationRequest(
-          this.editingItem
-        );
-        this.stopEditRequest();
-      } catch (error) {
-        await this.$store.dispatch('error', error);
-      }
-      await this.$store.dispatch('clearLoading');
-    }
   }
 }
 </script>
@@ -211,5 +198,40 @@ export default class ClarificationsView extends Vue {
       font-size: 0.5em;
     }
   }
+}
+
+.clarification-expand-container {
+  text-align: left;
+  padding: 20px;
+
+  h2,
+  h3 {
+    margin: 10px 0;
+    font-size: initial;
+    text-align: left;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  .msg-content {
+    margin-bottom: 10px;
+  }
+}
+
+.multiline {
+  white-space: pre-wrap;
+}
+
+.short-content {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+::v-deep .table table {
+  table-layout: fixed;
+  min-width: 600px;
 }
 </style>

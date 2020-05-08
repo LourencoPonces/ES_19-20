@@ -29,6 +29,11 @@ class TeacherEvaluatesStudentQuestionProfilingTest extends Specification {
 
     public static final String USER_NAME = "ist199999"
 
+    public static final String QUESTION_TITLE = "Question Title"
+    public static final String QUESTION_CONTENT = "Question Content"
+
+    public static final String OPTION_CONTENT = "Option Content"
+
     @Autowired
     TeacherEvaluatesStudentQuestionService teacherEvaluatesStudentQuestionService
 
@@ -64,11 +69,15 @@ class TeacherEvaluatesStudentQuestionProfilingTest extends Specification {
 
     private StudentQuestion createStudentQuestion(User user, Course course, Integer key) {
         def studentQuestion = new StudentQuestion()
+        studentQuestion.setTitle(QUESTION_TITLE)
+        studentQuestion.setContent(QUESTION_CONTENT)
         studentQuestion.addTopic(new Topic())
 
         Option o = new Option()
         o.setCorrect(true)
         o.setQuestion(studentQuestion)
+        o.setSequence(0)
+        o.setContent(OPTION_CONTENT)
         studentQuestion.addOption(o)
         studentQuestion.setKey(key)
         studentQuestion.setStudentQuestionKey(key)
@@ -93,7 +102,7 @@ class TeacherEvaluatesStudentQuestionProfilingTest extends Specification {
      */
     def "performance testing to evaluate 10000 student questions"() {
         def limit = 1  // USE 10000
-        List<Integer> studentQuestions =new LinkedList<Integer>();
+        List<Integer> studentQuestions = new LinkedList<Integer>();
 
         Random random = new Random()
 
@@ -110,9 +119,9 @@ class TeacherEvaluatesStudentQuestionProfilingTest extends Specification {
         when:
         for(Integer i : studentQuestions) {
             if(random.nextBoolean()) {
-                teacherEvaluatesStudentQuestionService.acceptStudentQuestion(i, "")
+                teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(i, StudentQuestion.SubmittedStatus.APPROVED, null)
             } else {
-                teacherEvaluatesStudentQuestionService.rejectStudentQuestion(i, "Bad question >:c")
+                teacherEvaluatesStudentQuestionService.evaluateStudentQuestion(i, StudentQuestion.SubmittedStatus.REJECTED, "Bad question >:c")
             }
         }
 

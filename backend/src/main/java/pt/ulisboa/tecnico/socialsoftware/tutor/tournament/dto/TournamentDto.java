@@ -1,13 +1,13 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto;
 
-import org.springframework.data.annotation.Transient;
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,9 +28,6 @@ public class TournamentDto implements Serializable {
 
     private List<TopicDto> topics = new ArrayList<>();
 
-    @Transient
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-
     public TournamentDto() {}
 
     public TournamentDto(Tournament tournament) {
@@ -41,13 +38,13 @@ public class TournamentDto implements Serializable {
         this.isCancelled = tournament.getStatus() == Tournament.Status.CANCELLED;
 
         if (tournament.getCreationDate() != null)
-            this.creationDate = tournament.getCreationDate().format(formatter);
+            this.creationDate = DateHandler.toISOString(tournament.getCreationDate());
         if (tournament.getAvailableDate() != null)
-            this.availableDate = tournament.getAvailableDate().format(formatter);
+            this.availableDate = DateHandler.toISOString(tournament.getAvailableDate());
         if (tournament.getRunningDate() != null)
-            this.runningDate = tournament.getRunningDate().format(formatter);
+            this.runningDate = DateHandler.toISOString(tournament.getRunningDate());
         if (tournament.getConclusionDate() != null)
-            this.conclusionDate = tournament.getConclusionDate().format(formatter);
+            this.conclusionDate = DateHandler.toISOString(tournament.getConclusionDate());
 
         setCreator(new UserDto(tournament.getCreator()));
         this.participants = tournament.getParticipants().stream().map(UserDto::new).collect(Collectors.toList());
@@ -78,10 +75,11 @@ public class TournamentDto implements Serializable {
         this.title = title;
     }
 
+    @JsonIgnore
     public Tournament.Status getStatus() {
         if (isCancelled) return Tournament.Status.CANCELLED;
 
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = DateHandler.now();
         LocalDateTime creationDate = getCreationDateDate();
         LocalDateTime availableDate = getAvailableDateDate();
         LocalDateTime runningDate = getRunningDateDate();
@@ -95,38 +93,6 @@ public class TournamentDto implements Serializable {
             return Tournament.Status.RUNNING;
         else
             return Tournament.Status.FINISHED;
-    }
-
-    public String getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(String creationDate) {
-        this.creationDate = creationDate;
-    }
-
-    public String getAvailableDate() {
-        return availableDate;
-    }
-
-    public void setAvailableDate(String availableDate) {
-        this.availableDate = availableDate;
-    }
-
-    public String getRunningDate() {
-        return runningDate;
-    }
-
-    public void setRunningDate(String runningDate) {
-        this.runningDate = runningDate;
-    }
-
-    public String getConclusionDate() {
-        return conclusionDate;
-    }
-
-    public void setConclusionDate(String conclusionDate) {
-        this.conclusionDate = conclusionDate;
     }
 
     public Integer getNumberOfQuestions() {
@@ -161,31 +127,67 @@ public class TournamentDto implements Serializable {
         this.topics = topics;
     }
 
+    public boolean getIsCancelled() { return isCancelled; }
+
+    public void setIsCancelled() { isCancelled = true; }
+    
+    public String getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(String creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public String getAvailableDate() {
+        return availableDate;
+    }
+
+    public void setAvailableDate(String availableDate) {
+        this.availableDate = availableDate;
+    }
+
+    public String getRunningDate() {
+        return runningDate;
+    }
+
+    public void setRunningDate(String runningDate) {
+        this.runningDate = runningDate;
+    }
+
+    public String getConclusionDate() {
+        return conclusionDate;
+    }
+
+    public void setConclusionDate(String conclusionDate) {
+        this.conclusionDate = conclusionDate;
+    }
+
     public LocalDateTime getCreationDateDate() {
         if (getCreationDate() == null || getCreationDate().isEmpty()) {
             return null;
         }
-        return LocalDateTime.parse(getCreationDate(), formatter);
+        return DateHandler.toLocalDateTime(getCreationDate());
     }
 
     public LocalDateTime getAvailableDateDate() {
         if (getAvailableDate() == null || getAvailableDate().isEmpty()) {
             return null;
         }
-        return LocalDateTime.parse(getAvailableDate(), formatter);
+        return DateHandler.toLocalDateTime(getAvailableDate());
     }
 
     public LocalDateTime getRunningDateDate() {
         if (getRunningDate() == null || getRunningDate().isEmpty()) {
             return null;
         }
-        return LocalDateTime.parse(getRunningDate(), formatter);
+        return DateHandler.toLocalDateTime(getRunningDate());
     }
 
     public LocalDateTime getConclusionDateDate() {
         if (getConclusionDate() == null || getConclusionDate().isEmpty()) {
             return null;
         }
-        return LocalDateTime.parse(getConclusionDate(), formatter);
+        return DateHandler.toLocalDateTime(getConclusionDate());
     }
 }

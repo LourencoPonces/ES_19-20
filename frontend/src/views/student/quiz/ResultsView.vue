@@ -56,6 +56,7 @@
       :clarifications="
         statementManager.statementQuiz.questions[questionOrder].clarifications
       "
+      :userRequests="userRequests"
       @submit-request="submitRequest"
     />
   </div>
@@ -79,18 +80,20 @@ import StatementQuiz from '@/models/statement/StatementQuiz';
 export default class ResultsView extends Vue {
   statementManager: StatementManager = StatementManager.getInstance;
   questionOrder: number = 0;
+  userRequests: ClarificationRequest[] = [];
 
   async created() {
+    await this.$store.dispatch('loading');
     if (this.statementManager.isEmpty()) {
       await this.$router.push({ name: 'create-quiz' });
     } else if (this.statementManager.correctAnswers.length === 0) {
-      await this.$store.dispatch('loading');
       setTimeout(() => {
         this.statementManager.concludeQuiz();
       }, 2000);
-
-      await this.$store.dispatch('clearLoading');
     }
+
+    this.userRequests = await RemoteServices.getUserClarificationRequests();
+    await this.$store.dispatch('clearLoading');
   }
 
   increaseOrder(): void {
@@ -115,29 +118,23 @@ export default class ResultsView extends Vue {
   }
 
   async submitRequest(info: string[]) {
+    // TODO: move into discussion component, avoid the weird event catching
     try {
-      const req = this.createRequest(
-        info[0],
-        this.$store.getters.getUserId,
-        parseInt(info[1])
-      );
-      this.statementManager.addClarificationRequest(
-        this.questionOrder,
+      const req = this.createRequest(info[0], parseInt(info[1]));
+      this.userRequests.push(
         await RemoteServices.submitClarificationRequest(req)
+      );
+      alert(
+        'Request submitted! You can see it in your Clarification Requests.'
       );
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
   }
 
-  createRequest(
-    content: string,
-    owner: number,
-    question: number
-  ): ClarificationRequest {
+  createRequest(content: string, question: number): ClarificationRequest {
     const req = new ClarificationRequest();
     req.setQuestionId(question);
-    req.setOwnerId(owner);
     req.setContent(content);
     return req;
   }

@@ -32,7 +32,7 @@
           <v-col cols="12" sm="4" data-cy="availableDate">
             <v-datetime-picker
               label="Available Date (default: now)"
-              format="yyyy-MM-dd HH:mm"
+              format="YYYY-MM-DDTHH:mm:ssZ"
               v-model="editTournament.availableDate"
               date-format="yyyy-MM-dd"
               time-format="HH:mm"
@@ -42,7 +42,7 @@
           <v-col cols="12" sm="4">
             <v-datetime-picker
               label="*Running Date"
-              format="yyyy-MM-dd HH:mm"
+              format="YYYY-MM-DDTHH:mm:ssZ"
               v-model="editTournament.runningDate"
               date-format="yyyy-MM-dd"
               time-format="HH:mm"
@@ -54,7 +54,7 @@
           <v-col cols="12" sm="4">
             <v-datetime-picker
               label="*Conclusion Date"
-              format="yyyy-MM-dd HH:mm"
+              format="YYYY-MM-DDTHH:mm:ssZ"
               v-model="editTournament.conclusionDate"
               date-format="yyyy-MM-dd"
               time-format="HH:mm"
@@ -114,7 +114,8 @@ import Store from '@/store';
 import RemoteServices from '@/services/RemoteServices';
 import Tournament from '@/models/management/Tournament';
 import Topic from '@/models/management/Topic';
-
+import DatetimePicker from 'vuetify-datetime-picker';
+Vue.use(DatetimePicker);
 @Component
 export default class EditTournamentDialog extends Vue {
   @Model('dialog', Boolean) dialog!: boolean;

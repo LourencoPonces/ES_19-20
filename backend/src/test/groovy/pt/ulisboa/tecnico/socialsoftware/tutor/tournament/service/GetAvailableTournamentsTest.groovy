@@ -4,15 +4,22 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
+import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.AnswersXmlImport
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.QuestionService
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.QuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.QuizService
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.repository.TournamentRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentService
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain.Tournament
@@ -53,6 +60,9 @@ class GetAvailableTournamentsTest extends Specification {
     @Autowired
     TournamentRepository tournamentRepository
 
+    @Autowired
+    QuestionRepository questionRepository
+
     TournamentDto tournamentDto
     User creator
     Course course
@@ -80,6 +90,15 @@ class GetAvailableTournamentsTest extends Specification {
         def topic = new Topic();
         topic.setName("TOPIC")
         topic.setCourse(course)
+
+        // So that quiz generation doesn't throw exceptions
+        def question = new Question()
+        question.addTopic(topic)
+        question.setTitle("question_title")
+        question.setCourse(course)
+        question.setStatus(Question.Status.AVAILABLE)
+
+        questionRepository.save(question)
         topicRepository.save(topic)
 
         def topicDto = new TopicDto(topic)
@@ -110,15 +129,15 @@ class GetAvailableTournamentsTest extends Specification {
         tournamentDto = new TournamentDto()
         tournamentDto.setTitle(TOURNAMENT_TITLE)
         tournamentDto.setKey(1)
-        creationDate = LocalDateTime.now().minusDays(1)
-        availableDate = LocalDateTime.now()
-        runningDate = LocalDateTime.now().plusDays(1)
-        conclusionDate = LocalDateTime.now().plusDays(2)
+        creationDate = DateHandler.now().minusDays(1)
+        availableDate = DateHandler.now()
+        runningDate = DateHandler.now().plusDays(1)
+        conclusionDate = DateHandler.now().plusDays(2)
         tournamentDto.setNumberOfQuestions(1)
-        tournamentDto.setCreationDate(creationDate.format(formatter))
-        tournamentDto.setAvailableDate(availableDate.format(formatter))
-        tournamentDto.setRunningDate(runningDate.format(formatter))
-        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
+        tournamentDto.setCreationDate(DateHandler.toISOString(creationDate))
+        tournamentDto.setAvailableDate(DateHandler.toISOString(availableDate))
+        tournamentDto.setRunningDate(DateHandler.toISOString(runningDate))
+        tournamentDto.setConclusionDate(DateHandler.toISOString(conclusionDate))
         tournamentDto.setTopics(topicDtoList)
     }
 
@@ -137,9 +156,9 @@ class GetAvailableTournamentsTest extends Specification {
         tournamentElement.getKey() != null
         tournamentElement.getTitle() == TOURNAMENT_TITLE
         tournamentElement.getCreationDate() != null
-        tournamentElement.getAvailableDate() == availableDate.format(formatter)
-        tournamentElement.getRunningDate() == runningDate.format(formatter)
-        tournamentElement.getConclusionDate() == conclusionDate.format(formatter)
+        tournamentElement.getAvailableDate() == DateHandler.toISOString(availableDate)
+        tournamentElement.getRunningDate() == DateHandler.toISOString(runningDate)
+        tournamentElement.getConclusionDate() == DateHandler.toISOString(conclusionDate)
         tournamentElement.getStatus() == Tournament.Status.AVAILABLE
         tournamentElement.getCreator().getUsername() == CREATOR_USERNAME
         tournamentElement.getTopics().size() == 1
@@ -148,38 +167,36 @@ class GetAvailableTournamentsTest extends Specification {
 
     def "get the available tournaments, although there are not any"() {
         when:
-        tournamentService.getAvailableTournaments(courseExecution.getId())
+        def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId())
 
-        then:
-        def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.TOURNAMENT_NOT_AVAILABLE
+        then: "There are no tournaments"
+        tournamentsList.size() == 0
     }
 
     @Unroll("get the available tournaments, although there are only tournaments in #createdDateDay | #availableDateDay | #runningDateDay | #conclusionDateDay")
     def "invalid dates"() {
         given: "tournaments in different phases"
-        creationDate = LocalDateTime.now().plusDays(creationDateDay)
-        availableDate = LocalDateTime.now().plusDays(availableDateDay)
-        runningDate = LocalDateTime.now().plusDays(runningDateDay)
-        conclusionDate = LocalDateTime.now().plusDays(conclusionDateDay)
-        tournamentDto.setCreationDate(creationDate.format(formatter))
-        tournamentDto.setAvailableDate(availableDate.format(formatter))
-        tournamentDto.setRunningDate(runningDate.format(formatter))
-        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
+        creationDate = DateHandler.now().plusDays(creationDateDay)
+        availableDate = DateHandler.now().plusDays(availableDateDay)
+        runningDate = DateHandler.now().plusDays(runningDateDay)
+        conclusionDate = DateHandler.now().plusDays(conclusionDateDay)
+        tournamentDto.setCreationDate(DateHandler.toISOString(creationDate))
+        tournamentDto.setAvailableDate(DateHandler.toISOString(availableDate))
+        tournamentDto.setRunningDate(DateHandler.toISOString(runningDate))
+        tournamentDto.setConclusionDate(DateHandler.toISOString(conclusionDate))
         tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
 
         when:
-        tournamentService.getAvailableTournaments(courseExecution.getId())
+        def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId())
 
-        then:
-        def exception = thrown(TutorException)
-        exception.getErrorMessage() == errorMessage
+        then: "There are no tournaments"
+        tournamentsList.size() == size
 
         where:
-        creationDateDay | availableDateDay | runningDateDay | conclusionDateDay || errorMessage
-         0              |  1               |  2             | 3                 || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
-        -2              | -1               |  0             | 1                 || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
-        -3              | -2               | -1             | 0                 || ErrorMessage.TOURNAMENT_NOT_AVAILABLE
+        creationDateDay | availableDateDay | runningDateDay | conclusionDateDay || size
+         0              |  1               |  2             | 3                 || 0
+        -2              | -1               |  0             | 1                 || 0
+        -3              | -2               | -1             | 0                 || 0
     }
 
     def "get the available tournaments with a non-existing course"() {
@@ -200,6 +217,26 @@ class GetAvailableTournamentsTest extends Specification {
         @Bean
         TournamentService tournamentService() {
             return new TournamentService()
+        }
+
+        @Bean
+        QuizService quizService() {
+            return new QuizService()
+        }
+
+        @Bean
+        QuestionService questionService() {
+            return new QuestionService()
+        }
+
+        @Bean
+        AnswerService answerService() {
+            return new AnswerService()
+        }
+
+        @Bean
+        AnswersXmlImport answersXmlImport() {
+            return new AnswersXmlImport()
         }
     }
 }

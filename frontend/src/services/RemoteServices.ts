@@ -16,7 +16,9 @@ import { QuizAnswers } from '@/models/management/QuizAnswers';
 import StudentQuestion from '@/models/management/StudentQuestion';
 import Tournament from '@/models/management/Tournament';
 import ClarificationRequest from '@/models/clarification/ClarificationRequest';
-import ClarificationRequestAnswer from '@/models/clarification/ClarificationRequestAnswer';
+import ClarificationMessage from '@/models/clarification/ClarificationMessage';
+import UserNameCacheService from './UserNameCacheService';
+import DashboardStats from '@/models/statement/DashboardStats';
 
 const httpClient = axios.create();
 httpClient.defaults.timeout = 10000;
@@ -42,7 +44,9 @@ export default class RemoteServices {
     return httpClient
       .get(`/auth/fenix?code=${code}`)
       .then(response => {
-        return new AuthDto(response.data);
+        const res = new AuthDto(response.data);
+        UserNameCacheService.addUser(res.user);
+        return res;
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
@@ -53,7 +57,9 @@ export default class RemoteServices {
     return httpClient
       .get('/auth/demo/student')
       .then(response => {
-        return new AuthDto(response.data);
+        const res = new AuthDto(response.data);
+        UserNameCacheService.addUser(res.user);
+        return res;
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
@@ -64,7 +70,9 @@ export default class RemoteServices {
     return httpClient
       .get('/auth/demo/teacher')
       .then(response => {
-        return new AuthDto(response.data);
+        const res = new AuthDto(response.data);
+        UserNameCacheService.addUser(res.user);
+        return res;
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
@@ -75,7 +83,9 @@ export default class RemoteServices {
     return httpClient
       .get('/auth/demo/admin')
       .then(response => {
-        return new AuthDto(response.data);
+        const res = new AuthDto(response.data);
+        UserNameCacheService.addUser(res.user);
+        return res;
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
@@ -93,6 +103,35 @@ export default class RemoteServices {
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
+  }
+
+  /*
+   * Dashboard
+   */
+
+  static async getUserDashboardStats(userId: number): Promise<DashboardStats> {
+    try {
+      const response = await httpClient.get(
+        `/courses/${Store.getters.getCurrentCourse.courseId}/dashboardStats/${userId}`
+      );
+      return new DashboardStats(response.data);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
+  static async updateStatsVisibility(
+    stats: DashboardStats
+  ): Promise<DashboardStats> {
+    try {
+      const response = await httpClient.put(
+        `/dashboardStats/${stats.id}`,
+        stats
+      );
+      return new DashboardStats(response.data);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
   }
 
   static async getQuestions(): Promise<Question[]> {
@@ -259,8 +298,22 @@ export default class RemoteServices {
         `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${questionId}/evaluate`,
         {
           evaluation: StudentQuestion.getServerStatusFormat(status),
-          justification: justification
+          justification: justification.trim() === '' ? null : justification
         }
+      );
+      return new StudentQuestion(response.data);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
+  static async editAndPromoteStudentQuestion(
+    studentQuestion: StudentQuestion
+  ): Promise<StudentQuestion> {
+    try {
+      const response = await httpClient.put(
+        `/courses/${Store.getters.getCurrentCourse.courseId}/studentQuestions/${studentQuestion.id}/evaluate`,
+        StudentQuestion.toRequest(studentQuestion)
       );
       return new StudentQuestion(response.data);
     } catch (error) {
@@ -338,6 +391,36 @@ export default class RemoteServices {
       });
   }
 
+  static async getSignedUpRunningTournaments(): Promise<Tournament[]> {
+    return httpClient
+      .get(
+        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments/running/signed-up`
+      )
+      .then(response => {
+        return response.data.map((tournament: any) => {
+          return new Tournament(tournament);
+        });
+      })
+      .catch(async error => {
+        console.log(this.errorMessage(error));
+      });
+  }
+
+  static async getCreatedTournaments(): Promise<Tournament[]> {
+    return httpClient
+      .get(
+        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments/created`
+      )
+      .then(response => {
+        return response.data.map((tournament: any) => {
+          return new Tournament(tournament);
+        });
+      })
+      .catch(async error => {
+        console.log(this.errorMessage(error));
+      });
+  }
+
   static async createTournament(tournament: Tournament): Promise<Tournament> {
     try {
       const response = await httpClient.post(
@@ -361,6 +444,24 @@ export default class RemoteServices {
   static async deleteTournament(tournament: Tournament) {
     try {
       await httpClient.delete(`/tournaments/${tournament.id}`);
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
+  static async getTournamentQuiz(
+    tournament: Tournament
+  ): Promise<StatementQuiz> {
+    try {
+      return (await httpClient.get(`/tournaments/${tournament.id}/quiz`)).data;
+    } catch (error) {
+      throw Error(await this.errorMessage(error));
+    }
+  }
+
+  static async cancelTournament(tournament: Tournament) {
+    try {
+      await httpClient.post(`/tournaments/${tournament.id}/cancel`);
     } catch (error) {
       throw Error(await this.errorMessage(error));
     }
@@ -660,20 +761,9 @@ export default class RemoteServices {
       });
   }
 
-  static async activateCourse(course: Course): Promise<Course> {
+  static getCourses(): Promise<Course[]> {
     return httpClient
-      .post('/courses', course)
-      .then(response => {
-        return new Course(response.data);
-      })
-      .catch(async error => {
-        throw Error(await this.errorMessage(error));
-      });
-  }
-
-  static async getCourses(): Promise<Course[]> {
-    return httpClient
-      .get('/admin/courses/executions')
+      .get('/courses/executions')
       .then(response => {
         return response.data.map((course: any) => {
           return new Course(course);
@@ -684,9 +774,20 @@ export default class RemoteServices {
       });
   }
 
-  static async createCourse(course: Course): Promise<Course> {
+  static async activateCourse(course: Course): Promise<Course> {
     return httpClient
-      .post('/admin/courses/executions', course)
+      .post('/courses/activate', course)
+      .then(response => {
+        return new Course(response.data);
+      })
+      .catch(async error => {
+        throw Error(await this.errorMessage(error));
+      });
+  }
+
+  static async createExternalCourse(course: Course): Promise<Course> {
+    return httpClient
+      .post('/courses/external', course)
       .then(response => {
         return new Course(response.data);
       })
@@ -697,7 +798,7 @@ export default class RemoteServices {
 
   static async deleteCourse(courseExecutionId: number | undefined) {
     return httpClient
-      .delete('/admin/courses/executions/' + courseExecutionId)
+      .delete(`/executions/${courseExecutionId}`)
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
@@ -757,44 +858,36 @@ export default class RemoteServices {
       });
   }
 
-  static async getClarificationRequests(): Promise<ClarificationRequest[]> {
+  static async submitClarificationMessage(
+    reqId: number,
+    content: string,
+    resolved: boolean = null
+  ): Promise<ClarificationMessage> {
+    if (content.trim() == '') {
+      // eslint-disable-next-line
+      throw Error("Message can't be empty");
+    }
+
+    try {
+      const response = await httpClient.post(
+        `/clarifications/${reqId}/messages`,
+        { content, resolved }
+      );
+
+      return new ClarificationMessage(response.data);
+    } catch (err) {
+      throw Error(await this.errorMessage(err));
+    }
+  }
+
+  static async getUserClarificationRequests(): Promise<ClarificationRequest[]> {
     try {
       const response = await httpClient.get('/clarifications');
-      return response.data.map(
+
+      UserNameCacheService.bulkAdd(response.data.names);
+
+      return response.data.requests.map(
         (req: ClarificationRequest) => new ClarificationRequest(req)
-      );
-    } catch (err) {
-      throw Error(await this.errorMessage(err));
-    }
-  }
-
-  static async submitClarificationRequestAnswer(
-    ans: ClarificationRequestAnswer
-  ): Promise<ClarificationRequestAnswer> {
-    if (ans.getContent().trim() == '') {
-      // eslint-disable-next-line
-      throw Error("Answer can't be empty");
-    }
-
-    try {
-      const response = await httpClient.put(
-        `/clarifications/${ans.getRequestId()}/answer`,
-        ans.getContent()
-      );
-
-      return new ClarificationRequestAnswer(response.data);
-    } catch (err) {
-      throw Error(await this.errorMessage(err));
-    }
-  }
-
-  static async getStudentClarificationRequests(): Promise<
-    ClarificationRequest[]
-  > {
-    try {
-      const response = await httpClient.get('/student/clarifications');
-      return response.data.map(
-        (request: any) => new ClarificationRequest(request)
       );
     } catch (error) {
       throw Error(await this.errorMessage(error));
@@ -802,33 +895,36 @@ export default class RemoteServices {
   }
 
   static async deleteClarificationRequest(id: number) {
-    return httpClient
-      .delete(`student/clarifications/${id}`)
-      .catch(async error => {
-        throw Error(await this.errorMessage(error));
-      });
+    return httpClient.delete(`/clarifications/${id}`).catch(async error => {
+      throw Error(await this.errorMessage(error));
+    });
   }
 
-  static async editClarificationRequest(
-    request: ClarificationRequest
+  static async deleteClarificationMessage(
+    msg: ClarificationMessage
+  ): Promise<void> {
+    try {
+      await httpClient.delete(`/clarifications/messages/${msg.getId()}`);
+    } catch (err) {
+      throw Error(await this.errorMessage(err));
+    }
+  }
+
+  static async changeClarificationRequestStatus(
+    id: number,
+    status: string
   ): Promise<ClarificationRequest> {
     return httpClient
-      .post(`/student/clarifications/${request.getId()}`, request)
+      .put(`/clarifications/${id}/status`, status, {
+        headers: {
+          'Content-Type': 'text/plain'
+        }
+      })
       .then(response => {
         return new ClarificationRequest(response.data);
       })
       .catch(async error => {
         throw Error(await this.errorMessage(error));
       });
-  }
-
-  static async deleteClarificationRequestAnswer(
-    ans: ClarificationRequestAnswer
-  ): Promise<void> {
-    try {
-      await httpClient.delete(`/clarifications/${ans.getRequestId()}/answer`);
-    } catch (err) {
-      throw Error(await this.errorMessage(err));
-    }
   }
 }

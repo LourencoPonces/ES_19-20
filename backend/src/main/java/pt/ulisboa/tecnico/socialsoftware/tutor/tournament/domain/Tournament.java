@@ -1,8 +1,10 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.tournament.domain;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler;
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz;
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
@@ -11,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.TOURNAMENT_NOT_CONSISTENT;
+import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
 
 @Entity
 @Table(name = "tournaments")
@@ -60,11 +62,16 @@ public class Tournament {
     @ManyToMany(mappedBy = "participantTournaments")
     private Set<User> participants = new HashSet<>();
 
+    @OneToOne
+    private Quiz quiz;
+
     public Tournament() {}
 
     public Tournament(TournamentDto tournamentDto) {
         this.key = tournamentDto.getKey();
         setTitle(tournamentDto.getTitle());
+
+        this.isCancelled = tournamentDto.getIsCancelled();
 
         setDates(tournamentDto);
 
@@ -87,6 +94,64 @@ public class Tournament {
 
     public void setKey(Integer key) {
         this.key = key;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        checkTitle(title);
+        this.title = title;
+    }
+
+    public Integer getNumberOfQuestions() {
+        return numberOfQuestions;
+    }
+
+    public void setNumberOfQuestions(Integer numberOfQuestions) {
+        checkNumberOfQuestions(numberOfQuestions);
+        this.numberOfQuestions = numberOfQuestions;
+    }
+
+    public User getCreator() {
+        return creator;
+    }
+
+    public void setCreator(User creator) {
+        this.creator = creator;
+    }
+
+    public Set<User> getParticipants() {
+        return participants;
+    }
+
+    public void addParticipant(User participant) {
+        this.participants.add(participant);
+    }
+
+    public Set<Topic> getTopics() {
+        return topics;
+    }
+
+    public void addTopic(Topic topic) {
+        this.topics.add(topic);
+    }
+
+    public CourseExecution getCourseExecution() {
+        return courseExecution;
+    }
+
+    public void setCourseExecution(CourseExecution courseExecution) {
+        this.courseExecution = courseExecution;
+    }
+
+    public Quiz getQuiz() {
+        return this.quiz;
+    }
+
+    public void setQuiz(Quiz quiz) {
+        this.quiz = quiz;
     }
 
     public LocalDateTime getCreationDate() {
@@ -125,19 +190,10 @@ public class Tournament {
         this.conclusionDate = conclusionDate;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        checkTitle(title);
-        this.title = title;
-    }
-
     public Status getStatus() {
         if (isCancelled) return Status.CANCELLED;
 
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = DateHandler.now();
         if (now.isAfter(creationDate) && now.isBefore(availableDate))
             return Status.CREATED;
         else if (now.isAfter(availableDate) && now.isBefore(runningDate))
@@ -148,50 +204,20 @@ public class Tournament {
             return Status.FINISHED;
     }
 
-    public Integer getNumberOfQuestions() {
-        return numberOfQuestions;
-    }
-
-    public void setNumberOfQuestions(Integer numberOfQuestions) {
-        checkNumberOfQuestions(numberOfQuestions);
-        this.numberOfQuestions = numberOfQuestions;
-    }
-
-
-    public Set<Topic> getTopics() {
-        return topics;
-    }
-
-    public void addTopic(Topic topic) {
-        this.topics.add(topic);
-    }
-
-    public CourseExecution getCourseExecution() {
-        return courseExecution;
-    }
-
-    public void setCourseExecution(CourseExecution courseExecution) {
-        this.courseExecution = courseExecution;
-    }
-
-    public User getCreator() {
-        return creator;
-    }
-
-    public void setCreator(User creator) {
-        this.creator = creator;
-    }
-
-    public Set<User> getParticipants() {
-        return participants;
-    }
-
-    public void addParticipant(User participant) {
-        this.participants.add(participant);
-    }
+    public boolean isCancelled() { return this.isCancelled; }
 
     public void cancel() {
-        isCancelled = true;
+        Status currentStatus = getStatus();
+        switch (currentStatus){
+            case RUNNING:
+                throw new TutorException(TOURNAMENT_CANNOT_BE_CANCELED, "running");
+            case FINISHED:
+                throw new TutorException(TOURNAMENT_CANNOT_BE_CANCELED, "finished");
+            case CANCELLED:
+                throw new TutorException(TOURNAMENT_CANNOT_BE_CANCELED, "cancelled");
+            default:
+                isCancelled = true;
+        }
     }
 
     public void delete() {
@@ -254,10 +280,10 @@ public class Tournament {
 
     private void setDates(TournamentDto tournamentDto) {
         this.creationDate = tournamentDto.getCreationDateDate();
-        if (this.creationDate == null) this.creationDate = LocalDateTime.now();
+        if (this.creationDate == null) this.creationDate = DateHandler.now();
 
         this.availableDate = tournamentDto.getAvailableDateDate();
-        if (this.availableDate == null) this.availableDate = creationDate;
+        if (this.availableDate == null) this.availableDate = DateHandler.now();
 
         this.runningDate = tournamentDto.getRunningDateDate();
         this.conclusionDate = tournamentDto.getConclusionDateDate();

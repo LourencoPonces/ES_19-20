@@ -1,6 +1,5 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.question.repository;
 
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -14,7 +13,7 @@ import java.util.Optional;
 @Repository
 @Transactional
 public interface QuestionRepository extends JpaRepository<Question, Integer> {
-    @Query(value = "SELECT q FROM Question q WHERE q.course.id = :courseId AND q.class=Question")
+    @Query(value = "SELECT q FROM Question q WHERE q.course.id = :courseId AND (q.class=Question OR (q.class=StudentQuestion AND q.submittedStatus='PROMOTED'))")
     List<Question> findQuestions(int courseId);
 
     @Query(value = "SELECT q FROM Question q WHERE q.course.id = :courseId AND q.status = 'AVAILABLE'")

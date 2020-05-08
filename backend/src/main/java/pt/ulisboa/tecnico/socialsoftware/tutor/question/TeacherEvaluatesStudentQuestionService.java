@@ -8,11 +8,16 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.StudentQuestion;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Topic;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.StudentQuestionDTO;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.dto.TopicDto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.StudentQuestionRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.repository.TopicRepository;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
@@ -23,6 +28,8 @@ public class TeacherEvaluatesStudentQuestionService {
     @Autowired
     private StudentQuestionRepository studentQuestionRepository;
 
+    @Autowired
+    private TopicRepository topicRepository;
 
     public void TeacherEvaluatesStudentQuestionService() {}
 
@@ -48,19 +55,10 @@ public class TeacherEvaluatesStudentQuestionService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public StudentQuestionDTO acceptStudentQuestion(Integer studentQuestionId, String justification) {
-        if(justification == null) { justification = ""; } // null justification -> empty justification
+    public StudentQuestionDTO evaluateStudentQuestion(Integer studentQuestionId, StudentQuestion.SubmittedStatus status, String justification) {
+        StudentQuestion studentQuestion = studentQuestionRepository.findById(studentQuestionId).orElseThrow(() -> new TutorException(STUDENT_QUESTION_NOT_FOUND, studentQuestionId));
 
-        // approved questions can have no justification
-        if(!justification.isEmpty()) {
-            checkJustification(justification);
-        }
-
-        StudentQuestion studentQuestion = findStudentQuestionById(studentQuestionId);
-
-        studentQuestion.setSubmittedStatus(StudentQuestion.SubmittedStatus.APPROVED);
-        studentQuestion.setJustification(justification);
-
+        studentQuestion.evaluate(status, justification);
         return new StudentQuestionDTO(studentQuestion);
     }
 
@@ -68,38 +66,20 @@ public class TeacherEvaluatesStudentQuestionService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public StudentQuestionDTO rejectStudentQuestion(Integer studentQuestionId, String justification) {
-        checkJustification(justification);
+    public StudentQuestionDTO updateAndPromoteStudentQuestion(Integer courseId, Integer studentQuestionId, StudentQuestionDTO changedStudentQuestionDTO) {
+        // get question
+        StudentQuestion studentQuestion = studentQuestionRepository.findById(studentQuestionId).orElseThrow(() -> new TutorException(STUDENT_QUESTION_NOT_FOUND, studentQuestionId));
 
-        StudentQuestion studentQuestion = findStudentQuestionById(studentQuestionId);
+        // set topics
+        TopicDto[] topicArray = new TopicDto[changedStudentQuestionDTO.getTopics().size()];
+        Set<Topic> newTopics = Arrays.stream(changedStudentQuestionDTO.getTopics().toArray(topicArray)).map(topicDto -> topicRepository.findTopicByName(courseId, topicDto.getName())).collect(Collectors.toSet());
 
-        if(!canReject(studentQuestion)) {
-            throw new TutorException(CANNOT_REJECT_ACCEPTED_SUGGESTION);
-        }
+        // update question
+        studentQuestion.update(changedStudentQuestionDTO, newTopics);
 
-        studentQuestion.setSubmittedStatus(StudentQuestion.SubmittedStatus.REJECTED);
-        studentQuestion.setJustification(justification);
+        // evaluate
+        studentQuestion.evaluate(StudentQuestion.SubmittedStatus.PROMOTED, changedStudentQuestionDTO.getJustification());
+
         return new StudentQuestionDTO(studentQuestion);
-    }
-
-
-    @Retryable(
-            value = { SQLException.class },
-            backoff = @Backoff(delay = 5000))
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
-    private StudentQuestion findStudentQuestionById(Integer id) {
-         return studentQuestionRepository.findById(id).orElseThrow(() -> new TutorException(STUDENT_QUESTION_NOT_FOUND, id));
-    }
-
-    private void checkJustification(String justification) {
-        if (justification == null || justification.isBlank()) {
-            throw new TutorException(INVALID_JUSTIFICATION, justification == null ? "" : justification);
-        }
-    }
-
-    private boolean canReject(StudentQuestion studentQuestion) {
-        // if already accepted throw error
-        // change later. the question may exist in quizzes, etc
-        return studentQuestion.getSubmittedStatus() != StudentQuestion.SubmittedStatus.APPROVED;
     }
 }

@@ -69,35 +69,32 @@ class SubmitClarificationRequestTestPerformance extends Specification {
     ClarificationService clarificationService
 
 
-    def course
-    def courseExecution
-    def clarificationRequest
-    def question
-    def quiz
-    def quizQuestion
-    def quizAnswer
-    def questionAnswer
-    def student
-    def formatter
-    def studentId
-    def questionId
+    Course course
+    CourseExecution courseExecution
+    Question question
+    Quiz quiz
+    QuizQuestion quizQuestion
+    QuizAnswer quizAnswer
+    QuestionAnswer questionAnswer
+    User student
+    DateTimeFormatter formatter
 
     def setup() {
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
 
-        course = createCourse(COURSE_NAME)
+        course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseRepository.save(course)
 
         courseExecution = createCourseExecution(course, ACRONYM, ACADEMIC_TERM)
         courseExecutionRepository.save(courseExecution)
 
-        student = createStudent(new User(), KEY_ONE, NAME, USERNAME_ONE, courseExecution)
+        student = createStudent(KEY_ONE, NAME, USERNAME_ONE, courseExecution)
         userRepository.save(student)
 
         1.upto(TEST_COUNT, {
             int i = it as int
             question = createQuestion(course)
-            quiz = createQuiz(i, courseExecution, Quiz.QuizType.GENERATED)
+            quiz = createQuiz(i, courseExecution, "GENERATED")
             quizQuestion = new QuizQuestion(quiz, question, 1)
             quizAnswer = new QuizAnswer(student, quiz)
             questionAnswer = createQuestionAnswer(quizAnswer, quizQuestion)
@@ -109,13 +106,10 @@ class SubmitClarificationRequestTestPerformance extends Specification {
             questionAnswerRepository.save(questionAnswer)
 
         })
-
-        questionId = question.getId()
-        studentId = student.getId()
     }
 
-    private QuestionAnswer createQuestionAnswer(QuizAnswer quizAnswer, QuizQuestion quizQuestion) {
-        questionAnswer = new QuestionAnswer()
+    private static QuestionAnswer createQuestionAnswer(QuizAnswer quizAnswer, QuizQuestion quizQuestion) {
+        def questionAnswer = new QuestionAnswer()
         questionAnswer.setQuizAnswer(quizAnswer)
         questionAnswer.setQuizQuestion(quizQuestion)
         questionAnswer.setSequence(0)
@@ -123,7 +117,8 @@ class SubmitClarificationRequestTestPerformance extends Specification {
         return questionAnswer
     }
 
-    private User createStudent(User student, int key, String name, String username, CourseExecution courseExecution) {
+    private static User createStudent(int key, String name, String username, CourseExecution courseExecution) {
+        def student = new User()
         student.setKey(key)
         student.setName(name)
         student.setUsername(username)
@@ -133,15 +128,16 @@ class SubmitClarificationRequestTestPerformance extends Specification {
         return student
     }
 
-    private Question createQuestion(Course course) {
-        question = new Question()
+    private static Question createQuestion(Course course) {
+        def question = new Question()
         question.setCourse(course)
+        question.setTitle("TITLE")
         course.addQuestion(question)
         return question
     }
 
-    private Quiz createQuiz(int i, CourseExecution courseExecution, Quiz.QuizType type) {
-        quiz = new Quiz()
+    private static Quiz createQuiz(int i, CourseExecution courseExecution, String type) {
+        def quiz = new Quiz()
         quiz.setKey(i)
         quiz.setType(type)
         quiz.setCourseExecution(courseExecution)
@@ -149,26 +145,26 @@ class SubmitClarificationRequestTestPerformance extends Specification {
         return quiz
     }
 
-    private CourseExecution createCourseExecution(Course course, String acronym, String term) {
-        courseExecution = new CourseExecution()
+    private static CourseExecution createCourseExecution(Course course, String acronym, String term) {
+        def courseExecution = new CourseExecution()
         courseExecution.setCourse(course)
         courseExecution.setAcronym(acronym)
         courseExecution.setAcademicTerm(term)
         return courseExecution
     }
 
-    private Course createCourse(String name) {
-        course = new Course()
-        course.setName(name)
-        return course
-    }
+    private static ClarificationRequestDto createRequestDto() {
+        def clarificationRequest = new ClarificationRequestDto()
+        clarificationRequest.setContent(CONTENT)
 
+        return clarificationRequest
+    }
 
     def "submit 2000 requests to 2000 different questions"() {
         when:
         1.upto(TEST_COUNT, {
-            clarificationRequest = createRequest()
-            clarificationService.submitClarificationRequest(it as int, student.getId(), clarificationRequest)
+            def clarificationRequestDto = createRequestDto()
+            clarificationService.submitClarificationRequest(it as int, student.id, clarificationRequestDto)
         })
 
         then:
@@ -178,18 +174,11 @@ class SubmitClarificationRequestTestPerformance extends Specification {
     def "student answered 2000 quizzes and submits one clarification request"() {
         when:
         int questionId = 4   // test with number between 1 and TEST_COUNT
-        clarificationRequest = createRequest()
-        clarificationService.submitClarificationRequest(questionId, student.getId(), clarificationRequest)
+        def clarificationRequestDto = createRequestDto()
+        clarificationService.submitClarificationRequest(questionId, student.id, clarificationRequestDto)
 
         then:
         true
-    }
-
-    def createRequest() {
-        clarificationRequest = new ClarificationRequestDto()
-        clarificationRequest.setContent(CONTENT)
-
-        return clarificationRequest
     }
 
 
@@ -198,7 +187,7 @@ class SubmitClarificationRequestTestPerformance extends Specification {
 
         @Bean
         ClarificationService ClarificationService() {
-            return new ClarificationService();
+            return new ClarificationService()
         }
     }
 }

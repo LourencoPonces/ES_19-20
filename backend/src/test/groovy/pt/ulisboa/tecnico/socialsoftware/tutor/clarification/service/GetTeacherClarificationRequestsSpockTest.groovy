@@ -7,10 +7,10 @@ import org.springframework.context.annotation.Bean
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationMessage
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequestAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestAnswerRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationMessageRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
@@ -56,7 +56,7 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
     ClarificationService clarificationService
 
     @Autowired
-    ClarificationRequestAnswerRepository clarificationRequestAnswerRepository
+    ClarificationMessageRepository clarificationMessageRepository
 
     Course course
     Question question
@@ -68,7 +68,7 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
     QuizAnswer quizAnswer, quizAnswer3
     QuizQuestion quizQuestion
     ClarificationRequest clarificationRequest, clarificationRequest3
-    ClarificationRequestAnswer clarificationRequestAnswer
+    ClarificationMessage clarificationReply
 
     CourseExecution courseExecution2
     User student2
@@ -79,12 +79,12 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
 
 
     def setup() {
-        course = createCourse("A course")
+        course = new Course("A course", Course.Type.TECNICO)
         question = createQuestion(1, course)
 
         courseExecution = createCourseExecution(course, "AC1", "1SEM")
         teacher = createUser(User.Role.TEACHER, 10, "t", courseExecution)
-        quiz = createQuiz(10, courseExecution, Quiz.QuizType.GENERATED)
+        quiz = createQuiz(10, courseExecution, "GENERATED")
         quizQuestion = createQuizQuestion(quiz, question, 1)
 
         student = createUser(User.Role.STUDENT, 1, "s1", courseExecution)
@@ -92,12 +92,12 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
 
         quizAnswer = createQuizAnswer(student, quiz)
         clarificationRequest = createClarificationRequest(1, student, question, "can we skip jmeter tests?")
-        clarificationRequestAnswer = createClarificationRequestAnswer(teacher, clarificationRequest, "lol no")
+        clarificationReply = createClarificationMessage(teacher, clarificationRequest, "lol no")
         quizAnswer3 = createQuizAnswer(student3, quiz)
         clarificationRequest3 = createClarificationRequest(3, student3, question, "but why?")
 
         courseExecution2 = createCourseExecution(course, "AC1", "1SEM")
-        quiz2 = createQuiz(20, courseExecution2, Quiz.QuizType.GENERATED)
+        quiz2 = createQuiz(20, courseExecution2, "GENERATED")
         quizQuestion2 = createQuizQuestion(quiz2, question, 1)
 
         student2 = createUser(User.Role.STUDENT, 2, "s2", courseExecution2)
@@ -106,7 +106,7 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
     }
 
     private User createUser(User.Role role, int key, String username, CourseExecution courseExecution) {
-        User user = new User();
+        User user = new User()
         user.setRole(role)
         user.setKey(key)
         user.setName(username)
@@ -122,20 +122,14 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
         def question = new Question()
         question.setKey(key)
         question.setCourse(course)
+        question.setTitle("TITLE")
         course.addQuestion(question)
         questionRepository.save(question)
         courseRepository.save(course)
         return question
     }
 
-    private Course createCourse(String name) {
-        def course = new Course()
-        course.setName(name)
-        courseRepository.save(course)
-        return course
-    }
-
-    private Quiz createQuiz(int key, CourseExecution courseExecution, Quiz.QuizType type) {
+    private Quiz createQuiz(int key, CourseExecution courseExecution, String type) {
         Quiz quiz = new Quiz()
         quiz.setKey(key)
         quiz.setType(type)
@@ -170,53 +164,52 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
     private ClarificationRequest createClarificationRequest(int key, User student, Question question, String content) {
         ClarificationRequestDto clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent(content)
-        ClarificationRequest clarificationRequest = new ClarificationRequest(student, question, clarificationRequestDto)
+        ClarificationRequest clarificationRequest = new ClarificationRequest(question, student, clarificationRequestDto)
         clarificationRequest.setKey(key)
         clarificationRequestRepository.save(clarificationRequest)
         return clarificationRequest
     }
 
-    private ClarificationRequestAnswer createClarificationRequestAnswer(User teacher, ClarificationRequest clarificationRequest, String content) {
-        ClarificationRequestAnswer clarificationRequestAnswer = new ClarificationRequestAnswer()
-        clarificationRequestAnswer.setCreator(teacher)
-        clarificationRequestAnswer.setRequest(clarificationRequest)
-        clarificationRequestAnswer.setContent(content)
-        clarificationRequest.setAnswer(clarificationRequestAnswer)
+    private ClarificationMessage createClarificationMessage(User teacher, ClarificationRequest clarificationRequest, String content) {
+        ClarificationMessage message = new ClarificationMessage()
+        message.setCreator(teacher)
+        message.setRequest(clarificationRequest)
+        message.setContent(content)
 
-        clarificationRequestAnswerRepository.save(clarificationRequestAnswer)
+        clarificationRequest.getMessages().add(message)
+
+        clarificationMessageRepository.save(message)
         clarificationRequestRepository.save(clarificationRequest)
-        return clarificationRequestAnswer
+        return message
     }
 
 
     def "the teacher can see clarification requests submitted by students taking their classes"() {
         when:
-        List<ClarificationRequestDto> requests = clarificationService.getTeacherClarificationRequests(teacher.getId())
-        requests.sort(new Comparator<ClarificationRequestDto>() {
-            @Override
-            int compare(ClarificationRequestDto o1, ClarificationRequestDto o2) {
-                int k1 = 0;
-                int k2 = 0;
-                if (o1 != null && o1.getKey() != null) k1 = o1.getKey();
-                if (o2 != null && o2.getKey() != null) k2 = o2.getKey();
-                return k1 - k2;
-            }
-        })
+        def result = clarificationService.getTeacherClarificationRequests(teacher.id)
+        List<ClarificationRequestDto> requests = result.requests
+        requests.sort(Comparator.comparing { r -> ((ClarificationRequestDto) r).id })
 
         then: "can only see requests from their students"
         requests.size() == 2
-        requests[0].getCreationDateDate() == clarificationRequest.getCreationDate()
-        requests[0].getContent() == clarificationRequest.getContent()
-        requests[0].getOwner() == clarificationRequest.getOwner().getId()
-        requests[0].getQuestionId() == clarificationRequest.getQuestion().getId()
-        requests[0].getAnswer() != null
-        requests[0].getAnswer().getCreationDateDate() == clarificationRequestAnswer.getCreationDate()
-        requests[0].getAnswer().getCreatorId() == clarificationRequestAnswer.getCreator().getId()
-        requests[0].getAnswer().getContent() == clarificationRequestAnswer.getContent()
-        requests[1].getCreationDateDate() == clarificationRequest3.getCreationDate()
-        requests[1].getContent() == clarificationRequest3.getContent()
-        requests[1].getOwner() == clarificationRequest3.getOwner().getId()
-        requests[1].getQuestionId() == clarificationRequest3.getQuestion().getId()
+        requests[0].getCreationDateDate() == clarificationRequest.creationDate
+        requests[0].content == clarificationRequest.content
+        requests[0].getCreatorUsername() == clarificationRequest.creator.username
+        requests[0].getQuestionId() == clarificationRequest.question.id
+        requests[0].getMessages() != null
+        requests[0].getMessages().size() == 1
+        def reply0 = requests[0].getMessages().get(0)
+        reply0.getCreationDateDate() == clarificationReply.creationDate
+        reply0.getCreatorUsername() == clarificationReply.creator.username
+        reply0.content == clarificationReply.content
+        requests[1].getCreationDateDate() == clarificationRequest3.creationDate
+        requests[1].content == clarificationRequest3.content
+        requests[1].getCreatorUsername() == clarificationRequest3.creator.username
+        requests[1].getQuestionId() == clarificationRequest3.question.id
+
+        and: "user information is returned"
+        result.names.get(clarificationRequest.creator.username) == clarificationRequest.creator.name
+        result.names.get(clarificationReply.creator.username) == clarificationReply.creator.name
     }
 
     @TestConfiguration
@@ -224,7 +217,7 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
 
         @Bean
         ClarificationService ClarificationService() {
-            return new ClarificationService();
+            return new ClarificationService()
         }
     }
 }

@@ -1,22 +1,25 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.CLARIFICATION_REQUEST_MISSING_CONTENT;
 
 @Entity
 @Table(name = "clarification_requests")
 public class ClarificationRequest {
+
+    public enum RequestStatus {
+        PRIVATE, PUBLIC
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,40 +28,56 @@ public class ClarificationRequest {
     private Integer key;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User owner;
-
-    @ManyToOne
     @JoinColumn(name = "question_id", nullable = false)
     private Question question;
 
-    @Column(columnDefinition = "TEXT")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "creator_id", nullable = false)
+    private User creator;
+
+    @Column(nullable = false)
+    private LocalDateTime creationDate = LocalDateTime.now();
+
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    @Column(name = "submission_date")
-    private LocalDateTime creationDate;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "request", orphanRemoval = true)
+    @OrderBy("creationDate ASC")
+    private List<ClarificationMessage> messages = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "request", fetch=FetchType.LAZY, orphanRemoval=true, optional=true)
-    private ClarificationRequestAnswer answer;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RequestStatus status = RequestStatus.PRIVATE;
 
-    public ClarificationRequest() {}
+    @Column(nullable = false)
+    private Boolean resolved = Boolean.FALSE;
 
-    public ClarificationRequest(User user, Question question, ClarificationRequestDto clarificationRequestDto) {
-        checkConsistentClarificationRequest(clarificationRequestDto);
+    public ClarificationRequest() {
+    }
+
+    public ClarificationRequest(Question question, User creator, ClarificationRequestDto clarificationRequestDto) {
         this.key = clarificationRequestDto.getKey();
-        this.owner = user;
         this.question = question;
+        this.status = clarificationRequestDto.getStatus();
+        this.creator = creator;
         this.content = clarificationRequestDto.getContent();
-        this.creationDate = clarificationRequestDto.getCreationDateDate();
+
+        this.ensureConsistent();
     }
 
-    private void checkConsistentClarificationRequest(ClarificationRequestDto clarificationRequestDto) {
-        if (clarificationRequestDto.getContent() == null || clarificationRequestDto.getContent().trim().length() == 0)
-            throw new TutorException(CLARIFICATION_REQUEST_MISSING_CONTENT);
+    private void ensureConsistent() {
+        if (this.content == null || this.content.isBlank())
+            throw new TutorException(ErrorMessage.CLARIFICATION_REQUEST_MISSING_CONTENT);
     }
 
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
     public Integer getKey() {
         if (this.key == null) {
             generateKeys();
@@ -67,7 +86,7 @@ public class ClarificationRequest {
     }
 
     private void generateKeys() {
-        Integer max = this.question.getClarificationRequests().stream()
+        int max = this.question.getClarificationRequests().stream()
                 .filter(request -> request.key != null)
                 .map(ClarificationRequest::getKey)
                 .max(Comparator.comparing(Integer::valueOf))
@@ -83,17 +102,47 @@ public class ClarificationRequest {
         }
     }
 
-    public void setKey(Integer key) { this.key = key; }
-    public User getOwner() { return owner; }
-    public void setOwner(User student) { owner = student; }
-    public Question getQuestion() { return question; }
-    public void setQuestion(Question question) { this.question = question; }
-    public String getContent() { return content; }
-    public void setContent(String content) { this.content = content; }
-    public LocalDateTime getCreationDate() { return creationDate; }
-    public void setCreationDate(LocalDateTime date) { creationDate = date; }
-    public Optional<ClarificationRequestAnswer> getAnswer() { return Optional.ofNullable(answer); }
-    public void setAnswer(ClarificationRequestAnswer a) { this.answer = a; }
-    public void removeAnswer() { this.setAnswer(null); }
-    public boolean hasAnswer() {return this.answer != null; }
+    public void setKey(Integer key) {
+        this.key = key;
+    }
+
+    public User getCreator() {
+        return this.creator;
+    }
+
+    public Question getQuestion() {
+        return question;
+    }
+
+    public void setQuestion(Question question) {
+        this.question = question;
+    }
+
+    public LocalDateTime getCreationDate() {
+        return this.creationDate;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public RequestStatus getStatus() {
+        return this.status;
+    }
+
+    public void setStatus(RequestStatus status) {
+        this.status = status;
+    }
+
+    public Boolean getResolved() {
+        return this.resolved;
+    }
+
+    public void setResolved(Boolean resolved) {
+        this.resolved = resolved;
+    }
+
+    public List<ClarificationMessage> getMessages() {
+        return messages;
+    }
 }

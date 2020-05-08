@@ -7,10 +7,7 @@ import org.springframework.context.annotation.Bean
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestAnswerRepository
-import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.repository.ClarificationRequestRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
@@ -26,7 +23,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
 
 @DataJpaTest
-class getStudentClarificationRequestsServiceSpockTest extends Specification {
+class GetStudentClarificationRequestsServiceSpockTest extends Specification {
     static final String COURSE_NAME = "Software Architecture"
     static final String ACRONYM = "AS1"
     static final String ACADEMIC_TERM = "1 SEM"
@@ -55,12 +52,6 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
     QuizAnswerRepository quizAnswerRepository
 
     @Autowired
-    ClarificationRequestRepository clarificationRequestRepository
-
-    @Autowired
-    ClarificationRequestAnswerRepository clarificationRequestAnswerRepository;
-
-    @Autowired
     ClarificationService clarificationService
 
     Course course
@@ -69,19 +60,16 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
     Quiz quiz
     QuizQuestion quizQuestion
     QuizAnswer quizAnswer
-    User student
-    ClarificationRequestDto clarificationRequestDto
-    int studentId
-    int questionId
-
+    User student, student2
 
     def setup() {
-        course = createCourse(COURSE_NAME)
+        course = new Course(COURSE_NAME, Course.Type.TECNICO)
         courseExecution = createCourseExecution(course, ACRONYM, ACADEMIC_TERM)
-        quiz = createQuiz(1, courseExecution, Quiz.QuizType.GENERATED)
+        quiz = createQuiz(1, courseExecution, "GENERATED")
         question = createQuestion(1, course)
         quizQuestion = new QuizQuestion(quiz, question, 1)
-        student = createStudent(new User(), 1, 'NAME', 'USERNAME_ONE', courseExecution)
+        student = createStudent(1, 'NAME', 'USERNAME_ONE', courseExecution)
+        student2 = createStudent(2, 'NAME2', 'USERNAME_TWO', courseExecution)
         quizAnswer = new QuizAnswer(student, quiz)
 
         courseRepository.save(course)
@@ -90,12 +78,12 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
         questionRepository.save(question)
         quizQuestionRepository.save(quizQuestion)
         userRepository.save(student)
+        userRepository.save(student2)
         quizAnswerRepository.save(quizAnswer)
-        questionId = question.getId()
-        studentId = student.getId()
     }
 
-    private User createStudent(User student, int key, String name, String username, CourseExecution courseExecution) {
+    private static User createStudent(int key, String name, String username, CourseExecution courseExecution) {
+        def student = new User()
         student.setKey(key)
         student.setName(name)
         student.setUsername(username)
@@ -105,15 +93,16 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
         return student
     }
 
-    private Question createQuestion(int key, Course course) {
+    private static Question createQuestion(int key, Course course) {
         def question = new Question()
         question.setKey(key)
         question.setCourse(course)
+        question.setTitle("TITLE")
         course.addQuestion(question)
         return question
     }
 
-    private Quiz createQuiz(int key, CourseExecution courseExecution, Quiz.QuizType type) {
+    private static Quiz createQuiz(int key, CourseExecution courseExecution, String type) {
         def quiz = new Quiz()
         quiz.setKey(key)
         quiz.setType(type)
@@ -122,7 +111,7 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
         return quiz
     }
 
-    private CourseExecution createCourseExecution(Course course, String acronym, String term) {
+    private static CourseExecution createCourseExecution(Course course, String acronym, String term) {
         def courseExecution = new CourseExecution()
         courseExecution.setCourse(course)
         courseExecution.setAcronym(acronym)
@@ -130,35 +119,31 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
         return courseExecution
     }
 
-    private Course createCourse(String name) {
-        def course = new Course()
-        course.setName(name)
-        return course
-    }
-
     def "student submitted 1 clarification request"() {
         given:
-        clarificationRequestDto = new ClarificationRequestDto()
+        def clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent(CONTENT)
-        clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
+        clarificationService.submitClarificationRequest(question.id, student.id, clarificationRequestDto)
 
         when:
-        def result = clarificationService.getStudentClarificationRequests(studentId)
+        def result = clarificationService.getStudentClarificationRequests(student.id)
+        def requests = result.requests
 
         then:
         result != null
-        result.size() == 1
-        ClarificationRequestDto req = result[0]
-        req.owner == studentId
+        result.requests != null
+        requests.size() == 1
+        ClarificationRequestDto req = requests[0]
+        req.creatorUsername == student.username
         req.content == CONTENT
-        req.questionId == question.getId()
+        req.questionId == question.id
     }
 
     def "student submitted 2 clarification requests"() {
         given: "a clarification request for one question"
-        clarificationRequestDto = new ClarificationRequestDto()
+        def clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent(CONTENT)
-        clarificationService.submitClarificationRequest(questionId, studentId, clarificationRequestDto)
+        clarificationService.submitClarificationRequest(question.id, student.id, clarificationRequestDto)
 
         and: "another answered question"
         def q = createQuestion(2, course)
@@ -171,31 +156,51 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
         userRepository.save(student)
 
         and: "a clarification request to this question"
-        def cr = new ClarificationRequestDto();
+        def cr = new ClarificationRequestDto()
         cr.setContent(CONTENT_2)
-        clarificationService.submitClarificationRequest(q.getId(), studentId, cr)
+        clarificationService.submitClarificationRequest(q.getId(), student.id, cr)
 
         when:
-        def result = clarificationService.getStudentClarificationRequests(studentId)
+        def result = clarificationService.getStudentClarificationRequests(student.id)
+        List<ClarificationRequestDto> requests = result.requests
+        requests.sort(Comparator.comparing { r -> ((ClarificationRequestDto) r).id })
 
         then: "returns list ordered by request Id DSC"
-        result != null
-        result.size() == 2
-        result[1].owner == studentId
-        result[1].content == CONTENT
-        result[1].questionId == question.getId()
-        result[0].owner == studentId
-        result[0].content == CONTENT_2
-        result[0].questionId == q.getId()
+        requests.size() == 2
+        requests[0].creatorUsername == student.username
+        requests[0].content == CONTENT
+        requests[0].questionId == question.id
+        requests[1].creatorUsername == student.username
+        requests[1].content == CONTENT_2
+        requests[1].questionId == q.id
+
+        and: "user information is returned"
+        result.names.get(student.username) == student.name
     }
 
     def "student didn't submit clarification requests"() {
         when:
-        def result = clarificationService.getStudentClarificationRequests(studentId)
+        def result = clarificationService.getStudentClarificationRequests(student.id)
 
         then:
         result != null
-        result.size() == 0
+        result.requests != null
+        result.requests.isEmpty()
+        result.names.isEmpty()
+    }
+
+    def "student didn't submit any clarification requests but others exist"() {
+        when: "another student submits a request"
+        def clarificationRequestDto = new ClarificationRequestDto()
+        clarificationRequestDto.setContent(CONTENT)
+        clarificationService.submitClarificationRequest(question.id, student.id, clarificationRequestDto)
+        def result = clarificationService.getStudentClarificationRequests(student2.id)
+
+        then:
+        result != null
+        result.requests != null
+        result.requests.isEmpty()
+        result.names.isEmpty()
     }
 
     @TestConfiguration
@@ -203,7 +208,7 @@ class getStudentClarificationRequestsServiceSpockTest extends Specification {
 
         @Bean
         ClarificationService ClarificationService() {
-            return new ClarificationService();
+            return new ClarificationService()
         }
     }
 }
