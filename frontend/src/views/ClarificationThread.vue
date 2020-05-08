@@ -12,7 +12,7 @@
             <v-container fluid>
               <v-row>
                 {{ nameForUsername(msg.creatorUsername) }}
-                <b v-if="messageIsMine(msg)">(me)</b>
+                <b v-if="messageIsMine(msg)" class="ml-1">(me)</b>
               </v-row>
               <v-row>{{ msg.creationDate }}</v-row>
             </v-container>
