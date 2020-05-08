@@ -37,11 +37,16 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizQuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentService
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.dto.TournamentDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User.Role
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto
 import spock.lang.Specification
 import spock.lang.Unroll
+
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @DataJpaTest
 class GetMyStatsServiceSpockTest extends Specification {
@@ -57,6 +62,10 @@ class GetMyStatsServiceSpockTest extends Specification {
     public static final String TOPIC_NAME = "topic name"
     public static final String QUESTION_TITLE = 'question title'
     public static final String QUESTION_CONTENT = 'question content'
+
+    public static final String TOURNAMENT_TITLE = "tournament title"
+    public static final String CREATOR_NAME = "user"
+    public static final String CREATOR_USERNAME = "username"
 
     @Autowired
     CourseRepository courseRepository
@@ -97,6 +106,9 @@ class GetMyStatsServiceSpockTest extends Specification {
     @Autowired
     ClarificationService clarificationService
 
+    @Autowired
+    TournamentService tournamentService
+
 
     Course course
     CourseExecution courseExecution
@@ -106,6 +118,14 @@ class GetMyStatsServiceSpockTest extends Specification {
     User student
     int studentId
     int courseId
+
+
+
+
+    DateTimeFormatter formatter
+    List<TopicDto> topicDtoList
+    User creator
+    TournamentDto tournamentDto
 
     def setup() {
         course = new Course(COURSE_NAME, Course.Type.TECNICO)
@@ -118,6 +138,10 @@ class GetMyStatsServiceSpockTest extends Specification {
         studentId = student.getId()
         courseId = course.getId()
 
+        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+        UserDto creatorDto = setupCreator(courseExecution)
+        topicDtoList = setupTopicList(course)
+        setupTournamentDto(creatorDto, formatter, topicDtoList)
     }
 
     def clarificationRequestSetup() {
@@ -201,6 +225,51 @@ class GetMyStatsServiceSpockTest extends Specification {
         return courseExecution
     }
 
+    private ArrayList<TopicDto> setupTopicList(Course course) {
+        def topic = new Topic();
+        topic.setName("TOPIC")
+        topic.setCourse(course)
+
+        // So that quiz generation doesn't throw exceptions
+        def question = new Question()
+        question.addTopic(topic)
+        question.setTitle("question_title")
+        question.setCourse(course)
+        question.setStatus(Question.Status.AVAILABLE)
+
+        questionRepository.save(question)
+        topicRepository.save(topic)
+
+        def topicDto = new TopicDto(topic)
+        topicDtoList = new ArrayList<TopicDto>();
+        topicDtoList.add(topicDto)
+        topicDtoList
+    }
+
+    private UserDto setupCreator(CourseExecution courseExecution) {
+        creator = new User(CREATOR_NAME, CREATOR_USERNAME, 2, User.Role.STUDENT)
+        creator.getCourseExecutions().add(courseExecution)
+        courseExecution.getUsers().add(creator)
+        userRepository.save(creator)
+        def creatorDto = new UserDto(creator);
+        creatorDto
+    }
+
+    private void setupTournamentDto(UserDto creatorDto, DateTimeFormatter formatter, ArrayList<TopicDto> topicDtoList) {
+        tournamentDto = new TournamentDto()
+        tournamentDto.setTitle(TOURNAMENT_TITLE)
+        tournamentDto.setKey(1)
+        def creationDate = LocalDateTime.now().minusDays(1)
+        def availableDate = LocalDateTime.now()
+        def runningDate = LocalDateTime.now().plusDays(1)
+        def conclusionDate = LocalDateTime.now().plusDays(2)
+        tournamentDto.setNumberOfQuestions(1)
+        tournamentDto.setCreationDate(creationDate.format(formatter))
+        tournamentDto.setAvailableDate(availableDate.format(formatter))
+        tournamentDto.setRunningDate(runningDate.format(formatter))
+        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
+        tournamentDto.setTopics(topicDtoList)
+    }
 
     def "get user's clarification dashboard stats"() {
         clarificationRequestSetup()
@@ -247,8 +316,36 @@ class GetMyStatsServiceSpockTest extends Specification {
         result.getApprovedQuestionsStat() == 1
         result.getApprovedQuestionsVisibility() == MyStats.StatsVisibility.PRIVATE
         result.getSubmittedQuestionsVisibility() == MyStats.StatsVisibility.PRIVATE
-
     }
+
+
+
+
+
+
+    def "get user's tournaments dashboard stats"() {
+        given: "an available tournament"
+        tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
+
+        when:
+        def result = myStatsService.getMyStats(creator.getId(), courseId)
+
+        then:
+        result != null
+        result.getTournamentsParticipatedStat() == 1;
+        //result.getTournamentsScoreStat() == 1 // TODO: Not working now
+        result.getTournamentsParticipatedVisibility() == MyStats.StatsVisibility.PRIVATE
+        result.getTournamentsScoreVisibility() == MyStats.StatsVisibility.PRIVATE
+    }
+
+
+
+
+
+
+
+
+
 
 
 

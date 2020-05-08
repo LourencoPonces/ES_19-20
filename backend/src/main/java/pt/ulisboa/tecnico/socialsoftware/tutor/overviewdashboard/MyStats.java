@@ -109,7 +109,7 @@ public class MyStats implements DomainEntity {
 
     public boolean canSeeTournamentsParticipated() { return this.tournamentsParticipated == StatsVisibility.PUBLIC; }
 
-    public StatsVisibility getTournamentsScore() { return this.getTournamentsScore(); }
+    public StatsVisibility getTournamentsScore() { return this.tournamentsScore; }
 
     public void setTournamentsScore(StatsVisibility tournamentsScore) { this.tournamentsScore = tournamentsScore; }
 

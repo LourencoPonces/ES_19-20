@@ -38,6 +38,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizQuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentService
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
@@ -125,7 +126,6 @@ class UpdateMyStatsVisibilitySpockTest extends Specification {
         quizAnswerRepository.save(quizAnswer)
         studentId = student.getId()
         courseId = course.getId()
-
     }
 
     private CourseExecution createCourseExecution(Course course, String acronym, String term) {
@@ -196,8 +196,8 @@ class UpdateMyStatsVisibilitySpockTest extends Specification {
         def clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent(content)
         return clarificationRequestDto
-
     }
+
     def "change submitted and public requests' visibility to public"() {
         given: "1 private clarification request"
         def req1 = createClarificationRequestDto(REQUEST_CONTENT)
@@ -270,14 +270,12 @@ class UpdateMyStatsVisibilitySpockTest extends Specification {
         when:
         def result = myStatsService.updateVisibility(myStatsDto.getId(), myStatsDto)
 
-
         then:
         result != null
         result.getSubmittedQuestionsStat() == 2
         result.getApprovedQuestionsStat() == 1
         result.getApprovedQuestionsVisibility() == MyStats.StatsVisibility.PUBLIC
         result.getSubmittedQuestionsVisibility() == MyStats.StatsVisibility.PUBLIC
-
     }
 
     def "change submitted and approved questions visibility to private"() {
@@ -324,16 +322,36 @@ class UpdateMyStatsVisibilitySpockTest extends Specification {
 
 
     @TestConfiguration
-    static class UpdateMyStatsVisibilityTestContextConfiguration {
+    static class ClarificationServiceImplTestContextConfiguration {
 
         @Bean
-        MyStatsService MyStatsService() {
+        MyStatsService myStatsService() {
             return new MyStatsService();
         }
 
         @Bean
-        ClarificationService ClarificationService() {
+        ClarificationService clarificationService() {
             return new ClarificationService();
+        }
+
+        @Bean
+        TournamentService tournamentService() {
+            return new TournamentService()
+        }
+
+        @Bean
+        QuizService quizService() {
+            return new QuizService()
+        }
+
+        @Bean
+        QuestionService questionService() {
+            return new QuestionService()
+        }
+
+        @Bean
+        AnswerService answerService() {
+            return new AnswerService()
         }
 
         @Bean

@@ -29,6 +29,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizQuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.repository.QuizRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.tournament.TournamentService
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import spock.lang.Specification
@@ -111,6 +112,33 @@ class GetOtherUserStatsServiceSpockTest extends Specification {
         quizAnswerRepository.save(quizAnswer)
     }
 
+    def TournamentSetup() {
+
+
+
+
+
+        createQuiz(1, courseExecution, "GENERATED")
+        question = createQuestion(1, course)
+        def quizQuestion = new QuizQuestion(quiz, question, 1)
+        def quizAnswer = new QuizAnswer(student, quiz)
+
+        quizRepository.save(quiz)
+        questionRepository.save(question)
+        quizQuestionRepository.save(quizQuestion)
+        quizAnswerRepository.save(quizAnswer)
+
+
+
+
+
+
+
+
+
+
+    }
+
     private User createUser(CourseExecution courseExecution, User.Role role, String username, int key) {
         def user = new User('NAME', username, key, role)
         user.getCourseExecutions().add(courseExecution)
@@ -175,8 +203,31 @@ class GetOtherUserStatsServiceSpockTest extends Specification {
         result.getSubmittedQuestionsStat() == null
         result.getApprovedQuestionsVisibility() == MyStats.StatsVisibility.PRIVATE
         result.getApprovedQuestionsStat() == null
-
     }
+
+    def "get other user's tournaments stats"() {
+
+
+
+
+        clarificationRequestSetup()
+        given: "a public clarification request by the first student"
+        def request = new ClarificationRequestDto()
+        request.setContent(CONTENT)
+        request = clarificationService.submitClarificationRequest(question.getId(), studentId, request)
+        clarificationService.changeClarificationRequestStatus(request.getId(), ClarificationRequest.RequestStatus.PUBLIC)
+
+        when:
+        def result = myStatsService.getOtherUserStats(student.getId(), courseId)
+
+        then:
+        result != null
+        result.getRequestsSubmittedStat() == null
+        result.getPublicRequestsStat() == null
+    }
+
+
+
 
     @Unroll("invalid arguments: #isUserId | #isCourseid || #error_message")
     def "invalid arguments"() {
@@ -209,13 +260,18 @@ class GetOtherUserStatsServiceSpockTest extends Specification {
     static class ClarificationServiceImplTestContextConfiguration {
 
         @Bean
-        MyStatsService MyStatsService() {
+        MyStatsService myStatsService() {
             return new MyStatsService();
         }
 
         @Bean
-        ClarificationService ClarificationService() {
+        ClarificationService clarificationService() {
             return new ClarificationService();
+        }
+
+        @Bean
+        TournamentService tournamentService() {
+            return new TournamentService()
         }
 
         @Bean
