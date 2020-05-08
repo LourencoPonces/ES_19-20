@@ -5,6 +5,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
@@ -25,7 +26,6 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.UserRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.dto.UserDto
 import spock.lang.Specification
 
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @DataJpaTest
@@ -131,7 +131,7 @@ class GetTournamentQuizTest extends Specification{
     }
 
     def prepareStatus(TournamentDto tournamentDto, Tournament.Status status) {
-        def now = LocalDateTime.now()
+        def now = DateHandler.now()
 
         switch(status) {
             case Tournament.Status.CREATED:
@@ -161,10 +161,10 @@ class GetTournamentQuizTest extends Specification{
                 break;
         }
 
-        tournamentDto.setCreationDate(creationDate.format(formatter))
-        tournamentDto.setAvailableDate(availableDate.format(formatter))
-        tournamentDto.setRunningDate(runningDate.format(formatter))
-        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
+        tournamentDto.setCreationDate(DateHandler.toISOString(creationDate))
+        tournamentDto.setAvailableDate(DateHandler.toISOString(availableDate))
+        tournamentDto.setRunningDate(DateHandler.toISOString(runningDate))
+        tournamentDto.setConclusionDate(DateHandler.toISOString(conclusionDate))
     }
 
     @TestConfiguration

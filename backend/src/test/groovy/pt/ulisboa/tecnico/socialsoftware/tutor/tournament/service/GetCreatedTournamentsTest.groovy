@@ -5,6 +5,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
@@ -128,15 +129,15 @@ class GetCreatedTournamentsTest extends Specification {
         tournamentDto = new TournamentDto()
         tournamentDto.setTitle(TOURNAMENT_TITLE)
         tournamentDto.setKey(1)
-        creationDate = LocalDateTime.now().minusDays(1)
-        availableDate = LocalDateTime.now()
-        runningDate = LocalDateTime.now().plusDays(1)
-        conclusionDate = LocalDateTime.now().plusDays(2)
+        creationDate = DateHandler.now().minusDays(1)
+        availableDate = DateHandler.now()
+        runningDate = DateHandler.now().plusDays(1)
+        conclusionDate = DateHandler.now().plusDays(2)
         tournamentDto.setNumberOfQuestions(1)
-        tournamentDto.setCreationDate(creationDate.format(formatter))
-        tournamentDto.setAvailableDate(availableDate.format(formatter))
-        tournamentDto.setRunningDate(runningDate.format(formatter))
-        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
+        tournamentDto.setCreationDate(DateHandler.toISOString(creationDate))
+        tournamentDto.setAvailableDate(DateHandler.toISOString(availableDate))
+        tournamentDto.setRunningDate(DateHandler.toISOString(runningDate))
+        tournamentDto.setConclusionDate(DateHandler.toISOString(conclusionDate))
         tournamentDto.setTopics(topicDtoList)
     }
 
@@ -155,9 +156,9 @@ class GetCreatedTournamentsTest extends Specification {
         tournamentElement.getKey() != null
         tournamentElement.getTitle() == TOURNAMENT_TITLE
         tournamentElement.getCreationDate() != null
-        tournamentElement.getAvailableDate() == availableDate.format(formatter)
-        tournamentElement.getRunningDate() == runningDate.format(formatter)
-        tournamentElement.getConclusionDate() == conclusionDate.format(formatter)
+        tournamentElement.getAvailableDate() == DateHandler.toISOString(availableDate)
+        tournamentElement.getRunningDate() == DateHandler.toISOString(runningDate)
+        tournamentElement.getConclusionDate() == DateHandler.toISOString(conclusionDate)
         tournamentElement.getStatus() == Tournament.Status.AVAILABLE
         tournamentElement.getCreator().getUsername() == CREATOR_USERNAME
         tournamentElement.getTopics().size() == 1

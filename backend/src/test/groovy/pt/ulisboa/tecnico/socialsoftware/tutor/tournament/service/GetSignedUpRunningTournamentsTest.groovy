@@ -5,6 +5,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
@@ -109,15 +110,15 @@ class GetSignedUpRunningTournamentsTest extends Specification {
         tournamentDto.setNumberOfQuestions(1)
         tournamentDto.setTopics(topicDtoList)
 
-        now = LocalDateTime.now()
+        now = DateHandler.now()
         creationDate = now.minusDays(3)
         availableDate = now.minusDays(2)
         runningDate = now.minusDays(1)
         conclusionDate = now.plusDays(2)
-        tournamentDto.setCreationDate(creationDate.format(formatter))
-        tournamentDto.setAvailableDate(availableDate.format(formatter))
-        tournamentDto.setRunningDate(runningDate.format(formatter))
-        tournamentDto.setConclusionDate(conclusionDate.format(formatter))
+        tournamentDto.setCreationDate(DateHandler.toISOString(creationDate))
+        tournamentDto.setAvailableDate(DateHandler.toISOString(availableDate))
+        tournamentDto.setRunningDate(DateHandler.toISOString(runningDate))
+        tournamentDto.setConclusionDate(DateHandler.toISOString(conclusionDate))
     }
 
 
@@ -135,7 +136,7 @@ class GetSignedUpRunningTournamentsTest extends Specification {
     def "Signed-up non-running tournament"() {
         given: "An available tournament"
         runningDate = now.plusDays(1)
-        tournamentDto.setRunningDate(runningDate.format(formatter))
+        tournamentDto.setRunningDate(DateHandler.toISOString(runningDate))
         tournamentDto = tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
 
         when:

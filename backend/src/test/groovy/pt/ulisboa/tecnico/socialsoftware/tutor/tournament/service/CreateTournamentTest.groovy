@@ -5,6 +5,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.AnswerService
+import pt.ulisboa.tecnico.socialsoftware.tutor.config.DateHandler
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecutionRepository
@@ -128,15 +129,15 @@ class CreateTournamentTest extends Specification {
         tournament = new TournamentDto()
         tournament.setTitle(TOURNAMENT_TITLE)
         tournament.setKey(1)
-        creationDate = LocalDateTime.now()
+        creationDate = DateHandler.now()
         availableDate = creationDate.plusDays(1)
         runningDate = creationDate.plusDays(2)
         conclusionDate = creationDate.plusDays(3)
         tournament.setNumberOfQuestions(1)
-        tournament.setCreationDate(creationDate.format(formatter))
-        tournament.setAvailableDate(availableDate.format(formatter))
-        tournament.setRunningDate(runningDate.format(formatter))
-        tournament.setConclusionDate(conclusionDate.format(formatter))
+        tournament.setCreationDate(DateHandler.toISOString(creationDate))
+        tournament.setAvailableDate(DateHandler.toISOString(availableDate))
+        tournament.setRunningDate(DateHandler.toISOString(runningDate))
+        tournament.setConclusionDate(DateHandler.toISOString(conclusionDate))
         tournament.setTopics(topicDtoList)
     }
 
@@ -150,10 +151,10 @@ class CreateTournamentTest extends Specification {
         result.getId() != null
         result.getKey() == 1
         result.getTitle() == TOURNAMENT_TITLE
-        result.getCreationDate().format(formatter) == creationDate.format(formatter)
-        result.getAvailableDate().format(formatter) == availableDate.format(formatter)
-        result.getRunningDate().format(formatter) == runningDate.format(formatter)
-        result.getConclusionDate().format(formatter) == conclusionDate.format(formatter)
+        DateHandler.toISOString(result.getCreationDate()) == DateHandler.toISOString(creationDate)
+        DateHandler.toISOString(result.getAvailableDate()) == DateHandler.toISOString(availableDate)
+        DateHandler.toISOString(result.getRunningDate()) == DateHandler.toISOString(runningDate)
+        DateHandler.toISOString(result.getConclusionDate()) == DateHandler.toISOString(conclusionDate)
         result.getStatus() == Tournament.Status.CREATED
         result.getCreator().getUsername() == CREATOR_USERNAME
         result.getTopics().size() == 1
@@ -256,9 +257,9 @@ class CreateTournamentTest extends Specification {
         runningDate = creationDate.plusDays(runningDateDay)
         conclusionDate = creationDate.plusDays(conclusionDateDay)
 
-        tournament.setAvailableDate(availableDate.format(formatter))
-        tournament.setRunningDate(runningDate.format(formatter))
-        tournament.setConclusionDate(conclusionDate.format(formatter))
+        tournament.setAvailableDate(DateHandler.toISOString(availableDate))
+        tournament.setRunningDate(DateHandler.toISOString(runningDate))
+        tournament.setConclusionDate(DateHandler.toISOString(conclusionDate))
 
         when:
         tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournament)
