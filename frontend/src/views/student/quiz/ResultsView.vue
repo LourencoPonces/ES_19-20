@@ -92,7 +92,7 @@ export default class ResultsView extends Vue {
       }, 2000);
     }
 
-    this.userRequests = await RemoteServices.getStudentClarificationRequests();
+    this.userRequests = await RemoteServices.getUserClarificationRequests();
     await this.$store.dispatch('clearLoading');
   }
 
@@ -118,29 +118,23 @@ export default class ResultsView extends Vue {
   }
 
   async submitRequest(info: string[]) {
+    // TODO: move into discussion component, avoid the weird event catching
     try {
-      const req = this.createRequest(
-        info[0],
-        this.$store.getters.getUserId,
-        parseInt(info[1])
-      );
+      const req = this.createRequest(info[0], parseInt(info[1]));
       this.userRequests.push(
         await RemoteServices.submitClarificationRequest(req)
       );
-      alert('Request submitted! You can see it in your Clarification Requests.');
+      alert(
+        'Request submitted! You can see it in your Clarification Requests.'
+      );
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
   }
 
-  createRequest(
-    content: string,
-    owner: number,
-    question: number
-  ): ClarificationRequest {
+  createRequest(content: string, question: number): ClarificationRequest {
     const req = new ClarificationRequest();
     req.setQuestionId(question);
-    req.setOwnerId(owner);
     req.setContent(content);
     return req;
   }
