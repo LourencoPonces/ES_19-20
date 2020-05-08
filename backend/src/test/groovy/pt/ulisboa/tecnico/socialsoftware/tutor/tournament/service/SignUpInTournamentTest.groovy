@@ -225,6 +225,11 @@ class SignUpInTournamentTest extends Specification{
                 conclusionDate = now.plusDays(1)
                 break;
             case Tournament.Status.FINISHED:
+                creationDate = now.minusDays(4)
+                availableDate = now.minusDays(3)
+                runningDate = now.minusDays(2)
+                conclusionDate = now.minusDays(1)
+                break;
             case Tournament.Status.CANCELLED:
                 creationDate = now.minusDays(4)
                 availableDate = now.minusDays(3)
