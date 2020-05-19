@@ -230,6 +230,36 @@ class StudentSubmitQuestionTest extends Specification {
 
     }
 
+    def "create question with argument"() {
+
+        given: "a studentQuestionDTO"
+        def questionDto = new StudentQuestionDTO()
+        StudentQuestionDtoSetup(questionDto)
+
+        and: "a TopicDTO"
+        def topicDto = new TopicDto(topic)
+        def topicList = new ArrayList<TopicDto>()
+        addToList(topicList, topicDto)
+        questionDto.setTopics(topicList)
+        and: "a OptionDTO"
+        def optionDto = new OptionDto()
+        optionDto.setContent(OPTION_CONTENT)
+        optionDto.setCorrect(true)
+        def optionList = new ArrayList<OptionDto>()
+        addToList(optionList, optionDto)
+        questionDto.setOptions(optionList)
+        and: "an argument"
+        def arg = "This question is very good. trust me"
+        questionDto.setArgument(arg)
+
+        when: "create studentQuestion with argument"
+        studentSubmitQuestionService.studentSubmitQuestion(course.getId(), questionDto, user.getId())
+
+        then: "student question created successfully"
+        def sq = studentQuestionRepository.findAll().get(0)
+        sq.getArgument() == arg
+    }
+
     @TestConfiguration
     static class StudentQuestionServiceImplTestContextConfiguration {
 

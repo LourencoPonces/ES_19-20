@@ -34,6 +34,9 @@ public class StudentQuestion extends Question {
     @Column
     private String justification = "";
 
+    @Column
+    private String argument = "";
+
     @Enumerated(EnumType.STRING)
     private SubmittedStatus submittedStatus = SubmittedStatus.WAITING_FOR_APPROVAL;
 
@@ -54,7 +57,7 @@ public class StudentQuestion extends Question {
             submittedStatus = questionDto.getSubmittedStatus();
         }
         justification = questionDto.getJustification();
-
+        argument = questionDto.getArgument();
     }
 
     public Integer getStudentQuestionKey() { return studentQuestionKey; }
@@ -92,6 +95,8 @@ public class StudentQuestion extends Question {
        this.justification = newJustification;
 
     }
+
+    public String getArgument() { return argument; }
 
     private boolean validJustification(String just) {
         return just == null || ( !just.isBlank() && just.length() <= MAX_JUSTIFICATION_SIZE);

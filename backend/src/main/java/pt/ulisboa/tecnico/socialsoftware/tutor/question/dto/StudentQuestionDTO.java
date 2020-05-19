@@ -8,6 +8,7 @@ public class StudentQuestionDTO extends QuestionDto{
     private String justification;
     private StudentQuestion.SubmittedStatus submittedStatus;
     private String username;
+    private String argument;
 
 
     public StudentQuestionDTO() {}
@@ -43,6 +44,9 @@ public class StudentQuestionDTO extends QuestionDto{
 
     public StudentQuestion.SubmittedStatus getSubmittedStatus() { return submittedStatus; }
     public void setSubmittedStatus(StudentQuestion.SubmittedStatus submittedStatus) { this.submittedStatus = submittedStatus; }
+
+    public String getArgument() { return argument; }
+    public void setArgument(String arg) { argument = arg; }
 
     @Override
     public String toString() {
