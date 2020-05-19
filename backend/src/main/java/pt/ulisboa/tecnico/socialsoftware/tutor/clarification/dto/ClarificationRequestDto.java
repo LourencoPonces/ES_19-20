@@ -20,6 +20,7 @@ public class ClarificationRequestDto {
     private String content;
     private Boolean resolved;
     private LocalDateTime creationDate;
+    private ClarificationRequest.RequestType type;
     private final List<ClarificationMessageDto> messages;
 
     @Transient
@@ -37,6 +38,7 @@ public class ClarificationRequestDto {
         this.content = clarificationRequest.getContent();
         this.creationDate = clarificationRequest.getCreationDate();
         this.resolved = clarificationRequest.getResolved();
+        this.type = clarificationRequest.getType();
 
         this.messages = clarificationRequest.getMessages()
                 .stream()
@@ -94,6 +96,14 @@ public class ClarificationRequestDto {
 
     public Boolean getResolved() {
         return resolved;
+    }
+
+    public void setType(ClarificationRequest.RequestType type) {
+        this.type = type;
+    }
+
+    public ClarificationRequest.RequestType getType() {
+        return type;
     }
 
     @JsonProperty

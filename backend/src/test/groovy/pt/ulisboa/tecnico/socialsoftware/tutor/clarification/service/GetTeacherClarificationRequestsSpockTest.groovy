@@ -91,10 +91,10 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
         student3 = createUser(User.Role.STUDENT, 3, "s3", courseExecution)
 
         quizAnswer = createQuizAnswer(student, quiz)
-        clarificationRequest = createClarificationRequest(1, student, question, "can we skip jmeter tests?")
+        clarificationRequest = createClarificationRequest(1, student, question, "can we skip jmeter tests?", null)
         clarificationReply = createClarificationMessage(teacher, clarificationRequest, "lol no")
         quizAnswer3 = createQuizAnswer(student3, quiz)
-        clarificationRequest3 = createClarificationRequest(3, student3, question, "but why?")
+        clarificationRequest3 = createClarificationRequest(3, student3, question, "but why?", null)
 
         courseExecution2 = createCourseExecution(course, "AC1", "1SEM")
         quiz2 = createQuiz(20, courseExecution2, "GENERATED")
@@ -102,7 +102,7 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
 
         student2 = createUser(User.Role.STUDENT, 2, "s2", courseExecution2)
         quizAnswer2 = createQuizAnswer(student2, quiz2)
-        clarificationRequest2 = createClarificationRequest(2, student2, question, "i really must skip jmeter tests")
+        clarificationRequest2 = createClarificationRequest(2, student2, question, "i really must skip jmeter tests", ClarificationRequest.RequestType.TYPO)
     }
 
     private User createUser(User.Role role, int key, String username, CourseExecution courseExecution) {
@@ -161,9 +161,10 @@ class GetTeacherClarificationRequestsSpockTest extends Specification {
         return quizAnswer
     }
 
-    private ClarificationRequest createClarificationRequest(int key, User student, Question question, String content) {
+    private ClarificationRequest createClarificationRequest(int key, User student, Question question, String content, ClarificationRequest.RequestType type) {
         ClarificationRequestDto clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent(content)
+        clarificationRequestDto.setType(type)
         ClarificationRequest clarificationRequest = new ClarificationRequest(question, student, clarificationRequestDto)
         clarificationRequest.setKey(key)
         clarificationRequestRepository.save(clarificationRequest)

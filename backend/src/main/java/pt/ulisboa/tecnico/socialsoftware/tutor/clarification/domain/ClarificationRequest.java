@@ -21,6 +21,11 @@ public class ClarificationRequest {
         PRIVATE, PUBLIC
     }
 
+    public enum RequestType {
+        TYPO,
+        MULTIPLE_CORRECT
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -49,6 +54,9 @@ public class ClarificationRequest {
     @Column(nullable = false)
     private RequestStatus status = RequestStatus.PRIVATE;
 
+    @Enumerated(EnumType.STRING)
+    private RequestType type = null;
+
     @Column(nullable = false)
     private Boolean resolved = Boolean.FALSE;
 
@@ -61,6 +69,7 @@ public class ClarificationRequest {
         this.status = clarificationRequestDto.getStatus();
         this.creator = creator;
         this.content = clarificationRequestDto.getContent();
+        this.type = clarificationRequestDto.getType();
 
         this.ensureConsistent();
     }
@@ -144,5 +153,13 @@ public class ClarificationRequest {
 
     public List<ClarificationMessage> getMessages() {
         return messages;
+    }
+
+    public RequestType getType() {
+        return type;
+    }
+
+    public void setType(RequestType type) {
+        this.type = type;
     }
 }

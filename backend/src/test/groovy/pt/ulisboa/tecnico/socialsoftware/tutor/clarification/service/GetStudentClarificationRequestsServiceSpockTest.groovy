@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
 import pt.ulisboa.tecnico.socialsoftware.tutor.answer.repository.QuizAnswerRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.ClarificationService
+import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.domain.ClarificationRequest
 import pt.ulisboa.tecnico.socialsoftware.tutor.clarification.dto.ClarificationRequestDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.Course
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.CourseExecution
@@ -123,6 +124,7 @@ class GetStudentClarificationRequestsServiceSpockTest extends Specification {
         given:
         def clarificationRequestDto = new ClarificationRequestDto()
         clarificationRequestDto.setContent(CONTENT)
+        clarificationRequestDto.setType(ClarificationRequest.RequestType.MULTIPLE_CORRECT)
         clarificationService.submitClarificationRequest(question.id, student.id, clarificationRequestDto)
 
         when:
@@ -137,6 +139,7 @@ class GetStudentClarificationRequestsServiceSpockTest extends Specification {
         req.creatorUsername == student.username
         req.content == CONTENT
         req.questionId == question.id
+        req.type == ClarificationRequest.RequestType.MULTIPLE_CORRECT
     }
 
     def "student submitted 2 clarification requests"() {

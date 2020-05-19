@@ -152,9 +152,33 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         result.getQuestion().getId() == question.getId()
         result.getCreationDate() != null
         result.getStatus() == ClarificationRequest.RequestStatus.PRIVATE
+        result.getType() == null // no type was provided
         and: "the clarification request was added to the student"
         def user = userRepository.findAll().get(0)
         user.getClarificationRequests().size() == 1
+    }
+
+    def "can submit request with a type"() {
+        //the clarification request is created
+        when:
+        def clarificationRequestDto = new ClarificationRequestDto()
+        clarificationRequestDto.setType(ClarificationRequest.RequestType.TYPO);
+        clarificationRequestDto.setContent(CONTENT)
+        clarificationRequestDto = clarificationService.submitClarificationRequest(question.id, student.id, clarificationRequestDto)
+
+        then: "request is created and is in the repository with the correct type"
+        clarificationRequestRepository.count() == 1L
+        def result = clarificationRequestRepository.findAll().get(0)
+        result.getId() != null
+        result.getCreator().getId() == student.getId()
+        result.getQuestion().getId() == question.getId()
+        result.getCreationDate() != null
+        result.getStatus() == ClarificationRequest.RequestStatus.PRIVATE
+        result.getType() == ClarificationRequest.RequestType.TYPO // no type was provided
+        and: "the clarification request was added to the student"
+        def user = userRepository.findAll().get(0)
+        user.getClarificationRequests().size() == 1
+
     }
 
     def "same student submits 2 requests for the same question"() {
