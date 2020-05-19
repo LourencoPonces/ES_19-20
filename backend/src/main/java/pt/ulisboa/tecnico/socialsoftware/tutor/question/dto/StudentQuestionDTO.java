@@ -6,6 +6,7 @@ public class StudentQuestionDTO extends QuestionDto{
     private Integer id;
     private Integer studentQuestionKey;
     private String justification;
+    private String acceptArg;
     private StudentQuestion.SubmittedStatus submittedStatus;
     private String username;
 
@@ -17,6 +18,7 @@ public class StudentQuestionDTO extends QuestionDto{
         this.id = studentQuestion.getId();
         this.studentQuestionKey = studentQuestion.getStudentQuestionKey();
         justification = studentQuestion.getJustification();
+        acceptArg = studentQuestion.getAcceptArg();
         submittedStatus = studentQuestion.getSubmittedStatus();
         username = studentQuestion.getUser().getUsername();
     }
@@ -37,6 +39,14 @@ public class StudentQuestionDTO extends QuestionDto{
 
     public String getJustification() { return justification; }
     public void setJustification(String justification) {this.justification = justification; }
+
+    public String getAcceptArg() {
+        return acceptArg;
+    }
+
+    public void setAcceptArg(String acceptArg) {
+        this.acceptArg = acceptArg;
+    }
 
     public String getUser() { return username; }
     public void setUser(String username) { this.username = username; }
@@ -62,6 +72,7 @@ public class StudentQuestionDTO extends QuestionDto{
                 ", sequence=" + this.getSequence() +
                 ", user_id=" + this.getUser() +
                 ", justification=" + this.getJustification() +
+                ", accept argument=" + this.getAcceptArg() +
                 '}';
     }
 }

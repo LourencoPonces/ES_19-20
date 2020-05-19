@@ -34,6 +34,9 @@ public class StudentQuestion extends Question {
     @Column
     private String justification = "";
 
+    @Column
+    private String acceptArg = "";
+
     @Enumerated(EnumType.STRING)
     private SubmittedStatus submittedStatus = SubmittedStatus.WAITING_FOR_APPROVAL;
 
@@ -54,6 +57,7 @@ public class StudentQuestion extends Question {
             submittedStatus = questionDto.getSubmittedStatus();
         }
         justification = questionDto.getJustification();
+        acceptArg = questionDto.getAcceptArg();
 
     }
 
@@ -62,6 +66,14 @@ public class StudentQuestion extends Question {
 
     public String getJustification() { return justification; }
     public void setJustification(String justification) { this.justification = justification; }
+
+    public String getAcceptArg() {
+        return acceptArg;
+    }
+
+    public void setAcceptArg(String acceptArg) {
+        this.acceptArg = acceptArg;
+    }
 
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }

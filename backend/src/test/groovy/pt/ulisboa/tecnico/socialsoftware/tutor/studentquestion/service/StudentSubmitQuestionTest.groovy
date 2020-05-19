@@ -35,6 +35,7 @@ class StudentSubmitQuestionTest extends Specification {
     public static final String ACADEMIC_TERM = "1 SEM"
     public static final String QUESTION_TITLE = 'question title'
     public static final String QUESTION_CONTENT = 'question content'
+    public static final String ACCEPT_ARGUMENT = 'I really like this question'
     public static final String OPTION_CONTENT = "optionId content"
     public static final String URL = 'URL'
     public static final String TOPIC_NAME = "topic name"
@@ -194,6 +195,7 @@ class StudentSubmitQuestionTest extends Specification {
         questionDto.setContent(QUESTION_CONTENT)
         questionDto.setTitle(QUESTION_TITLE)
         questionDto.setStatus(Question.Status.DISABLED.name())
+        questionDto.setAcceptArg(ACCEPT_ARGUMENT)
     }
 
     def addToList(ArrayList list, Object o) {
@@ -228,6 +230,32 @@ class StudentSubmitQuestionTest extends Specification {
         def resultTwo = studentQuestionRepository.findAll().get(1)
         resultOne.getStudentQuestionKey() + resultTwo.getStudentQuestionKey() == 3
 
+    }
+
+    def "submit a question with an argument"() {
+        given: "a StudentQuestionDTO"
+        def questionDto = new StudentQuestionDTO()
+        StudentQuestionDtoSetup(questionDto)
+        and: "a TopicDTO"
+        def topicDto = new TopicDto(topic)
+        def topicList = new ArrayList<TopicDto>()
+        addToList(topicList, topicDto)
+        questionDto.setTopics(topicList)
+        and: "a OptionDTO"
+        def optionDto = new OptionDto()
+        optionDto.setContent(OPTION_CONTENT)
+        optionDto.setCorrect(true)
+        def optionList = new ArrayList<OptionDto>()
+        addToList(optionList, optionDto)
+        questionDto.setOptions(optionList)
+
+        when: "create the question"
+        studentSubmitQuestionService.studentSubmitQuestion(course.getId(), questionDto, user.getId())
+
+        then: "the question exists and has the accept argument"
+        studentQuestionRepository.count() == 1L
+        def result = studentQuestionRepository.findAll().get(0)
+        result.getAcceptArg() == ACCEPT_ARGUMENT
     }
 
     @TestConfiguration
