@@ -142,6 +142,7 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         //the clarification request is created
         when:
         clarificationRequestDto.setContent(CONTENT)
+        clarificationRequestDto.setClarificationRequestReason(ClarificationRequest.RequestReason.TYPO);
         clarificationRequestDto = clarificationService.submitClarificationRequest(question.id, student.id, clarificationRequestDto)
 
         then: "request is created and is in the repository"
@@ -152,6 +153,7 @@ class SubmitClarificationRequestServiceSpockTest extends Specification {
         result.getQuestion().getId() == question.getId()
         result.getCreationDate() != null
         result.getStatus() == ClarificationRequest.RequestStatus.PRIVATE
+        result.getClarificationRequestReason() == ClarificationRequest.RequestReason.OTHER
         and: "the clarification request was added to the student"
         def user = userRepository.findAll().get(0)
         user.getClarificationRequests().size() == 1

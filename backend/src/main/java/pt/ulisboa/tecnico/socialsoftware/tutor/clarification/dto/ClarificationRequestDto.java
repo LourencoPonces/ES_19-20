@@ -16,6 +16,7 @@ public class ClarificationRequestDto {
     private Integer key;
     private Integer questionId;
     private ClarificationRequest.RequestStatus status = ClarificationRequest.RequestStatus.PRIVATE;
+    private ClarificationRequest.RequestReason reason;
     private String creatorUsername;
     private String content;
     private Boolean resolved;
@@ -38,10 +39,26 @@ public class ClarificationRequestDto {
         this.creationDate = clarificationRequest.getCreationDate();
         this.resolved = clarificationRequest.getResolved();
 
+        if (clarificationRequest.hasReason()) {
+            this.reason = clarificationRequest.getClarificationRequestReason();
+        }
+
         this.messages = clarificationRequest.getMessages()
                 .stream()
                 .map(ClarificationMessageDto::new)
                 .collect(Collectors.toList());
+    }
+
+    public ClarificationRequest.RequestReason getReason() {
+        return reason;
+    }
+
+    public void setClarificationRequestReason(ClarificationRequest.RequestReason reason) {
+        this.reason = reason;
+    }
+
+    public boolean hasReason() {
+        return reason != null;
     }
 
     public Integer getId() {

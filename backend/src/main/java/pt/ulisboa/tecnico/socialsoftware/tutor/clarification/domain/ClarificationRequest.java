@@ -21,6 +21,10 @@ public class ClarificationRequest {
         PRIVATE, PUBLIC
     }
 
+    public enum RequestReason {
+        CONFUSING, TYPO, MULTIPLE_ANSWERS, OTHER
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -49,6 +53,9 @@ public class ClarificationRequest {
     @Column(nullable = false)
     private RequestStatus status = RequestStatus.PRIVATE;
 
+    @Enumerated(EnumType.STRING)
+    private RequestReason reason;
+
     @Column(nullable = false)
     private Boolean resolved = Boolean.FALSE;
 
@@ -61,9 +68,22 @@ public class ClarificationRequest {
         this.status = clarificationRequestDto.getStatus();
         this.creator = creator;
         this.content = clarificationRequestDto.getContent();
+        if (clarificationRequestDto.hasReason()) {
+            this.reason = clarificationRequestDto.getReason();
+        }
 
         this.ensureConsistent();
     }
+
+    public RequestReason getClarificationRequestReason() {
+        return this.reason;
+    }
+
+    public boolean hasReason() {
+        return this.reason != null;
+    }
+
+
 
     private void ensureConsistent() {
         if (this.content == null || this.content.isBlank())
