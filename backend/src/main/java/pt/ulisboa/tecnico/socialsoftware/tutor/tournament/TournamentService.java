@@ -72,6 +72,10 @@ public class TournamentService {
 
         User creator = userRepository.findByUsername(username);
 
+        if (creator.isBannedFromTournaments()) {
+            throw new TutorException(USER_BANNED_FROM_TOURNAMENTS);
+        }
+
         checkKey(tournamentDto);
 
         Tournament tournament = new Tournament(tournamentDto);
@@ -126,6 +130,10 @@ public class TournamentService {
 
         User user = userRepository.findByUsername(username);
 
+        if (user.isBannedFromTournaments()) {
+            throw new TutorException(USER_BANNED_FROM_TOURNAMENTS);
+        }
+
         if (tournament.getStatus() != Tournament.Status.AVAILABLE) {
             throw new TutorException(TOURNAMENT_NOT_AVAILABLE);
         }
@@ -171,6 +179,19 @@ public class TournamentService {
                 .map(Tournament::getCourseExecution)
                 .map(CourseDto::new)
                 .orElseThrow(() -> new TutorException(TOURNAMENT_NOT_FOUND, tournamentId));
+    }
+
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void banStudentFromTournaments(int userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND, userId));
+
+        user.setBannedFromTournaments(true);
+
+        entityManager.persist(user);
     }
 
     @Retryable(

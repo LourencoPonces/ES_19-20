@@ -93,6 +93,7 @@ public enum ErrorMessage {
     TOURNAMENT_CREATED_BY_NON_STUDENT("Tournament created by non-student"),
     USER_NOT_ENROLLED_IN_COURSE_EXECUTION("User not enrolled in course execution %s"),
     MISSING_TOURNAMENT_OWNERSHIP("User did not create this tournament"),
+    USER_BANNED_FROM_TOURNAMENTS("User is banned from tournaments"),
 
 
 

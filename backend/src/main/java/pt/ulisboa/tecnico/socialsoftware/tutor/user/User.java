@@ -41,6 +41,9 @@ public class User implements UserDetails, DomainEntity {
     @Column(unique = true)
     private String username;
 
+    @Column(columnDefinition = "boolean default false")
+    private boolean bannedFromTournaments;
+
     private String name;
     private String enrolledCoursesAcronyms;
 
@@ -218,6 +221,14 @@ public class User implements UserDetails, DomainEntity {
     public void removeCreatedTournament(Integer createdTournamentId) {
         Tournament createdTournament = getCreatedTournament(createdTournamentId);
         createdTournaments.remove(createdTournament);
+    }
+
+    public void setBannedFromTournaments(boolean b) {
+        this.bannedFromTournaments = b;
+    }
+
+    public boolean isBannedFromTournaments() {
+        return this.bannedFromTournaments;
     }
 
     public Set<Tournament> getCreatedTournaments() {
