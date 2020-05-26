@@ -11,6 +11,7 @@ public class UserDto implements Serializable {
     private String name;
     private User.Role role;
     private String creationDate;
+    private boolean canParticipateInTournaments;
 
     public UserDto(User user) {
         this.id = user.getId();
@@ -18,7 +19,12 @@ public class UserDto implements Serializable {
         this.name = user.getName();
         this.role = user.getRole();
         this.creationDate = DateHandler.toISOString(user.getCreationDate());
+        this.canParticipateInTournaments = user.getTournamentParticipation();
     }
+
+    public boolean getTournamentParticipation() { return canParticipateInTournaments; }
+
+    public void setTournamentParticipation(boolean newStatus){ this.canParticipateInTournaments = newStatus; }
 
     public UserDto() {}
 

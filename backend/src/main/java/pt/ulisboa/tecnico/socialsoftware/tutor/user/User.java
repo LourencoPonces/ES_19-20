@@ -41,6 +41,9 @@ public class User implements UserDetails, DomainEntity {
     @Column(unique = true)
     private String username;
 
+    @Column(name = "canParticipateInTournaments")
+    private boolean canParticipateInTournaments;
+
     private String name;
     private String enrolledCoursesAcronyms;
 
@@ -109,7 +112,12 @@ public class User implements UserDetails, DomainEntity {
         this.numberOfCorrectTeacherAnswers = 0;
         this.numberOfCorrectInClassAnswers = 0;
         this.numberOfCorrectStudentAnswers = 0;
+        this.canParticipateInTournaments = true;
     }
+
+    public boolean getTournamentParticipation() { return this.canParticipateInTournaments; }
+
+    public void setTournamentParticipation(boolean newStatus){ this.canParticipateInTournaments = newStatus; }
 
     @Override
     public void accept(Visitor visitor) {

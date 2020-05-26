@@ -134,4 +134,11 @@ public class UserService {
 
         return newDemoUser;
     }
+
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public void setTournamentParticipation(int userId, boolean newStatus) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND, userId));
+
+        user.setTournamentParticipation(newStatus);
+    }
 }

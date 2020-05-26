@@ -72,6 +72,10 @@ public class TournamentService {
 
         User creator = userRepository.findByUsername(username);
 
+        if (creator.getTournamentParticipation() == false){
+            throw new TutorException(USER_CAN_NOT_CREATE_OR_PARTICIPATE_IN_TOURNAMENTS);
+        }
+
         checkKey(tournamentDto);
 
         Tournament tournament = new Tournament(tournamentDto);
@@ -125,6 +129,10 @@ public class TournamentService {
         Tournament tournament = tournamentRepository.findById(tournamentId).orElseThrow(() -> new TutorException(TOURNAMENT_NOT_FOUND, tournamentId));
 
         User user = userRepository.findByUsername(username);
+
+        if (user.getTournamentParticipation() == false){
+            throw new TutorException(USER_CAN_NOT_CREATE_OR_PARTICIPATE_IN_TOURNAMENTS);
+        }
 
         if (tournament.getStatus() != Tournament.Status.AVAILABLE) {
             throw new TutorException(TOURNAMENT_NOT_AVAILABLE);

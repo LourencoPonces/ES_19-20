@@ -34,6 +34,7 @@ public enum ErrorMessage {
     NO_TOPICS("The question has no Topics"),
     TOPIC_CONJUNCTION_NOT_FOUND("Topic Conjunction not found with id %d"),
     TOURNAMENT_NOT_FOUND("Tournament not found with id %d"),
+    USER_CAN_NOT_CREATE_OR_PARTICIPATE_IN_TOURNAMENTS("Uer can not create or participate in tournaments %d"),
 
     INVALID_JUSTIFICATION("The justification \"%s\" is invalid"),
     CANNOT_REJECT_ACCEPTED_SUGGESTION("Cannot reject already accepted suggestion"),
