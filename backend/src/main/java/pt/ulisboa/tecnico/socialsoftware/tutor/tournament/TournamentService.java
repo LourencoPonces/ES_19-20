@@ -211,6 +211,22 @@ public class TournamentService {
             value = { SQLException.class },
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<TournamentDto> getSolvedTournaments(int userId, int executionId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND, userId));
+
+        return user.getParticipantTournaments()
+                .stream()
+                .filter(tournament -> tournament.getCourseExecution().getId() == executionId)
+                .filter(tournament -> tournament.getStatus() == Tournament.Status.FINISHED)
+                .map(TournamentDto::new)
+                .sorted(Comparator.comparing(TournamentDto::getCreationDateDate).reversed())
+                .collect(Collectors.toList());
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public StatementQuizDto getQuiz(String username, int tournamentId) {
         User user = userRepository.findByUsername(username);
 
