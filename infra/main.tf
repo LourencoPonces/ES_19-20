@@ -12,6 +12,16 @@ resource "google_storage_bucket" "tf_state" {
 	versioning {
 		enabled = true
 	}
+
+	# delete old states
+	lifecycle_rule {
+		condition {
+			num_newer_versions = 5
+		}
+		action {
+			type = "Delete"
+		}
+	}
 }
 
 resource "google_storage_bucket_access_control" "tf_state_tf_svc" {
