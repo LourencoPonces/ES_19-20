@@ -104,27 +104,14 @@ module.exports = {
   // options for the PWA plugin.
   // see => https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-pwa
   // https://developers.google.com/web/tools/workbox/modules/workbox-webpack-plugin
-  /*  pwa: {
-    name: "Vue-Cli3 实践",
-    themeColor: "#4DBA87",
-    msTileColor: "#000000",
-    appleMobileWebAppCapable: "yes",
-    appleMobileWebAppStatusBarStyle: "black",
-    iconPaths: {
-      favicon32: "img/icons/fuji-mountain-32x32.png",
-      favicon16: "img/icons/fuji-mountain-16x16.png",
-      appleTouchIcon: "img/icons/apple-touch-icon-152x152.png",
-      maskIcon: "img/icons/safari-pinned-tab.svg",
-      msTileImage: "img/icons/msapplication-icon-144x144.png"
-    },
+  pwa: {
     // configure the workbox plugin (GenerateSW or InjectManifest)
-    workboxPluginMode: "InjectManifest",
+    workboxPluginMode: "GenerateSW",
     workboxOptions: {
-      // swSrc is required in InjectManifest mode.
-      swSrc: "public/service-worker.js"
-      // ...other Workbox options...
+      swDest: "js/service-worker.js",
+      importsDirectory: "js"
     }
-  },*/
+  },
 
   // configure webpack-dev-server behavior
   devServer: {

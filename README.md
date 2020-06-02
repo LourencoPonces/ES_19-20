@@ -58,14 +58,14 @@
 
 # About
 
-<img align="right" src="./frontend/public/Screenshot.png" height="250">
+<img align="right" src="./frontend/public/img/Screenshot.png" height="250">
 
 <br/>
 
-**Quizzes Tutor** allows teachers to create and reuse, multiple-choice questions with images and topics which can be inserted in assessments and quizzes. Its development started as an effort of project IMPRESS to share and reuse questions and quizzes of software engineering. 
+**Quizzes Tutor** allows teachers to create and reuse, multiple-choice questions with images and topics which can be inserted in assessments and quizzes. Its development started as an effort of project IMPRESS to share and reuse questions and quizzes of software engineering.
 
 <br/>
- 
+
 It is currently integrated with IST authentication such that it can be used for any course.
 
 <br/>

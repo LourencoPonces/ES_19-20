@@ -36,3 +36,71 @@ terraform {
 		credentials = "credentials.json"
 	}
 }
+
+resource "random_string" "suffix" {
+	length = 8
+	upper = false
+	special = false
+}
+
+# Frontend
+
+resource "google_storage_bucket" "frontend" {
+	name = "frontend-bucket-${random_string.suffix.result}"
+	location = "europe-west1"
+	storage_class = "REGIONAL"
+	website {
+		main_page_suffix = "index.html"
+	}
+}
+
+resource "google_storage_bucket_access_control" "frontend" {
+	bucket = google_storage_bucket.frontend.name
+	entity = "allUsers"
+	role = "READER"
+}
+
+resource "google_compute_backend_bucket" "frontend" {
+	name = "frontend-backend-bucket-${random_string.suffix.result}"
+	bucket_name = google_storage_bucket.frontend.name
+	enable_cdn = false # save money
+}
+
+resource "google_compute_url_map" "frontend_lbal" {
+	name = "frontend-lbal-url-map-${random_string.suffix.result}"
+	default_service = google_compute_backend_bucket.frontend.id
+
+	host_rule {
+		hosts = ["www.quiztutor.breda.pt", "quiztutor.breda.pt"]
+		path_matcher = "frontend"
+	}
+
+	path_matcher {
+		name = "frontend"
+		default_service = google_compute_backend_bucket.frontend.id
+
+		path_rule {
+			paths = ["/css/*", "/fonts/*", "/img/*", "/js/*", "/index.html", "/robots.txt", "/manifest.json", "/index.html.gz", "/manifest.json.gz"]
+			service = google_compute_backend_bucket.frontend.id
+		}
+
+		# default route: serve index.html
+		path_rule {
+			paths = ["/*"]
+			route_action {
+				url_rewrite {
+					# HACK: can't replace the whole path, so we just add ? to make everything afterwards part of the querystring
+					path_prefix_rewrite = "/index.html?"
+				}
+			}
+			service = google_compute_backend_bucket.frontend.id
+		}
+	}
+}
+
+resource "google_compute_target_https_proxy" "frontend_lbal" {
+	name = "frontend-lbal-${random_string.suffix.result}"
+	# TODO: move certificate provisioning to terraform (currently in beta)
+	ssl_certificates = ["TODO"]
+	url_map = google_compute_url_map.frontend_lbal.id
+}
