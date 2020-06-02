@@ -2,6 +2,7 @@
 .mvn
 .DS_Store
 
+infra/.terraform
 infra/credentials.json
 
 scripts
