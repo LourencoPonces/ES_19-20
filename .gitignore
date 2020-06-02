@@ -2,6 +2,8 @@
 .mvn
 .DS_Store
 
+infra/credentials.json
+
 scripts
 
 backend/src/main/resources/static/images/questions/
