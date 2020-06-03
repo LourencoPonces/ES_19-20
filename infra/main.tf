@@ -22,12 +22,14 @@ resource "google_storage_bucket" "tf_state" {
 			type = "Delete"
 		}
 	}
+
+	bucket_policy_only = true
 }
 
-resource "google_storage_bucket_access_control" "tf_state_tf_svc" {
+resource "google_storage_bucket_iam_binding" "tf_state_tf_svc" {
 	bucket = google_storage_bucket.tf_state.name
-	role = "OWNER"
-	entity = "user-terraform@quizzestutor.iam.gserviceaccount.com"
+	role = "roles/storage.objectAdmin"
+	members = ["serviceAccount:terraform@quizzestutor.iam.gserviceaccount.com"]
 }
 
 terraform {
@@ -52,18 +54,20 @@ resource "google_storage_bucket" "frontend" {
 	website {
 		main_page_suffix = "index.html"
 	}
+
+	bucket_policy_only = true
 }
 
-resource "google_storage_bucket_access_control" "frontend" {
+resource "google_storage_bucket_iam_binding" "frontend" {
 	bucket = google_storage_bucket.frontend.name
-	entity = "allUsers"
-	role = "READER"
+	members = ["allUsers"]
+	role = "roles/storage.objectViewer"
 }
 
 resource "google_compute_backend_bucket" "frontend" {
 	name = "frontend-backend-bucket-${random_string.suffix.result}"
 	bucket_name = google_storage_bucket.frontend.name
-	enable_cdn = false # save money
+	enable_cdn = false
 }
 
 resource "google_compute_url_map" "frontend_lbal" {
