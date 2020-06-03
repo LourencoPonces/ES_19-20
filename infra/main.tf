@@ -45,6 +45,12 @@ resource "random_string" "suffix" {
 	special = false
 }
 
+resource "google_project_iam_custom_role" "storageObjectsGetOnly" {
+	role_id = "storageObjectsGetOnly_${random_string.suffix.result}"
+	title = "Role that only grants permission to read bucket objects (storage.objects.get)"
+	permissions = ["storage.objects.get"]
+}
+
 # DNS
 
 resource "google_dns_managed_zone" "default" {
@@ -99,7 +105,7 @@ resource "google_storage_bucket" "frontend" {
 resource "google_storage_bucket_iam_binding" "frontend" {
 	bucket = google_storage_bucket.frontend.name
 	members = ["allUsers"]
-	role = "roles/storage.objectViewer"
+	role = google_project_iam_custom_role.storageObjectsGetOnly.id
 }
 
 resource "google_compute_backend_bucket" "frontend" {
