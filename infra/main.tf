@@ -140,9 +140,24 @@ resource "google_compute_url_map" "frontend_lbal" {
 	}
 }
 
-resource "google_compute_target_https_proxy" "frontend_lbal" {
+resource "google_compute_target_http_proxy" "frontend_lbal" {
 	name = "frontend-lbal-${random_string.suffix.result}"
-	# TODO: move certificate provisioning to terraform (currently in beta)
-	ssl_certificates = ["TODO"]
 	url_map = google_compute_url_map.frontend_lbal.id
+}
+
+resource "google_compute_global_forwarding_rule" "frontend_lbal_http" {
+	for_each = toset(["IPV4", "IPV6"])
+
+	name = "frontend-forward-http-${lower(each.value)}-${random_string.suffix.result}"
+	port_range = "80"
+	ip_address = google_compute_global_address.frontend_lbal[each.value].address
+	target = google_compute_target_http_proxy.frontend_lbal.id
+}
+
+resource "google_compute_global_address" "frontend_lbal" {
+	for_each = toset(["IPV4", "IPV6"])
+
+	name = "frontend-lbal-addr-${lower(each.value)}-${random_string.suffix.result}"
+	address_type = "EXTERNAL"
+	ip_version = each.value
 }
