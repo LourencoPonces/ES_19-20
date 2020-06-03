@@ -88,6 +88,9 @@ resource "google_storage_bucket" "frontend" {
 	storage_class = "REGIONAL"
 	website {
 		main_page_suffix = "index.html"
+
+		# HACK: serve index.html for SPA routes
+		not_found_page = "index.html"
 	}
 
 	bucket_policy_only = true
@@ -108,36 +111,6 @@ resource "google_compute_backend_bucket" "frontend" {
 resource "google_compute_url_map" "frontend_lbal" {
 	name = "frontend-lbal-url-map-${random_string.suffix.result}"
 	default_service = google_compute_backend_bucket.frontend.id
-
-	host_rule {
-		hosts = setunion(
-			values(google_dns_record_set.default)[*].name,
-			values(google_dns_record_set.www)[*].name
-		)
-		path_matcher = "frontend"
-	}
-
-	path_matcher {
-		name = "frontend"
-		default_service = google_compute_backend_bucket.frontend.id
-
-		path_rule {
-			paths = ["/css/*", "/fonts/*", "/img/*", "/js/*", "/index.html", "/robots.txt", "/manifest.json", "/index.html.gz", "/manifest.json.gz"]
-			service = google_compute_backend_bucket.frontend.id
-		}
-
-		# default route: serve index.html
-		path_rule {
-			paths = ["/*"]
-			route_action {
-				url_rewrite {
-					# HACK: can't replace the whole path, so we just add ? to make everything afterwards part of the querystring
-					path_prefix_rewrite = "/index.html?"
-				}
-			}
-			service = google_compute_backend_bucket.frontend.id
-		}
-	}
 }
 
 resource "google_compute_target_http_proxy" "frontend_lbal" {
