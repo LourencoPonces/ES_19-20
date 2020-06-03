@@ -127,6 +127,23 @@ resource "google_compute_global_forwarding_rule" "frontend_lbal_http" {
 	target = google_compute_target_http_proxy.frontend_lbal.id
 }
 
+resource "google_compute_target_https_proxy" "frontend_lbal" {
+	name = "frontend-lbal-${random_string.suffix.result}"
+	url_map = google_compute_url_map.frontend_lbal.id
+
+	# TODO: create google managed certificate in terraform (currently in beta, possibly not a good idea, investigate)
+	ssl_certificates = ["manual-quiztutor-frontend-cert-rbsyk4x0"]
+}
+
+resource "google_compute_global_forwarding_rule" "frontend_lbal_https" {
+	for_each = toset(["IPV4", "IPV6"])
+
+	name = "frontend-forward-https-${lower(each.value)}-${random_string.suffix.result}"
+	port_range = "443"
+	ip_address = google_compute_global_address.frontend_lbal[each.value].address
+	target = google_compute_target_https_proxy.frontend_lbal.id
+}
+
 resource "google_compute_global_address" "frontend_lbal" {
 	for_each = toset(["IPV4", "IPV6"])
 
