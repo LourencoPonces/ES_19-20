@@ -45,6 +45,41 @@ resource "random_string" "suffix" {
 	special = false
 }
 
+# DNS
+
+resource "google_dns_managed_zone" "default" {
+	name = "quiztutor-dns-zone-${random_string.suffix.result}"
+	dns_name = "quiztutor.breda.pt."
+}
+
+resource "google_dns_record_set" "default" {
+	for_each = {
+		"IPV4" = "A"
+		"IPV6" = "AAAA"
+	}
+
+	managed_zone = google_dns_managed_zone.default.name
+	name = google_dns_managed_zone.default.dns_name
+	type = each.value
+	ttl = 300
+
+	rrdatas = [google_compute_global_address.frontend_lbal[each.key].address]
+}
+
+resource "google_dns_record_set" "www" {
+	for_each = {
+		"IPV4" = "A"
+		"IPV6" = "AAAA"
+	}
+
+	managed_zone = google_dns_managed_zone.default.name
+	name = "www.${google_dns_managed_zone.default.dns_name}"
+	type = each.value
+	ttl = 300
+
+	rrdatas = [google_compute_global_address.frontend_lbal[each.key].address]
+}
+
 # Frontend
 
 resource "google_storage_bucket" "frontend" {
@@ -75,7 +110,10 @@ resource "google_compute_url_map" "frontend_lbal" {
 	default_service = google_compute_backend_bucket.frontend.id
 
 	host_rule {
-		hosts = ["www.quiztutor.breda.pt", "quiztutor.breda.pt"]
+		hosts = setunion(
+			values(google_dns_record_set.default)[*].name,
+			values(google_dns_record_set.www)[*].name
+		)
 		path_matcher = "frontend"
 	}
 
