@@ -53,9 +53,14 @@ resource "google_project_iam_custom_role" "storageObjectsGetOnly" {
 
 # DNS
 
+locals {
+	dns_root = "quiztutor.breda.pt"
+}
+
+
 resource "google_dns_managed_zone" "default" {
 	name = "quiztutor-dns-zone-${random_string.suffix.result}"
-	dns_name = "quiztutor.breda.pt."
+	dns_name = "${local.dns_root}."
 }
 
 resource "google_dns_record_set" "default" {
@@ -86,6 +91,35 @@ resource "google_dns_record_set" "www" {
 	rrdatas = [google_compute_global_address.frontend_lbal[each.key].address]
 }
 
+resource "google_dns_record_set" "userassets" {
+	for_each = {
+		"IPV4" = "A"
+		"IPV6" = "AAAA"
+	}
+
+	managed_zone = google_dns_managed_zone.default.name
+	name = "userassets.${google_dns_managed_zone.default.dns_name}"
+	type = each.value
+	ttl = 300
+
+	rrdatas = [google_compute_global_address.frontend_lbal[each.key].address]
+}
+
+# Backend
+
+resource "google_storage_bucket" "userassets" {
+	name = "userassets-bucket-${random_string.suffix.result}"
+	location = "europe-west1"
+	storage_class = "REGIONAL"
+	bucket_policy_only = true
+}
+
+resource "google_storage_bucket_iam_binding" "userassets_world" {
+	bucket = google_storage_bucket.userassets.name
+	members = ["allUsers"]
+	role = google_project_iam_custom_role.storageObjectsGetOnly.id
+}
+
 # Frontend
 
 resource "google_storage_bucket" "frontend" {
@@ -114,9 +148,40 @@ resource "google_compute_backend_bucket" "frontend" {
 	enable_cdn = false
 }
 
+resource "google_compute_backend_bucket" "userassets" {
+	name = "userassets-backend-bucket-${random_string.suffix.result}"
+	bucket_name = google_storage_bucket.userassets.name
+	enable_cdn = false
+}
+
 resource "google_compute_url_map" "frontend_lbal" {
 	name = "frontend-lbal-url-map-${random_string.suffix.result}"
-	default_service = google_compute_backend_bucket.frontend.id
+
+	host_rule {
+		hosts = [local.dns_root, "www.${local.dns_root}"]
+		path_matcher = "frontend"
+	}
+
+	path_matcher {
+		name = "frontend"
+		default_service = google_compute_backend_bucket.frontend.id
+	}
+
+	host_rule {
+		hosts = ["userassets.${local.dns_root}"]
+		path_matcher = "userassets"
+	}
+
+	path_matcher {
+		name = "userassets"
+		default_service = google_compute_backend_bucket.userassets.id
+	}
+
+	default_url_redirect {
+		host_redirect = local.dns_root
+		strip_query = false
+		redirect_response_code = "FOUND"
+	}
 }
 
 resource "google_compute_url_map" "frontend_lbal_https_redirect" {
@@ -149,7 +214,7 @@ resource "google_compute_target_https_proxy" "frontend_lbal" {
 	url_map = google_compute_url_map.frontend_lbal.id
 
 	# TODO: create google managed certificate in terraform (currently in beta, possibly not a good idea, investigate)
-	ssl_certificates = ["manual-quiztutor-frontend-cert-rbsyk4x0"]
+	ssl_certificates = ["manual-quiztutor-frontend-cert-rbsyk4x1"]
 }
 
 resource "google_compute_global_forwarding_rule" "frontend_lbal_https" {
