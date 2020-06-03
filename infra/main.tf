@@ -113,9 +113,20 @@ resource "google_compute_url_map" "frontend_lbal" {
 	default_service = google_compute_backend_bucket.frontend.id
 }
 
+resource "google_compute_url_map" "frontend_lbal_https_redirect" {
+	name = "frontend-lbal-url-map-https-redirect-${random_string.suffix.result}"
+
+	default_url_redirect {
+		https_redirect = true
+
+		# this is the default, but terraform requires it anyway to ensure the block is not empty
+		strip_query = false
+	}
+}
+
 resource "google_compute_target_http_proxy" "frontend_lbal" {
-	name = "frontend-lbal-${random_string.suffix.result}"
-	url_map = google_compute_url_map.frontend_lbal.id
+	name = "frontend-lbal-http-${random_string.suffix.result}"
+	url_map = google_compute_url_map.frontend_lbal_https_redirect.id
 }
 
 resource "google_compute_global_forwarding_rule" "frontend_lbal_http" {
@@ -128,7 +139,7 @@ resource "google_compute_global_forwarding_rule" "frontend_lbal_http" {
 }
 
 resource "google_compute_target_https_proxy" "frontend_lbal" {
-	name = "frontend-lbal-${random_string.suffix.result}"
+	name = "frontend-lbal-https-${random_string.suffix.result}"
 	url_map = google_compute_url_map.frontend_lbal.id
 
 	# TODO: create google managed certificate in terraform (currently in beta, possibly not a good idea, investigate)
