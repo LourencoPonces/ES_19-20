@@ -53,7 +53,7 @@
         </v-tooltip>
       </template>
     </v-data-table>
-
+    <footer></footer>
     <edit-course-dialog
       v-if="currentCourse"
       v-model="editCourseDialog"
