@@ -90,7 +90,7 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <v-icon
-                large
+                medium
                 class="mr-2"
                 v-on="on"
                 @click="showStudentQuestionDialog(item)"
@@ -103,7 +103,7 @@
           <v-tooltip bottom v-if="item.isChangeable()">
             <template v-slot:activator="{ on }">
               <v-icon
-                large
+                medium
                 class="mr-2"
                 v-on="on"
                 @click="showEditStudentQuestionDialog(item)"
@@ -116,7 +116,7 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <v-icon
-                large
+                medium
                 class="mr-2"
                 v-on="on"
                 @click="showDuplicateStudentQuestionDialog(item)"
@@ -129,7 +129,7 @@
           <v-tooltip bottom v-if="item.isChangeable()">
             <template v-slot:activator="{ on }">
               <v-icon
-                large
+                medium
                 class="mr-2"
                 v-on="on"
                 @click="deleteStudentQuestion(item)"
@@ -143,7 +143,7 @@
           <v-tooltip bottom v-if="item.justification">
             <template v-slot:activator="{ on }">
               <v-icon
-                large
+                medium
                 class="mr-2"
                 v-on="on"
                 @click="showJustificationDialog(item)"

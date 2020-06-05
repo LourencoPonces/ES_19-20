@@ -50,7 +50,7 @@
               v-if="!signedUpTournaments.includes(item)"
             >
               <v-icon
-                large
+                medium
                 class="mr-2"
                 v-on="on"
                 @click="signUpInTournament(item)"
