@@ -85,7 +85,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              large
+              medium
               class="mr-2"
               v-on="on"
               @click="showQuestionDialog(item)"
@@ -97,7 +97,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              large
+              medium
               class="mr-2"
               v-on="on"
               @click="duplicateQuestion(item)"
@@ -108,7 +108,7 @@
         </v-tooltip>
         <v-tooltip bottom v-if="item.numberOfAnswers === 0">
           <template v-slot:activator="{ on }">
-            <v-icon large class="mr-2" v-on="on" @click="editQuestion(item)"
+            <v-icon medium class="mr-2" v-on="on" @click="editQuestion(item)"
               >edit</v-icon
             >
           </template>
@@ -118,7 +118,7 @@
         <v-tooltip bottom v-if="item.numberOfAnswers === 0">
           <template v-slot:activator="{ on }">
             <v-icon
-              large
+              medium
               class="mr-2"
               v-on="on"
               @click="deleteQuestion(item)"

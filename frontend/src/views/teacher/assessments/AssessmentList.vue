@@ -42,7 +42,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              large
+              medium
               class="mr-2"
               v-on="on"
               @click="editAssessment(item.id)"
@@ -54,7 +54,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              large
+              medium
               class="mr-2"
               v-on="on"
               @click="deleteAssessment(item.id)"

@@ -138,7 +138,7 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <v-icon
-                large
+                medium
                 class="mr-2"
                 v-on="on"
                 @click="showQuestionDialog(item)"
@@ -150,7 +150,7 @@
           </v-tooltip>
           <v-tooltip bottom v-if="!item.sequence">
             <template v-slot:activator="{ on }">
-              <v-icon large class="mr-2" v-on="on" @click="addToQuiz(item)">
+              <v-icon medium class="mr-2" v-on="on" @click="addToQuiz(item)">
                 add</v-icon
               >
             </template>
@@ -160,7 +160,7 @@
             <v-tooltip bottom>
               <template v-slot:activator="{ on }">
                 <v-icon
-                  large
+                  medium
                   class="mr-2"
                   v-on="on"
                   @click="removeFromQuiz(item)"
@@ -173,7 +173,7 @@
             <v-tooltip bottom v-if="item.sequence !== 1">
               <template v-slot:activator="{ on }">
                 <v-icon
-                  large
+                  medium
                   class="mr-2"
                   v-on="on"
                   @click="changeQuestionPosition(item, 0)"
@@ -186,7 +186,7 @@
             <v-tooltip bottom v-if="item.sequence !== 1">
               <template v-slot:activator="{ on }">
                 <v-icon
-                  large
+                  medium
                   class="mr-2"
                   v-on="on"
                   @click="
@@ -204,7 +204,7 @@
             <v-tooltip bottom v-if="quizQuestions.length > 1">
               <template v-slot:activator="{ on }">
                 <v-icon
-                  large
+                  medium
                   class="mr-2"
                   v-on="on"
                   @click="openSetPosition(item)"
@@ -217,7 +217,7 @@
             <v-tooltip bottom v-if="item.sequence !== quizQuestions.length">
               <template v-slot:activator="{ on }">
                 <v-icon
-                  large
+                  medium
                   class="mr-2"
                   v-on="on"
                   @click="
@@ -235,7 +235,7 @@
             <v-tooltip bottom v-if="item.sequence !== quizQuestions.length">
               <template v-slot:activator="{ on }">
                 <v-icon
-                  large
+                  medium
                   class="mr-2"
                   v-on="on"
                   @click="

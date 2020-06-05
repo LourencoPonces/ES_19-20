@@ -48,7 +48,7 @@
       >
         <v-chip
           :color="item.getEvaluationColor()"
-          small
+          medium
           @click="showEvaluateStudentQuestionDialog(item)"
           data-cy="evaluate"
         >
@@ -70,7 +70,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              large
+              medium
               class="mr-2"
               v-on="on"
               @click="showQuestionDialog(item)"
@@ -82,7 +82,7 @@
         <v-tooltip bottom v-if="item.canEvaluate()">
           <template v-slot:activator="{ on }">
             <v-icon
-              large
+              medium
               class="mr-2"
               v-on="on"
               @click="showEvaluateStudentQuestionDialog(item)"
@@ -94,7 +94,7 @@
         <v-tooltip bottom v-if="item.canEvaluate()">
           <template v-slot:activator="{ on }">
             <v-icon
-              large
+              medium
               class="mr-2"
               v-on="on"
               @click="editStudentQuestion(item)"

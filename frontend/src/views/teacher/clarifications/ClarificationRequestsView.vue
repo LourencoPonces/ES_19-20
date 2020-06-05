@@ -55,14 +55,14 @@
             >
               <v-icon
                 v-if="item.isPrivate()"
-                small
+                medium
                 class="mr-2"
                 :data-cy="'private-' + item.content.slice(0, 15)"
                 >fas fa-eye-slash</v-icon
               >
               <v-icon
                 v-else
-                small
+                medium
                 class="mr-2"
                 :data-cy="'public-' + item.content.slice(0, 15)"
                 >fas fa-eye</v-icon
