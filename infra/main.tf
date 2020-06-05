@@ -166,6 +166,38 @@ resource "google_storage_bucket_iam_binding" "userassets_world" {
 	role = google_project_iam_custom_role.storageObjectsGetOnly.id
 }
 
+resource "google_storage_bucket" "exports" {
+	name = "quiztutor-exports-${random_string.suffix.result}"
+	location = "europe-west1"
+	storage_class = "REGIONAL"
+	bucket_policy_only = true
+
+	lifecycle_rule {
+		condition {
+			age = "7"
+		}
+		action {
+			type = "Delete"
+		}
+	}
+}
+
+resource "google_storage_bucket" "imports" {
+	name = "quiztutor-imports-${random_string.suffix.result}"
+	location = "europe-west1"
+	storage_class = "REGIONAL"
+	bucket_policy_only = true
+
+	lifecycle_rule {
+		condition {
+			age = "2"
+		}
+		action {
+			type = "Delete"
+		}
+	}
+}
+
 # Frontend
 
 resource "google_storage_bucket" "frontend" {
