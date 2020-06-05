@@ -1,3 +1,8 @@
+# TODO: use variables
+locals {
+	dns_root = "quiztutor.breda.pt"
+}
+
 provider "google" {
 	version = "~> 3.24"
 	credentials = file("credentials.json")
@@ -61,11 +66,6 @@ resource "google_project_iam_custom_role" "storageObjectsGetOnly" {
 
 # DNS
 
-locals {
-	dns_root = "quiztutor.breda.pt"
-}
-
-
 resource "google_dns_managed_zone" "default" {
 	name = "quiztutor-dns-zone-${random_string.suffix.result}"
 	dns_name = "${local.dns_root}."
@@ -111,6 +111,40 @@ resource "google_dns_record_set" "userassets" {
 	ttl = 300
 
 	rrdatas = [google_compute_global_address.frontend_lbal[each.key].address]
+}
+
+# DB
+
+resource "google_sql_database_instance" "default" {
+	database_version = "POSTGRES_12"
+	settings {
+		tier  = "db-f1-micro"
+
+		maintenance_window {
+			day = 7
+			hour = 2
+		}
+	}
+
+	lifecycle {
+		prevent_destroy = true
+	}
+}
+
+resource "google_sql_database" "tutordb" {
+	name = "tutordb"
+	instance = google_sql_database_instance.default.name
+}
+
+resource "random_password" "tutordb" {
+	length = 16
+	special = true
+}
+
+resource "google_sql_user" "tutordb" {
+	name = "tutordb"
+	instance = google_sql_database_instance.default.id
+	password = random_password.tutordb.result
 }
 
 # Backend
