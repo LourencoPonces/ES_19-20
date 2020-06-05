@@ -27,7 +27,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              large
+              medium
               class="mr-2"
               v-on="on"
               @click="createFromCourse(item)"
@@ -40,7 +40,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              large
+              medium
               class="mr-2"
               v-on="on"
               @click="deleteCourse(item)"
