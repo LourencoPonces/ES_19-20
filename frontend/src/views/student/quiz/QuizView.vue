@@ -94,7 +94,7 @@
 
         <v-card-actions>
           <v-spacer />
-          <v-btn color="secondary" text @click="confirmationDialog = false">
+          <v-btn color="error" text @click="confirmationDialog = false">
             Cancel
           </v-btn>
           <v-btn color="primary" text @click="concludeQuiz" data-cy="sure">
@@ -120,7 +120,7 @@
 
         <v-card-actions>
           <v-spacer />
-          <v-btn color="secondary" text @click="nextConfirmationDialog = false">
+          <v-btn color="error" text @click="nextConfirmationDialog = false">
             Cancel
           </v-btn>
           <v-btn color="primary" text @click="increaseOrder">

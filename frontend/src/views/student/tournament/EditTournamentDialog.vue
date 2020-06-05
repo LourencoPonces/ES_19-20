@@ -96,6 +96,7 @@
           <v-btn color="error" @click="$emit('dialog', false)">Cancel</v-btn>
           <v-btn
             color="primary"
+            dark
             @click="saveTournament"
             data-cy="saveTournament"
             >Save</v-btn
