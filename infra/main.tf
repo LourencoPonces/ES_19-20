@@ -24,12 +24,20 @@ resource "google_storage_bucket" "tf_state" {
 	}
 
 	bucket_policy_only = true
+
+	lifecycle {
+		prevent_destroy = true
+	}
 }
 
 resource "google_storage_bucket_iam_binding" "tf_state_tf_svc" {
 	bucket = google_storage_bucket.tf_state.name
 	role = "roles/storage.objectAdmin"
 	members = ["serviceAccount:terraform@quizzestutor.iam.gserviceaccount.com"]
+
+	lifecycle {
+		prevent_destroy = true
+	}
 }
 
 terraform {
@@ -108,10 +116,14 @@ resource "google_dns_record_set" "userassets" {
 # Backend
 
 resource "google_storage_bucket" "userassets" {
-	name = "userassets-bucket-${random_string.suffix.result}"
+	name = "quiztutor-userassets-bucket-${random_string.suffix.result}"
 	location = "europe-west1"
 	storage_class = "REGIONAL"
 	bucket_policy_only = true
+
+	lifecycle {
+		prevent_destroy = true
+	}
 }
 
 resource "google_storage_bucket_iam_binding" "userassets_world" {
