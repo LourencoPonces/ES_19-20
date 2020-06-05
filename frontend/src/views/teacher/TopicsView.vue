@@ -1,78 +1,82 @@
 <template v-if="topics">
-  <v-card class="table">
-    <v-data-table
-      :headers="headers"
-      :custom-filter="customFilter"
-      :items="topics"
-      :search="search"
-      :mobile-breakpoint="0"
-      :items-per-page="50"
-      :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
-    >
-      <template v-slot:top>
-        <v-card-title>
-          <v-text-field
-            v-model="search"
-            append-icon="search"
-            label="Search"
-            single-line
-            hide-details
-          />
-          <v-spacer />
-          <v-btn color="primary" dark @click="newTopic">New Topic</v-btn>
-        </v-card-title>
-      </template>
-      <template v-slot:item.action="{ item }">
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
-            <v-icon large class="mr-2" v-on="on" @click="editTopic(item)"
-              >edit</v-icon
-            >
-          </template>
-          <span>Edit Topic</span>
-        </v-tooltip>
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
-            <v-icon
-              large
-              class="mr-2"
-              v-on="on"
-              @click="deleteTopic(item)"
-              color="red"
-              >delete</v-icon
-            >
-          </template>
-          <span>Delete Topic</span>
-        </v-tooltip>
-      </template>
-      <template v-slot:item.name="{ item }">
-        <p @contextmenu="editTopic(item, $event)" style="cursor: pointer">
-          {{ item.name }}
-        </p>
-      </template>
-    </v-data-table>
-    <footer>
-      <v-icon class="mr-2">mouse</v-icon>Right-click on topic's name to edit it.
-    </footer>
+  <div class="container">
+    <h2>Topics</h2>
+    <v-card class="table">
+      <v-data-table
+        :headers="headers"
+        :custom-filter="customFilter"
+        :items="topics"
+        :search="search"
+        :mobile-breakpoint="0"
+        :items-per-page="50"
+        :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
+      >
+        <template v-slot:top>
+          <v-card-title>
+            <v-text-field
+              v-model="search"
+              append-icon="search"
+              label="Search"
+              single-line
+              hide-details
+            />
+            <v-spacer />
+            <v-btn color="primary" dark @click="newTopic">New Topic</v-btn>
+          </v-card-title>
+        </template>
+        <template v-slot:item.action="{ item }">
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-icon large class="mr-2" v-on="on" @click="editTopic(item)"
+                >edit</v-icon
+              >
+            </template>
+            <span>Edit Topic</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-icon
+                large
+                class="mr-2"
+                v-on="on"
+                @click="deleteTopic(item)"
+                color="red"
+                >delete</v-icon
+              >
+            </template>
+            <span>Delete Topic</span>
+          </v-tooltip>
+        </template>
+        <template v-slot:item.name="{ item }">
+          <p @contextmenu="editTopic(item, $event)" style="cursor: pointer">
+            {{ item.name }}
+          </p>
+        </template>
+      </v-data-table>
+      <footer>
+        <v-icon class="mr-2">mouse</v-icon>Right-click on topic's name to edit
+        it.
+      </footer>
 
-    <v-dialog v-model="topicDialog" max-width="75%">
-      <v-card>
-        <v-card-title>
-          <span class="headline">{{ formTitle() }}</span>
-        </v-card-title>
+      <v-dialog v-model="topicDialog" max-width="75%">
+        <v-card>
+          <v-card-title>
+            <span class="headline">{{ formTitle() }}</span>
+          </v-card-title>
 
-        <v-card-text v-if="editedTopic">
-          <v-text-field v-model="editedTopic.name" label="Topic" />
-        </v-card-text>
+          <v-card-text v-if="editedTopic">
+            <v-text-field v-model="editedTopic.name" label="Topic" />
+          </v-card-text>
 
-        <v-card-actions>
-          <v-spacer />
-          <v-btn color="blue darken-1" @click="closeDialogue">Cancel</v-btn>
-          <v-btn color="blue darken-1" @click="saveTopic">Save</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-card>
+          <v-card-actions>
+            <v-spacer />
+            <v-btn color="blue darken-1" @click="closeDialogue">Cancel</v-btn>
+            <v-btn color="blue darken-1" @click="saveTopic">Save</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-card>
+  </div>
 </template>
 
 <script lang="ts">
@@ -174,4 +178,21 @@ export default class TopicsView extends Vue {
 }
 </script>
 
-<style lang="scss" scoped />
+<style lang="scss" scoped>
+.container {
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  h2 {
+    font-size: 26px;
+    margin: 20px 0;
+    text-align: center;
+    small {
+      font-size: 0.5em;
+    }
+  }
+}
+</style>
