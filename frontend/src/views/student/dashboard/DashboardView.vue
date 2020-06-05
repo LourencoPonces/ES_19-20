@@ -338,18 +338,18 @@ export default class DashboardView extends Vue {
   dashboardUserToSee: Student | null = null;
   userStats: DashboardStats | null = null;
   headers: object = [
-    { text: 'Name', value: 'name', align: 'left', width: '40%' },
-    {
-      text: 'Number',
-      value: 'number',
-      align: 'center',
-      width: '10%'
-    },
     {
       text: 'Actions',
       value: 'action',
-      align: 'center',
-      width: '10%'
+      align: 'left',
+      width: '15%'
+    },
+    { text: 'Name', value: 'name', align: 'left', width: '30%' },
+    {
+      text: 'Number',
+      value: 'number',
+      align: 'left',
+      width: '20%'
     }
   ];
 
