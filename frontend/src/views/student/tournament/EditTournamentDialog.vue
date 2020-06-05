@@ -93,11 +93,9 @@
         </v-autocomplete>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="blue darken-1" @click="$emit('dialog', false)"
-            >Cancel</v-btn
-          >
+          <v-btn color="error" @click="$emit('dialog', false)">Cancel</v-btn>
           <v-btn
-            color="blue darken-1"
+            color="primary"
             @click="saveTournament"
             data-cy="saveTournament"
             >Save</v-btn
