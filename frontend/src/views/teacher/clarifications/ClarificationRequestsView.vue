@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card class="table">
     <v-data-table
       :headers="headers"
       :custom-filter="customFilter"
