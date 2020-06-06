@@ -1,6 +1,20 @@
-# TODO: use variables
 locals {
 	dns_root = "quiztutor.breda.pt"
+}
+
+variable "git_commit_hash" {
+	type = string
+	description = "identifying hash for current git commit (output of git rev-parse HEAD)"
+}
+
+variable "fenix_oauth_id" {
+	type = string
+	description = "Fénix OAuth Client ID"
+}
+
+variable "fenix_oauth_secret" {
+	type = string
+	description = "Fénix OAuth Client Secret"
 }
 
 provider "google" {
@@ -117,21 +131,35 @@ resource "google_dns_record_set" "userassets" {
 	rrdatas = [google_compute_global_address.frontend_lbal[each.key].address]
 }
 
-resource "google_compute_network" "private" {
-	name = "private"
+resource "google_dns_record_set" "backend" {
+	for_each = {
+		"IPV4" = "A"
+		"IPV6" = "AAAA"
+	}
+
+	managed_zone = google_dns_managed_zone.default.name
+	name = "backend.${google_dns_managed_zone.default.dns_name}"
+	type = each.value
+	ttl = 300
+
+	rrdatas = [google_compute_global_address.frontend_lbal[each.key].address]
+}
+
+resource "google_compute_network" "backend" {
+	name = "backend"
 	auto_create_subnetworks = false
 }
 
-resource "google_compute_subnetwork" "private_default" {
-	name = "private-default"
-	network = google_compute_network.private.id
+resource "google_compute_subnetwork" "backend_default" {
+	name = "backend-default"
+	network = google_compute_network.backend.id
 	ip_cidr_range = "10.128.0.0/16"
 	private_ip_google_access = true
 }
 
-resource "google_compute_firewall" "private_allow_icmp_ssh_http" {
-	name = "private-allow-icmp-ssh-http"
-	network = google_compute_network.private.name
+resource "google_compute_firewall" "backend_allow_icmp_ssh_http" {
+	name = "backend-allow-icmp-ssh-http"
+	network = google_compute_network.backend.id
 
 	allow {
 		protocol = "icmp"
@@ -143,19 +171,19 @@ resource "google_compute_firewall" "private_allow_icmp_ssh_http" {
 	}
 }
 
-data "google_compute_network" "private" {
-	name = google_compute_network.private.name
+data "google_compute_network" "backend" {
+	name = google_compute_network.backend.name
 }
 
-data "google_compute_subnetwork" "private_subnets" {
-	for_each = toset(data.google_compute_network.private.subnetworks_self_links)
+data "google_compute_subnetwork" "backend_subnets" {
+	for_each = toset(data.google_compute_network.backend.subnetworks_self_links)
 	self_link = each.value
 }
 
-resource "google_compute_firewall" "private_allow_internal" {
-	name = "private-allow-internal"
-	network = google_compute_network.private.name
-	source_ranges = values(data.google_compute_subnetwork.private_subnets)[*].ip_cidr_range
+resource "google_compute_firewall" "backend_allow_internal" {
+	name = "backend-allow-internal"
+	network = google_compute_network.backend.id
+	source_ranges = values(data.google_compute_subnetwork.backend_subnets)[*].ip_cidr_range
 
 	allow {
 		protocol = "udp"
@@ -168,18 +196,18 @@ resource "google_compute_firewall" "private_allow_internal" {
 
 # DB
 
-resource "google_compute_global_address" "private_svc_peering" {
-	name = "svc-peering-addr-${random_string.suffix.result}"
+resource "google_compute_global_address" "backend_svc_peering" {
+	name = "backend-svc-peering-addr-${random_string.suffix.result}"
 	purpose = "VPC_PEERING"
 	address_type = "INTERNAL"
 	prefix_length = 16
-	network = google_compute_network.private.id
+	network = google_compute_network.backend.id
 }
 
-resource "google_service_networking_connection" "private" {
-	network = google_compute_network.private.id
+resource "google_service_networking_connection" "backend" {
+	network = google_compute_network.backend.id
 	service = "servicenetworking.googleapis.com"
-	reserved_peering_ranges = [google_compute_global_address.private_svc_peering.name]
+	reserved_peering_ranges = [google_compute_global_address.backend_svc_peering.name]
 }
 
 resource "google_sql_database_instance" "default" {
@@ -188,7 +216,7 @@ resource "google_sql_database_instance" "default" {
 		tier  = "db-f1-micro"
 		ip_configuration {
 			ipv4_enabled = false
-			private_network = google_compute_network.private.id
+			private_network = google_compute_network.backend.id
 		}
 
 		maintenance_window {
@@ -197,7 +225,7 @@ resource "google_sql_database_instance" "default" {
 		}
 	}
 
-	depends_on = [google_service_networking_connection.private]
+	depends_on = [google_service_networking_connection.backend]
 }
 
 resource "google_sql_database" "tutordb" {
@@ -222,6 +250,10 @@ resource "google_sql_user" "tutordb" {
 
 # Backend
 
+resource "google_service_account" "backend" {
+	account_id = "backend-${random_string.suffix.result}"
+}
+
 resource "google_storage_bucket" "userassets" {
 	name = "quizzestutor-userassets-bucket-${random_string.suffix.result}"
 	location = "europe-west1"
@@ -237,6 +269,12 @@ resource "google_storage_bucket_iam_binding" "userassets_world" {
 	bucket = google_storage_bucket.userassets.name
 	members = ["allUsers"]
 	role = google_project_iam_custom_role.storageObjectsGetOnly.id
+}
+
+resource "google_storage_bucket_iam_binding" "userassets_backend" {
+	bucket = google_storage_bucket.userassets.name
+	members = ["serviceAccount:${google_service_account.backend.email}"]
+	role = "roles/storage.objectCreator"
 }
 
 resource "google_storage_bucket" "exports" {
@@ -255,6 +293,12 @@ resource "google_storage_bucket" "exports" {
 	}
 }
 
+resource "google_storage_bucket_iam_binding" "exports_backend" {
+	bucket = google_storage_bucket.exports.name
+	members = ["serviceAccount:${google_service_account.backend.email}"]
+	role = "roles/storage.objectCreator"
+}
+
 resource "google_storage_bucket" "imports" {
 	name = "quizzestutor-imports-${random_string.suffix.result}"
 	location = "europe-west1"
@@ -268,6 +312,135 @@ resource "google_storage_bucket" "imports" {
 		action {
 			type = "Delete"
 		}
+	}
+}
+
+resource "google_storage_bucket_iam_binding" "imports_backend" {
+	bucket = google_storage_bucket.imports.name
+	members = ["serviceAccount:${google_service_account.backend.email}"]
+	role = "roles/storage.objectCreator"
+}
+
+data "google_compute_image" "backend" {
+	family = "cos-81-lts"
+	project = "gce-uefi-images"
+}
+
+resource "google_container_registry" "default" {
+	location = "EU"
+}
+
+resource "google_storage_bucket_iam_member" "gcr_backend" {
+	bucket = google_container_registry.default.id
+	role = "roles/storage.objectViewer"
+	member = "serviceAccount:${google_service_account.backend.email}"
+}
+
+data "google_container_registry_image" "backend" {
+	name = "backend-gce"
+	region = "eu"
+	tag = var.git_commit_hash
+}
+
+data "cloudinit_config" "backend" {
+	gzip = false
+	base64_encode = false
+
+	part {
+		content_type = "text/cloud-config"
+		content = templatefile("backend-gce/cloudinit.yml.tmpl", {
+			container_image = data.google_container_registry_image.backend.image_url
+			buckets = {
+				userassets = google_storage_bucket.userassets.name
+				exports = google_storage_bucket.exports.name
+				imports = google_storage_bucket.imports.name
+			}
+			db = {
+				host = google_sql_database_instance.default.private_ip_address
+				username = google_sql_user.tutordb.name
+				password = google_sql_user.tutordb.password
+				name = google_sql_database.tutordb.name
+			}
+			fenix_oauth = {
+				id = var.fenix_oauth_id
+				secret = var.fenix_oauth_secret
+				callback_url = "https://${local.dns_root}/login"
+			}
+		})
+	}
+}
+
+resource "google_compute_instance_template" "backend" {
+	name_prefix = "backend-${random_string.suffix.result}-"
+	machine_type = "e2-highcpu-2"
+
+	disk {
+		source_image = data.google_compute_image.backend.self_link
+	}
+
+	network_interface {
+		subnetwork = google_compute_subnetwork.backend_default.self_link
+	}
+
+	service_account {
+		email = google_service_account.backend.email
+
+		# IAM bindings are not enough for GCR/GCS it seems
+		scopes = [
+			"https://www.googleapis.com/auth/logging.write",
+			"https://www.googleapis.com/auth/monitoring.write",
+			"userinfo-email",
+			"compute-ro",
+			"storage-rw"
+		]
+	}
+
+	metadata = {
+		user-data = data.cloudinit_config.backend.rendered
+	}
+
+	lifecycle {
+		create_before_destroy = true
+	}
+}
+
+resource "google_compute_health_check" "backend" {
+	name = "backend-http-health-check-${random_string.suffix.result}"
+
+	timeout_sec = 1
+	check_interval_sec = 1
+
+	http_health_check {
+		port = 80
+		request_path = "/auth/demo/student"
+	}
+}
+
+resource "google_compute_instance_group_manager" "backend" {
+	name = "backend-igm"
+	base_instance_name = "backend-igm"
+	zone = "europe-west1-b"
+	target_size = 1 # TODO: autoscale
+
+	version {
+		name = "backend-rolling"
+		instance_template = google_compute_instance_template.backend.id
+	}
+
+	named_port {
+		name = "http"
+		port = 80
+	}
+
+	update_policy {
+		type = "PROACTIVE"
+		minimal_action = "RESTART"
+		max_unavailable_fixed = 1
+	}
+
+	auto_healing_policies {
+		health_check = google_compute_health_check.backend.id
+		initial_delay_sec = 10 * 60 # 10 min
 	}
 }
 
@@ -305,6 +478,17 @@ resource "google_compute_backend_bucket" "userassets" {
 	enable_cdn = false
 }
 
+resource "google_compute_backend_service" "backend" {
+	name = "backend-lbal-backend-${random_string.suffix.result}"
+	health_checks = [google_compute_health_check.backend.id]
+
+	backend {
+		group = google_compute_instance_group_manager.backend.instance_group
+	}
+
+	depends_on = [google_compute_instance_group_manager.backend]
+}
+
 resource "google_compute_url_map" "frontend_lbal" {
 	name = "frontend-lbal-url-map-${random_string.suffix.result}"
 
@@ -326,6 +510,38 @@ resource "google_compute_url_map" "frontend_lbal" {
 	path_matcher {
 		name = "userassets"
 		default_service = google_compute_backend_bucket.userassets.id
+	}
+
+	host_rule {
+		hosts = ["backend.${local.dns_root}"]
+		path_matcher = "backend"
+	}
+
+	path_matcher {
+		name = "backend"
+		default_service = google_compute_backend_service.backend.id
+		header_action {
+			response_headers_to_add {
+				header_name = "Access-Control-Allow-Origin"
+				header_value = "https://${local.dns_root}, https://www.${local.dns_root}"
+				replace = true
+			}
+			response_headers_to_add {
+				header_name = "Access-Control-Allow-Credentials"
+				header_value = "true"
+				replace = true
+			}
+			response_headers_to_add {
+				header_name = "Access-Control-Max-Age"
+				header_value = 7 * 24 * 3600 # one week
+				replace = true
+			}
+			response_headers_to_add {
+				header_name = "Expect-CT"
+				header_value= "max-age=86400, enforce"
+				replace = false
+			}
+		}
 	}
 
 	default_url_redirect {

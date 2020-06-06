@@ -1,0 +1,47 @@
+users:
+  - name: quizzestutor
+    uid: 2000
+
+write_files:
+  - path: /etc/quizzestutor.prod.env
+    content: |
+      ## Datasource
+      SPRING_DATASOURCE_USERNAME=${db.username}
+      SPRING_DATASOURCE_PASSWORD=${db.password}
+      SPRING_DATASOURCE_URL=jdbc:postgresql://${db.host}:5432/${db.name}
+
+      ## Resources
+      FIGURES_DIR=/data/userassets
+      EXPORT_DIR=/data/exports
+      LOAD_DIR=/data/imports
+
+      ## Fenix oauth
+      OAUTH_CONSUMER_KEY=${fenix_oauth.id}
+      OAUTH_CONSUMER_SECRET=${fenix_oauth.secret}
+      CALLBACK_URL=${fenix_oauth.callback_url}
+      BASE_URL=https://fenix.tecnico.ulisboa.pt
+
+      ## buckets to mount (used by the wrapper script, not spring)
+      USERASSETS_BUCKET=${buckets.userassets}
+      EXPORTS_BUCKET=${buckets.exports}
+      IMPORTS_BUCKET=${buckets.imports}
+  - path: /etc/systemd/system/quizzestutor.service
+    content: |
+      [Unit]
+      Description=Quizzes Tutor backend
+      After=gcr-online.target local-fs.target network-online.target google.service sys-fs-fuse-connections.mount cloud-config.service
+      Wants=gcr-online.target local-fs.target network-online.target google.service sys-fs-fuse-connections.mount
+
+      [Service]
+      Environment="HOME=/home/quizzestutor"
+      ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
+      ExecStart=/usr/bin/docker run -u 2000 --env-file=/etc/quizzestutor.prod.env --restart=unless-stopped -p 80:8080 --name=quizzestutor-backend ${container_image}
+      ExecStop=/usr/bin/docker stop -t 20 quizzestutor-backend
+      ExecStopPost=/usr/bin/docker rm quizzestutor-backend
+
+      [Install]
+      WantedBy=multi-user.target
+
+runcmd:
+  - systemctl daemon-reload
+  - systemctl start quizzestutor.service
