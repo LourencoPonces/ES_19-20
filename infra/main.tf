@@ -67,7 +67,7 @@ resource "google_project_iam_custom_role" "storageObjectsGetOnly" {
 # DNS
 
 resource "google_dns_managed_zone" "default" {
-	name = "quiztutor-dns-zone-${random_string.suffix.result}"
+	name = "quizzestutor-dns-zone-${random_string.suffix.result}"
 	dns_name = "${local.dns_root}."
 }
 
@@ -150,7 +150,7 @@ resource "google_sql_user" "tutordb" {
 # Backend
 
 resource "google_storage_bucket" "userassets" {
-	name = "quiztutor-userassets-bucket-${random_string.suffix.result}"
+	name = "quizzestutor-userassets-bucket-${random_string.suffix.result}"
 	location = "europe-west1"
 	storage_class = "REGIONAL"
 	bucket_policy_only = true
@@ -167,7 +167,7 @@ resource "google_storage_bucket_iam_binding" "userassets_world" {
 }
 
 resource "google_storage_bucket" "exports" {
-	name = "quiztutor-exports-${random_string.suffix.result}"
+	name = "quizzestutor-exports-${random_string.suffix.result}"
 	location = "europe-west1"
 	storage_class = "REGIONAL"
 	bucket_policy_only = true
@@ -183,7 +183,7 @@ resource "google_storage_bucket" "exports" {
 }
 
 resource "google_storage_bucket" "imports" {
-	name = "quiztutor-imports-${random_string.suffix.result}"
+	name = "quizzestutor-imports-${random_string.suffix.result}"
 	location = "europe-west1"
 	storage_class = "REGIONAL"
 	bucket_policy_only = true
