@@ -27,7 +27,9 @@ HELP.md
 
 
 application-dev.properties
-application-prod.properties
+
+# deployment strategy needs it there
+!application-prod.properties
 
 ### images location ###
 /src/main/resources/static/images/questions/
