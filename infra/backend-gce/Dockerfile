@@ -13,15 +13,10 @@ RUN apt-get update \
 	&& apt-get upgrade -y \
 	&& rm -rf /var/lib/apt/lists/*
 
-RUN useradd --system --shell /usr/bin/nologin --no-log-init quizzestutor \
-	&& mkdir -p /data/{userassets,exports,imports} \
+RUN mkdir -p /data/{userassets,exports,imports} \
 	&& chown quizzestutor /data/*
 
-USER quizzestutor
-
 COPY entrypoint.sh ./entrypoint.sh
-
-EXPOSE 8080
 
 ENTRYPOINT [ "./entrypoint.sh" ]
 CMD []
