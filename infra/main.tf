@@ -69,6 +69,10 @@ resource "google_project_iam_custom_role" "storageObjectsGetOnly" {
 resource "google_dns_managed_zone" "default" {
 	name = "quizzestutor-dns-zone-${random_string.suffix.result}"
 	dns_name = "${local.dns_root}."
+
+	lifecycle {
+		prevent_destroy = true # may require NS record updates after recreation
+	}
 }
 
 resource "google_dns_record_set" "default" {
@@ -125,15 +129,15 @@ resource "google_sql_database_instance" "default" {
 			hour = 2
 		}
 	}
-
-	lifecycle {
-		prevent_destroy = true
-	}
 }
 
 resource "google_sql_database" "tutordb" {
 	name = "tutordb"
 	instance = google_sql_database_instance.default.name
+
+	lifecycle {
+		prevent_destroy = true
+	}
 }
 
 resource "random_password" "tutordb" {
