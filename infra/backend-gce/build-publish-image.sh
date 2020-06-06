@@ -13,7 +13,6 @@ pushd ../../backend
 $DOCKER build -t "quizzestutor-backend:$VERSION" .
 popd
 
-
 # Build GCE-specialized backend image (requires the former)
 $DOCKER build -t "$REG_NAME:$VERSION" -t "$REG_NAME:last" .
 
@@ -21,11 +20,13 @@ $DOCKER build -t "$REG_NAME:$VERSION" -t "$REG_NAME:last" .
 gcloud auth configure-docker
 $DOCKER push "$REG_NAME:last"
 $DOCKER push "$REG_NAME:$VERSION"
-if [ "a$(git branch --show-current)" = "amaster" ]; then
+
+BRANCH_LIST="$(git branch --points-at HEAD -a --format "%(refname:short)")"
+if echo $BRANCH_LIST | grep "^origin/master$"; then
 	$DOCKER tag "$REG_NAME:$VERSION" "$REG_NAME:stable"
 	$DOCKER push "$REG_NAME:stable"
 fi
-if [ "a$(git branch --show-current)" = "adevelop" ]; then
+if echo $BRANCH_LIST | grep "^origin/develop$"; then
 	$DOCKER tag "$REG_NAME:$VERSION" "$REG_NAME:staging"
 	$DOCKER push "$REG_NAME:staging"
 fi
