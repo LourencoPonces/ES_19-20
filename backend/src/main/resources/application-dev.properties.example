@@ -4,7 +4,7 @@ spring.datasource.username= <DATABASE USERNAME>
 spring.datasource.password= <DATABASE PASSWORD>
 
 ## Jpa
-spring.jpa.database-platform=org.hibernate.dialect.PostgreSQL9Dialect
+#spring.jpa.database-platform=org.hibernate.dialect.PostgreSQL9Dialect
 
 ## Resources
 figures.dir=${maven.basedir}/../data/images/
