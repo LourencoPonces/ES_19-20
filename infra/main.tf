@@ -24,6 +24,14 @@ provider "google" {
 	project = "quizzestutor"
 }
 
+provider "random" {
+	version = "~> 2.2"
+}
+
+provider "cloudinit" {
+	version = "~> 1.0"
+}
+
 resource "google_storage_bucket" "tf_state" {
 	name = "quizzestutor-tf-state"
 	location = "europe-west1"
