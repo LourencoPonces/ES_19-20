@@ -350,6 +350,20 @@ data "google_container_registry_image" "backend" {
 	tag = var.git_commit_hash
 }
 
+resource "random_password" "auth_secret" {
+	length = 100
+	special = true
+	override_special = "!@#%&*-_+?"
+
+	# Invalidate sessions when underlying user data changes
+	keepers = {
+		db_id = google_sql_database.tutordb.id
+		userassets_id = google_storage_bucket.userassets.id
+		exports_id = google_storage_bucket.exports.id
+		imports_id = google_storage_bucket.imports.id
+	}
+}
+
 data "cloudinit_config" "backend" {
 	gzip = false
 	base64_encode = false
@@ -373,6 +387,10 @@ data "cloudinit_config" "backend" {
 				id = var.fenix_oauth_id
 				secret = var.fenix_oauth_secret
 				callback_url = "https://${local.dns_root}/login"
+			}
+			auth = {
+				cookie_domain = local.dns_root
+				secret = random_password.auth_secret.result
 			}
 		})
 	}

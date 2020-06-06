@@ -21,6 +21,10 @@ write_files:
       CALLBACK_URL=${fenix_oauth.callback_url}
       BASE_URL=https://fenix.tecnico.ulisboa.pt
 
+      ## Authentication
+      AUTH_COOKIE_DOMAIN=${auth.cookie_domain}
+      AUTH_SECRET=${auth.secret}
+
       ## buckets to mount (used by the wrapper script, not spring)
       USERASSETS_BUCKET=${buckets.userassets}
       EXPORTS_BUCKET=${buckets.exports}

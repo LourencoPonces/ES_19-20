@@ -26,6 +26,9 @@ public class AuthController {
     @Value("${callback.url}")
     private String callbackUrl;
 
+    @Value("${auth.cookie.domain}")
+    private String cookieDomain;
+
     @GetMapping("/auth/fenix")
     public AuthDto fenixAuth(@RequestParam String code, HttpServletResponse response) {
         FenixEduInterface fenix = new FenixEduInterface(baseUrl, oauthConsumerKey, oauthConsumerSecret, callbackUrl);
@@ -60,6 +63,7 @@ public class AuthController {
         Cookie authCookie = new Cookie(JwtTokenProvider.COOKIE_NAME, dto.getToken());
         authCookie.setHttpOnly(true);
         authCookie.setSecure(true);
+        authCookie.setDomain(cookieDomain);
         authCookie.setMaxAge(JwtTokenProvider.EXPIRATION_TIME + 1);
 
         response.addCookie(authCookie);
