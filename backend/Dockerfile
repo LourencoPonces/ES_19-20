@@ -9,7 +9,7 @@ RUN mvn -Pprod -Dmaven.test.skip=true package
 
 FROM adoptopenjdk/openjdk11-openj9:jre-11.0.7_10_openj9-0.20.0
 
-RUN useradd --system --shell /usr/bin/nologin --no-log-init quizzestutor
+RUN useradd --uid 2000 --system --shell /usr/bin/nologin --no-log-init quizzestutor
 USER quizzestutor
 
 EXPOSE 8080
