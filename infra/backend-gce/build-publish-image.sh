@@ -13,7 +13,7 @@ gcloud auth configure-docker
 
 # Build "regular" backend image
 pushd ../../backend
-$DOCKER build -t "quizzestutor-backend:$VERSION" .
+$DOCKER build -t "quizzestutor-backend" .
 popd
 
 # Build GCE-specialized backend image (requires the former)
