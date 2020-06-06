@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.auth.service
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
@@ -446,8 +447,11 @@ class FenixAuthTest extends Specification {
     @TestConfiguration
     static class AuthServiceImplTestContextConfiguration {
 
+        @Value('${auth.secret}')
+        private String authSecret
+
         @Autowired
-        private UserRepository userRepository;
+        private UserRepository userRepository
 
         @Bean
         AuthService authService() {
@@ -461,7 +465,7 @@ class FenixAuthTest extends Specification {
 
         @Bean
         JwtTokenProvider jwtTokenProvider() {
-            return new JwtTokenProvider(userRepository, null)
+            return new JwtTokenProvider(userRepository, authSecret)
         }
     }
 }

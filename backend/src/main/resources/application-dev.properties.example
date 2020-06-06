@@ -17,5 +17,9 @@ oauth.consumer.secret=<FENIX SECRET>
 callback.url=http://localhost:8081/login
 base.url=https://fenix.tecnico.ulisboa.pt
 
+# Authentication
+auth.secret=thisissupersecretshhhhhhhhhneedtomakeitlongenoughasdhflkjdsahfksahdflk
+auth.cookie.domain=localhost
+
 # Restart server
 spring.devtools.restart.enabled=true

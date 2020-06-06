@@ -34,11 +34,10 @@ public class JwtTokenProvider {
 
     private JwtParser jwtParser;
 
-    public JwtTokenProvider(UserRepository userRepository, @Value("${auth.secret}") String key) {
+    public JwtTokenProvider(UserRepository userRepository, @Value("${auth.secret}") String secret) {
         this.userRepository = userRepository;
-        secretKey = Keys.hmacShaKeyFor(key.getBytes());
-
-        jwtParser = Jwts.parserBuilder().setSigningKey(secretKey).build();
+        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
+        this.jwtParser = Jwts.parserBuilder().setSigningKey(secretKey).build();
     }
 
     private static SecretKey generateSecret() {
