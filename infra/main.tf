@@ -117,18 +117,87 @@ resource "google_dns_record_set" "userassets" {
 	rrdatas = [google_compute_global_address.frontend_lbal[each.key].address]
 }
 
+resource "google_compute_network" "private" {
+	name = "private"
+	auto_create_subnetworks = false
+}
+
+resource "google_compute_subnetwork" "private_default" {
+	name = "private-default"
+	network = google_compute_network.private.id
+	ip_cidr_range = "10.128.0.0/16"
+	private_ip_google_access = true
+}
+
+resource "google_compute_firewall" "private_allow_icmp_ssh_http" {
+	name = "private-allow-icmp-ssh-http"
+	network = google_compute_network.private.name
+
+	allow {
+		protocol = "icmp"
+	}
+
+	allow {
+		protocol = "tcp"
+		ports = ["80", "22"]
+	}
+}
+
+data "google_compute_network" "private" {
+	name = google_compute_network.private.name
+}
+
+data "google_compute_subnetwork" "private_subnets" {
+	for_each = toset(data.google_compute_network.private.subnetworks_self_links)
+	self_link = each.value
+}
+
+resource "google_compute_firewall" "private_allow_internal" {
+	name = "private-allow-internal"
+	network = google_compute_network.private.name
+	source_ranges = values(data.google_compute_subnetwork.private_subnets)[*].ip_cidr_range
+
+	allow {
+		protocol = "udp"
+	}
+
+	allow {
+		protocol = "tcp"
+	}
+}
+
 # DB
+
+resource "google_compute_global_address" "private_svc_peering" {
+	name = "svc-peering-addr-${random_string.suffix.result}"
+	purpose = "VPC_PEERING"
+	address_type = "INTERNAL"
+	prefix_length = 16
+	network = google_compute_network.private.id
+}
+
+resource "google_service_networking_connection" "private" {
+	network = google_compute_network.private.id
+	service = "servicenetworking.googleapis.com"
+	reserved_peering_ranges = [google_compute_global_address.private_svc_peering.name]
+}
 
 resource "google_sql_database_instance" "default" {
 	database_version = "POSTGRES_12"
 	settings {
 		tier  = "db-f1-micro"
+		ip_configuration {
+			ipv4_enabled = false
+			private_network = google_compute_network.private.id
+		}
 
 		maintenance_window {
 			day = 7
 			hour = 2
 		}
 	}
+
+	depends_on = [google_service_networking_connection.private]
 }
 
 resource "google_sql_database" "tutordb" {
