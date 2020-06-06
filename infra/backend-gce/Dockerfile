@@ -2,6 +2,9 @@
 # A fancy way of saying it mounts storage buckets before starting the server
 FROM quizzestutor-backend
 
+# temporarily set user back to root to install stuff
+USER root
+
 RUN apt-get update \
 	&& apt-get install -y gnupg2 lsb-release \
 	&& echo "deb http://packages.cloud.google.com/apt gcsfuse-$(lsb_release -c -s) main" > /etc/apt/sources.list.d/gcsfuse.list \
@@ -17,6 +20,9 @@ RUN mkdir -p /data/{userassets,exports,imports} \
 	&& chown quizzestutor /data/*
 
 COPY entrypoint.sh ./entrypoint.sh
+
+# go back to unprivileged user
+USER quizzestutor
 
 ENTRYPOINT [ "./entrypoint.sh" ]
 CMD []
