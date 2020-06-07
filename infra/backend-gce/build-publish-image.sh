@@ -36,7 +36,7 @@ gcloud auth configure-docker
 
 # Build "regular" backend image
 pushd ../../backend
-$DOCKER build -t "quizzestutor-backend" .
+$DOCKER build --build-arg SPRING_PROFILE=prod -t "quizzestutor-backend" .
 popd
 
 # Build GCE-specialized backend image (requires the former)
