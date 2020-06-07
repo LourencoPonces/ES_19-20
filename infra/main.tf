@@ -376,6 +376,10 @@ data "cloudinit_config" "backend" {
 				cookie_domain = local.dns_root
 				secret = random_password.auth_secret.result
 			}
+			allowed_origins = [
+				"https://${local.dns_root}",
+				"https://www.${local.dns_root}"
+			]
 		})
 	}
 }

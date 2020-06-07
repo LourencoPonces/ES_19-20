@@ -1,18 +1,30 @@
+# Spring refuses to load prod profile if this file is not inside the jar
+# but we pass all values for these properties as env variables, so it is unnecessary
+# the only exception to this is hibernate's dialect
+# LEAVE IT AS IS
+
 ## Datasource
-spring.datasource.url=jdbc:postgresql://localhost:<DATABASE PORT>/<DATABASE NAME>
-spring.datasource.username= <DATABASE USERNAME>
-spring.datasource.password= <DATABASE PASSWORD>
+#spring.datasource.url=jdbc:postgresql://localhost:<DATABASE PORT>/<DATABASE NAME>
+#spring.datasource.username= <DATABASE USERNAME>
+#spring.datasource.password= <DATABASE PASSWORD>
 
 ## Jpa
+# dialect autodetection didn't work
 spring.jpa.database-platform=org.hibernate.dialect.PostgreSQL10Dialect
 
 ## Resources
-figures.dir=<DIRECTORY_WITH_FIGURES>
-export.dir=<DIRECTORY_TO_EXPORT>
-load.dir=<DIRECTORY_FOR_LOAD>
+#figures.dir=<DIRECTORY_WITH_FIGURES>
+#export.dir=<DIRECTORY_TO_EXPORT>
+#load.dir=<DIRECTORY_FOR_LOAD>
 
 ## Fenix oauth
-oauth.consumer.key=<FENIX CLIENT KEY>
-oauth.consumer.secret=<FENIX SECRET>
-callback.url=<URL FENIX REDIRECTS TO>
-base.url=https://fenix.tecnico.ulisboa.pt
+#oauth.consumer.key=<FENIX CLIENT KEY>
+#oauth.consumer.secret=<FENIX SECRET>
+#callback.url=<URL FENIX REDIRECTS TO>
+#base.url=https://fenix.tecnico.ulisboa.pt
+
+# Authentication
+#auth.secret=thisissupersecretshhhhhhhhhneedtomakeitlongenoughasdhflkjdsahfksahdflk
+#auth.cookie.domain=localhost
+
+#cors.allowed_origins=*

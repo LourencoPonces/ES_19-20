@@ -17,6 +17,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import pt.ulisboa.tecnico.socialsoftware.tutor.auth.JwtConfigurer;
 import pt.ulisboa.tecnico.socialsoftware.tutor.auth.JwtTokenProvider;
 
+import java.util.Arrays;
+
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
@@ -28,6 +30,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${spring.profiles.active}")
     private String activeProfile;
 
+    @Value("${cors.allowed_origins}")
+    private String[] allowedOrigins;
+
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/resources/**");
@@ -35,49 +40,53 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        if (activeProfile.equals("dev")) {
-            http
+        http
+                .cors().and()
                 .httpBasic().disable()
                 .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
-                .antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
-                .antMatchers( "/auth/**").permitAll()
-                .antMatchers( "/images/**").permitAll()
-                .antMatchers( "/swagger-ui.html").permitAll()
-                .antMatchers( "/favicon.ico").permitAll()
-                .antMatchers( "/webjars/*").permitAll()
-                .antMatchers( "/webjars/**").permitAll()
-                .antMatchers( "/swagger-resources/*").permitAll()
-                .antMatchers( "/swagger-resources/**").permitAll()
-                .antMatchers( "/v2/*").permitAll()
-                .antMatchers( "/v2/**").permitAll()
-                .antMatchers( "/csrf").permitAll()
-                .antMatchers( "/").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .apply(new JwtConfigurer(jwtTokenProvider));
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+        if (activeProfile.equals("dev")) {
+            http.authorizeRequests()
+                    .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                    .antMatchers("/auth/**").permitAll()
+                    .antMatchers("/images/**").permitAll()
+                    .antMatchers("/swagger-ui.html").permitAll()
+                    .antMatchers("/favicon.ico").permitAll()
+                    .antMatchers("/webjars/*").permitAll()
+                    .antMatchers("/webjars/**").permitAll()
+                    .antMatchers("/swagger-resources/*").permitAll()
+                    .antMatchers("/swagger-resources/**").permitAll()
+                    .antMatchers("/v2/*").permitAll()
+                    .antMatchers("/v2/**").permitAll()
+                    .antMatchers("/csrf").permitAll()
+                    .antMatchers("/").permitAll()
+                    .anyRequest().authenticated();
         } else {
             http
-                .httpBasic().disable()
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
-                .antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
-                .antMatchers( "/auth/**").permitAll()
-                .antMatchers( "/images/**").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .apply(new JwtConfigurer(jwtTokenProvider));
+                    .authorizeRequests()
+                    .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                    .antMatchers("/auth/**").permitAll()
+                    .antMatchers("/images/**").permitAll()
+                    .anyRequest().authenticated();
         }
+
+        http.apply(new JwtConfigurer(jwtTokenProvider));
     }
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
+        CorsConfiguration defaultConfig = new CorsConfiguration();
+        defaultConfig.setAllowCredentials(true);
+        defaultConfig.setAllowedOrigins(Arrays.asList(allowedOrigins));
+        defaultConfig.setMaxAge(1800L);
+
+        CorsConfiguration unauthConfig = new CorsConfiguration(defaultConfig);
+        unauthConfig.setAllowCredentials(false);
+
+        source.registerCorsConfiguration("/auth/**", unauthConfig);
+        source.registerCorsConfiguration("/**", defaultConfig);
         return source;
     }
 }

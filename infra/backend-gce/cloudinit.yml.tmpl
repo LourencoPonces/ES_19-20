@@ -25,6 +25,8 @@ write_files:
       AUTH_COOKIE_DOMAIN=${auth.cookie_domain}
       AUTH_SECRET=${auth.secret}
 
+      CORS_ALLOWED_ORIGINS=${join(",", allowed_origins)}
+
       ## buckets to mount (used by the wrapper script, not spring)
       USERASSETS_BUCKET=${buckets.userassets}
       EXPORTS_BUCKET=${buckets.exports}
