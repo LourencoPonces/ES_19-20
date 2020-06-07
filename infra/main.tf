@@ -1,5 +1,8 @@
 locals {
 	dns_root = "quiztutor.breda.pt"
+	project = "quizzestutor"
+	region = "europe-west1"
+	zone = "europe-west1-b"
 }
 
 variable "git_commit_hash" {
@@ -20,8 +23,8 @@ variable "fenix_oauth_secret" {
 provider "google" {
 	version = "~> 3.24"
 	credentials = file("credentials.json")
-	region = "europe-west1"
-	project = "quizzestutor"
+	region = local.region
+	project = local.project
 }
 
 provider "random" {
@@ -34,7 +37,7 @@ provider "cloudinit" {
 
 resource "google_storage_bucket" "tf_state" {
 	name = "quizzestutor-tf-state"
-	location = "europe-west1"
+	location = local.region
 	storage_class = "REGIONAL"
 	versioning {
 		enabled = true
@@ -86,6 +89,10 @@ resource "google_project_iam_custom_role" "storageObjectsGetOnly" {
 	permissions = ["storage.objects.get"]
 }
 
+resource "google_container_registry" "default" {
+	location = "EU"
+}
+
 # DNS
 
 resource "google_dns_managed_zone" "default" {
@@ -97,32 +104,13 @@ resource "google_dns_managed_zone" "default" {
 	}
 }
 
-resource "google_dns_record_set" "default" {
-	for_each = {
-		"IPV4" = "A"
-		"IPV6" = "AAAA"
-	}
-
+resource "google_dns_record_set" "google_domain_verification" {
 	managed_zone = google_dns_managed_zone.default.name
-	name = google_dns_managed_zone.default.dns_name
-	type = each.value
+	name = "z6hgevdct4gw.${google_dns_managed_zone.default.dns_name}"
+	type = "CNAME"
 	ttl = 300
 
-	rrdatas = [google_compute_global_address.frontend_lbal[each.key].address]
-}
-
-resource "google_dns_record_set" "www" {
-	for_each = {
-		"IPV4" = "A"
-		"IPV6" = "AAAA"
-	}
-
-	managed_zone = google_dns_managed_zone.default.name
-	name = "www.${google_dns_managed_zone.default.dns_name}"
-	type = each.value
-	ttl = 300
-
-	rrdatas = [google_compute_global_address.frontend_lbal[each.key].address]
+	rrdatas = ["gv-byq3wtx43kczdr.dv.googlehosted.com."]
 }
 
 resource "google_dns_record_set" "userassets" {
@@ -264,7 +252,7 @@ resource "google_service_account" "backend" {
 
 resource "google_storage_bucket" "userassets" {
 	name = "quizzestutor-userassets-bucket-${random_string.suffix.result}"
-	location = "europe-west1"
+	location = local.region
 	storage_class = "REGIONAL"
 	bucket_policy_only = true
 
@@ -287,7 +275,7 @@ resource "google_storage_bucket_iam_binding" "userassets_backend" {
 
 resource "google_storage_bucket" "exports" {
 	name = "quizzestutor-exports-${random_string.suffix.result}"
-	location = "europe-west1"
+	location = local.region
 	storage_class = "REGIONAL"
 	bucket_policy_only = true
 
@@ -309,7 +297,7 @@ resource "google_storage_bucket_iam_binding" "exports_backend" {
 
 resource "google_storage_bucket" "imports" {
 	name = "quizzestutor-imports-${random_string.suffix.result}"
-	location = "europe-west1"
+	location = local.region
 	storage_class = "REGIONAL"
 	bucket_policy_only = true
 
@@ -332,10 +320,6 @@ resource "google_storage_bucket_iam_binding" "imports_backend" {
 data "google_compute_image" "backend" {
 	family = "cos-81-lts"
 	project = "gce-uefi-images"
-}
-
-resource "google_container_registry" "default" {
-	location = "EU"
 }
 
 resource "google_storage_bucket_iam_member" "gcr_backend" {
@@ -445,7 +429,7 @@ resource "google_compute_health_check" "backend" {
 resource "google_compute_instance_group_manager" "backend" {
 	name = "backend-igm"
 	base_instance_name = "backend-igm"
-	zone = "europe-west1-b"
+	zone = local.zone
 	target_size = 1 # TODO: autoscale
 
 	version {
@@ -470,34 +454,6 @@ resource "google_compute_instance_group_manager" "backend" {
 	}
 }
 
-# Frontend
-
-resource "google_storage_bucket" "frontend" {
-	name = "frontend-bucket-${random_string.suffix.result}"
-	location = "europe-west1"
-	storage_class = "REGIONAL"
-	website {
-		main_page_suffix = "index.html"
-
-		# HACK: serve index.html for SPA routes
-		not_found_page = "index.html"
-	}
-
-	bucket_policy_only = true
-}
-
-resource "google_storage_bucket_iam_binding" "frontend" {
-	bucket = google_storage_bucket.frontend.name
-	members = ["allUsers"]
-	role = google_project_iam_custom_role.storageObjectsGetOnly.id
-}
-
-resource "google_compute_backend_bucket" "frontend" {
-	name = "frontend-backend-bucket-${random_string.suffix.result}"
-	bucket_name = google_storage_bucket.frontend.name
-	enable_cdn = false
-}
-
 resource "google_compute_backend_bucket" "userassets" {
 	name = "userassets-backend-bucket-${random_string.suffix.result}"
 	bucket_name = google_storage_bucket.userassets.name
@@ -519,16 +475,6 @@ resource "google_compute_url_map" "frontend_lbal" {
 	name = "frontend-lbal-url-map-${random_string.suffix.result}"
 
 	host_rule {
-		hosts = [local.dns_root, "www.${local.dns_root}"]
-		path_matcher = "frontend"
-	}
-
-	path_matcher {
-		name = "frontend"
-		default_service = google_compute_backend_bucket.frontend.id
-	}
-
-	host_rule {
 		hosts = ["userassets.${local.dns_root}"]
 		path_matcher = "userassets"
 	}
@@ -546,28 +492,6 @@ resource "google_compute_url_map" "frontend_lbal" {
 	path_matcher {
 		name = "backend"
 		default_service = google_compute_backend_service.backend.id
-		header_action {
-			response_headers_to_add {
-				header_name = "Access-Control-Allow-Origin"
-				header_value = "https://${local.dns_root}, https://www.${local.dns_root}"
-				replace = true
-			}
-			response_headers_to_add {
-				header_name = "Access-Control-Allow-Credentials"
-				header_value = "true"
-				replace = true
-			}
-			response_headers_to_add {
-				header_name = "Access-Control-Max-Age"
-				header_value = 7 * 24 * 3600 # one week
-				replace = true
-			}
-			response_headers_to_add {
-				header_name = "Expect-CT"
-				header_value= "max-age=86400, enforce"
-				replace = false
-			}
-		}
 	}
 
 	default_url_redirect {
@@ -625,4 +549,102 @@ resource "google_compute_global_address" "frontend_lbal" {
 	name = "frontend-lbal-addr-${lower(each.value)}-${random_string.suffix.result}"
 	address_type = "EXTERNAL"
 	ip_version = each.value
+}
+
+# Frontend
+data "google_container_registry_image" "frontend" {
+	name = "frontend-gc"
+	region = "eu"
+	tag = var.git_commit_hash
+}
+
+resource "google_cloud_run_service" "frontend" {
+	name     = "quizzestutor-frontend"
+	location = local.region
+
+	metadata {
+		namespace = local.project
+	}
+
+	template {
+		spec {
+			containers {
+				image = data.google_container_registry_image.frontend.image_url
+			}
+		}
+	}
+}
+
+resource "google_cloud_run_service_iam_member" "frontend" {
+	service = google_cloud_run_service.frontend.name
+	location = google_cloud_run_service.frontend.location
+	member = "allUsers"
+	role = "roles/run.invoker"
+}
+
+resource "google_cloud_run_domain_mapping" "frontend_default" {
+	name     = local.dns_root
+	location = local.region
+
+	metadata {
+		namespace = local.project
+	}
+
+	spec {
+		route_name = google_cloud_run_service.frontend.name
+	}
+}
+
+resource "google_dns_record_set" "frontend_default" {
+	# TODO: try to define in terms of google_cloud_run_domain_mapping status
+	for_each = {
+		_ = {
+			type = "A"
+			rrdatas = [
+				"216.239.32.21",
+				"216.239.34.21",
+				"216.239.36.21",
+				"216.239.38.21"
+			]
+		}
+		__ = {
+			type = "AAAA"
+			rrdatas = [
+				"2001:4860:4802:32::15",
+				"2001:4860:4802:34::15",
+				"2001:4860:4802:36::15",
+				"2001:4860:4802:38::15"
+			]
+		}
+	}
+
+	managed_zone = google_dns_managed_zone.default.name
+	name = google_dns_managed_zone.default.dns_name
+	type = lookup(each.value, "type", "A")
+	ttl = 300
+
+	rrdatas = each.value.rrdatas
+}
+
+resource "google_cloud_run_domain_mapping" "frontend_www" {
+	name     = "www.${local.dns_root}"
+	location = local.region
+
+	metadata {
+		namespace = local.project
+	}
+
+	spec {
+		route_name = google_cloud_run_service.frontend.name
+	}
+}
+
+resource "google_dns_record_set" "frontend_www" {
+	# TODO: try to define in terms of google_cloud_run_domain_mapping status
+	managed_zone = google_dns_managed_zone.default.name
+	name = "www.${google_dns_managed_zone.default.dns_name}"
+	type = "CNAME"
+	ttl = 300
+
+	rrdatas = ["ghs.googlehosted.com."]
 }
