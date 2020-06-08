@@ -2,6 +2,7 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.auth;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,8 +17,8 @@ import javax.crypto.SecretKey;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.Optional;
 
-import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.AUTHENTICATION_ERROR;
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.USER_NOT_FOUND;
 
 @Component
@@ -80,11 +81,13 @@ public class JwtTokenProvider {
         return "";
     }
 
-    int getUserId(String token) {
+    Optional<Integer> getUserId(String token) {
         try {
-            return Integer.parseInt(jwtParser.parseClaimsJws(token).getBody().getSubject());
+            return Optional.of(Integer.parseInt(jwtParser.parseClaimsJws(token).getBody().getSubject()));
+        } catch (SignatureException ex) {
+            logger.error("Invalid JWT signature");
         } catch (MalformedJwtException ex) {
-            logger.error("Invalkey JWT token");
+            logger.error("Invalid JWT token");
         } catch (ExpiredJwtException ex) {
             logger.error("Expired JWT token");
         } catch (UnsupportedJwtException ex) {
@@ -92,11 +95,15 @@ public class JwtTokenProvider {
         } catch (IllegalArgumentException ex) {
             logger.error("JWT claims string is empty.");
         }
-        throw new TutorException(AUTHENTICATION_ERROR);
+
+        return Optional.empty();
     }
 
     Authentication getAuthentication(String token) {
-        User user = this.userRepository.findById(getUserId(token)).orElseThrow(() -> new TutorException(USER_NOT_FOUND, getUserId(token)));
-        return new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
+        return getUserId(token)
+                .map(id -> this.userRepository.findById(id)
+                        .orElseThrow(() -> new TutorException(USER_NOT_FOUND, id)))
+                .map(user -> new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities()))
+                .orElse(null);
     }
 }
