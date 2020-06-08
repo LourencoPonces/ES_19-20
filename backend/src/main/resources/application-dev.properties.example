@@ -21,7 +21,7 @@ base.url=https://fenix.tecnico.ulisboa.pt
 auth.secret=thisissupersecretshhhhhhhhhneedtomakeitlongenoughasdhflkjdsahfksahdflk
 auth.cookie.domain=localhost
 
-cors.allowed_origins=*
+cors.allowed_origins=http://localhost:8081
 
 # Restart server
 spring.devtools.restart.enabled=true

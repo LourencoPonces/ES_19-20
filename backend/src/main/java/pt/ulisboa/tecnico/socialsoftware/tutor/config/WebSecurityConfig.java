@@ -63,8 +63,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/").permitAll()
                     .anyRequest().authenticated();
         } else {
-            http
-                    .authorizeRequests()
+            http.authorizeRequests()
                     .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .antMatchers("/auth/**").permitAll()
                     .antMatchers("/images/**").permitAll()
@@ -80,12 +79,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         CorsConfiguration defaultConfig = new CorsConfiguration();
         defaultConfig.setAllowCredentials(true);
         defaultConfig.setAllowedOrigins(Arrays.asList(allowedOrigins));
+        defaultConfig.addAllowedHeader("authorization");
         defaultConfig.setMaxAge(1800L);
-
-        CorsConfiguration unauthConfig = new CorsConfiguration(defaultConfig);
-        unauthConfig.setAllowCredentials(false);
-
-        source.registerCorsConfiguration("/auth/**", unauthConfig);
         source.registerCorsConfiguration("/**", defaultConfig);
         return source;
     }
