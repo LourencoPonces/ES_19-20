@@ -255,6 +255,9 @@ resource "google_sql_database" "tutordb" {
 resource "random_password" "tutordb" {
 	length = 16
 	special = true
+	keepers = {
+		db = google_sql_database.tutordb.self_link
+	}
 }
 
 resource "google_sql_user" "tutordb" {
