@@ -445,8 +445,8 @@ resource "google_compute_instance_template" "backend" {
 resource "google_compute_health_check" "backend" {
 	name = "backend-http-health-check-${random_string.suffix.result}"
 
-	timeout_sec = 1
-	check_interval_sec = 1
+	timeout_sec = 3
+	check_interval_sec = 25
 
 	http_health_check {
 		port = 80
