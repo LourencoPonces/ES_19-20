@@ -278,6 +278,11 @@ resource "google_storage_bucket" "userassets" {
 	lifecycle {
 		prevent_destroy = true
 	}
+
+	cors {
+		origin = ["https://${local.dns_root}", "https://www.${local.dns_root}"]
+		method = ["GET", "OPTIONS", "HEAD"]
+	}
 }
 
 resource "google_storage_bucket_iam_binding" "userassets_world" {
