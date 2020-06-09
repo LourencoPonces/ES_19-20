@@ -297,7 +297,7 @@ resource "google_storage_bucket_iam_binding" "userassets_world" {
 resource "google_storage_bucket_iam_binding" "userassets_backend" {
 	bucket = google_storage_bucket.userassets.name
 	members = ["serviceAccount:${google_service_account.backend.email}"]
-	role = "roles/storage.objectCreator"
+	role = "roles/storage.objectAdmin"
 }
 
 resource "google_storage_bucket" "exports" {
@@ -319,7 +319,7 @@ resource "google_storage_bucket" "exports" {
 resource "google_storage_bucket_iam_binding" "exports_backend" {
 	bucket = google_storage_bucket.exports.name
 	members = ["serviceAccount:${google_service_account.backend.email}"]
-	role = "roles/storage.objectCreator"
+	role = "roles/storage.objectAdmin"
 }
 
 resource "google_storage_bucket" "imports" {
@@ -341,7 +341,7 @@ resource "google_storage_bucket" "imports" {
 resource "google_storage_bucket_iam_binding" "imports_backend" {
 	bucket = google_storage_bucket.imports.name
 	members = ["serviceAccount:${google_service_account.backend.email}"]
-	role = "roles/storage.objectCreator"
+	role = "roles/storage.objectAdmin"
 }
 
 data "google_compute_image" "backend" {
@@ -443,6 +443,12 @@ resource "google_compute_instance_template" "backend" {
 	lifecycle {
 		create_before_destroy = true
 	}
+
+	depends_on = [
+		google_storage_bucket_iam_binding.userassets_backend,
+		google_storage_bucket_iam_binding.exports_backend,
+		google_storage_bucket_iam_binding.imports_backend
+	]
 }
 
 resource "google_compute_health_check" "backend" {

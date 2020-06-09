@@ -1,5 +1,6 @@
 users:
   - name: quizzestutor
+    groups: [docker]
     uid: 2000
 
 write_files:
@@ -39,9 +40,9 @@ write_files:
       Wants=gcr-online.target local-fs.target network-online.target google.service sys-fs-fuse-connections.mount
 
       [Service]
-      Environment="HOME=/home/quizzestutor"
+      User=quizzestutor
       ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
-      ExecStart=/usr/bin/docker run -u 2000 --env-file=/etc/quizzestutor.prod.env --restart=unless-stopped -p 80:8080 --name=quizzestutor-backend ${container_image}
+      ExecStart=/usr/bin/docker run --cap-add SYS_ADMIN --device /dev/fuse --security-opt apparmor:unconfined --env-file=/etc/quizzestutor.prod.env --restart=unless-stopped -p 80:8080 --name=quizzestutor-backend ${container_image}
       ExecStop=/usr/bin/docker stop -t 20 quizzestutor-backend
       ExecStopPost=/usr/bin/docker rm quizzestutor-backend
 
@@ -49,5 +50,7 @@ write_files:
       WantedBy=multi-user.target
 
 runcmd:
+  # weird, but the user module seems to ignore my groups
+  - usermod -aG docker quizzestutor
   - systemctl daemon-reload
   - systemctl start quizzestutor.service

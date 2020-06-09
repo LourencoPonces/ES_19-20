@@ -16,7 +16,7 @@ RUN apt-get update \
 	&& apt-get upgrade -y \
 	&& rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /data/{userassets,exports,imports} \
+RUN mkdir -p /data/userassets /data/exports /data/imports \
 	&& chown quizzestutor /data/*
 
 COPY entrypoint.sh ./entrypoint.sh
@@ -24,5 +24,4 @@ COPY entrypoint.sh ./entrypoint.sh
 # go back to unprivileged user
 USER quizzestutor
 
-ENTRYPOINT [ "./entrypoint.sh" ]
-CMD []
+CMD [ "./entrypoint.sh" ]
