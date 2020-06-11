@@ -44,25 +44,13 @@
           </v-chip-group>
         </template>
 
-<<<<<<< HEAD
-      <template
-        v-slot:item.submittedStatus="{ item }"
-        data-cy="submitted-status"
-      >
-        <v-chip
-          :color="item.getEvaluationColor()"
-          medium
-          @click="showEvaluateStudentQuestionDialog(item)"
-          data-cy="evaluate"
-=======
         <template
           v-slot:item.submittedStatus="{ item }"
           data-cy="submitted-status"
->>>>>>> UsabilityImprovement
         >
           <v-chip
             :color="item.getEvaluationColor()"
-            small
+            medium
             @click="showEvaluateStudentQuestionDialog(item)"
             data-cy="evaluate"
           >
@@ -80,86 +68,11 @@
           </p>
         </template>
 
-<<<<<<< HEAD
-      <template v-slot:item.action="{ item }">
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
-            <v-icon
-              medium
-              class="mr-2"
-              v-on="on"
-              @click="showQuestionDialog(item)"
-              >visibility</v-icon
-            >
-          </template>
-          <span>Show Question</span>
-        </v-tooltip>
-        <v-tooltip bottom v-if="item.canEvaluate()">
-          <template v-slot:activator="{ on }">
-            <v-icon
-              medium
-              class="mr-2"
-              v-on="on"
-              @click="showEvaluateStudentQuestionDialog(item)"
-              >fa-clipboard-check</v-icon
-            >
-          </template>
-          <span>Evaluate</span>
-        </v-tooltip>
-        <v-tooltip bottom v-if="item.canEvaluate()">
-          <template v-slot:activator="{ on }">
-            <v-icon
-              medium
-              class="mr-2"
-              v-on="on"
-              @click="editStudentQuestion(item)"
-              data-cy="editStudentQuestion"
-              >edit</v-icon
-            >
-          </template>
-          <span>Edit and Promote Question</span>
-        </v-tooltip>
-      </template>
-    </v-data-table>
-    <footer>
-      <v-icon class="mr-2">mouse</v-icon>Left-click on question's title to view
-      it. <v-icon class="mr-2">mouse</v-icon>Right-click on question's title to
-      edit it.
-    </footer>
-    <show-question-dialog
-      v-if="questionDialog"
-      v-model="questionDialog"
-      :question="currentStudentQuestion"
-      v-on:close-show-question-dialog="onCloseDialog"
-    />
-    <evaluate-question-dialog
-      v-if="evaluateQuestion"
-      v-model="evaluateQuestion"
-      :studentQuestion="currentStudentQuestion"
-      v-on:evaluated-question="onSaveStudentQuestion"
-      v-on:cancel-evaluate="onCloseDialog"
-    />
-    <edit-and-promote-question-dialog
-      v-if="editAndPromoteStudentQuestionDialog"
-      v-model="editAndPromoteStudentQuestionDialog"
-      :studentQuestion="currentStudentQuestion"
-      :topics="topics"
-      v-on:save-student-question="onSaveStudentQuestion"
-      v-on:cancel-evaluate="onCloseDialog"
-    />
-    <show-student-question-justification
-      v-if="studentQuestionJustification"
-      v-model="studentQuestionJustification"
-      :studentQuestion="currentStudentQuestion"
-      v-on:close-show-student-question-justification="onCloseDialog"
-    />
-  </v-card>
-=======
         <template v-slot:item.action="{ item }">
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <v-icon
-                large
+                medium
                 class="mr-2"
                 v-on="on"
                 @click="showQuestionDialog(item)"
@@ -171,7 +84,7 @@
           <v-tooltip bottom v-if="item.canEvaluate()">
             <template v-slot:activator="{ on }">
               <v-icon
-                large
+                medium
                 class="mr-2"
                 v-on="on"
                 @click="showEvaluateStudentQuestionDialog(item)"
@@ -183,7 +96,7 @@
           <v-tooltip bottom v-if="item.canEvaluate()">
             <template v-slot:activator="{ on }">
               <v-icon
-                large
+                medium
                 class="mr-2"
                 v-on="on"
                 @click="editStudentQuestion(item)"
@@ -229,7 +142,6 @@
       />
     </v-card>
   </div>
->>>>>>> UsabilityImprovement
 </template>
 
 <script lang="ts">
