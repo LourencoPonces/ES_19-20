@@ -26,7 +26,7 @@ BRANCH_LIST="$(git branch --points-at HEAD -a --format "%(refname:short)")"
 (grep "^origin/develop$" <<<$BRANCH_LIST) && TAGS+="$REG_NAME:stable"
 
 function tags_as_options() {
-	for tag in $TAGS; do
+	for tag in "${TAGS[@]}"; do
 		echo -n " -t $tag"
 	done
 }
@@ -43,6 +43,6 @@ popd
 $DOCKER build $(tags_as_options) .
 
 # Publish GCE-specialized image to Container Registry
-for tag in $TAGS; do
+for tag in "${TAGS[@]}"; do
 	$DOCKER push "$tag" $PUSH_OPTIONS
 done
