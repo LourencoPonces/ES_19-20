@@ -272,8 +272,8 @@
         </v-card-text>
         <v-card-actions>
           <div class="flex-grow-1"></div>
-          <v-btn color="blue darken-1" @click="closeSetPosition">Close</v-btn>
-          <v-btn color="blue darken-1" @click="saveSetPosition">Save</v-btn>
+          <v-btn color="primary" dark @click="closeSetPosition">Close</v-btn>
+          <v-btn color="primary" dark @click="saveSetPosition">Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
