@@ -1,7 +1,8 @@
 <template>
   <div class="container">
     <h2>Questions</h2>
-    <v-card class="table">
+    <!-- WEB BROWSER -->
+    <v-card v-if="!isMobile" class="table">
       <v-data-table
         :headers="headers"
         :custom-filter="customFilter"
@@ -152,6 +153,67 @@
         v-on:close-show-question-dialog="onCloseShowQuestionDialog"
       />
     </v-card>
+
+    <!-- MOBILE -->
+    <v-card v-else class="table">
+      <v-data-table
+        :headers="headers_mobile"
+        :custom-filter="customFilter"
+        :items="questions"
+        :search="search"
+        :sort-by="['creationDate']"
+        sort-desc
+        :mobile-breakpoint="0"
+        :items-per-page="15"
+        :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
+      >
+        <template v-slot:top>
+          <v-card-title>
+            <v-row>
+              <v-col cols="9">
+                  <v-text-field
+                    v-model="search"
+                    append-icon="search"
+                    label="Search"
+                    class="mx-2"
+                    data-cy="search-input"
+                  />
+              </v-col>
+              <v-col cols="3" align-self="center">
+                  <template>
+                    <v-btn fab primary small color="primary">
+                      <v-icon small class="mr-2" v-on="on" @click="newQuestion"
+                        >fa fa-plus</v-icon
+                      >
+                    </v-btn>
+                  </template>
+              </v-col>
+            </v-row>
+          </v-card-title>
+        </template>
+        <template v-slot:item.title="{ item }">
+          <p
+            @click="showQuestionDialog(item)"
+            @contextmenu="editQuestion(item, $event)"
+            style="cursor: pointer"
+          >
+            {{ item.title }}
+          </p>
+        </template>
+      </v-data-table>
+      <edit-question-dialog
+        v-if="currentQuestion"
+        v-model="editQuestionDialog"
+        :question="currentQuestion"
+        v-on:save-question="onSaveQuestion"
+      />
+      <show-question-dialog
+        v-if="currentQuestion"
+        v-model="questionDialog"
+        :question="currentQuestion"
+        v-on:close-show-question-dialog="onCloseShowQuestionDialog"
+      />
+    </v-card>
   </div>
 </template>
 
@@ -173,6 +235,7 @@ import EditQuestionTopics from '@/views/teacher/questions/EditQuestionTopics.vue
   }
 })
 export default class QuestionsView extends Vue {
+  isMobile: boolean = false;
   questions: Question[] = [];
   topics: Topic[] = [];
   currentQuestion: Question | null = null;
@@ -222,6 +285,10 @@ export default class QuestionsView extends Vue {
     }
   ];
 
+  headers_mobile: object = [
+    { text: 'Question', value: 'title', align: 'center', sortable: false }
+  ];
+
   @Watch('editQuestionDialog')
   closeError() {
     if (!this.editQuestionDialog) {
@@ -231,6 +298,9 @@ export default class QuestionsView extends Vue {
 
   async created() {
     await this.$store.dispatch('loading');
+    if (window.innerWidth <= 500) {
+      this.isMobile = true;
+    }
     try {
       [this.topics, this.questions] = await Promise.all([
         RemoteServices.getTopics(),
@@ -374,7 +444,7 @@ export default class QuestionsView extends Vue {
 
 <style lang="scss" scoped>
 .container {
-  max-width: 90%;
+  max-width: 100%;
   margin-left: auto;
   margin-right: auto;
   padding-left: 10px;
