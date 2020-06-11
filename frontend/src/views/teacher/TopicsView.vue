@@ -27,7 +27,7 @@
         <template v-slot:item.action="{ item }">
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
-              <v-icon large class="mr-2" v-on="on" @click="editTopic(item)"
+              <v-icon medium class="mr-2" v-on="on" @click="editTopic(item)"
                 >edit</v-icon
               >
             </template>
@@ -36,7 +36,7 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <v-icon
-                large
+                medium
                 class="mr-2"
                 v-on="on"
                 @click="deleteTopic(item)"

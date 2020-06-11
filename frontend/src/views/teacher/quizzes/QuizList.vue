@@ -28,7 +28,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              large
+              medium
               class="mr-2"
               v-on="on"
               @click="showQuizDialog(item.id)"
@@ -40,7 +40,7 @@
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
-              large
+              medium
               class="mr-2"
               v-on="on"
               @click="showQuizAnswers(item.id)"
@@ -51,7 +51,7 @@
         </v-tooltip>
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
-            <v-icon large class="mr-2" v-on="on" @click="exportQuiz(item.id)"
+            <v-icon medium class="mr-2" v-on="on" @click="exportQuiz(item.id)"
               >fas fa-download</v-icon
             >
           </template>
@@ -59,7 +59,7 @@
         </v-tooltip>
         <v-tooltip bottom v-if="item.qrCodeOnly">
           <template v-slot:activator="{ on }">
-            <v-icon large class="mr-2" v-on="on" @click="showQrCode(item.id)"
+            <v-icon medium class="mr-2" v-on="on" @click="showQrCode(item.id)"
               >fas fa-qrcode</v-icon
             >
           </template>
@@ -67,7 +67,7 @@
         </v-tooltip>
         <v-tooltip bottom v-if="item.numberOfAnswers === 0">
           <template v-slot:activator="{ on }">
-            <v-icon large class="mr-2" v-on="on" @click="editQuiz(item)"
+            <v-icon medium class="mr-2" v-on="on" @click="editQuiz(item)"
               >edit</v-icon
             >
           </template>
@@ -76,7 +76,7 @@
         <v-tooltip bottom v-if="item.numberOfAnswers === 0">
           <template v-slot:activator="{ on }">
             <v-icon
-              large
+              medium
               class="mr-2"
               v-on="on"
               @click="deleteQuiz(item.id)"

@@ -62,7 +62,7 @@
               "
             >
               <v-icon
-                large
+                medium
                 class="mr-2"
                 v-on="on"
                 @click="cancelTournament(item)"
@@ -76,7 +76,7 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <v-icon
-                large
+                medium
                 class="mr-2"
                 v-on="on"
                 @click="deleteTournament(item)"

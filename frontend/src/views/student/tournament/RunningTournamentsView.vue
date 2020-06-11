@@ -67,7 +67,7 @@ export default class RunningTournamentsView extends Vue {
     {
       value: 'solve-quiz-button',
       align: 'center',
-      width: '10%',
+      width: '5%',
       sortable: false
     },
     {
@@ -87,19 +87,19 @@ export default class RunningTournamentsView extends Vue {
       text: 'Nº of Questions',
       value: 'numberOfQuestions',
       align: 'center',
-      width: '20%'
+      width: '15%'
     },
     {
       text: 'Running Date',
       value: 'runningDate',
       align: 'center',
-      width: '20%'
+      width: '15%'
     },
     {
       text: 'Conclusion Date',
       value: 'conclusionDate',
       align: 'center',
-      width: '20%'
+      width: '15%'
     },
     {
       text: 'Creator',
@@ -112,7 +112,7 @@ export default class RunningTournamentsView extends Vue {
       text: 'Participants',
       value: 'participants.length',
       align: 'center',
-      width: '10%'
+      width: '15%'
     }
   ];
 
