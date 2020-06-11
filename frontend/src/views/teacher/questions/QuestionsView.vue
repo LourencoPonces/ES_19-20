@@ -194,11 +194,14 @@
         </template>
         <template v-slot:item.title="{ item }">
           <v-row @click="showQuestionDialog(item)">
-            <v-col cols="7">
-              <p>{{ item.title }}</p>
-            </v-col>
             <v-col align-self="center">
-              <v-chip :color="getStatusColor(item.status)" small></v-chip>
+              <v-badge
+                bordered
+                :color="getStatusColor(item.status)"
+              />
+            </v-col>
+            <v-col cols="11">
+              <p>{{ item.title }}</p>
             </v-col>
           </v-row>
         </template>
