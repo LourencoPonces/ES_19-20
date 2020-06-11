@@ -183,7 +183,7 @@
               <v-col cols="3" align-self="center">
                 <template>
                   <v-btn fab primary small color="primary">
-                    <v-icon small class="mr-2" v-on="on" @click="newQuestion"
+                    <v-icon small class="mr-2" @click="newQuestion"
                       >fa fa-plus</v-icon
                     >
                   </v-btn>
@@ -193,17 +193,12 @@
           </v-card-title>
         </template>
         <template v-slot:item.title="{ item }">
-          <v-row @click="showQuestionMobile(item)">
+          <v-row @click="showQuestionDialog(item)">
             <v-col cols="7">
-              <p
-                @contextmenu="editQuestion(item, $event)"
-                style="cursor: pointer"
-              >
-                {{ item.title }}
-              </p>
+              <p>{{ item.title }}</p>
             </v-col>
             <v-col align-self="center">
-              <v-chip :color="getStatusColor(item)" small></v-chip>
+              <v-chip :color="getStatusColor(item.status)" small></v-chip>
             </v-col>
           </v-row>
         </template>
@@ -220,6 +215,16 @@
         :question="currentQuestion"
         v-on:close-show-question-dialog="onCloseShowQuestionDialog"
       />
+      <show-question-dialog-mobile
+        v-if="currentQuestion"
+        v-model="questionDialogMobile"
+        :question="currentQuestion"
+        :topics="topics"
+        :color="getStatusColor(currentQuestion.status)"
+        v-on:close-show-question-dialog="onCloseShowQuestionDialog"
+        v-on:question-changed-topics="onQuestionChangedTopics"
+        v-on:set-status="setStatus"
+      />
     </v-card>
   </div>
 </template>
@@ -231,12 +236,14 @@ import Question from '@/models/management/Question';
 import Image from '@/models/management/Image';
 import Topic from '@/models/management/Topic';
 import ShowQuestionDialog from '@/views/teacher/questions/ShowQuestionDialog.vue';
+import ShowQuestionDialogMobile from '@/views/teacher/questions/ShowQuestionDialogMobile.vue';
 import EditQuestionDialog from '@/views/teacher/questions/EditQuestionDialog.vue';
 import EditQuestionTopics from '@/views/teacher/questions/EditQuestionTopics.vue';
 
 @Component({
   components: {
     'show-question-dialog': ShowQuestionDialog,
+    'show-question-dialog-mobile': ShowQuestionDialogMobile,
     'edit-question-dialog': EditQuestionDialog,
     'edit-question-topics': EditQuestionTopics
   }
@@ -248,6 +255,7 @@ export default class QuestionsView extends Vue {
   currentQuestion: Question | null = null;
   editQuestionDialog: boolean = false;
   questionDialog: boolean = false;
+  questionDialogMobile: boolean = false;
   search: string = '';
   statusList = ['DISABLED', 'AVAILABLE', 'REMOVED'];
 
@@ -346,6 +354,7 @@ export default class QuestionsView extends Vue {
   }
 
   async setStatus(questionId: number, status: string) {
+    console.log('Setting status!');
     try {
       await RemoteServices.setQuestionStatus(questionId, status);
       let question = this.questions.find(
@@ -380,12 +389,17 @@ export default class QuestionsView extends Vue {
 
   showQuestionDialog(question: Question) {
     this.currentQuestion = question;
-    this.questionDialog = true;
+    if (this.isMobile) {
+      this.questionDialogMobile = true;
+    } else {
+      this.questionDialog = true;
+    }
   }
 
   onCloseShowQuestionDialog() {
     this.currentQuestion = null;
     this.questionDialog = false;
+    this.questionDialogMobile = false;
   }
 
   newQuestion() {
