@@ -1,67 +1,74 @@
 <template>
-  <v-card class="table">
-    <v-data-table
-      :headers="headers"
-      :items="courses"
-      :search="search"
-      disable-pagination
-      :hide-default-footer="true"
-      :mobile-breakpoint="0"
-    >
-      <template v-slot:top>
-        <v-card-title>
-          <v-text-field
-            v-model="search"
-            append-icon="search"
-            label="Search"
-            class="mx-2"
-          />
-          <v-spacer />
-          <v-btn color="primary" dark @click="newCourse" data-cy="createButton"
-            >New Course</v-btn
-          >
-        </v-card-title>
-      </template>
-
-      <template v-slot:item.action="{ item }">
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
-            <v-icon
-              medium
-              class="mr-2"
-              v-on="on"
-              @click="createFromCourse(item)"
-              data-cy="createFromCourse"
-              >cached</v-icon
+  <div class="container">
+    <h2>Manage Courses</h2>
+    <v-card class="table">
+      <v-data-table
+        :headers="headers"
+        :items="courses"
+        :search="search"
+        disable-pagination
+        :hide-default-footer="true"
+        :mobile-breakpoint="0"
+      >
+        <template v-slot:top>
+          <v-card-title>
+            <v-text-field
+              v-model="search"
+              append-icon="search"
+              label="Search"
+              class="mx-2"
+            />
+            <v-spacer />
+            <v-btn
+              color="primary"
+              dark
+              @click="newCourse"
+              data-cy="createButton"
+              >New Course</v-btn
             >
-          </template>
-          <span>Create from Course</span>
-        </v-tooltip>
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
-            <v-icon
-              medium
-              class="mr-2"
-              v-on="on"
-              @click="deleteCourse(item)"
-              color="red"
-              data-cy="deleteCourse"
-              >delete</v-icon
-            >
-          </template>
-          <span>Delete Course</span>
-        </v-tooltip>
-      </template>
-    </v-data-table>
+          </v-card-title>
+        </template>
 
-    <edit-course-dialog
-      v-if="currentCourse"
-      v-model="editCourseDialog"
-      :course="currentCourse"
-      v-on:new-course="onCreateCourse"
-      v-on:close-dialog="onCloseDialog"
-    />
-  </v-card>
+        <template v-slot:item.action="{ item }">
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-icon
+                medium
+                class="mr-2"
+                v-on="on"
+                @click="createFromCourse(item)"
+                data-cy="createFromCourse"
+                >cached</v-icon
+              >
+            </template>
+            <span>Create from Course</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-icon
+                medium
+                class="mr-2"
+                v-on="on"
+                @click="deleteCourse(item)"
+                color="red"
+                data-cy="deleteCourse"
+                >delete</v-icon
+              >
+            </template>
+            <span>Delete Course</span>
+          </v-tooltip>
+        </template>
+      </v-data-table>
+      <footer></footer>
+      <edit-course-dialog
+        v-if="currentCourse"
+        v-model="editCourseDialog"
+        :course="currentCourse"
+        v-on:new-course="onCreateCourse"
+        v-on:close-dialog="onCloseDialog"
+      />
+    </v-card>
+  </div>
 </template>
 
 <script lang="ts">
@@ -171,4 +178,21 @@ export default class CoursesView extends Vue {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.container {
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  h2 {
+    font-size: 26px;
+    margin: 20px 0;
+    text-align: center;
+    small {
+      font-size: 0.5em;
+    }
+  }
+}
+</style>

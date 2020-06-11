@@ -1,47 +1,50 @@
 <template>
-  <v-card class="table">
-    <v-data-table
-      :headers="headers"
-      :custom-filter="customFilter"
-      :items="studentQuestions"
-      :search="search"
-      multi-sort
-      :sort-by="['creationDate']"
-      :sort-desc="[true]"
-      :mobile-breakpoint="0"
-      :items-per-page="15"
-      :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
-    >
-      <template v-slot:top>
-        <v-card-title>
-          <v-text-field
-            v-model="search"
-            append-icon="search"
-            data-cy="search-input"
-            label="Search"
-            class="mx-2"
-          />
-        </v-card-title>
-      </template>
+  <div class="container">
+    <h2>Student Questions</h2>
+    <v-card class="table">
+      <v-data-table
+        :headers="headers"
+        :custom-filter="customFilter"
+        :items="studentQuestions"
+        :search="search"
+        multi-sort
+        :sort-by="['creationDate']"
+        :sort-desc="[true]"
+        :mobile-breakpoint="0"
+        :items-per-page="15"
+        :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
+      >
+        <template v-slot:top>
+          <v-card-title>
+            <v-text-field
+              v-model="search"
+              append-icon="search"
+              data-cy="search-input"
+              label="Search"
+              class="mx-2"
+            />
+          </v-card-title>
+        </template>
 
-      <template v-slot:item.title="{ item }">
-        <p
-          style="cursor: pointer"
-          @click="showQuestionDialog(item)"
-          @contextmenu="editStudentQuestion(item, $event)"
-        >
-          {{ item.title }}
-        </p>
-      </template>
+        <template v-slot:item.title="{ item }">
+          <p
+            style="cursor: pointer"
+            @click="showQuestionDialog(item)"
+            @contextmenu="editStudentQuestion(item, $event)"
+          >
+            {{ item.title }}
+          </p>
+        </template>
 
-      <template v-slot:item.topics="{ item }">
-        <v-chip-group>
-          <v-chip v-for="topic in item.topics" :key="topic.name">
-            {{ topic.name }}
-          </v-chip>
-        </v-chip-group>
-      </template>
+        <template v-slot:item.topics="{ item }">
+          <v-chip-group>
+            <v-chip v-for="topic in item.topics" :key="topic.name">
+              {{ topic.name }}
+            </v-chip>
+          </v-chip-group>
+        </template>
 
+<<<<<<< HEAD
       <template
         v-slot:item.submittedStatus="{ item }"
         data-cy="submitted-status"
@@ -51,21 +54,33 @@
           medium
           @click="showEvaluateStudentQuestionDialog(item)"
           data-cy="evaluate"
+=======
+        <template
+          v-slot:item.submittedStatus="{ item }"
+          data-cy="submitted-status"
+>>>>>>> UsabilityImprovement
         >
-          <span>{{ item.submittedStatus }}</span>
-        </v-chip>
-      </template>
+          <v-chip
+            :color="item.getEvaluationColor()"
+            small
+            @click="showEvaluateStudentQuestionDialog(item)"
+            data-cy="evaluate"
+          >
+            <span>{{ item.submittedStatus }}</span>
+          </v-chip>
+        </template>
 
-      <template v-slot:item.justification="{ item }">
-        <p
-          @click="showEvaluateStudentQuestionDialog(item)"
-          style="cursor:pointer"
-          data-cy="showJustification"
-        >
-          {{ truncate(item.justification) }}
-        </p>
-      </template>
+        <template v-slot:item.justification="{ item }">
+          <p
+            @click="showEvaluateStudentQuestionDialog(item)"
+            style="cursor:pointer"
+            data-cy="showJustification"
+          >
+            {{ truncate(item.justification) }}
+          </p>
+        </template>
 
+<<<<<<< HEAD
       <template v-slot:item.action="{ item }">
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
@@ -139,6 +154,82 @@
       v-on:close-show-student-question-justification="onCloseDialog"
     />
   </v-card>
+=======
+        <template v-slot:item.action="{ item }">
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-icon
+                large
+                class="mr-2"
+                v-on="on"
+                @click="showQuestionDialog(item)"
+                >visibility</v-icon
+              >
+            </template>
+            <span>Show Question</span>
+          </v-tooltip>
+          <v-tooltip bottom v-if="item.canEvaluate()">
+            <template v-slot:activator="{ on }">
+              <v-icon
+                large
+                class="mr-2"
+                v-on="on"
+                @click="showEvaluateStudentQuestionDialog(item)"
+                >fa-clipboard-check</v-icon
+              >
+            </template>
+            <span>Evaluate</span>
+          </v-tooltip>
+          <v-tooltip bottom v-if="item.canEvaluate()">
+            <template v-slot:activator="{ on }">
+              <v-icon
+                large
+                class="mr-2"
+                v-on="on"
+                @click="editStudentQuestion(item)"
+                data-cy="editStudentQuestion"
+                >edit</v-icon
+              >
+            </template>
+            <span>Edit and Promote Question</span>
+          </v-tooltip>
+        </template>
+      </v-data-table>
+      <footer>
+        <v-icon class="mr-2">mouse</v-icon>Left-click on question's title to
+        view it. <v-icon class="mr-2">mouse</v-icon>Right-click on question's
+        title to edit it.
+      </footer>
+      <show-question-dialog
+        v-if="questionDialog"
+        v-model="questionDialog"
+        :question="currentStudentQuestion"
+        v-on:close-show-question-dialog="onCloseDialog"
+      />
+      <evaluate-question-dialog
+        v-if="evaluateQuestion"
+        v-model="evaluateQuestion"
+        :studentQuestion="currentStudentQuestion"
+        v-on:evaluated-question="onSaveStudentQuestion"
+        v-on:cancel-evaluate="onCloseDialog"
+      />
+      <edit-and-promote-question-dialog
+        v-if="editAndPromoteStudentQuestionDialog"
+        v-model="editAndPromoteStudentQuestionDialog"
+        :studentQuestion="currentStudentQuestion"
+        :topics="topics"
+        v-on:save-student-question="onSaveStudentQuestion"
+        v-on:cancel-evaluate="onCloseDialog"
+      />
+      <show-student-question-justification
+        v-if="studentQuestionJustification"
+        v-model="studentQuestionJustification"
+        :studentQuestion="currentStudentQuestion"
+        v-on:close-show-student-question-justification="onCloseDialog"
+      />
+    </v-card>
+  </div>
+>>>>>>> UsabilityImprovement
 </template>
 
 <script lang="ts">
@@ -289,6 +380,22 @@ export default class StudentQuestionsView extends Vue {
 </script>
 
 <style lang="scss" scoped>
+.container {
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  h2 {
+    font-size: 26px;
+    margin: 20px 0;
+    text-align: center;
+    small {
+      font-size: 0.5em;
+    }
+  }
+}
 .question-textarea {
   text-align: left;
 

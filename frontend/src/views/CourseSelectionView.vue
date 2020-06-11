@@ -79,7 +79,7 @@
 
         <v-card-actions>
           <v-spacer />
-          <v-btn color="secondary" text @click="unselectCourse">
+          <v-btn color="error" text @click="unselectCourse">
             Cancel
           </v-btn>
           <v-btn color="primary" text @click="activateCourse">
