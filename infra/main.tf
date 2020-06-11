@@ -1,5 +1,5 @@
 locals {
-	dns_root = "quiztutor.breda.pt"
+	dns_root = "quizzes-tutor.breda.pt"
 	project = "quizzestutor"
 	region = "europe-west1"
 	zone = "europe-west1-b"
@@ -106,11 +106,11 @@ resource "google_dns_managed_zone" "default" {
 
 resource "google_dns_record_set" "google_domain_verification" {
 	managed_zone = google_dns_managed_zone.default.name
-	name = "z6hgevdct4gw.${google_dns_managed_zone.default.dns_name}"
+	name = "jy3vqdvtaxmj.${google_dns_managed_zone.default.dns_name}"
 	type = "CNAME"
 	ttl = 300
 
-	rrdatas = ["gv-byq3wtx43kczdr.dv.googlehosted.com."]
+	rrdatas = ["gv-2vwpeccsnzqlb2.dv.googlehosted.com."]
 }
 
 resource "google_dns_record_set" "userassets" {
@@ -569,7 +569,7 @@ resource "google_compute_target_https_proxy" "frontend_lbal" {
 	url_map = google_compute_url_map.frontend_lbal.id
 
 	# TODO: create google managed certificate in terraform (currently in beta, possibly not a good idea, investigate)
-	ssl_certificates = ["manual-quiztutor-frontend-cert-rbsyk4x1"]
+	ssl_certificates = ["manual-quizzestutor-frontend-cert-rbsyk4x3"]
 }
 
 resource "google_compute_global_forwarding_rule" "frontend_lbal_https" {

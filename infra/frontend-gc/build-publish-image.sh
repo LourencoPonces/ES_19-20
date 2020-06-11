@@ -18,8 +18,8 @@ VERSION="$(git rev-parse HEAD)"
 
 # TODO: pass this variables in here in a better way
 FENIX_CLIENT_ID="${FENIX_CLIENT_ID:-1695915081466032}"
-FRONTEND_BASE_URL="${FRONTEND_BASE_URL:-https://quiztutor.breda.pt}"
-BACKEND_BASE_URL="${BACKEND_BASE_URL:-https://backend.quiztutor.breda.pt}"
+FRONTEND_BASE_URL="${FRONTEND_BASE_URL:-https://quizzes-tutor.breda.pt}"
+BACKEND_BASE_URL="${BACKEND_BASE_URL:-https://backend.quizzes-tutor.breda.pt}"
 
 # compute image tags
 TAGS=(
