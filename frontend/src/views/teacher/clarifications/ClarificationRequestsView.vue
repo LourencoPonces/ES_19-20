@@ -1,93 +1,98 @@
 <template>
-  <v-card>
-    <v-data-table
-      :headers="headers"
-      :custom-filter="customFilter"
-      :items="clarifications"
-      :search="search"
-      :mobile-breakpoint="0"
-      :items-per-page="50"
-      show-expand
-      single-expand
-      class="table"
-      :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
-    >
-      <template v-slot:top>
-        <v-card-title>
-          <v-text-field
-            v-model="search"
-            append-icon="search"
-            label="Search"
-            single-line
-            hide-details
+  <div class="container">
+    <h2>Question Clarifications</h2>
+    <v-card class="table">
+      <v-data-table
+        :headers="headers"
+        :custom-filter="customFilter"
+        :items="clarifications"
+        :search="search"
+        :mobile-breakpoint="0"
+        :items-per-page="50"
+        show-expand
+        single-expand
+        class="table"
+        :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
+      >
+        <template v-slot:top>
+          <v-card-title>
+            <v-text-field
+              v-model="search"
+              append-icon="search"
+              label="Search"
+              single-line
+              hide-details
+            />
+          </v-card-title>
+        </template>
+
+        <template v-slot:item.content="{ item }">
+          <div
+            class="short-content"
+            :data-cy="'req-' + item.content.slice(0, 15)"
+          >
+            {{ item.content }}
+          </div>
+        </template>
+
+        <template v-slot:item.resolved="{ item }">
+          <v-simple-checkbox
+            :value="item.resolved"
+            readonly
+            :aria-label="
+              item.resolved
+                ? 'request was resolved'
+                : 'request was not resolved'
+            "
           />
-        </v-card-title>
-      </template>
+        </template>
 
-      <template v-slot:item.content="{ item }">
-        <div
-          class="short-content"
-          :data-cy="'req-' + item.content.slice(0, 15)"
-        >
-          {{ item.content }}
-        </div>
-      </template>
-
-      <template v-slot:item.resolved="{ item }">
-        <v-simple-checkbox
-          :value="item.resolved"
-          readonly
-          :aria-label="
-            item.resolved ? 'request was resolved' : 'request was not resolved'
-          "
-        />
-      </template>
-
-      <template v-slot:item.status="{ item }">
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
-            <v-btn
-              v-on="on"
-              text
-              @click="changeRequestStatus(item)"
-              :data-cy="'changeStatus-' + item.content.slice(0, 15)"
-              :aria-label="item.isPrivate() ? 'Make Public' : 'Make Private'"
-            >
-              <v-icon
-                v-if="item.isPrivate()"
-                small
-                class="mr-2"
-                :data-cy="'private-' + item.content.slice(0, 15)"
-                >fas fa-eye-slash</v-icon
+        <template v-slot:item.status="{ item }">
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                v-on="on"
+                text
+                @click="changeRequestStatus(item)"
+                :data-cy="'changeStatus-' + item.content.slice(0, 15)"
+                :aria-label="item.isPrivate() ? 'Make Public' : 'Make Private'"
               >
-              <v-icon
-                v-else
-                small
-                class="mr-2"
-                :data-cy="'public-' + item.content.slice(0, 15)"
-                >fas fa-eye</v-icon
-              >
-            </v-btn>
-          </template>
-          <span v-if="item.isPrivate()">Make Public</span>
-          <span v-else>Make Private</span>
-        </v-tooltip>
-      </template>
+                <v-icon
+                  v-if="item.isPrivate()"
+                  small
+                  class="mr-2"
+                  :data-cy="'private-' + item.content.slice(0, 15)"
+                  >fas fa-eye-slash</v-icon
+                >
+                <v-icon
+                  v-else
+                  small
+                  class="mr-2"
+                  :data-cy="'public-' + item.content.slice(0, 15)"
+                  >fas fa-eye</v-icon
+                >
+              </v-btn>
+            </template>
+            <span v-if="item.isPrivate()">Make Public</span>
+            <span v-else>Make Private</span>
+          </v-tooltip>
+        </template>
 
-      <template v-slot:expanded-item="{ headers, item }">
-        <td :colspan="headers.length" class="clarification-expand-container">
-          <h2>Question:</h2>
-          <show-question :question="questionCache[item.questionId]" />
+        <template v-slot:expanded-item="{ headers, item }">
+          <td :colspan="headers.length" class="clarification-expand-container">
+            <h2>Question:</h2>
+            <show-question :question="questionCache[item.questionId]" />
 
-          <h2>Clarification Request:</h2>
-          <div class="multiline msg-content">{{ item.content }}</div>
+            <h2>Clarification Request:</h2>
+            <div class="multiline msg-content">{{ item.content }}</div>
 
-          <h3>Messages:</h3>
-          <clarification-thread :request="item"></clarification-thread>
-        </td>
-      </template>
-    </v-data-table>
-  </v-card>
+            <h3>Messages:</h3>
+            <clarification-thread :request="item"></clarification-thread>
+          </td>
+        </template>
+      </v-data-table>
+    </v-card>
+  </div>
 </template>
 
 <script lang="ts">
@@ -195,6 +200,40 @@ export default class ClarificationRequestsView extends Vue {
 </script>
 
 <style lang="scss" scoped>
+.container {
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  h2 {
+    font-size: 26px;
+    margin: 20px 0;
+    text-align: center;
+    small {
+      font-size: 0.5em;
+    }
+  }
+}
+
+.question-textarea {
+  text-align: left;
+
+  .CodeMirror,
+  .CodeMirror-scroll {
+    min-height: 200px !important;
+  }
+}
+.option-textarea {
+  text-align: left;
+
+  .CodeMirror,
+  .CodeMirror-scroll {
+    min-height: 100px !important;
+  }
+}
+
 .answer-context {
   text-align: left;
   margin-bottom: 20px;
@@ -223,10 +262,6 @@ export default class ClarificationRequestsView extends Vue {
   .msg-content {
     margin-bottom: 10px;
   }
-}
-
-#delete-btn {
-  color: #ffffff;
 }
 
 .multiline {
