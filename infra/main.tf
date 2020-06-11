@@ -5,9 +5,9 @@ locals {
 	zone = "europe-west1-b"
 }
 
-variable "git_commit_hash" {
+variable "app_version" {
 	type = string
-	description = "identifying hash for current git commit (output of git rev-parse HEAD)"
+	description = "version to deploy (stable, staging, last, some commit hash, etc.)"
 }
 
 variable "fenix_oauth_id" {
@@ -358,7 +358,7 @@ resource "google_storage_bucket_iam_member" "gcr_backend" {
 data "google_container_registry_image" "backend" {
 	name = "backend-gce"
 	region = "eu"
-	tag = var.git_commit_hash
+	tag = var.app_version
 }
 
 resource "random_password" "auth_secret" {
@@ -592,7 +592,7 @@ resource "google_compute_global_address" "frontend_lbal" {
 data "google_container_registry_image" "frontend" {
 	name = "frontend-gc"
 	region = "eu"
-	tag = var.git_commit_hash
+	tag = var.app_version
 }
 
 resource "google_cloud_run_service" "frontend" {
