@@ -166,39 +166,46 @@
         :mobile-breakpoint="0"
         :items-per-page="15"
         :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
+        fixed-header
       >
         <template v-slot:top>
           <v-card-title>
             <v-row>
               <v-col cols="9">
-                  <v-text-field
-                    v-model="search"
-                    append-icon="search"
-                    label="Search"
-                    class="mx-2"
-                    data-cy="search-input"
-                  />
+                <v-text-field
+                  v-model="search"
+                  append-icon="search"
+                  label="Search"
+                  class="mx-2"
+                  data-cy="search-input"
+                />
               </v-col>
               <v-col cols="3" align-self="center">
-                  <template>
-                    <v-btn fab primary small color="primary">
-                      <v-icon small class="mr-2" v-on="on" @click="newQuestion"
-                        >fa fa-plus</v-icon
-                      >
-                    </v-btn>
-                  </template>
+                <template>
+                  <v-btn fab primary small color="primary">
+                    <v-icon small class="mr-2" v-on="on" @click="newQuestion"
+                      >fa fa-plus</v-icon
+                    >
+                  </v-btn>
+                </template>
               </v-col>
             </v-row>
           </v-card-title>
         </template>
         <template v-slot:item.title="{ item }">
-          <p
-            @click="showQuestionDialog(item)"
-            @contextmenu="editQuestion(item, $event)"
-            style="cursor: pointer"
-          >
-            {{ item.title }}
-          </p>
+          <v-row @click="showQuestionMobile(item)">
+            <v-col cols="7">
+              <p
+                @contextmenu="editQuestion(item, $event)"
+                style="cursor: pointer"
+              >
+                {{ item.title }}
+              </p>
+            </v-col>
+            <v-col align-self="center">
+              <v-chip :color="getStatusColor(item)" small></v-chip>
+            </v-col>
+          </v-row>
         </template>
       </v-data-table>
       <edit-question-dialog
