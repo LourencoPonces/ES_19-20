@@ -220,10 +220,14 @@
         v-model="questionDialogMobile"
         :question="currentQuestion"
         :topics="topics"
-        :color="getStatusColor(currentQuestion.status)"
+        :statusColor="getStatusColor(currentQuestion.status)"
+        :diffColor="getDifficultyColor(currentQuestion.difficulty)"
         v-on:close-show-question-dialog="onCloseShowQuestionDialog"
         v-on:question-changed-topics="onQuestionChangedTopics"
         v-on:set-status="setStatus"
+        v-on:edit-question="editQuestion"
+        v-on:delete-question="deleteQuestion"
+        v-on:duplicate-question="duplicateQuestion"
       />
     </v-card>
   </div>
@@ -354,7 +358,6 @@ export default class QuestionsView extends Vue {
   }
 
   async setStatus(questionId: number, status: string) {
-    console.log('Setting status!');
     try {
       await RemoteServices.setQuestionStatus(questionId, status);
       let question = this.questions.find(
@@ -455,6 +458,7 @@ export default class QuestionsView extends Vue {
         this.questions = this.questions.filter(
           question => question.id != toDeletequestion.id
         );
+        this.onCloseShowQuestionDialog();
       } catch (error) {
         await this.$store.dispatch('error', error);
       }

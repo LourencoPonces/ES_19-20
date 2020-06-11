@@ -6,8 +6,8 @@
     max-width="75%"
   >
     <v-card>
-      <v-card-title>
-        <span class="headline">
+      <v-card-title class="justify-center">
+        <span>
           {{ question.title }}<br />
           <span class="subtitle">{{ question.creationDate }} </span></span
         >
@@ -26,7 +26,7 @@
               @change="$emit('set-status', question.id, question.status)"
             >
               <template v-slot:selection="{ item }">
-                <v-chip :color="color" small>
+                <v-chip :color="statusColor" small>
                   <span>{{ item }}</span>
                 </v-chip>
               </template>
@@ -52,6 +52,57 @@
             </v-expansion-panel-header>
             <v-expansion-panel-content>
               <show-question :question="question" />
+              <template>
+                <v-btn fab primary small color="primary" align-self="right">
+                  <v-icon
+                    medium
+                    class="mr-2"
+                    @click="$emit('edit-question', question)"
+                    >edit</v-icon
+                  >
+                </v-btn>
+              </template>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+          <v-expansion-panel v-if="question.difficulty">
+            <v-expansion-panel-header>
+              <p>Stats</p>
+            </v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-row>
+                <v-col cols="8">
+                  <span>Difficulty:</span>
+                </v-col>
+                <v-col align-self="center">
+                  <v-chip :color="diffColor" dark>
+                    {{ question.difficulty + '%' }}</v-chip
+                  >
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="9">
+                  <span>No. of answers:</span>
+                </v-col>
+                <v-col align-self="center">
+                  <span>{{ question.numberOfAnswers }}</span>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="9">
+                  <span>No. of generated quizzes:</span>
+                </v-col>
+                <v-col align-self="center">
+                  <span>{{ question.numberOfGeneratedQuizzes }}</span>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="9">
+                  <span>No. of non generated quizzes:</span>
+                </v-col>
+                <v-col align-self="center">
+                  <span>{{ question.numberOfNonGeneratedQuizzes }}</span>
+                </v-col>
+              </v-row>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
@@ -60,11 +111,25 @@
       <v-card-actions>
         <v-spacer />
         <v-btn
-          dark
-          color="blue darken-1"
-          @click="$emit('close-show-question-dialog')"
+          v-if="question.numberOfAnswers == 0"
+          fab
+          color="error"
+          small
+          @click="$emit('delete-question', question)"
         >
-          close
+          <v-icon medium class="mr-2">
+            delete
+          </v-icon>
+        </v-btn>
+        <v-btn
+          fab
+          color="primary"
+          small
+          @click="$emit('duplicate-question', question)"
+        >
+          <v-icon medium class="mr-2">
+            far fa-copy
+          </v-icon>
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -88,7 +153,8 @@ export default class ShowQuestionDialogMobile extends Vue {
   @Model('dialog', Boolean) dialog!: boolean;
   @Prop({ type: Question, required: true }) readonly question!: Question;
   @Prop({ type: Array, required: true }) readonly topics: Topic[];
-  @Prop({ type: String, required: true }) readonly color!: String;
+  @Prop({ type: String, required: true }) readonly statusColor!: String;
+  @Prop({ type: String, required: true }) readonly diffColor!: String;
   statusList = ['DISABLED', 'AVAILABLE', 'REMOVED'];
 
   changeTopics(questionId: Number, changedTopics: Topic[]) {
