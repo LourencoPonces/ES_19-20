@@ -8,7 +8,7 @@ write_files:
     content: |
       ## Datasource
       SPRING_DATASOURCE_USERNAME=${db.username}
-      SPRING_DATASOURCE_PASSWORD=${db.password}
+      #SPRING_DATASOURCE_PASSWORD=
       SPRING_DATASOURCE_URL=jdbc:postgresql://${db.host}:5432/${db.name}
 
       ## Resources
@@ -17,14 +17,14 @@ write_files:
       LOAD_DIR=/data/imports
 
       ## Fenix oauth
-      OAUTH_CONSUMER_KEY=${fenix_oauth.id}
-      OAUTH_CONSUMER_SECRET=${fenix_oauth.secret}
+      #OAUTH_CONSUMER_KEY=
+      #OAUTH_CONSUMER_SECRET=
       CALLBACK_URL=${fenix_oauth.callback_url}
       BASE_URL=https://fenix.tecnico.ulisboa.pt
 
       ## Authentication
       AUTH_COOKIE_DOMAIN=${auth.cookie_domain}
-      AUTH_SECRET=${auth.secret}
+      #AUTH_SECRET=
 
       CORS_ALLOWED_ORIGINS=${join(",", allowed_origins)}
 

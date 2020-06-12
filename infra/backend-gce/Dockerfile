@@ -10,7 +10,7 @@ RUN apt-get update \
 	&& echo "deb http://packages.cloud.google.com/apt gcsfuse-$(lsb_release -c -s) main" > /etc/apt/sources.list.d/gcsfuse.list \
 	&& curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - \
 	&& apt-get update \
-	&& apt-get install -y --no-install-recommends gcsfuse \
+	&& apt-get install -y --no-install-recommends gcsfuse curl jq \
 	&& apt-get purge -y lsb-release gnupg2 \
 	&& apt-get autoremove --purge -y \
 	&& apt-get upgrade -y \

@@ -422,14 +422,6 @@ resource "random_password" "auth_secret" {
 	}
 }
 
-data "google_secret_manager_secret_version" "fenix_id" {
-	secret = "FENIX_ID"
-}
-
-data "google_secret_manager_secret_version" "fenix_secret" {
-	secret = "FENIX_SECRET"
-}
-
 data "cloudinit_config" "backend" {
 	gzip = false
 	base64_encode = false
@@ -446,17 +438,17 @@ data "cloudinit_config" "backend" {
 			db = {
 				host = google_sql_database_instance.default.private_ip_address
 				username = google_sql_user.tutordb.name
-				password = google_sql_user.tutordb.password
+				#password
 				name = google_sql_database.tutordb.name
 			}
 			fenix_oauth = {
-				id = data.google_secret_manager_secret_version.fenix_id.secret_data
-				secret = data.google_secret_manager_secret_version.fenix_secret.secret_data
+				#id
+				#secret
 				callback_url = "https://${local.dns_root}/login"
 			}
 			auth = {
 				cookie_domain = local.dns_root
-				secret = random_password.auth_secret.result
+				#secret =
 			}
 			allowed_origins = [
 				"https://${local.dns_root}",
@@ -464,6 +456,41 @@ data "cloudinit_config" "backend" {
 			]
 		})
 	}
+}
+
+resource "google_secret_manager_secret" "backend_db_password" {
+	secret_id = "BACKEND_DB_PASSWORD"
+	replication {
+		automatic = true
+	}
+}
+resource "google_secret_manager_secret_version" "backend_db_password" {
+	secret = google_secret_manager_secret.backend_db_password.id
+	secret_data = google_sql_user.tutordb.password
+}
+
+resource "google_secret_manager_secret" "backend_auth_secret" {
+	secret_id = "BACKEND_AUTH_SECRET"
+	replication {
+		automatic = true
+	}
+}
+resource "google_secret_manager_secret_version" "backend_auth_secret" {
+	secret = google_secret_manager_secret.backend_auth_secret.id
+	secret_data = random_password.auth_secret.result
+}
+
+resource "google_secret_manager_secret_iam_member" "backend" {
+	for_each = toset([
+		google_secret_manager_secret.backend_db_password.secret_id,
+		google_secret_manager_secret.backend_auth_secret.secret_id,
+		"FENIX_ID",
+		"FENIX_SECRET"
+	])
+
+	secret_id = each.value
+	member = "serviceAccount:${google_service_account.backend.email}"
+	role = "roles/secretmanager.secretAccessor"
 }
 
 resource "google_compute_instance_template" "backend" {
@@ -487,7 +514,8 @@ resource "google_compute_instance_template" "backend" {
 			"https://www.googleapis.com/auth/monitoring.write",
 			"userinfo-email",
 			"compute-ro",
-			"storage-rw"
+			"storage-rw",
+			"cloud-platform"
 		]
 	}
 
@@ -502,7 +530,10 @@ resource "google_compute_instance_template" "backend" {
 	depends_on = [
 		google_storage_bucket_iam_binding.userassets_backend,
 		google_storage_bucket_iam_binding.exports_backend,
-		google_storage_bucket_iam_binding.imports_backend
+		google_storage_bucket_iam_binding.imports_backend,
+		google_secret_manager_secret_iam_member.backend,
+		google_secret_manager_secret_version.backend_db_password,
+		google_secret_manager_secret_version.backend_auth_secret
 	]
 }
 
