@@ -1,12 +1,15 @@
 <template>
   <div class="container">
     <h2>Question Clarifications</h2>
-    <v-card class="table">
+    <!-- BROWSER -->
+    <v-card v-if="!isMobile" class="table">
       <v-data-table
         :headers="headers"
         :custom-filter="customFilter"
         :items="clarifications"
         :search="search"
+        :sort-by="['creationDate']"
+        sort-desc
         :mobile-breakpoint="0"
         :items-per-page="50"
         show-expand
@@ -92,6 +95,54 @@
         </template>
       </v-data-table>
     </v-card>
+
+    <!-- MOBILE -->
+    <v-card v-else>
+      <v-data-table
+        :headers="headers_mobile"
+        :custom-filter="customFilter"
+        :items="clarifications"
+        :search="search"
+        :sort-by="['creationDate']"
+        sort-desc
+        :mobile-breakpoint="0"
+        :items-per-page="15"
+        :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
+        fixed-header
+      >
+        <template v-slot:top>
+          <v-card-title>
+            <v-text-field
+              v-model="search"
+              append-icon="search"
+              label="Search"
+              class="mx-2"
+            />
+          </v-card-title>
+        </template>
+        <template v-slot:item.content="{ item }">
+          <v-row @click="showClarificationDialog(item)">
+            <v-col cols="2" align-self="center" color="green">
+              <v-icon v-if="item.resolved">far fa-check-square</v-icon>
+              <v-icon v-else>far fa-square</v-icon>
+            </v-col>
+            <v-col cols="9" align-self="center">
+              <p>{{ item.content }}</p>
+            </v-col>
+          </v-row>
+        </template>
+      </v-data-table>
+
+      <show-clarification-dialog-mobile
+        v-if="currentClarification"
+        v-model="clarificationDialogMobile"
+        :clarification="currentClarification"
+        :question="questionCache[currentClarification.questionId]"
+        :isMobile="isMobile"
+        v-on:close-clarification-dialog="closeClarificationDialog"
+        v-on:change-clarification-status="changeRequestStatus"
+      />
+    </v-card>
   </div>
 </template>
 
@@ -100,21 +151,26 @@ import { Component, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import ClarificationRequest from '@/models/clarification/ClarificationRequest';
 import ClarificationMessage from '@/models/clarification/ClarificationMessage';
-import ShowQuestion from '../questions/ShowQuestion.vue';
-import Question from '../../../models/management/Question';
-import User from '../../../models/user/User';
-import ClarificationThread from '../../ClarificationThread.vue';
+import ShowQuestion from '@/views/teacher/questions/ShowQuestion.vue';
+import Question from '@/models/management/Question';
+import User from '@/models/user/User';
+import ClarificationThread from '@/views/ClarificationThread.vue';
+import ShowClarificationDialogMobile from '@/views/teacher/clarifications/ShowClarificationDialogMobile.vue';
 
 @Component({
   components: {
     'show-question': ShowQuestion,
-    'clarification-thread': ClarificationThread
+    'clarification-thread': ClarificationThread,
+    'show-clarification-dialog-mobile': ShowClarificationDialogMobile
   }
 })
 export default class ClarificationRequestsView extends Vue {
+  isMobile: boolean = false;
   clarifications: ClarificationRequest[] = [];
   questionCache: Record<number, Question> = {};
   search: string = '';
+  clarificationDialogMobile: boolean = false;
+  currentClarification: ClarificationRequest | null = null;
   headers: object = [
     {
       text: 'Visibility',
@@ -141,8 +197,20 @@ export default class ClarificationRequestsView extends Vue {
     }
   ];
 
+  headers_mobile: object = [
+    {
+      text: 'Clarification Request',
+      value: 'content',
+      align: 'center',
+      sortable: false
+    }
+  ];
+
   async created(): Promise<void> {
     await this.$store.dispatch('loading');
+    if (window.innerWidth <= 500) {
+      this.isMobile = true;
+    }
     try {
       this.clarifications = await RemoteServices.getUserClarificationRequests();
 
@@ -196,12 +264,21 @@ export default class ClarificationRequestsView extends Vue {
       await this.$store.dispatch('clearLoading');
     }
   }
+
+  showClarificationDialog(clarification: ClarificationRequest) {
+    this.currentClarification = clarification;
+    this.clarificationDialogMobile = true;
+  }
+
+  closeClarificationDialog() {
+    this.currentClarification = null;
+    this.clarificationDialogMobile = false;
+  }
 }
 </script>
-
 <style lang="scss" scoped>
 .container {
-  max-width: 90%;
+  max-width: 100%;
   margin-left: auto;
   margin-right: auto;
   padding-left: 10px;

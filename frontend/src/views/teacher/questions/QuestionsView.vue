@@ -195,12 +195,9 @@
         <template v-slot:item.title="{ item }">
           <v-row @click="showQuestionDialog(item)">
             <v-col align-self="center">
-              <v-badge
-                bordered
-                :color="getStatusColor(item.status)"
-              />
+              <v-badge bordered :color="getStatusColor(item.status)" />
             </v-col>
-            <v-col cols="11">
+            <v-col cols="10">
               <p>{{ item.title }}</p>
             </v-col>
           </v-row>

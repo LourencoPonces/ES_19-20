@@ -1,6 +1,5 @@
 <template>
-  <!-- BROWSER -->
-  <div v-if="!isMobile" class="container">
+  <div class="container">
     <v-card v-for="msg in request.messages" v-bind:key="msg.id" class="message">
       <v-container fluid>
         <v-row class="align-center">
@@ -68,70 +67,18 @@
       </v-row>
     </v-container>
   </div>
-  <!-- MOBILE -->
-  <div v-else class="container">
-    <v-card
-      flat
-      max-width="100%"
-      v-for="msg in request.messages"
-      v-bind:key="msg.id"
-    >
-      <v-card-title class="message-author">
-        {{ nameForUsername(msg.creatorUsername) }}
-        <b v-if="messageIsMine(msg)" class="ml-1">(me)</b>
-      </v-card-title>
-      <v-card-subtitle>{{ msg.creationDate }}</v-card-subtitle>
-      <v-card-text>
-        {{ msg.content }}
-      </v-card-text>
-      <v-card-actions>
-        <v-btn
-          v-if="messageIsMine(msg)"
-          fab
-          color="error"
-          small
-          @click="deleteMessage(msg)"
-        >
-          <v-icon class="mr-2" medium>
-            delete
-          </v-icon>
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-    <v-divider />
-    <v-container class="new-msg-container">
-      <v-row>
-        <v-textarea
-          label="Message Content"
-          v-model="newMessageContent"
-          data-cy="newMessageContent"
-        />
-      </v-row>
-      <v-row>
-        <v-col cols="7">
-          <v-switch v-model="newMessageResolvedState" label="Resolved" />
-        </v-col>
-        <v-col cols="3" align-self="center">
-          <v-btn primary small color="primary" @click="submitMessage()">
-            Submit
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-container>
-  </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import ClarificationRequest from '../models/clarification/ClarificationRequest';
-import RemoteServices from '../services/RemoteServices';
-import ClarificationMessage from '../models/clarification/ClarificationMessage';
-import UserNameCacheService from '../services/UserNameCacheService';
+import ClarificationRequest from '@/models/clarification/ClarificationRequest';
+import RemoteServices from '@/services/RemoteServices';
+import ClarificationMessage from '@/models/clarification/ClarificationMessage';
+import UserNameCacheService from '@/services/UserNameCacheService';
 
 @Component
 export default class ClarificationThread extends Vue {
   @Prop(ClarificationRequest) request!: ClarificationRequest;
-  @Prop({ type: Boolean, required: true }) isMobile!: boolean;
 
   newMessageContent: string = '';
   newMessageResolvedState: boolean = false;
@@ -209,10 +156,6 @@ export default class ClarificationThread extends Vue {
 .message-content {
   padding: 0 12px;
   white-space: pre-wrap;
-}
-
-.message-author {
-  font-size: 16px;
 }
 
 .new-msg-container > * {
