@@ -16,19 +16,18 @@ command -v podman &>/dev/null \
 REG_NAME="eu.gcr.io/quizzestutor/frontend-gc"
 VERSION="$(git rev-parse HEAD)"
 
-# TODO: pass this variables in here in a better way
-FENIX_CLIENT_ID="${FENIX_CLIENT_ID:-1695915081466032}"
-FRONTEND_BASE_URL="${FRONTEND_BASE_URL:-https://quizzes-tutor.breda.pt}"
-BACKEND_BASE_URL="${BACKEND_BASE_URL:-https://backend.quizzes-tutor.breda.pt}"
+FENIX_CLIENT_ID="$(gcloud secrets versions access --secret FENIX_ID latest)"
+
+pushd ..
+FRONTEND_BASE_URL="${FRONTEND_BASE_URL:-$(terraform output frontend_base_url)}"
+BACKEND_BASE_URL="${BACKEND_BASE_URL:-$(terraform output backend_base_url)}"
+popd
 
 # compute image tags
 TAGS=(
 	"$REG_NAME:$VERSION"
 	"$REG_NAME:last"
 )
-BRANCH_LIST="$(git branch --points-at HEAD -a --format "%(refname:short)")"
-(grep "^origin/master$" <<<$BRANCH_LIST) && TAGS+="$REG_NAME:stable"
-(grep "^origin/develop$" <<<$BRANCH_LIST) && TAGS+="$REG_NAME:stable"
 
 function tags_as_options() {
 	for tag in "${TAGS[@]}"; do

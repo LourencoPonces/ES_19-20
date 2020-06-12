@@ -933,3 +933,33 @@ resource "google_compute_global_address" "frontend_lbal" {
 	address_type = "EXTERNAL"
 	ip_version = each.value
 }
+
+# GitHub integrations
+resource "google_service_account" "github" {
+	account_id = "github-${random_string.suffix.result}"
+}
+
+resource "google_secret_manager_secret_iam_member" "github" {
+	secret_id = "FENIX_ID"
+	member = "serviceAccount:${google_service_account.github.email}"
+	role = "roles/secretmanager.secretAccessor"
+}
+
+resource "google_project_iam_member" "github" {
+	role = "roles/viewer"
+	member = "serviceAccount:${google_service_account.github.email}"
+}
+
+resource "google_storage_bucket_iam_member" "tf_state_github" {
+	bucket = google_storage_bucket.tf_state.name
+	role = "roles/storage.objectViewer"
+	member = "serviceAccount:${google_service_account.github.email}"
+}
+
+output "frontend_base_url" {
+	value = "https://${local.dns_root}"
+}
+
+output "backend_base_url" {
+	value = "https://backend.${local.dns_root}"
+}

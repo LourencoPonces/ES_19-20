@@ -21,9 +21,6 @@ TAGS=(
 	"$REG_NAME:$VERSION"
 	"$REG_NAME:last"
 )
-BRANCH_LIST="$(git branch --points-at HEAD -a --format "%(refname:short)")"
-(grep "^origin/master$" <<<$BRANCH_LIST) && TAGS+="$REG_NAME:stable"
-(grep "^origin/develop$" <<<$BRANCH_LIST) && TAGS+="$REG_NAME:stable"
 
 function tags_as_options() {
 	for tag in "${TAGS[@]}"; do
