@@ -22,6 +22,8 @@ jobs:
         service_account_key: ${{ secrets.GCLOUD_SVC_ACCOUNT_KEY }}
         project_id: quizzestutor
     - uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_wrapper: false
     - name: finish setting up terraform
       env:
         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCLOUD_SVC_ACCOUNT_KEY }}
