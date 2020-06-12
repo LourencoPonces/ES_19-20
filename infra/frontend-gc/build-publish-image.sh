@@ -40,7 +40,7 @@ function tags_as_options() {
 gcloud auth configure-docker
 
 # Pull previous build (acts as cache)
-$DOCKER pull $REG_NAME
+$DOCKER pull $REG_NAME || true
 
 # Build "regular" frontend image
 pushd ../../frontend
