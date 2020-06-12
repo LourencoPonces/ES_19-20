@@ -18,10 +18,10 @@ VERSION="$(git rev-parse HEAD)"
 
 FENIX_CLIENT_ID="$(gcloud secrets versions access --secret FENIX_ID latest)"
 
-pushd ..
+pushd .. >/dev/null
 FRONTEND_BASE_URL="${FRONTEND_BASE_URL:-$(terraform output frontend_base_url)}"
 BACKEND_BASE_URL="${BACKEND_BASE_URL:-$(terraform output backend_base_url)}"
-popd
+popd >/dev/null
 
 # compute image tags
 TAGS=(
