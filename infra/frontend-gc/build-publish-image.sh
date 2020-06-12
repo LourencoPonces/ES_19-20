@@ -39,6 +39,9 @@ function tags_as_options() {
 # Ensure GCR credentials are available
 gcloud auth configure-docker
 
+# Pull previous build (acts as cache)
+$DOCKER pull $REG_NAME
+
 # Build "regular" frontend image
 pushd ../../frontend
 $DOCKER build --build-arg NODE_ENV=production --build-arg FENIX_CLIENT_ID=$FENIX_CLIENT_ID --build-arg FRONTEND_BASE_URL=$FRONTEND_BASE_URL --build-arg BACKEND_BASE_URL=$BACKEND_BASE_URL -t "quizzestutor-frontend" .

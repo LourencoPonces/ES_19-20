@@ -32,6 +32,9 @@ function tags_as_options() {
 # Ensure GCR credentials are available
 gcloud auth configure-docker
 
+# Pull previous build (acts as cache)
+$DOCKER pull $REG_NAME
+
 # Build "regular" backend image
 pushd ../../backend
 $DOCKER build --build-arg SPRING_PROFILE=prod -t "quizzestutor-backend" .

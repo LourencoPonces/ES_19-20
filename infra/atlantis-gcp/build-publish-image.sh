@@ -32,6 +32,9 @@ function tags_as_options() {
 # Ensure GCR credentials are available
 gcloud auth configure-docker
 
+# Pull previous build (acts as cache)
+$DOCKER pull $REG_NAME
+
 # Build GCP-specialized atlantis image
 $DOCKER build $(tags_as_options) .
 
