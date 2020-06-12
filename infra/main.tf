@@ -956,6 +956,12 @@ resource "google_storage_bucket_iam_member" "tf_state_github" {
 	member = "serviceAccount:${google_service_account.github.email}"
 }
 
+resource "google_storage_bucket_iam_member" "gcr_github" {
+	bucket = google_container_registry.default.id
+	role = "roles/storage.objectCreator"
+	member = "serviceAccount:${google_service_account.github.email}"
+}
+
 output "frontend_base_url" {
 	value = "https://${local.dns_root}"
 }
