@@ -39,7 +39,7 @@ jobs:
     - name: setup gcp credentials for terraform
       env:
         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCLOUD_SVC_ACCOUNT_KEY }}
-      run: echo $GOOGLE_APPLICATION_CREDENTIALS | base64 -d > infra/credentials.json
+      run: 'echo -n "$GOOGLE_APPLICATION_CREDENTIALS" | base64 -d > infra/credentials.json'
     - name: build & push image
       env:
         DOCKER: docker
