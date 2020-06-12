@@ -20,7 +20,7 @@ VERSION="$(git rev-parse HEAD)"
 # compute image tags
 TAGS=(
 	"$REG_NAME:$VERSION"
-	"$REG_NAME:last"
+	"$REG_NAME:latest"
 )
 
 function tags_as_options() {

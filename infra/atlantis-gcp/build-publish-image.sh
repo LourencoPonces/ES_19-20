@@ -20,7 +20,7 @@ VERSION="v0.13.0" # TODO: pass and user in Dockerfile (currently works bad in po
 # compute image tags
 TAGS=(
 	"$REG_NAME:$VERSION"
-	"$REG_NAME:last"
+	"$REG_NAME:latest"
 )
 
 function tags_as_options() {

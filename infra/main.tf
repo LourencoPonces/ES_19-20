@@ -8,7 +8,7 @@ locals {
 variable "app_version" {
 	type = string
 	description = "version to deploy (stable, staging, last, some commit hash, etc.)"
-	default = "last"
+	default = "latest"
 }
 
 variable "atlantis_version" {
