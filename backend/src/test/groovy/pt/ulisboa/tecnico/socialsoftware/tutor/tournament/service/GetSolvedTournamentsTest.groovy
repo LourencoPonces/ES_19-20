@@ -34,7 +34,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @DataJpaTest
-class GetAvailableTournamentsTest extends Specification {
+class GetSolvedTournamentsTest extends Specification {
     public static final String COURSE_NAME = "Software Architecture"
     public static final String ACRONYM = "AS1"
     public static final String ACADEMIC_TERM = "1 SEM"
@@ -141,40 +141,16 @@ class GetAvailableTournamentsTest extends Specification {
         tournamentDto.setTopics(topicDtoList)
     }
 
-    def "get the available tournaments"() {
-        given: "an available tournament"
-        tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
-
+    def "get the solved tournaments, although there are not any"() {
         when:
-        def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId())
-
-        then: "there are only one tournament in the list"
-        tournamentsList.size() == 1
-        and: "the tournament in the list have the correct data"
-        def tournamentElement = tournamentsList.get(0)
-        tournamentElement.getId() != null
-        tournamentElement.getKey() != null
-        tournamentElement.getTitle() == TOURNAMENT_TITLE
-        tournamentElement.getCreationDate() != null
-        tournamentElement.getAvailableDate() == DateHandler.toISOString(availableDate)
-        tournamentElement.getRunningDate() == DateHandler.toISOString(runningDate)
-        tournamentElement.getConclusionDate() == DateHandler.toISOString(conclusionDate)
-        tournamentElement.getStatus() == Tournament.Status.AVAILABLE
-        tournamentElement.getCreator().getUsername() == CREATOR_USERNAME
-        tournamentElement.getTopics().size() == 1
-        tournamentElement.getParticipants().size() == 1
-    }
-
-    def "get the available tournaments, although there are not any"() {
-        when:
-        def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId())
+        def tournamentsList = tournamentService.getSolvedTournaments(creator.getId(), courseExecution.getId())
 
         then: "There are no tournaments"
         tournamentsList.size() == 0
     }
 
-    @Unroll("get the available tournaments, although there are only tournaments in #createdDateDay | #availableDateDay | #runningDateDay | #conclusionDateDay")
-    def "invalid dates"() {
+    @Unroll("get the solved tournaments in #createdDateDay | #availableDateDay | #runningDateDay | #conclusionDateDay")
+    def "dates"() {
         given: "tournaments in different phases"
         creationDate = DateHandler.now().plusDays(creationDateDay)
         availableDate = DateHandler.now().plusDays(availableDateDay)
@@ -187,7 +163,7 @@ class GetAvailableTournamentsTest extends Specification {
         tournamentService.createTournament(CREATOR_USERNAME, courseExecution.getId(), tournamentDto)
 
         when:
-        def tournamentsList = tournamentService.getAvailableTournaments(courseExecution.getId())
+        def tournamentsList = tournamentService.getSolvedTournaments(creator.getId(), courseExecution.getId())
 
         then: "There are no tournaments"
         tournamentsList.size() == size
@@ -195,20 +171,21 @@ class GetAvailableTournamentsTest extends Specification {
         where:
         creationDateDay | availableDateDay | runningDateDay | conclusionDateDay || size
          0              |  1               |  2             | 3                 || 0
+        -1              |  0               |  1             | 2                 || 0
         -2              | -1               |  0             | 1                 || 0
-        -3              | -2               | -1             | 0                 || 0
+        -3              | -2               |  -1            | 0                 || 1
     }
 
-    def "get the available tournaments with a non-existing course"() {
-        given: 'a bad courseId'
-        def badCourseId = 2
+    def "get the created tournaments with a non-existing id"() {
+        given: 'a bad userId'
+        def badUserId = 12345678
 
         when:
-        tournamentService.getAvailableTournaments(badCourseId)
+        tournamentService.getSolvedTournaments(badUserId, courseExecution.getId())
 
-        then:
+        then: ""
         def exception = thrown(TutorException)
-        exception.getErrorMessage() == ErrorMessage.COURSE_EXECUTION_NOT_FOUND
+        exception.getErrorMessage() == ErrorMessage.USER_NOT_FOUND
     }
 
 
