@@ -12,7 +12,7 @@ command -v podman &>/dev/null && test -z $DOCKER \
 	&& PUSH_OPTIONS="--remove-signatures" \
 	&& export BUILDAH_FORMAT=docker \
 	&& echo "using podman for builds" \
-	|| DOCKER=docker
+	|| true # don't fail pipeline
 
 REG_NAME="eu.gcr.io/quizzestutor/backend-gce"
 VERSION="$(git rev-parse HEAD)"

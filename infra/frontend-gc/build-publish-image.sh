@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e # exit on first error
+set -x -e # exit on first error
 
 PUSH_OPTIONS=""
 #DOCKER=docker
@@ -12,7 +12,7 @@ command -v podman &>/dev/null && test -z $DOCKER \
 	&& PUSH_OPTIONS="--remove-signatures" \
 	&& export BUILDAH_FORMAT=docker \
 	&& echo "using podman for builds" \
-	|| DOCKER=docker
+	|| true # don't fail pipeline
 
 REG_NAME="eu.gcr.io/quizzestutor/frontend-gc"
 VERSION="$(git rev-parse HEAD)"
