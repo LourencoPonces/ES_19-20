@@ -26,6 +26,7 @@ import StudentQuestionView from './views/student/studentQuestions/StudentQuestio
 import RunningTournamentsView from '@/views/student/tournament/RunningTournamentsView.vue';
 import AvailableTournamentsView from '@/views/student/tournament/AvailableTournamentsView.vue';
 import CreatedTournamentsView from '@/views/student/tournament/CreatedTournamentsView.vue';
+import SolvedTournamentsView from '@/views/student/tournament/SolvedTournamentsView.vue';
 
 import AdminManagementView from '@/views/admin/AdminManagementView.vue';
 import NotFoundView from '@/views/NotFoundView.vue';
@@ -244,6 +245,15 @@ let router = new Router({
           component: CreatedTournamentsView,
           meta: {
             title: process.env.VUE_APP_NAME + ' - Created Tournaments',
+            requiredAuth: 'Student'
+          }
+        },
+        {
+          path: 'tournaments-solved',
+          name: 'tournaments-solved',
+          component: SolvedTournamentsView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - Solved Tournaments',
             requiredAuth: 'Student'
           }
         },
