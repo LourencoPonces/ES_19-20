@@ -20,7 +20,7 @@ jobs:
     - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
       with:
         service_account_key: ${{ secrets.GCLOUD_SVC_ACCOUNT_KEY }}
-        project: quizzestutor
+        project_id: quizzestutor
     - name: build & push image
       working-directory: infra/backend-gce
       run: ./build-publish-image.sh
@@ -32,7 +32,7 @@ jobs:
     - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
       with:
         service_account_key: ${{ secrets.GCLOUD_SVC_ACCOUNT_KEY }}
-        project: quizzestutor
+        project_id: quizzestutor
     - uses: hashicorp/setup-terraform@v1
     - name: setup gcp credentials for terraform
       env:
@@ -51,7 +51,7 @@ jobs:
     - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
       with:
         service_account_key: ${{ secrets.GCLOUD_SVC_ACCOUNT_KEY }}
-        project: quizzestutor
+        project_id: quizzestutor
     - name: build & push image
       working-directory: infra/atlantis-gcp
       run: ./build-publish-image.sh
