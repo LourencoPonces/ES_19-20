@@ -44,7 +44,7 @@ jobs:
         DOCKER_BUILDKIT: 1
       working-directory: infra/frontend-gc
       run: ./build-publish-image.sh
-    - name: build & push image
+    - name: build & push atlantis image
       env:
         DOCKER: docker
         DOCKER_BUILDKIT: 1
