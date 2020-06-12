@@ -317,9 +317,7 @@ export default class QuestionsView extends Vue {
 
   async created() {
     await this.$store.dispatch('loading');
-    if (window.innerWidth <= 500) {
-      this.isMobile = true;
-    }
+    this.isMobile = window.innerWidth <= 500;
     try {
       [this.topics, this.questions] = await Promise.all([
         RemoteServices.getTopics(),
