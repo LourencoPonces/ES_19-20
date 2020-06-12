@@ -26,16 +26,19 @@ jobs:
     - name: build & push backend image
       env:
         DOCKER: docker
+        DOCKER_BUILDKIT: 1
       working-directory: infra/backend-gce
       run: ./build-publish-image.sh
     - name: build & push frontend image
       env:
         DOCKER: docker
+        DOCKER_BUILDKIT: 1
       working-directory: infra/frontend-gc
       run: ./build-publish-image.sh
     - name: build & push image
       env:
         DOCKER: docker
+        DOCKER_BUILDKIT: 1
       working-directory: infra/atlantis-gcp
       run: ./build-publish-image.sh
 
