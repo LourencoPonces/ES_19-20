@@ -3,15 +3,16 @@
 set -e # exit on first error
 
 PUSH_OPTIONS=""
-DOCKER=docker
+#DOCKER=docker
 
 # If using podman, make the necessary tweaks to push docker-format manifests
 # Cloud Run is picky about this unfortunately
-command -v podman &>/dev/null \
+command -v podman &>/dev/null && test -z $DOCKER \
 	&& DOCKER=podman \
 	&& PUSH_OPTIONS="--remove-signatures" \
 	&& export BUILDAH_FORMAT=docker \
-	&& echo "using podman for builds"
+	&& echo "using podman for builds" \
+	|| DOCKER=docker
 
 REG_NAME="eu.gcr.io/quizzestutor/atlantis-gcp"
 VERSION="v0.13.0" # TODO: pass and user in Dockerfile (currently works bad in podman)
