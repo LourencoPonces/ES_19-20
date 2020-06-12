@@ -15,58 +15,43 @@ jobs:
   build-backend:
     runs-on: ubuntu-latest
 
-    # TODO: refactor for tighter integration with GitHub Actions
     steps:
     - uses: actions/checkout@v1
-    - uses: google/cloud-sdk
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCLOUD_SVC_ACCOUNT_KEY }}
-        IMAGE: "backend-gce"
-      run: |
-        echo $GOOGLE_APPLICATION_CREDENTIALS | base64 -d > infra/credentials.json
-        export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/infra/credentials.json"
-
-        pushd infra/$IMAGE
-        ./build-publish-image.sh
-        popd
-
-        rm infra/credentials.json
+    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      with:
+        service_account_key: ${{ secrets.GCLOUD_SVC_ACCOUNT_KEY }}
+        project: quizzestutor
+    - name: build & push image
+      working-directory: infra/backend-gce
+      run: ./build-publish-image.sh
   build-frontend:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v1
-    - uses: google/cloud-sdk:alpine
+    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      with:
+        service_account_key: ${{ secrets.GCLOUD_SVC_ACCOUNT_KEY }}
+        project: quizzestutor
+    - uses: hashicorp/setup-terraform@v1
+    - name: setup gcp credentials for terraform
       env:
         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCLOUD_SVC_ACCOUNT_KEY }}
-        IMAGE: "frontend-gc"
-      run: |
-        echo $GOOGLE_APPLICATION_CREDENTIALS | base64 -d > infra/credentials.json
-        export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/infra/credentials.json"
-
-        # frontend needs it
-        apk add --no-cache terraform
-
-        pushd infra/$IMAGE
-        ./build-publish-image.sh
-        popd
-
-        rm infra/credentials.json
+      run: echo $GOOGLE_APPLICATION_CREDENTIALS | base64 -d > infra/credentials.json
+    - name: build & push image
+      working-directory: infra/frontend-gc
+      run: ./build-publish-image.sh
+    - name: cleanup gcp credentials for terraform
+      run: rm infra/credentials.json
   build-atlantis:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v1
-    - uses: google/cloud-sdk
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCLOUD_SVC_ACCOUNT_KEY }}
-        IMAGE: "atlantis-gcp"
-      run: |
-        echo $GOOGLE_APPLICATION_CREDENTIALS | base64 -d > infra/credentials.json
-        export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/infra/credentials.json"
-
-        pushd infra/$IMAGE
-        ./build-publish-image.sh
-        popd
-
-        rm infra/credentials.json
+    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      with:
+        service_account_key: ${{ secrets.GCLOUD_SVC_ACCOUNT_KEY }}
+        project: quizzestutor
+    - name: build & push image
+      working-directory: infra/atlantis-gcp
+      run: ./build-publish-image.sh
