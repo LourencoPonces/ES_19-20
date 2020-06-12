@@ -12,7 +12,7 @@ on:
     - develop
 
 jobs:
-  build-backend:
+  build:
     runs-on: ubuntu-20.04
 
     steps:
@@ -21,43 +21,23 @@ jobs:
       with:
         service_account_key: ${{ secrets.GCLOUD_SVC_ACCOUNT_KEY }}
         project_id: quizzestutor
-    - name: build & push image
+    - uses: hashicorp/setup-terraform@v1
+
+    - name: build & push backend image
       env:
         DOCKER: docker
       working-directory: infra/backend-gce
       run: ./build-publish-image.sh
-  build-frontend:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v1
-    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
-      with:
-        service_account_key: ${{ secrets.GCLOUD_SVC_ACCOUNT_KEY }}
-        project_id: quizzestutor
-    - uses: hashicorp/setup-terraform@v1
-    - name: setup gcp credentials for terraform
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCLOUD_SVC_ACCOUNT_KEY }}
-      run: 'echo -n "$GOOGLE_APPLICATION_CREDENTIALS" | base64 -d > infra/credentials.json'
-    - name: build & push image
+    - name: build & push frontend image
       env:
         DOCKER: docker
       working-directory: infra/frontend-gc
       run: ./build-publish-image.sh
-    - name: cleanup gcp credentials for terraform
-      run: rm infra/credentials.json
-  build-atlantis:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v1
-    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
-      with:
-        service_account_key: ${{ secrets.GCLOUD_SVC_ACCOUNT_KEY }}
-        project_id: quizzestutor
     - name: build & push image
       env:
         DOCKER: docker
       working-directory: infra/atlantis-gcp
       run: ./build-publish-image.sh
+
+    - name: cleanup gcp credentials for terraform
+      run: rm infra/credentials.json
