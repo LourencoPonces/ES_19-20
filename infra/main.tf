@@ -8,17 +8,9 @@ locals {
 variable "app_version" {
 	type = string
 	description = "version to deploy (stable, staging, last, some commit hash, etc.)"
+	default = "last"
 }
 
-variable "fenix_oauth_id" {
-	type = string
-	description = "Fénix OAuth Client ID"
-}
-
-variable "fenix_oauth_secret" {
-	type = string
-	description = "Fénix OAuth Client Secret"
-}
 
 provider "google" {
 	version = "~> 3.24"
@@ -375,6 +367,14 @@ resource "random_password" "auth_secret" {
 	}
 }
 
+data "google_secret_manager_secret_version" "fenix_id" {
+	secret = "FENIX_ID"
+}
+
+data "google_secret_manager_secret_version" "fenix_secret" {
+	secret = "FENIX_SECRET"
+}
+
 data "cloudinit_config" "backend" {
 	gzip = false
 	base64_encode = false
@@ -395,8 +395,8 @@ data "cloudinit_config" "backend" {
 				name = google_sql_database.tutordb.name
 			}
 			fenix_oauth = {
-				id = var.fenix_oauth_id
-				secret = var.fenix_oauth_secret
+				id = data.google_secret_manager_secret_version.fenix_id.secret_data
+				secret = data.google_secret_manager_secret_version.fenix_secret.secret_data
 				callback_url = "https://${local.dns_root}/login"
 			}
 			auth = {
