@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -x -e # exit on first error
+set -e # exit on first error
 
 PUSH_OPTIONS=""
 #DOCKER=docker
