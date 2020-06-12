@@ -36,8 +36,8 @@ write_files:
     content: |
       [Unit]
       Description=Quizzes Tutor backend
-      After=gcr-online.target local-fs.target network-online.target google.service sys-fs-fuse-connections.mount cloud-config.service
-      Wants=gcr-online.target local-fs.target network-online.target google.service sys-fs-fuse-connections.mount
+      After=gcr-online.target local-fs.target network-online.target sys-fs-fuse-connections.mount cloud-config.service
+      Wants=gcr-online.target local-fs.target network-online.target sys-fs-fuse-connections.mount
 
       [Service]
       User=quizzestutor
