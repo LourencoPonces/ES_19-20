@@ -56,10 +56,14 @@ resource "google_storage_bucket" "tf_state" {
 	}
 }
 
+data "google_service_account" "terraform" {
+	account_id = "terraform"
+}
+
 resource "google_storage_bucket_iam_binding" "tf_state_tf_svc" {
 	bucket = google_storage_bucket.tf_state.name
 	role = "roles/storage.objectAdmin"
-	members = ["serviceAccount:terraform@quizzestutor.iam.gserviceaccount.com"]
+	members = ["serviceAccount:${data.google_service_account.terraform.email}"]
 
 	lifecycle {
 		prevent_destroy = true
@@ -692,10 +696,6 @@ resource "google_dns_record_set" "frontend_www" {
 }
 
 # Atlantis (CI/CD)
-resource "google_service_account" "atlantis" {
-	account_id = "atlantis-${random_string.suffix.result}"
-}
-
 resource "google_storage_bucket" "atlantis_data" {
 	name = "quizzestutor-atlantis-data"
 	location = local.region
@@ -703,34 +703,10 @@ resource "google_storage_bucket" "atlantis_data" {
 	bucket_policy_only = true
 }
 
-resource "google_storage_bucket_iam_binding" "atlantis_data" {
-	bucket = google_storage_bucket.atlantis_data.name
-	members = ["serviceAccount:${google_service_account.atlantis.email}"]
-	role = "roles/storage.objectAdmin"
-}
-
-resource "google_secret_manager_secret_iam_member" "atlantis" {
-	for_each = toset([
-		"ATLANTIS_GH_USER",
-		"ATLANTIS_GH_TOKEN",
-		"ATLANTIS_WEBHOOK_SECRET"
-	])
-
-	secret_id = each.value
-	member = "serviceAccount:${google_service_account.atlantis.email}"
-	role = "roles/secretmanager.secretAccessor"
-}
-
 data "google_container_registry_image" "atlantis" {
 	name = "atlantis-gcp"
 	region = "eu"
 	tag = var.atlantis_version
-}
-
-resource "google_storage_bucket_iam_member" "gcr_atlantis" {
-	bucket = google_container_registry.default.id
-	role = "roles/storage.objectViewer"
-	member = "serviceAccount:${google_service_account.atlantis.email}"
 }
 
 data "google_compute_image" "atlantis" {
@@ -748,7 +724,7 @@ data "cloudinit_config" "atlantis" {
 			container_image = data.google_container_registry_image.atlantis.image_url
 			data_bucket = google_storage_bucket.atlantis_data.name
 			base_url = "https://atlantis.${local.dns_root}/"
-			svc_account_email = google_service_account.atlantis.email
+			svc_account_email = data.google_service_account.terraform.email
 		})
 	}
 }
@@ -768,9 +744,10 @@ resource "google_compute_instance_template" "atlantis" {
 	}
 
 	service_account {
-		email = google_service_account.atlantis.email
+		# this means this instance can do anything
+		# but that's exactly the point
+		email = data.google_service_account.terraform.email
 
-		# IAM bindings are not enough for GCR/GCS it seems
 		scopes = [
 			"https://www.googleapis.com/auth/logging.write",
 			"https://www.googleapis.com/auth/monitoring.write",
@@ -788,11 +765,6 @@ resource "google_compute_instance_template" "atlantis" {
 	lifecycle {
 		create_before_destroy = true
 	}
-
-	depends_on = [
-		google_storage_bucket_iam_binding.atlantis_data,
-		google_secret_manager_secret_iam_member.atlantis
-	]
 }
 
 resource "google_compute_health_check" "atlantis" {
