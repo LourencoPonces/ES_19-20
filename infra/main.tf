@@ -7,7 +7,7 @@ locals {
 
 variable "app_version" {
 	type = string
-	description = "version to deploy (stable, staging, last, some commit hash, etc.)"
+	description = "version to deploy (latest or some commit hash)"
 	default = "latest"
 }
 
