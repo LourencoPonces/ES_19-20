@@ -6,6 +6,7 @@ users:
 write_files:
   - path: /etc/quizzestutor.prod.env
     content: |
+      SVC_ACCOUNT=${svc_account_email}
       ## Datasource
       SPRING_DATASOURCE_USERNAME=${db.username}
       #SPRING_DATASOURCE_PASSWORD=

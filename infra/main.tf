@@ -431,6 +431,7 @@ data "cloudinit_config" "backend" {
 	part {
 		content_type = "text/cloud-config"
 		content = templatefile("backend-gce/cloudinit.yml.tmpl", {
+			svc_account_email = google_service_account.backend.email
 			container_image = data.google_container_registry_image.backend.image_url
 			buckets = {
 				userassets = google_storage_bucket.userassets.name
