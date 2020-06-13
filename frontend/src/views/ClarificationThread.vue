@@ -123,10 +123,10 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import ClarificationRequest from '../models/clarification/ClarificationRequest';
-import RemoteServices from '../services/RemoteServices';
-import ClarificationMessage from '../models/clarification/ClarificationMessage';
-import UserNameCacheService from '../services/UserNameCacheService';
+import ClarificationRequest from '@/models/clarification/ClarificationRequest';
+import RemoteServices from '@/services/RemoteServices';
+import ClarificationMessage from '@/models/clarification/ClarificationMessage';
+import UserNameCacheService from '@/services/UserNameCacheService';
 
 @Component
 export default class ClarificationThread extends Vue {

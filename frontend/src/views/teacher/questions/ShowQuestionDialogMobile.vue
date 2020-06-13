@@ -107,31 +107,6 @@
           </v-expansion-panel>
         </v-expansion-panels>
       </v-card-text>
-
-      <v-card-actions>
-        <v-spacer />
-        <v-btn
-          v-if="question.numberOfAnswers == 0"
-          fab
-          color="error"
-          small
-          @click="$emit('delete-question', question)"
-        >
-          <v-icon medium class="mr-2">
-            delete
-          </v-icon>
-        </v-btn>
-        <v-btn
-          fab
-          color="primary"
-          small
-          @click="$emit('duplicate-question', question)"
-        >
-          <v-icon medium class="mr-2">
-            far fa-copy
-          </v-icon>
-        </v-btn>
-      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>

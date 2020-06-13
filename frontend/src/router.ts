@@ -21,7 +21,7 @@ import ResultsView from './views/student/quiz/ResultsView.vue';
 import StatsView from './views/student/StatsView.vue';
 import DashboardView from './views/student/dashboard/DashboardView.vue';
 import ScanView from './views/student/ScanView.vue';
-import ClarificationsStudentView from './views/student/ClarificationsView.vue';
+import ClarificationsStudentView from './views/student/clarifications/ClarificationsView.vue';
 import StudentQuestionView from './views/student/studentQuestions/StudentQuestionView.vue';
 import RunningTournamentsView from '@/views/student/tournament/RunningTournamentsView.vue';
 import AvailableTournamentsView from '@/views/student/tournament/AvailableTournamentsView.vue';
