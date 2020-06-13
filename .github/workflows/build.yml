@@ -29,6 +29,7 @@ jobs:
       working-directory: infra
       run: |
         echo -n "$GOOGLE_APPLICATION_CREDENTIALS" | base64 -d > credentials.json
+        export GOOGLE_APPLICATION_CREDENTIALS=credentials.json
         terraform init
 
     - name: build & push backend image
