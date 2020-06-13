@@ -41,10 +41,6 @@ public class JwtTokenProvider {
         this.jwtParser = Jwts.parserBuilder().setSigningKey(secretKey).build();
     }
 
-    private static SecretKey generateSecret() {
-        return Keys.secretKeyFor(SignatureAlgorithm.HS512);
-    }
-
     String generateToken(User user) {
         Claims claims = Jwts.claims().setSubject(String.valueOf(user.getId()));
         claims.put("role", user.getRole());
