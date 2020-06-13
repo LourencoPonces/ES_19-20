@@ -1,3 +1,18 @@
 repos:
   - id: /.*/
     apply_requirements: [mergeable, approved]
+    workflow: custom
+
+workflows:
+  custom:
+    plan:
+      steps:
+        - env:
+            name: APP_VERSION
+            command: git rev-parse HEAD
+        - init
+        - plan:
+            extra_args: [-var, 'app_version=$APP_VERSION']
+    apply:
+      steps:
+        - apply

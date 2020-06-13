@@ -14,7 +14,7 @@ variable "app_version" {
 variable "atlantis_version" {
 	type = string
 	description = "Atlantis version to deploy"
-	default = "v0.13.0"
+	default = "v0.13.0-r1"
 }
 
 provider "google" {

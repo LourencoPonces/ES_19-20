@@ -15,7 +15,7 @@ command -v podman &>/dev/null && test -z $DOCKER \
 	|| true # don't fail pipeline
 
 REG_NAME="eu.gcr.io/quizzestutor/atlantis-gcp"
-VERSION="v0.13.0" # TODO: pass and user in Dockerfile (currently works bad in podman)
+VERSION="v0.13.0-r1"
 
 # compute image tags
 TAGS=(

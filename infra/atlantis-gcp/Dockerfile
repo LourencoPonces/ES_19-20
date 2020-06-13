@@ -1,9 +1,7 @@
 # An Atlantis container with tweaks for running in GCP
 # A fancy way of saying it loads some configuration from Secret Manager
+# and some of our own configuration
 
-# DOES NOT WORK IN BUILDAH/PODMAN
-#ARG VERSION=latest
-#FROM runatlantis/atlantis:${VERSION}
 FROM runatlantis/atlantis:v0.13.0
 
 RUN apk add --no-cache curl jq && rm -rf /tmp/*
