@@ -28,7 +28,7 @@ jobs:
         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCLOUD_SVC_ACCOUNT_KEY }}
       working-directory: infra
       run: |
-        echo -n "$GOOGLE_APPLICATION_CREDENTIALS" | base64 -d > credentials.json
+        gcloud auth application-default login
         terraform init
 
     - name: build & push backend image
@@ -49,6 +49,3 @@ jobs:
         DOCKER_BUILDKIT: 1
       working-directory: infra/atlantis-gcp
       run: ./build-publish-image.sh
-
-    - name: cleanup gcp credentials for terraform
-      run: rm infra/credentials.json

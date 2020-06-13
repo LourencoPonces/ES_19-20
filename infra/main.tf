@@ -19,7 +19,6 @@ variable "atlantis_version" {
 
 provider "google" {
 	version = "~> 3.24"
-	credentials = file("credentials.json")
 	region = local.region
 	project = local.project
 }
@@ -70,7 +69,6 @@ resource "google_storage_bucket_iam_binding" "tf_state_tf_svc" {
 terraform {
 	backend "gcs" {
 		bucket = "quizzestutor-tf-state"
-		credentials = "credentials.json"
 	}
 }
 
