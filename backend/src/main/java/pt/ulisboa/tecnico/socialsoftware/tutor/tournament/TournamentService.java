@@ -89,10 +89,12 @@ public class TournamentService {
         addCreator(tournamentDto, creator, tournament);
 
         entityManager.persist(tournament);
+        generateQuiz(tournament);
 
         creator.addCreatedTournament(tournament);
         creator.addParticipantTournament(tournament);
         entityManager.persist(creator);
+        entityManager.persist(new QuizAnswer(creator, tournament.getQuiz()));
 
         addTournamentToTopics(tournamentDto, courseExecution, tournament);
 
@@ -137,12 +139,7 @@ public class TournamentService {
         tournament.addParticipant(user);
         user.addParticipantTournament(tournament);
 
-        if (tournament.getQuiz() == null) {
-            if (tournament.getParticipants().size() >= 2)
-                generateQuiz(tournament);
-        } else {
-            entityManager.persist(new QuizAnswer(user, tournament.getQuiz()));
-        }
+        entityManager.persist(new QuizAnswer(user, tournament.getQuiz()));
 
         entityManager.persist(tournament);
         entityManager.persist(user);
