@@ -1,5 +1,17 @@
 #!/bin/ash
 
+set -e # fail fast
+
+# check that required env vars exist
+assert_present() {
+	local var="$1"
+	if eval 'test -z "${'"$var"'}"'; then
+		echo "Variable $var not set"
+		exit 1
+	fi
+}
+assert_present PORT
+
 cat > /etc/nginx/nginx.conf <<EOF
 user nginx;
 worker_processes auto;

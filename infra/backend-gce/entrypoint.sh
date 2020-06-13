@@ -1,5 +1,28 @@
 #!/bin/sh
 
+set -e # fail fast
+
+# check that required env vars exist
+assert_present() {
+	local var="$1"
+	if eval 'test -z "${'"$var"'}"'; then
+		echo "Variable $var not set"
+		exit 1
+	fi
+}
+assert_present SVC_ACCOUNT
+assert_present USERASSETS_BUCKET
+assert_present EXPORTS_BUCKET
+assert_present IMPORTS_BUCKET
+
+assert_present SPRING_DATASOURCE_USERNAME
+assert_present SPRING_DATASOURCE_URL
+assert_present FIGURES_DIR
+assert_present EXPORT_DIR
+assert_present LOAD_DIR
+assert_present CALLBACK_URL
+assert_present CORS_ALLOWED_ORIGINS
+
 get_token() {
 	curl "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/$SVC_ACCOUNT/token" -H "Metadata-Flavor: Google" \
 		| jq -r .access_token
