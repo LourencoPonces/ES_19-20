@@ -15,7 +15,7 @@ command -v podman &>/dev/null && test -z $DOCKER \
 	|| true # don't fail pipeline
 
 REG_NAME="eu.gcr.io/quizzestutor/backend-gce"
-VERSION="$(git rev-parse HEAD)"
+VERSION="${GITHUB_SHA:-$(git rev-parse HEAD)}"
 
 # compute image tags
 TAGS=(

@@ -15,7 +15,7 @@ command -v podman &>/dev/null && test -z $DOCKER \
 	|| true # don't fail pipeline
 
 REG_NAME="eu.gcr.io/quizzestutor/frontend-gc"
-VERSION="$(git rev-parse HEAD)"
+VERSION="${GITHUB_SHA:-$(git rev-parse HEAD)}"
 
 FENIX_CLIENT_ID="$(gcloud secrets versions access --secret FENIX_ID latest)"
 
