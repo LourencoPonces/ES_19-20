@@ -62,14 +62,14 @@
               />
             </v-flex>
             <v-flex xs24 sm12 md8>
-              <v-textarea
+              <editor
                 outline
                 auto-grow
-                rows="1"
+                rows="10"
                 v-model="editStudentQuestion.content"
-                label="Question"
+                :textVal="editStudentQuestion.content"
                 data-cy="StudentQuestionContent"
-              ></v-textarea>
+              ></editor>
             </v-flex>
             <v-flex
               xs24
@@ -121,10 +121,15 @@
 <script lang="ts">
 import { Component, Model, Prop, Vue } from 'vue-property-decorator';
 import StudentQuestion from '@/models/management/StudentQuestion';
+import Editor from '@/components/Editor.vue';
 import Topic from '@/models/management/Topic';
 import RemoteServices from '@/services/RemoteServices';
 
-@Component
+@Component({
+  components: {
+    'editor': Editor
+  }
+})
 export default class EditStudentQuestionDialog extends Vue {
   @Model('dialog', Boolean) dialog!: boolean;
   @Prop({ type: StudentQuestion, required: true })
@@ -142,6 +147,7 @@ export default class EditStudentQuestionDialog extends Vue {
   }
 
   async saveStudentQuestion() {
+    console.log(this.editStudentQuestion)
     if (
       this.editStudentQuestion &&
       (!this.editStudentQuestion.title ||

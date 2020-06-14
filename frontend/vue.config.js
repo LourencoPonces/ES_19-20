@@ -4,9 +4,12 @@ const path = require('path');
 const CompressionPlugin = require('compression-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const PurgecssPlugin = require('purgecss-webpack-plugin');
+const CKEditorWebpackPlugin = require('@ckeditor/ckeditor5-dev-webpack-plugin');
 const glob = require('glob-all');
 
 const isProductionEnvFlag = process.env.NODE_ENV === 'production';
+
+const { styles } = require('@ckeditor/ckeditor5-dev-utils');
 
 let custompaths = {
   host: 'http://localhost:8081/',
@@ -24,6 +27,33 @@ module.exports = {
   productionSourceMap: process.env.NODE_ENV !== 'production',
 
   chainWebpack: config => {
+    const svgRule = config.module.rule('svg');
+
+    svgRule.uses.clear();
+    svgRule.use('raw-loader').loader('raw-loader');
+
+    //svgRule.exclude.add(path.join(__dirname, 'node_modules', '@ckeditor'));
+
+    /*config.module
+      .rule('cke-svg')
+      .test(/ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/)
+      .use('raw-loader')
+      .loader('raw-loader');*/
+
+    config.module
+      .rule('cke-css')
+      .test(/ckeditor5-[^/\\]+[/\\].+\.css$/)
+      .use('postcss-loader')
+      .loader('postcss-loader')
+      .tap(() => {
+        return styles.getPostCssConfig({
+          themeImporter: {
+            themePath: require.resolve('@ckeditor/ckeditor5-theme-lark')
+          },
+          minify: true
+        });
+      });
+
     config.resolve.alias
       .set('vue$', 'vue/dist/vue.esm.js')
       .set('@assets', path.join(__dirname, 'src/assets'))
@@ -71,7 +101,7 @@ module.exports = {
     }
   },
 
-  transpileDependencies: ['vuetify'],
+  transpileDependencies: ['vuetify', /ckeditor5-[^/\\]+[/\\]src[/\\].+\.js$/],
   configureWebpack: {
     plugins: [
       // https://github.com/FullHuman/purgecss/issues/67
@@ -93,7 +123,11 @@ module.exports = {
           })
         : () => {},
       isProductionEnvFlag ? new CompressionPlugin() : () => {},
-      isProductionEnvFlag ? new TerserPlugin() : () => {}
+      isProductionEnvFlag ? new TerserPlugin() : () => {},
+      new CKEditorWebpackPlugin({
+        buildAllTranslationsToSeparateFiles: true,
+        language: 'en'
+      })
     ]
   },
 
