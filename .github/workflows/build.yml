@@ -31,11 +31,7 @@ jobs:
         echo -n "$GOOGLE_APPLICATION_CREDENTIALS" | base64 -d > credentials.json
         export GOOGLE_APPLICATION_CREDENTIALS=credentials.json
         terraform init
-    - name: test
-      working-directory: infra/backend-gce
-      run: |
-        git rev-parse HEAD
-        ls -la ../..
+
     - name: build & push backend image
       env:
         DOCKER: docker
