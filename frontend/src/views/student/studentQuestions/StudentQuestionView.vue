@@ -228,6 +228,8 @@
       :studentQuestion="currentStudentQuestion"
       v-on:close-show-student-question-dialog="closeDialogs"
       v-on:edit-student-question-mobile="showEditStudentQuestionDialog"
+      v-on:duplicate-student-question="showDuplicateStudentQuestionDialog"
+      v-on:delete-student-question="deleteStudentQuestion"
     />
     <show-student-question-dialog
       v-if="studentQuestionDialog"

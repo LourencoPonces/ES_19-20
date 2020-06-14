@@ -207,6 +207,7 @@
         v-if="currentQuestion"
         v-model="editQuestionDialog"
         :question="currentQuestion"
+        :isMobile="isMobile"
         v-on:save-question="onSaveQuestion"
       />
       <show-question-dialog

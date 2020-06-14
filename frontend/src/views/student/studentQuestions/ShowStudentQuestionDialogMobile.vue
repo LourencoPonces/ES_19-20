@@ -57,12 +57,33 @@
         <v-btn
           v-if="studentQuestion.isChangeable()"
           fab
+          color="error"
+          small
+          @click="$emit('delete-student-question', studentQuestion)"
+        >
+          <v-icon medium class="mr-2">
+            delete
+          </v-icon>
+        </v-btn>
+        <v-btn
+          v-if="studentQuestion.isChangeable()"
+          fab
           primary
           small
           color="primary"
           @click="$emit('edit-student-question-mobile', studentQuestion)"
         >
           <v-icon medium class="mr-2">edit</v-icon>
+        </v-btn>
+        <v-btn
+          fab
+          color="primary"
+          small
+          @click="$emit('duplicate-student-question', studentQuestion)"
+        >
+          <v-icon medium class="mr-2">
+            far fa-copy
+          </v-icon>
         </v-btn>
       </v-card-actions>
     </v-card>

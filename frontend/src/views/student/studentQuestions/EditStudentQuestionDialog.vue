@@ -116,17 +116,6 @@
       </v-card-actions>
       <v-card-actions v-else>
         <v-spacer />
-        <v-btn
-          v-if="studentQuestion.isChangeable()"
-          fab
-          color="error"
-          small
-          @click="$emit('delete-student-question', studentQuestion)"
-        >
-          <v-icon medium class="mr-2">
-            delete
-          </v-icon>
-        </v-btn>
         <v-btn fab color="primary" small @click="saveStudentQuestion">
           <v-icon medium class="mr-2">
             far fa-save
