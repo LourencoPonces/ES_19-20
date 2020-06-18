@@ -112,20 +112,6 @@ resource "google_dns_record_set" "google_domain_verification" {
 	rrdatas = ["gv-2vwpeccsnzqlb2.dv.googlehosted.com."]
 }
 
-resource "google_dns_record_set" "userassets" {
-	for_each = {
-		"IPV4" = "A"
-		"IPV6" = "AAAA"
-	}
-
-	managed_zone = google_dns_managed_zone.default.name
-	name = "userassets.${google_dns_managed_zone.default.dns_name}"
-	type = each.value
-	ttl = 300
-
-	rrdatas = [google_compute_global_address.frontend_lbal[each.key].address]
-}
-
 resource "google_dns_record_set" "backend" {
 	for_each = {
 		"IPV4" = "A"
@@ -581,12 +567,6 @@ resource "google_compute_instance_group_manager" "backend" {
 	}
 }
 
-resource "google_compute_backend_bucket" "userassets" {
-	name = "userassets-backend-bucket-${random_string.suffix.result}"
-	bucket_name = google_storage_bucket.userassets.name
-	enable_cdn = false
-}
-
 resource "google_compute_backend_service" "backend" {
 	name = "backend-lbal-backend-${random_string.suffix.result}"
 	health_checks = [google_compute_health_check.backend.id]
@@ -817,16 +797,6 @@ resource "google_compute_backend_service" "atlantis" {
 
 resource "google_compute_url_map" "frontend_lbal" {
 	name = "frontend-lbal-url-map-${random_string.suffix.result}"
-
-	host_rule {
-		hosts = ["userassets.${local.dns_root}"]
-		path_matcher = "userassets"
-	}
-
-	path_matcher {
-		name = "userassets"
-		default_service = google_compute_backend_bucket.userassets.id
-	}
 
 	host_rule {
 		hosts = ["backend.${local.dns_root}"]
