@@ -797,6 +797,8 @@ resource "google_compute_backend_service" "atlantis" {
 
 resource "google_compute_url_map" "frontend_lbal" {
 	name = "frontend-lbal-url-map-${random_string.suffix.result}"
+	# doesn't matter which one
+	default_service = google_compute_backend_service.backend.id
 
 	host_rule {
 		hosts = ["backend.${local.dns_root}"]
@@ -816,12 +818,6 @@ resource "google_compute_url_map" "frontend_lbal" {
 	path_matcher {
 		name = "atlantis"
 		default_service = google_compute_backend_service.atlantis.id
-	}
-
-	default_url_redirect {
-		host_redirect = local.dns_root
-		strip_query = false
-		redirect_response_code = "FOUND"
 	}
 }
 
