@@ -3,11 +3,9 @@ name: build
 on:
   push:
     branches:
-    - master
     - develop
   pull_request:
     branches:
-    - master
     - develop
 
 jobs:
@@ -16,20 +14,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: tests
-      env:
-        VARS_GITHUB_SHA: ${{ github.sha }}
-        VARS_GITHUB_REF: ${{ github.ref }}
-        VARS_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-      run: |
-        echo "GITHUB_SHA: $GITHUB_SHA"
-        echo "GITHUB_REF: $GITHUB_REF"
-        echo "rev-parse HEAD: $(git rev-parse HEAD)"
-        echo "github.sha: $VARS_GITHUB_SHA"
-        echo "github.ref: $VARS_GITHUB_REF"
-        echo "github.event.pull_request.head.sha: $VARS_PR_HEAD_SHA"
-
-        exit 1 # just stop
     - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
       with:
         service_account_key: ${{ secrets.GCLOUD_SVC_ACCOUNT_KEY }}
@@ -45,7 +29,6 @@ jobs:
         echo -n "$GOOGLE_APPLICATION_CREDENTIALS" | base64 -d > credentials.json
         export GOOGLE_APPLICATION_CREDENTIALS=credentials.json
         terraform init
-
     - name: build & push backend image
       env:
         DOCKER: docker

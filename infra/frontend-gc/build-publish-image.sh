@@ -15,6 +15,11 @@ command -v podman &>/dev/null && test -z $DOCKER \
 	|| true # don't fail pipeline
 
 REG_NAME="eu.gcr.io/quizzestutor/frontend-gc"
+
+# fix github_sha for pull requests
+if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
+    GITHUB_SHA=$(cat $GITHUB_EVENT_PATH | jq -r .pull_request.head.sha)
+fi
 VERSION="${GITHUB_SHA:-$(git rev-parse HEAD)}"
 
 FENIX_CLIENT_ID="$(gcloud secrets versions access --secret FENIX_ID latest)"
