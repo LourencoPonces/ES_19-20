@@ -66,7 +66,7 @@
           </v-card-title>
         </template>
         <template v-slot:item.name="{ item }">
-          <v-expansion-panels focusable>
+          <v-expansion-panels flat>
             <v-expansion-panel>
               <v-expansion-panel-header>
                 <p>{{ item.name }}</p>
@@ -190,7 +190,7 @@ export default class StudentsView extends Vue {
   ];
 
   headers_mobile: object = [
-    { text: 'Name', value: 'name', align: 'center', width: '40%' }
+    { text: 'Name', value: 'name', align: 'center', width: '40%', sortable: false }
   ];
 
   async created() {
