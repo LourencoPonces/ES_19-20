@@ -102,7 +102,9 @@
                   </v-col>
                   <v-col>
                     <v-chip
-                      :color="getPercentageColor(item.percentageOfCorrectAnswers)"
+                      :color="
+                        getPercentageColor(item.percentageOfCorrectAnswers)
+                      "
                       dark
                       >{{ item.percentageOfCorrectAnswers }}%</v-chip
                     >
@@ -122,7 +124,9 @@
                   </v-col>
                   <v-col>
                     <v-chip
-                      :color="getPercentageColor(item.percentageOfCorrectAnswers)"
+                      :color="
+                        getPercentageColor(item.percentageOfCorrectAnswers)
+                      "
                       dark
                       >{{ item.percentageOfCorrectTeacherAnswers }}%</v-chip
                     >
@@ -190,7 +194,13 @@ export default class StudentsView extends Vue {
   ];
 
   headers_mobile: object = [
-    { text: 'Name', value: 'name', align: 'center', width: '40%', sortable: false }
+    {
+      text: 'Name',
+      value: 'name',
+      align: 'center',
+      width: '40%',
+      sortable: false
+    }
   ];
 
   async created() {
