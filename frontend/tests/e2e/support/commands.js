@@ -224,7 +224,13 @@ Cypress.Commands.add(
       .click();
 
     if (title) cy.get('[data-cy="StudentQuestionTitle"]').type(title);
-    if (content) cy.get('[data-cy="StudentQuestionContent"]').type(content);
+    if (content)
+      cy.get('[data-cy="StudentQuestionContent"]')
+        .find('iframe')
+        .then($iframe => {
+          const $body = $iframe.contents().find('body');
+          cy.wrap($body).type(content);
+        });
 
     correctOptions.forEach(correctOption => {
       if (correctOption > 0 && correctOption < 5) {
@@ -235,7 +241,12 @@ Cypress.Commands.add(
     });
 
     for (let i = 1; i < options.length + 1; i++) {
-      cy.get(`[data-cy  =Option${i}]`).type(options[i - 1]);
+      cy.get(`[data-cy=Option${i}]`)
+        .find('iframe')
+        .then($iframe => {
+          const $body = $iframe.contents().find('body');
+          cy.wrap($body).type(options[i - 1]);
+        });
     }
 
     cy.get('[data-cy="SaveStudentQuestion"]').click();
@@ -449,13 +460,23 @@ Cypress.Commands.add(
       .type(newTitle);
 
     cy.get('[data-cy="StudentQuestionContent"]')
-      .clear()
-      .type(newContent);
+      .find('iframe')
+      .then($iframe => {
+        const $body = $iframe.contents().find('body');
+        cy.wrap($body)
+          .clear()
+          .type(newContent);
+      });
 
     for (let i = 1; i < newOptions.length + 1; i++) {
       cy.get(`[data-cy=Option${i}]`)
-        .clear()
-        .type(newOptions[i - 1]);
+        .find('iframe')
+        .then($iframe => {
+          const $body = $iframe.contents().find('body');
+          cy.wrap($body)
+            .clear()
+            .type(newOptions[i - 1]);
+        });
     }
 
     cy.get('[data-cy="SaveStudentQuestion"]').click();

@@ -62,14 +62,16 @@
               />
             </v-flex>
             <v-flex xs24 sm12 md8>
-              <v-textarea
+              <span>Question Content</span>
+              <ckeditor
                 outline
                 auto-grow
                 rows="1"
                 v-model="editStudentQuestion.content"
                 label="Question"
                 data-cy="StudentQuestionContent"
-              ></v-textarea>
+                :config="editorConfig"
+              ></ckeditor>
             </v-flex>
             <v-flex
               xs24
@@ -84,14 +86,15 @@
                 label="Correct"
                 :data-cy="`CorrectOption${index}`"
               />
-              <v-textarea
+              <span>Option {{ index }}</span>
+              <ckeditor
                 outline
                 auto-grow
                 rows="1"
                 v-model="editStudentQuestion.options[index - 1].content"
-                :label="`Option ${index}`"
                 :data-cy="`Option${index}`"
-              ></v-textarea>
+                :config="editorConfig"
+              ></ckeditor>
             </v-flex>
           </v-layout>
         </v-container>
@@ -139,6 +142,16 @@ export default class EditStudentQuestionDialog extends Vue {
 
   created() {
     this.editStudentQuestion = new StudentQuestion(this.studentQuestion);
+  }
+
+  data() {
+    return {
+      editorConfig: {
+        extraPlugins: 'mathjax',
+        mathJaxLib:
+          'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML'
+      }
+    };
   }
 
   async saveStudentQuestion() {
