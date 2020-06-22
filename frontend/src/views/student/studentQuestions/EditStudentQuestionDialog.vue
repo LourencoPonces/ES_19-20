@@ -62,6 +62,7 @@
               />
             </v-flex>
             <v-flex xs24 sm12 md8>
+              <span>Question Content</span>
               <ckeditor
                 outline
                 auto-grow
@@ -85,14 +86,15 @@
                 label="Correct"
                 :data-cy="`CorrectOption${index}`"
               />
-              <v-textarea
+              <span>Option {{ index }}</span>
+              <ckeditor
                 outline
                 auto-grow
                 rows="1"
                 v-model="editStudentQuestion.options[index - 1].content"
-                :label="`Option ${index}`"
                 :data-cy="`Option${index}`"
-              ></v-textarea>
+                :config="editorConfig"
+              ></ckeditor>
             </v-flex>
           </v-layout>
         </v-container>

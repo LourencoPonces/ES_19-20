@@ -19,24 +19,26 @@
 
       <v-card-text class="text-left" v-if="editQuestion">
         <v-text-field v-model="editQuestion.title" label="Title" />
-        <v-textarea
+        <span>Question Content</span>
+        <ckeditor
           outline
           rows="10"
           v-model="editQuestion.content"
-          label="Question"
-        ></v-textarea>
+          :config="editorConfig"
+        ></ckeditor>
         <div v-for="index in editQuestion.options.length" :key="index">
           <v-switch
             v-model="editQuestion.options[index - 1].correct"
             class="ma-4"
             label="Correct"
           />
-          <v-textarea
+          <span>Option {{ index }}</span>
+          <ckeditor
             outline
             rows="10"
             v-model="editQuestion.options[index - 1].content"
-            :label="`Option ${index}`"
-          ></v-textarea>
+            :config="editorConfig"
+          ></ckeditor>
         </div>
       </v-card-text>
 
@@ -65,6 +67,16 @@ export default class EditQuestionDialog extends Vue {
 
   created() {
     this.updateQuestion();
+  }
+
+  data() {
+    return {
+      editorConfig: {
+        extraPlugins: 'mathjax',
+        mathJaxLib:
+          'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML'
+      }
+    };
   }
 
   @Watch('question', { immediate: true, deep: true })
