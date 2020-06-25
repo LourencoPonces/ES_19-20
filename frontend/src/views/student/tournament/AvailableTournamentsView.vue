@@ -119,24 +119,34 @@
                     <span>{{ item.numberOfQuestions }} questions</span>
                   </v-col>
                   <v-col>
-                    <span>{{ item.participants.length }} participant{{item.participants.length === 1 ? "" : "s" }}</span>
+                    <span
+                      >{{ item.participants.length }} participant{{
+                        item.participants.length === 1 ? '' : 's'
+                      }}</span
+                    >
                   </v-col>
                 </v-row>
                 <v-row>
-                    <v-col>
-                      <span><b>Topics</b></span>
-                      <br/>
-                      <v-chip-group data-cy="topics-list" column>
-                        <v-chip v-for="topic in item.topics" :key="topic.name">
-                          {{ topic.name }}
-                        </v-chip>
-                      </v-chip-group>
-                    </v-col>
+                  <v-col>
+                    <span><b>Topics</b></span>
+                    <br />
+                    <v-chip-group data-cy="topics-list" column>
+                      <v-chip v-for="topic in item.topics" :key="topic.name">
+                        {{ topic.name }}
+                      </v-chip>
+                    </v-chip-group>
+                  </v-col>
                 </v-row>
                 <v-row>
-                    <v-col>
-                      <v-checkbox v-model="selected" label="Signed In" :value="item.id" :disabled="selected.includes(item.id)" @change="signUpInTournament(item)"></v-checkbox>
-                    </v-col>
+                  <v-col>
+                    <v-checkbox
+                      v-model="selected"
+                      label="Signed In"
+                      :value="item.id"
+                      :disabled="selected.includes(item.id)"
+                      @change="signUpInTournament(item)"
+                    ></v-checkbox>
+                  </v-col>
                 </v-row>
               </v-expansion-panel-content>
             </v-expansion-panel>
@@ -229,14 +239,14 @@ export default class AvailableTournamentsView extends Vue {
     }
   ];
 
-   headers_mobile = [
-      {
-        text: 'Tournament',
-        value: 'title',
-        align: 'center',
-        sortable: false
-    },
-   ]
+  headers_mobile = [
+    {
+      text: 'Tournament',
+      value: 'title',
+      align: 'center',
+      sortable: false
+    }
+  ];
 
   async created() {
     await this.$store.dispatch('loading');
@@ -251,9 +261,8 @@ export default class AvailableTournamentsView extends Vue {
   }
 
   async signUpInTournament(tournament: Tournament, event) {
-    if(this.isMobile) {
-      console.log(this.selected);
-      return
+    if (this.isMobile) {
+      console.log(tournament);
     }
     await this.$store.dispatch('loading');
     if (tournament.id)
