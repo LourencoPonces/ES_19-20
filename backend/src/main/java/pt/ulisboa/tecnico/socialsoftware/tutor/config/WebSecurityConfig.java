@@ -80,6 +80,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         defaultConfig.setAllowCredentials(true);
         defaultConfig.setAllowedOrigins(Arrays.asList(allowedOrigins));
         defaultConfig.addAllowedHeader("authorization");
+        defaultConfig.addAllowedHeader("content-type");
+        defaultConfig.addAllowedMethod("*");
         defaultConfig.setMaxAge(1800L);
         source.registerCorsConfiguration("/**", defaultConfig);
         return source;
