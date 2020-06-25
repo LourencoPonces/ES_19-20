@@ -1,0 +1,35 @@
+users:
+  - name: clouduser
+    groups: [docker]
+
+write_files:
+  - path: /etc/atlantis.env
+    content: |
+      PORT=8080
+      SVC_ACCOUNT=${svc_account_email}
+      ATLANTIS_ATLANTIS_URL=${base_url}
+      ATLANTIS_HIDE_PREV_PLAN_COMMENTS=1
+      ATLANTIS_REPO_WHITELIST=github.com/tecnico-softeng/es20al_19-project
+      ATLANTIS_AUTOMERGE=1
+  - path: /etc/systemd/system/atlantis.service
+    content: |
+      [Unit]
+      Description=Atlantis
+      After=gcr-online.target local-fs.target network-online.target sys-fs-fuse-connections.mount cloud-config.service
+      Wants=gcr-online.target local-fs.target network-online.target sys-fs-fuse-connections.mount
+
+      [Service]
+      User=clouduser
+      ExecStartPre=/usr/bin/docker-credential-gcr configure-docker
+      ExecStart=/usr/bin/docker run --env-file=/etc/atlantis.env --restart=unless-stopped -p 80:8080 --name=atlantis ${container_image}
+      ExecStop=/usr/bin/docker stop -t 20 atlantis
+      ExecStopPost=/usr/bin/docker rm atlantis
+
+      [Install]
+      WantedBy=multi-user.target
+
+runcmd:
+  # weird, but the user module seems to ignore my groups
+  - usermod -aG docker clouduser
+  - systemctl daemon-reload
+  - systemctl start atlantis.service

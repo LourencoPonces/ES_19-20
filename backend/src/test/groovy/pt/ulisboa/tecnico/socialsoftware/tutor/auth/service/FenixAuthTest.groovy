@@ -1,11 +1,13 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.auth.service
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import pt.ulisboa.tecnico.socialsoftware.tutor.auth.AuthService
 import pt.ulisboa.tecnico.socialsoftware.tutor.auth.FenixEduInterface
+import pt.ulisboa.tecnico.socialsoftware.tutor.auth.JwtTokenProvider
 import pt.ulisboa.tecnico.socialsoftware.tutor.course.*
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.User
@@ -445,6 +447,12 @@ class FenixAuthTest extends Specification {
     @TestConfiguration
     static class AuthServiceImplTestContextConfiguration {
 
+        @Value('${auth.secret}')
+        private String authSecret
+
+        @Autowired
+        private UserRepository userRepository
+
         @Bean
         AuthService authService() {
             return new AuthService()
@@ -453,6 +461,11 @@ class FenixAuthTest extends Specification {
         @Bean
         UserService userService() {
             return new UserService()
+        }
+
+        @Bean
+        JwtTokenProvider jwtTokenProvider() {
+            return new JwtTokenProvider(userRepository, authSecret)
         }
     }
 }

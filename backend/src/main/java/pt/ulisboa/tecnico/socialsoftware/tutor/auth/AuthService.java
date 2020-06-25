@@ -35,8 +35,11 @@ public class AuthService {
     @Autowired
     private CourseExecutionRepository courseExecutionRepository;
 
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public AuthDto fenixAuth(FenixEduInterface fenix) {
@@ -80,14 +83,14 @@ public class AuthService {
 
                 user.setEnrolledCoursesAcronyms(ids);
             }
-            return new AuthDto(JwtTokenProvider.generateToken(user), new AuthUserDto(user,allCoursesInDb));
+            return new AuthDto(jwtTokenProvider.generateToken(user), new AuthUserDto(user, allCoursesInDb));
         }
 
         // Update student courses
         if (!activeAttendingCourses.isEmpty() && user.getRole() == User.Role.STUDENT) {
             User student = user;
             activeAttendingCourses.stream().filter(courseExecution -> !student.getCourseExecutions().contains(courseExecution)).forEach(user::addCourse);
-            return new AuthDto(JwtTokenProvider.generateToken(user), new AuthUserDto(user));
+            return new AuthDto(jwtTokenProvider.generateToken(user), new AuthUserDto(user));
         }
 
         // Update teacher courses
@@ -100,12 +103,12 @@ public class AuthService {
                     .collect(Collectors.joining(","));
 
             user.setEnrolledCoursesAcronyms(ids);
-            return new AuthDto(JwtTokenProvider.generateToken(user), new AuthUserDto(user,  fenixTeachingCourses));
+            return new AuthDto(jwtTokenProvider.generateToken(user), new AuthUserDto(user, fenixTeachingCourses));
         }
 
         // Previous teacher without active courses
         if (user.getRole() == User.Role.TEACHER) {
-            return new AuthDto(JwtTokenProvider.generateToken(user), new AuthUserDto(user));
+            return new AuthDto(jwtTokenProvider.generateToken(user), new AuthUserDto(user));
         }
 
         throw new TutorException(USER_NOT_ENROLLED, username);
@@ -113,20 +116,20 @@ public class AuthService {
 
     private List<CourseExecution> getActiveTecnicoCourses(List<CourseDto> courses) {
         return courses.stream()
-                .map(courseDto ->  {
+                .map(courseDto -> {
                     Course course = courseRepository.findByNameType(courseDto.getName(), Course.Type.TECNICO.name()).orElse(null);
                     if (course == null) {
                         return null;
                     }
-                    return course.getCourseExecution(courseDto.getAcronym(),courseDto.getAcademicTerm(), Course.Type.TECNICO)
-                                .orElse(null);
+                    return course.getCourseExecution(courseDto.getAcronym(), courseDto.getAcademicTerm(), Course.Type.TECNICO)
+                            .orElse(null);
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
             maxAttempts = 2,
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
@@ -138,28 +141,28 @@ public class AuthService {
             user = this.userService.getDemoStudent();
 //        }
 
-        return new AuthDto(JwtTokenProvider.generateToken(user), new AuthUserDto(user));
+        return new AuthDto(jwtTokenProvider.generateToken(user), new AuthUserDto(user));
     }
 
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
             maxAttempts = 2,
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public AuthDto demoTeacherAuth() {
         User user = this.userService.getDemoTeacher();
 
-        return new AuthDto(JwtTokenProvider.generateToken(user), new AuthUserDto(user));
+        return new AuthDto(jwtTokenProvider.generateToken(user), new AuthUserDto(user));
     }
 
     @Retryable(
-            value = { SQLException.class },
+            value = {SQLException.class},
             maxAttempts = 2,
             backoff = @Backoff(delay = 5000))
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public AuthDto demoAdminAuth() {
         User user = this.userService.getDemoAdmin();
 
-        return new AuthDto(JwtTokenProvider.generateToken(user), new AuthUserDto(user));
+        return new AuthDto(jwtTokenProvider.generateToken(user), new AuthUserDto(user));
     }
 }
