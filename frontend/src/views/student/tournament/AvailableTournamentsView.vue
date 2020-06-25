@@ -1,6 +1,8 @@
 <template>
   <div class="container">
     <h2>Available Tournaments</h2>
+
+    <!-- WEB BROWSER -->
     <v-card class="table" v-if="!isMobile">
       <v-data-table
         :headers="headers"
@@ -62,6 +64,8 @@
         </template>
       </v-data-table>
     </v-card>
+
+    <!-- MOBILE -->
     <v-card class="table" v-else>
       <v-data-table
         :headers="headers_mobile"
