@@ -29,7 +29,7 @@ import QuizList from '@/views/teacher/quizzes/QuizList.vue';
 @Component({
   components: {
     QuizForm,
-    QuizList,
+    QuizList
   }
 })
 export default class QuizzesView extends Vue {

@@ -168,39 +168,36 @@
       <template v-slot:top>
         <v-card-title>
           <v-row>
-              <v-col cols="9">
-                <v-text-field
-                  v-model="search"
-                  append-icon="search"
-                  label="Search"
-                  class="mx-2"
-                  data-cy="search-input"
-                />
-              </v-col>
-              <v-col cols="3" align-self="center">
-                <template>
-                  <v-btn fab primary small color="primary">
-                    <v-icon
-                      small
-                      class="mr-2"
-                      @click="$emit('newQuiz')"
-                      >fa fa-plus</v-icon
-                    >
-                  </v-btn>
-                </template>
-              </v-col>
-            </v-row>
+            <v-col cols="9">
+              <v-text-field
+                v-model="search"
+                append-icon="search"
+                label="Search"
+                class="mx-2"
+                data-cy="search-input"
+              />
+            </v-col>
+            <v-col cols="3" align-self="center">
+              <template>
+                <v-btn fab primary small color="primary">
+                  <v-icon small class="mr-2" @click="$emit('newQuiz')"
+                    >fa fa-plus</v-icon
+                  >
+                </v-btn>
+              </template>
+            </v-col>
+          </v-row>
         </v-card-title>
       </template>
 
       <template v-slot:item.title="{ item }">
         <v-row @click="showQuizDialog(item.id)">
           <v-col align-self="center">
-              <v-badge bordered :color="getStatusColor(item)" />
-            </v-col>
-            <v-col cols="10">
-              <p>{{ item.title }}</p>
-            </v-col>
+            <v-badge bordered :color="getStatusColor(item)" />
+          </v-col>
+          <v-col cols="10">
+            <p>{{ item.title }}</p>
+          </v-col>
         </v-row>
       </template>
     </v-data-table>
@@ -226,7 +223,7 @@ import { QuizAnswers } from '@/models/management/QuizAnswers';
 })
 export default class QuizList extends Vue {
   @Prop({ type: Array, required: true }) readonly quizzes!: Quiz[];
-   @Prop({ type: Boolean, required: true }) readonly isMobile!: boolean;
+  @Prop({ type: Boolean, required: true }) readonly isMobile!: boolean;
   quiz: Quiz | null = null;
   quizAnswers: QuizAnswer[] = [];
   correctSequence: number[] = [];
@@ -285,7 +282,7 @@ export default class QuizList extends Vue {
       width: '10%'
     }
   ];
-  headers_mobile: object = [ 
+  headers_mobile: object = [
     { text: 'Title', value: 'title', align: 'center', width: '20%' }
   ];
 
@@ -293,8 +290,7 @@ export default class QuizList extends Vue {
     if (quiz.timeToConclusion <= 0) return 'red';
     else if (new Date(quiz.availableDate) < new Date(Date.now())) {
       return 'green';
-    }
-    else return 'orange';
+    } else return 'orange';
   }
 
   async showQuizDialog(quizId: number) {
