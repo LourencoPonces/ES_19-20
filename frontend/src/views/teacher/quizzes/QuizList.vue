@@ -201,6 +201,38 @@
         </v-row>
       </template>
     </v-data-table>
+
+    <show-quiz-dialog-mobile
+      v-if="quiz"
+      v-model="quizDialog"
+      :quiz="quiz"
+      v-on:delete-quiz="deleteQuiz"
+      v-on:edit-quiz="editQuiz"
+      v-on:show-qr-code="showQrCode"
+      v-on:show-quiz-answers="showQuizAnswers"
+    />
+    <v-dialog
+      v-model="qrcodeDialog"
+      @keydown.esc="qrcodeDialog = false"
+      max-width="75%"
+    >
+      <v-card v-if="qrValue">
+        <vue-qrcode
+          class="qrcode"
+          :value="qrValue.toString()"
+          errorCorrectionLevel="M"
+          :quality="1"
+          :scale="100"
+        />
+      </v-card>
+    </v-dialog>
+    <show-quiz-answers-dialog
+      v-if="quizAnswers"
+      v-model="quizAnswersDialog"
+      :quiz-answers="quizAnswers"
+      :correct-sequence="correctSequence"
+      :timeToSubmission="timeToSubmission"
+    />
   </v-card>
 </template>
 
@@ -209,6 +241,7 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 import { Quiz } from '@/models/management/Quiz';
 import RemoteServices from '@/services/RemoteServices';
 import ShowQuizDialog from '@/views/teacher/quizzes/ShowQuizDialog.vue';
+import ShowQuizDialogMobile from '@/views/teacher/quizzes/ShowQuizDialogMobile.vue';
 import ShowQuizAnswersDialog from '@/views/teacher/quizzes/ShowQuizAnswersDialog.vue';
 import VueQrcode from 'vue-qrcode';
 import { QuizAnswer } from '@/models/management/QuizAnswer';
@@ -218,6 +251,7 @@ import { QuizAnswers } from '@/models/management/QuizAnswers';
   components: {
     'show-quiz-answers-dialog': ShowQuizAnswersDialog,
     'show-quiz-dialog': ShowQuizDialog,
+    'show-quiz-dialog-mobile': ShowQuizDialogMobile,
     'vue-qrcode': VueQrcode
   }
 })
@@ -351,6 +385,7 @@ export default class QuizList extends Vue {
       } catch (error) {
         await this.$store.dispatch('error', error);
       }
+      this.quizDialog = false;
     }
   }
 }

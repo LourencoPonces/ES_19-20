@@ -315,32 +315,30 @@
     <v-card-text>
       <v-text-field v-model="quiz.title" label="*Title" />
       <v-container fluid>
-        <v-row>
-          <v-col>
-            <VueCtkDateTimePicker
-              label="*Available Date"
-              id="availableDateInput"
-              v-model="quiz.availableDate"
-              format="YYYY-MM-DDTHH:mm:ssZ"
-            ></VueCtkDateTimePicker>
-          </v-col>
-          <v-col v-if="quiz.timed">
-            <VueCtkDateTimePicker
-              label="*Conclusion Date"
-              id="conclusionDateInput"
-              v-model="quiz.conclusionDate"
-              format="YYYY-MM-DDTHH:mm:ssZ"
-            ></VueCtkDateTimePicker>
-          </v-col>
-          <v-col v-if="quiz.timed">
-            <VueCtkDateTimePicker
-              label="Results Date"
-              id="resultsDateInput"
-              v-model="quiz.resultsDate"
-              format="YYYY-MM-DDTHH:mm:ssZ"
-            ></VueCtkDateTimePicker>
-          </v-col>
-        </v-row>
+        <VueCtkDateTimePicker
+          class="datePicker"
+          label="*Available Date"
+          id="availableDateInput"
+          v-model="quiz.availableDate"
+          format="YYYY-MM-DDTHH:mm:ssZ"
+        ></VueCtkDateTimePicker>
+        <VueCtkDateTimePicker
+          class="datePicker"
+          v-if="quiz.timed"
+          label="*Conclusion Date"
+          id="conclusionDateInput"
+          v-model="quiz.conclusionDate"
+          format="YYYY-MM-DDTHH:mm:ssZ"
+        ></VueCtkDateTimePicker>
+        <VueCtkDateTimePicker
+          class="datePicker"
+          v-if="quiz.timed"
+          responsive
+          label="Results Date"
+          id="resultsDateInput"
+          v-model="quiz.resultsDate"
+          format="YYYY-MM-DDTHH:mm:ssZ"
+        ></VueCtkDateTimePicker>
         <v-row>
           <v-col>
             <v-tooltip bottom>
@@ -407,10 +405,10 @@
 
         <template v-slot:item.title="{ item }">
           <v-row @click="showQuestionDialog(item)">
-            <v-col cols="3" align-self="center">
-              {{ item.numberOfAnswers }}
+            <v-col v-if="item.sequence" cols="3" align-self="center">
+              {{ item.sequence }}
             </v-col>
-            <v-col cols="8" align-self="center">
+            <v-col align-self="center">
               <p>{{ item.title }}</p>
             </v-col>
           </v-row>
@@ -623,6 +621,7 @@ export default class QuizForm extends Vue {
   addToQuiz(question: Question) {
     question.sequence = this.quizQuestions.length + 1;
     this.quizQuestions.push(question);
+    this.quizQuestionDialogMobile = false;
   }
 
   removeFromQuiz(question: Question) {
@@ -693,4 +692,9 @@ export default class QuizForm extends Vue {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.datePicker {
+  margin: 5px;
+  max-height: 5%;
+}
+</style>

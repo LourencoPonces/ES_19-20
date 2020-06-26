@@ -41,10 +41,10 @@
             </v-expansion-panel-header>
             <v-expansion-panel-content>
               <v-row>
-                <v-col cols="9">
+                <v-col cols="8">
                   <span>Difficulty:</span>
                 </v-col>
-                <v-col align-self="center">
+                <v-col cols="4" align-self="center">
                   {{ question.difficulty + '%' }}
                 </v-col>
               </v-row>
@@ -75,17 +75,17 @@
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
-        <v-row>
+        <v-row v-if="question.sequence">
           <v-col align-self="center">
             <b>Sequence:</b>
           </v-col>
           <v-col>
             <v-select
-              v-model="question.sequence"
+              v-model="new_sequence"
               :items="possible_sequences"
               dense
               @change="
-                $emit('change-question-position', question, question.sequence)
+                $emit('change-question-position', question, new_sequence - 1)
               "
             >
             </v-select>
@@ -95,7 +95,7 @@
       <v-card-actions>
         <v-spacer />
         <v-btn v-if="!question.sequence" fab small class="mr-2" color="primary">
-          <v-icon medium class="mr-2" @click="$emit('add-to-quiz', item)">
+          <v-icon medium class="mr-2" @click="$emit('add-to-quiz', question)">
             add</v-icon
           >
         </v-btn>
@@ -103,7 +103,6 @@
           <v-icon
             medium
             class="mr-2"
-            v-on="on"
             @click="$emit('remove-from-quiz', question)"
           >
             remove</v-icon
@@ -132,11 +131,13 @@ export default class ShowQuizQuestionDialogMobile extends Vue {
   @Prop({ type: Question, required: true }) readonly question!: Question;
   @Prop({ type: Number, required: true }) readonly number_questions!: Number;
   possible_sequences: Number[] = [];
+  new_sequence!: number;
 
   created() {
-    for (let i = 0; i <= this.number_questions; i++) {
-      this.possible_sequences.push(i);
+    for (let i = 0; i < this.number_questions; i++) {
+      this.possible_sequences.push(i + 1);
     }
+    this.new_sequence = this.question.sequence;
   }
 }
 </script>
