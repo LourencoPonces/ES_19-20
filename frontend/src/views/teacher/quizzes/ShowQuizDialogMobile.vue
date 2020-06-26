@@ -6,7 +6,7 @@
     max-width="75%"
   >
     <v-card v-if="quiz">
-      <v-card-title >{{ quiz.title }}</v-card-title>
+      <v-card-title>{{ quiz.title }}</v-card-title>
 
       <v-card-text>
         <v-row>
@@ -15,9 +15,9 @@
           </v-col>
           <v-col>
             <v-spacer />
-              <v-icon v-if="quiz.oneWay" class="mr-2">forward</v-icon>
-              <v-icon v-if="quiz.scramble" class="mr-2">shuffle</v-icon>
-              <v-icon v-if="quiz.qrCodeOnly" class="mr-2">fas fa-qrcode</v-icon>
+            <v-icon v-if="quiz.oneWay" class="mr-2">forward</v-icon>
+            <v-icon v-if="quiz.scramble" class="mr-2">shuffle</v-icon>
+            <v-icon v-if="quiz.qrCodeOnly" class="mr-2">fas fa-qrcode</v-icon>
           </v-col>
         </v-row>
         <v-expansion-panels focusable>
@@ -29,7 +29,7 @@
                   <span><b>Created:</b></span>
                 </v-col>
                 <v-col>
-                  {{  quiz.creationDate  }}
+                  {{ quiz.creationDate }}
                 </v-col>
               </v-row>
               <v-row v-if="quiz.availableDate">
@@ -90,12 +90,7 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn
-          fab
-          color="error"
-          small
-          @click="$emit('delete-quiz', quiz.id)"
-        >
+        <v-btn fab color="error" small @click="$emit('delete-quiz', quiz.id)">
           <v-icon medium class="mr-2">
             delete
           </v-icon>
@@ -147,6 +142,5 @@ import ShowQuestionList from '@/views/teacher/questions/ShowQuestionList.vue';
 export default class ShowQuizDialogMobile extends Vue {
   @Model('dialog', Boolean) dialog!: boolean;
   @Prop({ type: Quiz, required: true }) readonly quiz!: Quiz | null;
-
 }
 </script>

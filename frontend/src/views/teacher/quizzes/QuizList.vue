@@ -229,6 +229,7 @@
     <show-quiz-answers-dialog
       v-if="quizAnswers"
       v-model="quizAnswersDialog"
+      :isMobile="isMobile"
       :quiz-answers="quizAnswers"
       :correct-sequence="correctSequence"
       :timeToSubmission="timeToSubmission"
