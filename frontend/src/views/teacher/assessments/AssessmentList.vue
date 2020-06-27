@@ -1,5 +1,6 @@
 <template>
-  <v-card class="table">
+  <!-- BROWSER -->
+  <v-card v-if="!isMobile" class="table">
     <v-data-table
       :headers="headers"
       :items="assessments"
@@ -125,21 +126,82 @@
       </v-card>
     </v-dialog>
   </v-card>
+
+  <!-- MOBILE -->
+  <v-card v-else-if="!editMode && !assessment && isMobile" class="table">
+    <v-data-table
+      :headers="headers_mobile"
+      :items="assessments"
+      :search="search"
+      :sort-by="['sequence']"
+      :mobile-breakpoint="0"
+      :items-per-page="15"
+      :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
+    >
+      <template v-slot:top>
+        <v-card-title>
+          <v-row>
+            <v-col cols="9">
+              <v-text-field
+                v-model="search"
+                append-icon="search"
+                label="Search"
+                class="mx-4"
+              />
+            </v-col>
+            <v-col cols="3" align-self="center">
+              <v-btn fab primary small color="primary">
+                <v-icon small class="mr-2" @click="$emit('newAssessment')"
+                  >fa fa-plus</v-icon
+                >
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-title>
+      </template>
+      <template v-slot:item.title="{ item }">
+        <v-row @click="showEditAssessmentMobile(item)">
+          <v-col align-self="center">
+            <v-badge bordered :color="getStatusColor(item.status)" />
+          </v-col>
+          <v-col cols="10">
+            <p>{{ item.title }}</p>
+          </v-col>
+        </v-row>
+      </template>
+    </v-data-table>
+  </v-card>
+  <assessment-form
+    v-else-if="editMode && assessment && !isMobile"
+    @switchMode="changeMode"
+    @updateAssessment="updateAssessment"
+    :edit-mode="editMode"
+    :assessment="assessment"
+    :isMobile="isMobile"
+  />
+  
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Component, Vue, Prop, Model } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import { convertMarkDown } from '@/services/ConvertMarkdownService';
 import Image from '@/models/management/Image';
 import Assessment from '@/models/management/Assessment';
+import AssessmentForm from '@/views/teacher/assessments/AssessmentForm.vue';
+import EditAssessmentMobile from '@/views/teacher/assessments/EditAssessmentMobile.vue';
 
-@Component
+@Component({
+  components: {
+    'assessment-form': AssessmentForm,
+    'edit-assessment-mobile': EditAssessmentMobile,
+  }
+})
 export default class AssessmentList extends Vue {
   @Prop({ type: Array, required: true }) readonly assessments!: Assessment[];
+  @Prop({ type: Boolean, required: true }) readonly isMobile!: boolean;
   assessment: Assessment | null = null;
   search: string = '';
-  statusList = ['DISABLED', 'AVAILABLE', 'REMOVED'];
   dialog: boolean = false;
   headers: object = [
     {
@@ -158,6 +220,9 @@ export default class AssessmentList extends Vue {
       width: '7%'
     },
     { text: 'Status', value: 'status', align: 'center', width: '7%' }
+  ];
+  headers_mobile: object = [
+    { text: 'Title', value: 'title', align: 'center', sortable: false }
   ];
 
   closeAssessment() {

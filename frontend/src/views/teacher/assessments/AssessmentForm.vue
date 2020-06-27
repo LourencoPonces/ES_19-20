@@ -1,5 +1,5 @@
 <template>
-  <v-card v-if="editMode && assessment" class="table">
+  <v-card v-if="!isMobile" class="table">
     <v-card-title>
       <span>Create Assessment</span>
       <v-spacer />
@@ -228,10 +228,17 @@
       </v-card>
     </v-dialog>
   </v-card>
+  <edit-assessment-mobile
+    v-else
+    v-model="dialog"
+    :assessment="assessment"
+    v-on:set-status="setStatus"
+
+  />
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
+import { Component, Vue, Prop, Watch, Model } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import Assessment from '@/models/management/Assessment';
 import Question from '@/models/management/Question';
@@ -240,11 +247,18 @@ import Image from '@/models/management/Image';
 import TopicConjunction from '@/models/management/TopicConjunction';
 import { _ } from 'vue-underscore';
 import Topic from '@/models/management/Topic';
+import EditAssessmentMobile from '@/views/teacher/assessments/EditAssessmentMobile.vue';
 
-@Component
+@Component({
+  components: {
+    'edit-assessment-mobile': EditAssessmentMobile
+  }
+})
 export default class AssessmentForm extends Vue {
   @Prop(Assessment) readonly assessment!: Assessment;
-  @Prop(Boolean) readonly editMode!: boolean;
+   @Prop({ type: Boolean, required: true }) readonly editMode!: boolean;
+  @Prop({ type: Boolean, required: true }) readonly isMobile!: boolean;
+  @Prop(Boolean) readonly dialog!: boolean;
   currentTopicsSearch: string = '';
   currentTopicsSearchText: string = '';
   allTopicsSearch: string = '';
@@ -410,7 +424,9 @@ export default class AssessmentForm extends Vue {
   convertMarkDown(text: string, image: Image | null = null): string {
     return convertMarkDown(text, image);
   }
+
+  setStatus(id: number, status: string) {
+    this.$emit('set-status', id, status);
+  }
 }
 </script>
-
-<style lang="scss" scoped></style>
