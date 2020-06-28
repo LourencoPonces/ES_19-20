@@ -78,9 +78,9 @@ export default class EditQuestionDialog extends Vue {
 
   data() {
     return {
-      language: 'en',
       editorConfig: {
         extraPlugins: 'mathjax',
+        language: 'en',
         mathJaxLib:
           'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML'
       }
