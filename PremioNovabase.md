@@ -65,3 +65,40 @@ Desktop                              |  Mobile
 Desktop                              |  Mobile
 :-----------------------------------:|:-----------------------------------:
 ![](p5-images/student_runningTournaments.png) | ![](p5-images/student_runningTournaments_mobile.png)
+
+
+
+### Mathematical writing
+
+#### Subgroup
+Daniel Seara
+
+#### Description
+Allow teachers and students to create questions and insert mathematical formulas, using CKEditor4 and Latex
+
+#### Screenshots
+
+<img src="p5-images/screenshot_SQ_content.png" width="700">  <img src="p5-images/screenshot_SQ_math.png" width="700">
+
+### Interface Consistency
+
+#### Subgroup
+Daniel Seara
+
+#### Description
+Normalize the size of all the action buttons and the color of the Save/Cancel buttons.
+
+#### Screenshots
+
+**Cancel/Save buttons**
+
+Before                               |  After
+:-----------------------------------:|:-----------------------------------:
+![](p5-images/CancelSaveBefore.png) | ![](p5-images/CancelSaveButtons.png)
+
+**Action buttons**
+
+Before                               |  After
+:-----------------------------------:|:-----------------------------------:
+![](p5-images/ActionButtonsBefore.png) | ![](p5-images/UniformActionButtons.png)
+
