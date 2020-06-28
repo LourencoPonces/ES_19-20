@@ -1,5 +1,6 @@
 <template>
-  <v-card v-if="editMode && quiz" class="table">
+  <!-- WEB BROWSER -->
+  <v-card v-if="!isMobile && editMode && quiz" class="table">
     <v-card-title>
       <span>Edit Quiz</span>
 
@@ -138,7 +139,7 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <v-icon
-                large
+                medium
                 class="mr-2"
                 v-on="on"
                 @click="showQuestionDialog(item)"
@@ -150,7 +151,7 @@
           </v-tooltip>
           <v-tooltip bottom v-if="!item.sequence">
             <template v-slot:activator="{ on }">
-              <v-icon large class="mr-2" v-on="on" @click="addToQuiz(item)">
+              <v-icon medium class="mr-2" v-on="on" @click="addToQuiz(item)">
                 add</v-icon
               >
             </template>
@@ -160,7 +161,7 @@
             <v-tooltip bottom>
               <template v-slot:activator="{ on }">
                 <v-icon
-                  large
+                  medium
                   class="mr-2"
                   v-on="on"
                   @click="removeFromQuiz(item)"
@@ -173,7 +174,7 @@
             <v-tooltip bottom v-if="item.sequence !== 1">
               <template v-slot:activator="{ on }">
                 <v-icon
-                  large
+                  medium
                   class="mr-2"
                   v-on="on"
                   @click="changeQuestionPosition(item, 0)"
@@ -186,7 +187,7 @@
             <v-tooltip bottom v-if="item.sequence !== 1">
               <template v-slot:activator="{ on }">
                 <v-icon
-                  large
+                  medium
                   class="mr-2"
                   v-on="on"
                   @click="
@@ -204,7 +205,7 @@
             <v-tooltip bottom v-if="quizQuestions.length > 1">
               <template v-slot:activator="{ on }">
                 <v-icon
-                  large
+                  medium
                   class="mr-2"
                   v-on="on"
                   @click="openSetPosition(item)"
@@ -217,7 +218,7 @@
             <v-tooltip bottom v-if="item.sequence !== quizQuestions.length">
               <template v-slot:activator="{ on }">
                 <v-icon
-                  large
+                  medium
                   class="mr-2"
                   v-on="on"
                   @click="
@@ -235,7 +236,7 @@
             <v-tooltip bottom v-if="item.sequence !== quizQuestions.length">
               <template v-slot:activator="{ on }">
                 <v-icon
-                  large
+                  medium
                   class="mr-2"
                   v-on="on"
                   @click="
@@ -272,8 +273,8 @@
         </v-card-text>
         <v-card-actions>
           <div class="flex-grow-1"></div>
-          <v-btn color="blue darken-1" @click="closeSetPosition">Close</v-btn>
-          <v-btn color="blue darken-1" @click="saveSetPosition">Save</v-btn>
+          <v-btn color="primary" dark @click="closeSetPosition">Close</v-btn>
+          <v-btn color="primary" dark @click="saveSetPosition">Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -284,6 +285,154 @@
       v-on:close-show-question-dialog="onCloseShowQuestionDialog"
     />
   </v-card>
+
+  <!-- MOBILE -->
+  <v-card v-else-if="editMode && quiz" class="table">
+    <v-card-title>
+      <span>Edit Quiz</span>
+
+      <v-spacer />
+
+      <v-btn
+        v-if="editMode && canSave"
+        fab
+        small
+        color="primary"
+        dark
+        @click="save"
+      >
+        <v-icon medium class="mr-2">
+          far fa-save
+        </v-icon>
+      </v-btn>
+
+      <v-btn fab small color="red" dark @click="switchMode">
+        <v-icon medium class="mr-2">
+          fas fa-times
+        </v-icon>
+      </v-btn>
+    </v-card-title>
+    <v-card-text>
+      <v-text-field v-model="quiz.title" label="*Title" />
+      <v-container fluid>
+        <VueCtkDateTimePicker
+          class="datePicker"
+          label="*Available Date"
+          id="availableDateInput"
+          v-model="quiz.availableDate"
+          format="YYYY-MM-DDTHH:mm:ssZ"
+        ></VueCtkDateTimePicker>
+        <VueCtkDateTimePicker
+          class="datePicker"
+          v-if="quiz.timed"
+          label="*Conclusion Date"
+          id="conclusionDateInput"
+          v-model="quiz.conclusionDate"
+          format="YYYY-MM-DDTHH:mm:ssZ"
+        ></VueCtkDateTimePicker>
+        <VueCtkDateTimePicker
+          class="datePicker"
+          v-if="quiz.timed"
+          responsive
+          label="Results Date"
+          id="resultsDateInput"
+          v-model="quiz.resultsDate"
+          format="YYYY-MM-DDTHH:mm:ssZ"
+        ></VueCtkDateTimePicker>
+        <v-row>
+          <v-col>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-switch v-on="on" v-model="quiz.scramble" label="Scramble" />
+              </template>
+            </v-tooltip>
+          </v-col>
+          <v-col>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-switch
+                  v-on="on"
+                  v-model="quiz.qrCodeOnly"
+                  label="QRCode Only"
+                />
+              </template>
+            </v-tooltip>
+          </v-col>
+          <v-col>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-switch
+                  v-on="on"
+                  v-model="quiz.oneWay"
+                  label="One Way Quiz"
+                />
+              </template>
+            </v-tooltip>
+          </v-col>
+          <v-col>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-switch v-on="on" v-model="quiz.timed" label="Timer" />
+              </template>
+            </v-tooltip>
+          </v-col> </v-row
+        >\
+      </v-container>
+
+      <v-data-table
+        :headers="headers_mobile"
+        :custom-filter="customFilter"
+        :custom-sort="customSort"
+        :items="questions"
+        :search="search"
+        :sort-by="['sequence']"
+        :sort-desc="[false]"
+        :mobile-breakpoint="0"
+        must-sort
+        :items-per-page="15"
+        :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
+      >
+        <template v-slot:top>
+          <v-container fluid>
+            <v-text-field
+              v-model="search"
+              append-icon="search"
+              label="Search"
+              class="mx-4"
+            />
+          </v-container>
+        </template>
+
+        <template v-slot:item.title="{ item }">
+          <v-row @click="showQuestionDialog(item)">
+            <v-col v-if="item.sequence" cols="3" align-self="center">
+              {{ item.sequence }}
+            </v-col>
+            <v-col align-self="center">
+              <p>{{ item.title }}</p>
+            </v-col>
+          </v-row>
+        </template>
+      </v-data-table>
+    </v-card-text>
+
+    <show-quiz-dialog
+      v-if="quiz"
+      v-model="quizDialog"
+      :quiz="quiz"
+      v-on:close-quiz-dialog="onCloseQuizDialog"
+    />
+    <show-quiz-question-dialog-mobile
+      v-if="currentQuestion"
+      v-model="quizQuestionDialogMobile"
+      :question="currentQuestion"
+      :number_questions="quizQuestions.length"
+      v-on:close-show-question-dialog="onCloseShowQuestionDialog"
+      v-on:change-question-position="changeQuestionPosition"
+      v-on:add-to-quiz="addToQuiz"
+      v-on:remove-from-quiz="removeFromQuiz"
+    />
+  </v-card>
 </template>
 
 <script lang="ts">
@@ -292,6 +441,7 @@ import RemoteServices from '@/services/RemoteServices';
 import { Quiz } from '@/models/management/Quiz';
 import Question from '@/models/management/Question';
 import ShowQuestionDialog from '@/views/teacher/questions/ShowQuestionDialog.vue';
+import ShowQuizQuestionDialogMobile from '@/views/teacher/quizzes/ShowQuizQuestionDialogMobile.vue';
 import ShowQuizDialog from '@/views/teacher/quizzes/ShowQuizDialog.vue';
 import VueCtkDateTimePicker from 'vue-ctk-date-time-picker';
 import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css';
@@ -301,12 +451,14 @@ Vue.component('VueCtkDateTimePicker', VueCtkDateTimePicker);
 @Component({
   components: {
     'show-question-dialog': ShowQuestionDialog,
-    'show-quiz-dialog': ShowQuizDialog
+    'show-quiz-dialog': ShowQuizDialog,
+    'show-quiz-question-dialog-mobile': ShowQuizQuestionDialogMobile
   }
 })
 export default class QuizForm extends Vue {
   @Prop(Quiz) readonly quiz!: Quiz;
   @Prop(Boolean) readonly editMode!: boolean;
+  @Prop(Boolean) readonly isMobile!: boolean;
   questions: Question[] = [];
   search: string = '';
   currentQuestion: Question | null | undefined = null;
@@ -315,6 +467,7 @@ export default class QuizForm extends Vue {
 
   positionDialog: boolean = false;
   questionDialog: boolean = false;
+  quizQuestionDialogMobile: boolean = false;
   quizDialog: boolean = false;
 
   headers: object = [
@@ -346,7 +499,9 @@ export default class QuizForm extends Vue {
     },
     { text: 'Answers', value: 'numberOfAnswers', align: 'center', width: '1%' }
   ];
-
+  headers_mobile: object = [
+    { text: 'Question Title', value: 'title', align: 'center', sortable: false }
+  ];
   async created() {
     await this.$store.dispatch('loading');
     try {
@@ -450,17 +605,23 @@ export default class QuizForm extends Vue {
 
   showQuestionDialog(question: Question) {
     this.currentQuestion = question;
-    this.questionDialog = true;
+    if (this.isMobile) {
+      this.quizQuestionDialogMobile = true;
+    } else {
+      this.questionDialog = true;
+    }
   }
 
   onCloseShowQuestionDialog() {
     this.currentQuestion = null;
     this.questionDialog = false;
+    this.quizQuestionDialogMobile = false;
   }
 
   addToQuiz(question: Question) {
     question.sequence = this.quizQuestions.length + 1;
     this.quizQuestions.push(question);
+    this.quizQuestionDialogMobile = false;
   }
 
   removeFromQuiz(question: Question) {
@@ -531,4 +692,9 @@ export default class QuizForm extends Vue {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.datePicker {
+  margin: 5px;
+  max-height: 5%;
+}
+</style>

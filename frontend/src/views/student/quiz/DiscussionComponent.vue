@@ -54,8 +54,7 @@
             </v-card-text>
             <v-card-actions>
               <v-btn
-                dark
-                color="red"
+                color="error"
                 style="margin: 5px;"
                 @click="cancelCreateRequest()"
               >

@@ -5,6 +5,7 @@
       :key="question.sequence"
       class="text-left"
     >
+      <span>{{ question.sequence }}</span>
       <show-question :question="question" />
     </li>
   </ol>

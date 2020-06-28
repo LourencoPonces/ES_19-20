@@ -1,8 +1,16 @@
 <template>
   <div>
-    <span
+    <!-- <span
       v-html="convertMarkDown(studentQuestion.content, studentQuestion.image)"
-    />
+    /> -->
+    <ckeditor
+      outline
+      auto-grow
+      rows="1"
+      v-model="studentQuestion.content"
+      :config="editorConfig"
+    >
+    </ckeditor>
     <ul>
       <li v-for="option in studentQuestion.options" :key="option.number">
         <span
@@ -32,6 +40,21 @@ export default class ShowStudentQuestion extends Vue {
 
   convertMarkDown(text: string, image: Image | null = null): string {
     return convertMarkDown(text, image);
+  }
+
+  data() {
+    return {
+      editorConfig: {
+        removePlugins: 'elementspath',
+        readOnly: true,
+        toolbarCanCollapse: true,
+        toolbarStartupExpanded: false,
+        language: 'en',
+        extraPlugins: 'mathjax',
+        mathJaxLib:
+          'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML'
+      }
+    };
   }
 }
 </script>
