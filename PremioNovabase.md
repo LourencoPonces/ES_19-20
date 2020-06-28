@@ -11,3 +11,6 @@ Afonso Gonçalves & Mariana Oliveira
 Refactor the application presentation, so it is more usable in smaller screens. We managed to have no information loss in this refactor.
 
 #### Screenshots
+
+**Teacher Questions**
+![](p5-images/teacher_questions.png) ![](p5-images/teacher_questions_mobile.png)
