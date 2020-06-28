@@ -1,7 +1,8 @@
 <template>
   <div class="container">
     <h2>Student Questions</h2>
-    <v-card class="table">
+    <!-- WEB BROWSER -->
+    <v-card v-if="!isMobile" class="table">
       <v-data-table
         :headers="headers"
         :custom-filter="customFilter"
@@ -90,7 +91,7 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <v-icon
-                large
+                medium
                 class="mr-2"
                 v-on="on"
                 @click="showStudentQuestionDialog(item)"
@@ -103,7 +104,7 @@
           <v-tooltip bottom v-if="item.isChangeable()">
             <template v-slot:activator="{ on }">
               <v-icon
-                large
+                medium
                 class="mr-2"
                 v-on="on"
                 @click="showEditStudentQuestionDialog(item)"
@@ -116,7 +117,7 @@
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <v-icon
-                large
+                medium
                 class="mr-2"
                 v-on="on"
                 @click="showDuplicateStudentQuestionDialog(item)"
@@ -129,7 +130,7 @@
           <v-tooltip bottom v-if="item.isChangeable()">
             <template v-slot:activator="{ on }">
               <v-icon
-                large
+                medium
                 class="mr-2"
                 v-on="on"
                 @click="deleteStudentQuestion(item)"
@@ -143,7 +144,7 @@
           <v-tooltip bottom v-if="item.justification">
             <template v-slot:activator="{ on }">
               <v-icon
-                large
+                medium
                 class="mr-2"
                 v-on="on"
                 @click="showJustificationDialog(item)"
@@ -160,20 +161,6 @@
         view it. <v-icon class="mr-2">mouse</v-icon>Right-click on question's
         title to edit it.
       </footer>
-      <edit-student-question-dialog
-        v-if="editStudentQuestionDialog"
-        v-model="editStudentQuestionDialog"
-        :studentQuestion="currentStudentQuestion"
-        :topics="topics"
-        v-on:save-student-question="onSaveStudentQuestion"
-        v-on:close-edit-student-question-dialog="closeDialogs"
-      />
-      <show-student-question-dialog
-        v-if="studentQuestionDialog"
-        v-model="studentQuestionDialog"
-        :studentQuestion="currentStudentQuestion"
-        v-on:close-show-student-question-dialog="closeDialogs"
-      />
       <show-student-question-justification
         v-if="studentQuestionJustification"
         v-model="studentQuestionJustification"
@@ -181,6 +168,86 @@
         v-on:close-show-student-question-justification="closeDialogs"
       />
     </v-card>
+
+    <!-- MOBILE -->
+    <v-card v-else class="table">
+      <v-data-table
+        :headers="headers_mobile"
+        :custom-filter="customFilter"
+        :items="studentQuestions"
+        :search="search"
+        :sort-by="['creationDate']"
+        sort-desc
+        :mobile-breakpoint="0"
+        :items-per-page="15"
+        :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
+        fixed-header
+      >
+        <template v-slot:top>
+          <v-card-title>
+            <v-row>
+              <v-col cols="9">
+                <v-text-field
+                  v-model="search"
+                  append-icon="search"
+                  label="Search"
+                  class="mx-2"
+                  data-cy="search-input"
+                />
+              </v-col>
+              <v-col cols="3" align-self="center">
+                <template>
+                  <v-btn fab primary small color="primary">
+                    <v-icon
+                      small
+                      class="mr-2"
+                      @click="showNewStudentQuestionDialog"
+                      >fa fa-plus</v-icon
+                    >
+                  </v-btn>
+                </template>
+              </v-col>
+            </v-row>
+          </v-card-title>
+        </template>
+        <template v-slot:item.title="{ item }">
+          <v-row @click="showStudentQuestionDialog(item)">
+            <v-col align-self="center">
+              <v-badge bordered :color="item.getEvaluationColor()" />
+            </v-col>
+            <v-col cols="10">
+              <p>{{ item.title }}</p>
+            </v-col>
+          </v-row>
+        </template>
+      </v-data-table>
+    </v-card>
+    <show-student-question-dialog-mobile
+      v-if="studentQuestionDialogMobile"
+      v-model="studentQuestionDialogMobile"
+      :studentQuestion="currentStudentQuestion"
+      v-on:close-show-student-question-dialog="closeDialogs"
+      v-on:edit-student-question-mobile="showEditStudentQuestionDialog"
+      v-on:duplicate-student-question="showDuplicateStudentQuestionDialog"
+      v-on:delete-student-question="deleteStudentQuestion"
+    />
+    <show-student-question-dialog
+      v-if="studentQuestionDialog"
+      v-model="studentQuestionDialog"
+      :studentQuestion="currentStudentQuestion"
+      v-on:close-show-student-question-dialog="closeDialogs"
+      v-on:edit-student-question="showEditStudentQuestionDialog"
+    />
+    <edit-student-question-dialog
+      v-if="editStudentQuestionDialog"
+      v-model="editStudentQuestionDialog"
+      :studentQuestion="currentStudentQuestion"
+      :topics="topics"
+      :isMobile="isMobile"
+      v-on:delete-student-question="deleteStudentQuestion"
+      v-on:save-student-question="onSaveStudentQuestion"
+      v-on:close-edit-student-question-dialog="closeDialogs"
+    />
   </div>
 </template>
 
@@ -191,22 +258,26 @@ import StudentQuestion from '@/models/management/StudentQuestion';
 import Image from '@/models/management/Image';
 import Topic from '@/models/management/Topic';
 import ShowStudentQuestionDialog from '@/views/student/studentQuestions/ShowStudentQuestionDialog.vue';
+import ShowStudentQuestionDialogMobile from '@/views/student/studentQuestions/ShowStudentQuestionDialogMobile.vue';
 import EditStudentQuestionDialog from '@/views/student/studentQuestions/EditStudentQuestionDialog.vue';
 import ShowStudentQuestionJustification from '@/views/student/studentQuestions/ShowStudentQuestionJustification.vue';
 
 @Component({
   components: {
     'show-student-question-dialog': ShowStudentQuestionDialog,
+    'show-student-question-dialog-mobile': ShowStudentQuestionDialogMobile,
     'edit-student-question-dialog': EditStudentQuestionDialog,
     'show-student-question-justification': ShowStudentQuestionJustification
   }
 })
 export default class StudentQuestionView extends Vue {
+  isMobile: boolean = false;
   studentQuestions: StudentQuestion[] = [];
   topics: Topic[] = [];
   currentStudentQuestion: StudentQuestion | null = null;
   editStudentQuestionDialog: boolean = false;
   studentQuestionDialog: boolean = false;
+  studentQuestionDialogMobile: boolean = false;
   studentQuestionJustification: boolean = false;
   search: string = '';
 
@@ -252,8 +323,13 @@ export default class StudentQuestionView extends Vue {
     }
   ];
 
+  headers_mobile: object = [
+    { text: 'Question', value: 'title', align: 'center', sortable: false }
+  ];
+
   async created() {
     await this.$store.dispatch('loading');
+    this.isMobile = window.innerWidth <= 500;
     try {
       [this.topics, this.studentQuestions] = await Promise.all([
         RemoteServices.getTopics(),
@@ -289,6 +365,7 @@ export default class StudentQuestionView extends Vue {
         this.studentQuestions = this.studentQuestions.filter(
           question => question.id != toDeleteStudentquestion.id
         );
+        this.closeDialogs();
       } catch (error) {
         await this.$store.dispatch('error', error);
       }
@@ -313,7 +390,11 @@ export default class StudentQuestionView extends Vue {
   }
   showStudentQuestionDialog(studentQuestion: StudentQuestion) {
     this.currentStudentQuestion = studentQuestion;
-    this.studentQuestionDialog = true;
+    if (this.isMobile) {
+      this.studentQuestionDialogMobile = true;
+    } else {
+      this.studentQuestionDialog = true;
+    }
   }
 
   showJustificationDialog(studentQuestion: StudentQuestion) {
@@ -355,10 +436,20 @@ export default class StudentQuestionView extends Vue {
     this.closeDialogs();
   }
 
+  onStudentQuestionChangedTopics(questionId: Number, changedTopics: Topic[]) {
+    let question = this.studentQuestions.find(
+      (question: StudentQuestion) => question.id == questionId
+    );
+    if (question) {
+      question.topics = changedTopics;
+    }
+  }
+
   closeDialogs() {
     this.currentStudentQuestion = null;
     this.editStudentQuestionDialog = false;
     this.studentQuestionDialog = false;
+    this.studentQuestionDialogMobile = false;
     this.studentQuestionJustification = false;
   }
 

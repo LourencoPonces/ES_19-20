@@ -1,153 +1,237 @@
 <template>
-  <v-card class="table">
-    <v-data-table
-      :headers="headers"
-      :custom-filter="customFilter"
-      :items="questions"
-      :search="search"
-      :sort-by="['creationDate']"
-      sort-desc
-      :mobile-breakpoint="0"
-      :items-per-page="15"
-      :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
-    >
-      <template v-slot:top>
-        <v-card-title>
-          <v-text-field
-            v-model="search"
-            append-icon="search"
-            label="Search"
-            class="mx-2"
-            data-cy="search-input"
-          />
+  <div class="container">
+    <h2>Questions</h2>
+    <!-- WEB BROWSER -->
+    <v-card v-if="!isMobile" class="table">
+      <v-data-table
+        :headers="headers"
+        :custom-filter="customFilter"
+        :items="questions"
+        :search="search"
+        :sort-by="['creationDate']"
+        sort-desc
+        :mobile-breakpoint="0"
+        :items-per-page="15"
+        :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
+      >
+        <template v-slot:top>
+          <v-card-title>
+            <v-text-field
+              v-model="search"
+              append-icon="search"
+              label="Search"
+              class="mx-2"
+              data-cy="search-input"
+            />
 
-          <v-spacer />
-          <v-btn color="primary" dark @click="newQuestion">New Question</v-btn>
-          <v-btn color="primary" dark @click="exportCourseQuestions"
-            >Export Questions</v-btn
+            <v-spacer />
+            <v-btn color="primary" dark @click="newQuestion"
+              >New Question</v-btn
+            >
+            <v-btn color="primary" dark @click="exportCourseQuestions"
+              >Export Questions</v-btn
+            >
+          </v-card-title>
+        </template>
+
+        <template v-slot:item.title="{ item }">
+          <p
+            @click="showQuestionDialog(item)"
+            @contextmenu="editQuestion(item, $event)"
+            style="cursor: pointer"
           >
-        </v-card-title>
-      </template>
+            {{ item.title }}
+          </p>
+        </template>
 
-      <template v-slot:item.title="{ item }">
-        <p
-          @click="showQuestionDialog(item)"
-          @contextmenu="editQuestion(item, $event)"
-          style="cursor: pointer"
-        >
-          {{ item.title }}
-        </p>
-      </template>
+        <template v-slot:item.topics="{ item }">
+          <edit-question-topics
+            :question="item"
+            :topics="topics"
+            v-on:question-changed-topics="onQuestionChangedTopics"
+          />
+        </template>
 
-      <template v-slot:item.topics="{ item }">
-        <edit-question-topics
-          :question="item"
-          :topics="topics"
-          v-on:question-changed-topics="onQuestionChangedTopics"
-        />
-      </template>
+        <template v-slot:item.difficulty="{ item }">
+          <v-chip
+            v-if="item.difficulty"
+            :color="getDifficultyColor(item.difficulty)"
+            dark
+            >{{ item.difficulty + '%' }}</v-chip
+          >
+        </template>
 
-      <template v-slot:item.difficulty="{ item }">
-        <v-chip
-          v-if="item.difficulty"
-          :color="getDifficultyColor(item.difficulty)"
-          dark
-          >{{ item.difficulty + '%' }}</v-chip
-        >
-      </template>
+        <template v-slot:item.status="{ item }">
+          <v-select
+            v-model="item.status"
+            :items="statusList"
+            dense
+            @change="setStatus(item.id, item.status)"
+          >
+            <template v-slot:selection="{ item }">
+              <v-chip :color="getStatusColor(item)" small>
+                <span>{{ item }}</span>
+              </v-chip>
+            </template>
+          </v-select>
+        </template>
 
-      <template v-slot:item.status="{ item }">
-        <v-select
-          v-model="item.status"
-          :items="statusList"
-          dense
-          @change="setStatus(item.id, item.status)"
-        >
-          <template v-slot:selection="{ item }">
-            <v-chip :color="getStatusColor(item)" small>
-              <span>{{ item }}</span>
-            </v-chip>
-          </template>
-        </v-select>
-      </template>
+        <template v-slot:item.image="{ item }">
+          <v-file-input
+            show-size
+            dense
+            small-chips
+            @change="handleFileUpload($event, item)"
+            accept="image/*"
+          />
+        </template>
 
-      <template v-slot:item.image="{ item }">
-        <v-file-input
-          show-size
-          dense
-          small-chips
-          @change="handleFileUpload($event, item)"
-          accept="image/*"
-        />
-      </template>
+        <template v-slot:item.action="{ item }">
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-icon
+                medium
+                class="mr-2"
+                v-on="on"
+                @click="showQuestionDialog(item)"
+                >visibility</v-icon
+              >
+            </template>
+            <span>Show Question</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-icon
+                medium
+                class="mr-2"
+                v-on="on"
+                @click="duplicateQuestion(item)"
+                >cached</v-icon
+              >
+            </template>
+            <span>Duplicate Question</span>
+          </v-tooltip>
+          <v-tooltip bottom v-if="item.numberOfAnswers === 0">
+            <template v-slot:activator="{ on }">
+              <v-icon medium class="mr-2" v-on="on" @click="editQuestion(item)"
+                >edit</v-icon
+              >
+            </template>
+            <span>Edit Question</span>
+          </v-tooltip>
 
-      <template v-slot:item.action="{ item }">
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
-            <v-icon
-              large
-              class="mr-2"
-              v-on="on"
-              @click="showQuestionDialog(item)"
-              >visibility</v-icon
-            >
-          </template>
-          <span>Show Question</span>
-        </v-tooltip>
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
-            <v-icon
-              large
-              class="mr-2"
-              v-on="on"
-              @click="duplicateQuestion(item)"
-              >cached</v-icon
-            >
-          </template>
-          <span>Duplicate Question</span>
-        </v-tooltip>
-        <v-tooltip bottom v-if="item.numberOfAnswers === 0">
-          <template v-slot:activator="{ on }">
-            <v-icon large class="mr-2" v-on="on" @click="editQuestion(item)"
-              >edit</v-icon
-            >
-          </template>
-          <span>Edit Question</span>
-        </v-tooltip>
+          <v-tooltip bottom v-if="item.numberOfAnswers === 0">
+            <template v-slot:activator="{ on }">
+              <v-icon
+                medium
+                class="mr-2"
+                v-on="on"
+                @click="deleteQuestion(item)"
+                color="red"
+                >delete</v-icon
+              >
+            </template>
+            <span>Delete Question</span>
+          </v-tooltip>
+        </template>
+      </v-data-table>
+      <footer>
+        <v-icon class="mr-2">mouse</v-icon>Left-click on question's title to
+        view it. <v-icon class="mr-2">mouse</v-icon>Right-click on question's
+        title to edit it.
+      </footer>
+      <edit-question-dialog
+        v-if="currentQuestion"
+        v-model="editQuestionDialog"
+        :question="currentQuestion"
+        v-on:save-question="onSaveQuestion"
+      />
+      <show-question-dialog
+        v-if="currentQuestion"
+        v-model="questionDialog"
+        :question="currentQuestion"
+        v-on:close-show-question-dialog="onCloseShowQuestionDialog"
+      />
+    </v-card>
 
-        <v-tooltip bottom v-if="item.numberOfAnswers === 0">
-          <template v-slot:activator="{ on }">
-            <v-icon
-              large
-              class="mr-2"
-              v-on="on"
-              @click="deleteQuestion(item)"
-              color="red"
-              >delete</v-icon
-            >
-          </template>
-          <span>Delete Question</span>
-        </v-tooltip>
-      </template>
-    </v-data-table>
-    <footer>
-      <v-icon class="mr-2">mouse</v-icon>Left-click on question's title to view
-      it. <v-icon class="mr-2">mouse</v-icon>Right-click on question's title to
-      edit it.
-    </footer>
-    <edit-question-dialog
-      v-if="currentQuestion"
-      v-model="editQuestionDialog"
-      :question="currentQuestion"
-      v-on:save-question="onSaveQuestion"
-    />
-    <show-question-dialog
-      v-if="currentQuestion"
-      v-model="questionDialog"
-      :question="currentQuestion"
-      v-on:close-show-question-dialog="onCloseShowQuestionDialog"
-    />
-  </v-card>
+    <!-- MOBILE -->
+    <v-card v-else class="table">
+      <v-data-table
+        :headers="headers_mobile"
+        :custom-filter="customFilter"
+        :items="questions"
+        :search="search"
+        :sort-by="['creationDate']"
+        sort-desc
+        :mobile-breakpoint="0"
+        :items-per-page="15"
+        :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
+        fixed-header
+      >
+        <template v-slot:top>
+          <v-card-title>
+            <v-row>
+              <v-col cols="9">
+                <v-text-field
+                  v-model="search"
+                  append-icon="search"
+                  label="Search"
+                  class="mx-2"
+                  data-cy="search-input"
+                />
+              </v-col>
+              <v-col cols="3" align-self="center">
+                <template>
+                  <v-btn fab primary small color="primary">
+                    <v-icon small class="mr-2" @click="newQuestion"
+                      >fa fa-plus</v-icon
+                    >
+                  </v-btn>
+                </template>
+              </v-col>
+            </v-row>
+          </v-card-title>
+        </template>
+        <template v-slot:item.title="{ item }">
+          <v-row @click="showQuestionDialog(item)">
+            <v-col align-self="center">
+              <v-badge bordered :color="getStatusColor(item.status)" />
+            </v-col>
+            <v-col cols="10">
+              <p>{{ item.title }}</p>
+            </v-col>
+          </v-row>
+        </template>
+      </v-data-table>
+      <edit-question-dialog
+        v-if="currentQuestion"
+        v-model="editQuestionDialog"
+        :question="currentQuestion"
+        :isMobile="isMobile"
+        v-on:save-question="onSaveQuestion"
+      />
+      <show-question-dialog
+        v-if="currentQuestion"
+        v-model="questionDialog"
+        :question="currentQuestion"
+        v-on:close-show-question-dialog="onCloseShowQuestionDialog"
+      />
+      <show-question-dialog-mobile
+        v-if="currentQuestion"
+        v-model="questionDialogMobile"
+        :question="currentQuestion"
+        :topics="topics"
+        :statusColor="getStatusColor(currentQuestion.status)"
+        :diffColor="getDifficultyColor(currentQuestion.difficulty)"
+        v-on:close-show-question-dialog="onCloseShowQuestionDialog"
+        v-on:question-changed-topics="onQuestionChangedTopics"
+        v-on:set-status="setStatus"
+        v-on:edit-question="editQuestion"
+        v-on:delete-question="deleteQuestion"
+        v-on:duplicate-question="duplicateQuestion"
+      />
+    </v-card>
+  </div>
 </template>
 
 <script lang="ts">
@@ -157,22 +241,26 @@ import Question from '@/models/management/Question';
 import Image from '@/models/management/Image';
 import Topic from '@/models/management/Topic';
 import ShowQuestionDialog from '@/views/teacher/questions/ShowQuestionDialog.vue';
+import ShowQuestionDialogMobile from '@/views/teacher/questions/ShowQuestionDialogMobile.vue';
 import EditQuestionDialog from '@/views/teacher/questions/EditQuestionDialog.vue';
 import EditQuestionTopics from '@/views/teacher/questions/EditQuestionTopics.vue';
 
 @Component({
   components: {
     'show-question-dialog': ShowQuestionDialog,
+    'show-question-dialog-mobile': ShowQuestionDialogMobile,
     'edit-question-dialog': EditQuestionDialog,
     'edit-question-topics': EditQuestionTopics
   }
 })
 export default class QuestionsView extends Vue {
+  isMobile: boolean = false;
   questions: Question[] = [];
   topics: Topic[] = [];
   currentQuestion: Question | null = null;
   editQuestionDialog: boolean = false;
   questionDialog: boolean = false;
+  questionDialogMobile: boolean = false;
   search: string = '';
   statusList = ['DISABLED', 'AVAILABLE', 'REMOVED'];
 
@@ -217,6 +305,10 @@ export default class QuestionsView extends Vue {
     }
   ];
 
+  headers_mobile: object = [
+    { text: 'Question', value: 'title', align: 'center', sortable: false }
+  ];
+
   @Watch('editQuestionDialog')
   closeError() {
     if (!this.editQuestionDialog) {
@@ -226,6 +318,7 @@ export default class QuestionsView extends Vue {
 
   async created() {
     await this.$store.dispatch('loading');
+    this.isMobile = window.innerWidth <= 500;
     try {
       [this.topics, this.questions] = await Promise.all([
         RemoteServices.getTopics(),
@@ -298,12 +391,17 @@ export default class QuestionsView extends Vue {
 
   showQuestionDialog(question: Question) {
     this.currentQuestion = question;
-    this.questionDialog = true;
+    if (this.isMobile) {
+      this.questionDialogMobile = true;
+    } else {
+      this.questionDialog = true;
+    }
   }
 
   onCloseShowQuestionDialog() {
     this.currentQuestion = null;
     this.questionDialog = false;
+    this.questionDialogMobile = false;
   }
 
   newQuestion() {
@@ -359,6 +457,7 @@ export default class QuestionsView extends Vue {
         this.questions = this.questions.filter(
           question => question.id != toDeletequestion.id
         );
+        this.onCloseShowQuestionDialog();
       } catch (error) {
         await this.$store.dispatch('error', error);
       }
@@ -368,6 +467,22 @@ export default class QuestionsView extends Vue {
 </script>
 
 <style lang="scss" scoped>
+.container {
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  h2 {
+    font-size: 26px;
+    margin: 20px 0;
+    text-align: center;
+    small {
+      font-size: 0.5em;
+    }
+  }
+}
 .question-textarea {
   text-align: left;
 

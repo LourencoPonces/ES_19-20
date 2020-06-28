@@ -21,11 +21,12 @@ import ResultsView from './views/student/quiz/ResultsView.vue';
 import StatsView from './views/student/StatsView.vue';
 import DashboardView from './views/student/dashboard/DashboardView.vue';
 import ScanView from './views/student/ScanView.vue';
-import ClarificationsStudentView from './views/student/ClarificationsView.vue';
+import ClarificationsStudentView from './views/student/clarifications/ClarificationsView.vue';
 import StudentQuestionView from './views/student/studentQuestions/StudentQuestionView.vue';
 import RunningTournamentsView from '@/views/student/tournament/RunningTournamentsView.vue';
 import AvailableTournamentsView from '@/views/student/tournament/AvailableTournamentsView.vue';
 import CreatedTournamentsView from '@/views/student/tournament/CreatedTournamentsView.vue';
+import SolvedTournamentsView from '@/views/student/tournament/SolvedTournamentsView.vue';
 
 import AdminManagementView from '@/views/admin/AdminManagementView.vue';
 import NotFoundView from '@/views/NotFoundView.vue';
@@ -244,6 +245,15 @@ let router = new Router({
           component: CreatedTournamentsView,
           meta: {
             title: process.env.VUE_APP_NAME + ' - Created Tournaments',
+            requiredAuth: 'Student'
+          }
+        },
+        {
+          path: 'tournaments-solved',
+          name: 'tournaments-solved',
+          component: SolvedTournamentsView,
+          meta: {
+            title: process.env.VUE_APP_NAME + ' - Solved Tournaments',
             requiredAuth: 'Student'
           }
         },
