@@ -156,6 +156,7 @@ export default class EditStudentQuestionDialog extends Vue {
   data() {
     return {
       editorConfig: {
+        language: 'en',
         extraPlugins: 'mathjax',
         mathJaxLib:
           'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML'
