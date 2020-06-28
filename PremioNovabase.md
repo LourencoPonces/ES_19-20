@@ -113,3 +113,4 @@ Lourenço Duarte & Marcelo Santos
 Allow students to see the tournaments that they have participated
 
 #### Screenshots
+<img src="p5-images/solvedTournaments.png" width="700">
