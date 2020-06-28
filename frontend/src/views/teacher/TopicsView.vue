@@ -1,7 +1,9 @@
 <template v-if="topics">
   <div class="container">
     <h2>Topics</h2>
-    <v-card class="table">
+
+    <!-- WEB BROWSER -->
+    <v-card v-if="!isMobile" class="table">
       <v-data-table
         :headers="headers"
         :custom-filter="customFilter"
@@ -76,6 +78,88 @@
         </v-card>
       </v-dialog>
     </v-card>
+
+    <!-- MOBILE -->
+    <v-card v-else class="table">
+      <v-data-table
+        :headers="headers_mobile"
+        :custom-filter="customFilter"
+        :items="topics"
+        :search="search"
+        :mobile-breakpoint="0"
+        :items-per-page="50"
+        :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
+      >
+        <template v-slot:top>
+          <v-card-title>
+            <v-row>
+              <v-col cols="9">
+                <v-text-field
+                  v-model="search"
+                  append-icon="search"
+                  label="Search"
+                  single-line
+                  hide-details
+                />
+              </v-col>
+              <v-col cols="3" align-self="center">
+                <template>
+                  <v-btn fab primary small color="primary">
+                    <v-icon small class="mr-2" @click="newTopic"
+                      >fa fa-plus</v-icon
+                    >
+                  </v-btn>
+                </template>
+              </v-col>
+            </v-row>
+          </v-card-title>
+        </template>
+        <template v-slot:item.name="{ item }">
+          <p @click="editTopic(item, $event)" style="cursor: pointer">
+            {{ item.name }}
+          </p>
+        </template>
+      </v-data-table>
+      <footer />
+
+      <v-dialog v-model="topicDialog" max-width="75%">
+        <v-card>
+          <v-card-title>
+            <span class="headline">Topic</span>
+          </v-card-title>
+
+          <v-card-text>
+            <v-text-field v-model="editedTopic.name" label="Name" />
+            <b
+              >There {{ editedTopic.numberOfQuestions === 1 ? 'is' : 'are' }}
+              {{ editedTopic.numberOfQuestions }} question{{
+                editedTopic.numberOfQuestions === 1 ? '' : 's'
+              }}
+              about this topic
+            </b>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer />
+            <v-btn
+              v-if="editedTopic.numberOfQuestions == 0"
+              fab
+              color="error"
+              small
+              @click="deleteTopic(editedTopic)"
+            >
+              <v-icon medium class="mr-2">
+                delete
+              </v-icon>
+            </v-btn>
+            <v-btn fab color="primary" small @click="saveTopic">
+              <v-icon medium class="mr-2">
+                far fa-save
+              </v-icon>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-card>
   </div>
 </template>
 
@@ -86,6 +170,7 @@ import Topic from '@/models/management/Topic';
 
 @Component
 export default class TopicsView extends Vue {
+  isMobile: boolean = false;
   topics: Topic[] = [];
   editedTopic: Topic = new Topic();
   topicDialog: boolean = false;
@@ -106,9 +191,13 @@ export default class TopicsView extends Vue {
       width: '115px'
     }
   ];
+  headers_mobile: object = [
+    { text: 'Topic', value: 'name', align: 'center', sortable: false }
+  ];
 
   async created() {
     await this.$store.dispatch('loading');
+    this.isMobile = window.innerWidth <= 500;
     try {
       this.topics = await RemoteServices.getTopics();
     } catch (error) {
@@ -152,6 +241,7 @@ export default class TopicsView extends Vue {
         this.topics = this.topics.filter(
           topic => topic.id !== toDeleteTopic.id
         );
+        this.topicDialog = false;
       } catch (error) {
         await this.$store.dispatch('error', error);
       }

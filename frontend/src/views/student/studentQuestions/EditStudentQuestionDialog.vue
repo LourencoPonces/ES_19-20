@@ -12,8 +12,8 @@
         <span class="headline">
           {{
             editStudentQuestion && editStudentQuestion.id === null
-              ? 'New Student Question'
-              : 'Edit Student Question'
+              ? 'New Question'
+              : 'Edit My Question'
           }}
         </span>
       </v-card-title>
@@ -100,7 +100,7 @@
         </v-container>
       </v-card-text>
 
-      <v-card-actions>
+      <v-card-actions v-if="!isMobile">
         <v-spacer />
         <v-btn
           color="error"
@@ -115,6 +115,14 @@
           data-cy="SaveStudentQuestion"
         >
           Save
+        </v-btn>
+      </v-card-actions>
+      <v-card-actions v-else>
+        <v-spacer />
+        <v-btn fab color="primary" small @click="saveStudentQuestion">
+          <v-icon medium class="mr-2">
+            far fa-save
+          </v-icon>
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -133,6 +141,7 @@ export default class EditStudentQuestionDialog extends Vue {
   @Prop({ type: StudentQuestion, required: true })
   studentQuestion!: StudentQuestion;
   @Prop({ type: Array, required: true }) readonly topics!: Topic[];
+  @Prop({ type: Boolean, required: true }) readonly isMobile!: boolean;
 
   studentQuestionTopics: Topic[] = JSON.parse(
     JSON.stringify(this.studentQuestion.topics)

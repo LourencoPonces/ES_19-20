@@ -1,5 +1,6 @@
 <template>
-  <v-card class="table">
+  <!-- WEB BROWSER -->
+  <v-card v-if="!isMobile" class="table">
     <v-data-table
       :headers="headers"
       :items="quizzes"
@@ -150,6 +151,90 @@
       </v-card>
     </v-dialog>
   </v-card>
+
+  <!-- MOBILE -->
+  <v-card v-else class="table">
+    <v-data-table
+      :headers="headers_mobile"
+      :items="quizzes"
+      :search="search"
+      :sort-by="['creationDate']"
+      sort-desc
+      :mobile-breakpoint="0"
+      :items-per-page="15"
+      :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
+      fixed-header
+    >
+      <template v-slot:top>
+        <v-card-title>
+          <v-row>
+            <v-col cols="9">
+              <v-text-field
+                v-model="search"
+                append-icon="search"
+                label="Search"
+                class="mx-2"
+                data-cy="search-input"
+              />
+            </v-col>
+            <v-col cols="3" align-self="center">
+              <template>
+                <v-btn fab primary small color="primary">
+                  <v-icon small class="mr-2" @click="$emit('newQuiz')"
+                    >fa fa-plus</v-icon
+                  >
+                </v-btn>
+              </template>
+            </v-col>
+          </v-row>
+        </v-card-title>
+      </template>
+
+      <template v-slot:item.title="{ item }">
+        <v-row @click="showQuizDialog(item.id)">
+          <v-col align-self="center">
+            <v-badge bordered :color="getStatusColor(item)" />
+          </v-col>
+          <v-col cols="10">
+            <p>{{ item.title }}</p>
+          </v-col>
+        </v-row>
+      </template>
+    </v-data-table>
+
+    <show-quiz-dialog-mobile
+      v-if="quiz"
+      v-model="quizDialog"
+      :quiz="quiz"
+      v-on:delete-quiz="deleteQuiz"
+      v-on:edit-quiz="editQuiz"
+      v-on:show-qr-code="showQrCode"
+      v-on:show-quiz-answers="showQuizAnswers"
+    />
+    <v-dialog
+      v-model="qrcodeDialog"
+      @keydown.esc="qrcodeDialog = false"
+      max-width="75%"
+    >
+      <v-card v-if="qrValue">
+        <vue-qrcode
+          class="qrcode"
+          :value="qrValue.toString()"
+          errorCorrectionLevel="M"
+          :quality="1"
+          :scale="100"
+        />
+      </v-card>
+    </v-dialog>
+    <show-quiz-answers-dialog
+      v-if="quizAnswers"
+      v-model="quizAnswersDialog"
+      :isMobile="isMobile"
+      :quiz-answers="quizAnswers"
+      :correct-sequence="correctSequence"
+      :timeToSubmission="timeToSubmission"
+    />
+  </v-card>
 </template>
 
 <script lang="ts">
@@ -157,6 +242,7 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 import { Quiz } from '@/models/management/Quiz';
 import RemoteServices from '@/services/RemoteServices';
 import ShowQuizDialog from '@/views/teacher/quizzes/ShowQuizDialog.vue';
+import ShowQuizDialogMobile from '@/views/teacher/quizzes/ShowQuizDialogMobile.vue';
 import ShowQuizAnswersDialog from '@/views/teacher/quizzes/ShowQuizAnswersDialog.vue';
 import VueQrcode from 'vue-qrcode';
 import { QuizAnswer } from '@/models/management/QuizAnswer';
@@ -166,11 +252,13 @@ import { QuizAnswers } from '@/models/management/QuizAnswers';
   components: {
     'show-quiz-answers-dialog': ShowQuizAnswersDialog,
     'show-quiz-dialog': ShowQuizDialog,
+    'show-quiz-dialog-mobile': ShowQuizDialogMobile,
     'vue-qrcode': VueQrcode
   }
 })
 export default class QuizList extends Vue {
   @Prop({ type: Array, required: true }) readonly quizzes!: Quiz[];
+  @Prop({ type: Boolean, required: true }) readonly isMobile!: boolean;
   quiz: Quiz | null = null;
   quizAnswers: QuizAnswer[] = [];
   correctSequence: number[] = [];
@@ -229,6 +317,16 @@ export default class QuizList extends Vue {
       width: '10%'
     }
   ];
+  headers_mobile: object = [
+    { text: 'Title', value: 'title', align: 'center', width: '20%' }
+  ];
+
+  getStatusColor(quiz: Quiz) {
+    if (quiz.timeToConclusion <= 0) return 'red';
+    else if (new Date(quiz.availableDate) < new Date(Date.now())) {
+      return 'green';
+    } else return 'orange';
+  }
 
   async showQuizDialog(quizId: number) {
     try {
@@ -288,6 +386,7 @@ export default class QuizList extends Vue {
       } catch (error) {
         await this.$store.dispatch('error', error);
       }
+      this.quizDialog = false;
     }
   }
 }

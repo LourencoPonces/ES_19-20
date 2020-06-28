@@ -42,10 +42,18 @@
         </div>
       </v-card-text>
 
-      <v-card-actions>
+      <v-card-actions v-if="!isMobile">
         <v-spacer />
         <v-btn color="error" @click="$emit('dialog', false)">Cancel</v-btn>
         <v-btn color="primary" dark @click="saveQuestion">Save</v-btn>
+      </v-card-actions>
+      <v-card-actions v-else>
+        <v-spacer />
+        <v-btn fab color="primary" small @click="saveQuestion">
+          <v-icon medium class="mr-2">
+            far fa-save
+          </v-icon>
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -60,6 +68,7 @@ import RemoteServices from '@/services/RemoteServices';
 export default class EditQuestionDialog extends Vue {
   @Model('dialog', Boolean) dialog!: boolean;
   @Prop({ type: Question, required: true }) readonly question!: Question;
+  @Prop({ type: Boolean, required: true }) readonly isMobile!: boolean;
 
   editQuestion!: Question;
 

@@ -1,7 +1,9 @@
 <template>
   <div class="container">
     <h2>Created Tournaments</h2>
-    <v-card class="table">
+
+    <!-- WEB BROWSER -->
+    <v-card class="table" v-if="!isMobile">
       <v-data-table
         :headers="headers"
         :items="createdTournaments"
@@ -90,6 +92,147 @@
         </template>
       </v-data-table>
     </v-card>
+
+    <!-- MOBILE -->
+    <v-card class="table" v-else>
+      <v-data-table
+        :headers="headers_mobile"
+        :items="createdTournaments"
+        :search="search"
+        multi-sort
+        :mobile-breakpoint="0"
+        :items-per-page="15"
+        :footer-props="{ itemsPerPageOptions: [15, 30, 50, 100] }"
+        no-data-text="No Created Tournaments"
+        no-results-text="No Tournaments Found"
+        data-cy="createdTournamentsTable"
+      >
+        <template v-slot:top>
+          <v-card-title>
+            <v-row>
+              <v-col cols="9">
+                <v-text-field
+                  v-model="search"
+                  append-icon="search"
+                  label="Search"
+                  class="mx-2"
+                  data-cy="search-input"
+                />
+              </v-col>
+              <v-col cols="3" align-self="center">
+                <template>
+                  <v-btn fab primary small color="primary">
+                    <v-icon small class="mr-2" @click="newTournament"
+                      >fa fa-plus</v-icon
+                    >
+                  </v-btn>
+                </template>
+              </v-col>
+            </v-row>
+            <edit-tournament-dialog
+              v-if="currentTournament"
+              v-model="editTournamentDialog"
+              :tournament="currentTournament"
+              :topics="topics"
+              @saveTournament="createdTournament"
+            />
+          </v-card-title>
+        </template>
+        <template v-slot:item.title="{ item }">
+          <v-expansion-panels flat>
+            <v-expansion-panel>
+              <v-expansion-panel-header>
+                <p>{{ item.title }}</p>
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <v-row>
+                  <v-col cols="6">
+                    <span>Status:</span>
+                  </v-col>
+                  <v-col>
+                    {{ getStatus(item) }}
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="6">
+                    <span>Available Date:</span>
+                  </v-col>
+                  <v-col>
+                    <span>{{ item.availableDate }}</span>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="6">
+                    <span>Running Date:</span>
+                  </v-col>
+                  <v-col>
+                    <span>{{ item.runningDate }}</span>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="6">
+                    <span>Conclusion Date:</span>
+                  </v-col>
+                  <v-col>
+                    <span>{{ item.conclusionDate }}</span>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col>
+                    <span>{{ item.numberOfQuestions }} questions</span>
+                  </v-col>
+                  <v-col>
+                    <span
+                      >{{ item.participants.length }} participant{{
+                        item.participants.length === 1 ? '' : 's'
+                      }}</span
+                    >
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col>
+                    <span><b>Topics</b></span>
+                    <br />
+                    <v-chip-group data-cy="topics-list" column>
+                      <v-chip v-for="topic in item.topics" :key="topic.name">
+                        {{ topic.name }}
+                      </v-chip>
+                    </v-chip-group>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-spacer />
+                  <v-btn
+                    v-if="
+                      getStatus(item) == 'Created' ||
+                        getStatus(item) == 'Available'
+                    "
+                    fab
+                    color="error"
+                    small
+                    @click="cancelTournament(item)"
+                  >
+                    <v-icon medium class="mr-2">
+                      fas fa-ban
+                    </v-icon>
+                  </v-btn>
+                  <v-btn
+                    fab
+                    color="error"
+                    small
+                    @click="deleteTournament(item)"
+                  >
+                    <v-icon medium class="mr-2">
+                      delete
+                    </v-icon>
+                  </v-btn>
+                </v-row>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
+        </template>
+      </v-data-table>
+    </v-card>
   </div>
 </template>
 
@@ -106,6 +249,7 @@ import EditTournamentDialog from './EditTournamentDialog.vue';
   }
 })
 export default class CreatedTournamentsView extends Vue {
+  isMobile: boolean = false;
   createdTournaments: Tournament[] = [];
   currentTournament: Tournament | null = null;
   editTournamentDialog: boolean = false;
@@ -177,8 +321,18 @@ export default class CreatedTournamentsView extends Vue {
     }
   ];
 
+  headers_mobile = [
+    {
+      text: 'Tournament',
+      value: 'title',
+      align: 'center',
+      sortable: false
+    }
+  ];
+
   async created() {
     await this.$store.dispatch('loading');
+    this.isMobile = window.innerWidth <= 500;
     try {
       this.topics = await RemoteServices.getTopics();
     } catch (error) {
