@@ -102,3 +102,14 @@ Before                               |  After
 :-----------------------------------:|:-----------------------------------:
 ![](p5-images/ActionButtonsBefore.png) | ![](p5-images/UniformActionButtons.png)
 
+## Conclusion of Tournament Feature
+
+### Solved Tournaments
+
+#### Subgroup
+Lourenço Duarte & Marcelo Santos
+
+#### Description
+Allow students to see the tournaments that they have participated
+
+#### Screenshots
