@@ -20,10 +20,16 @@
         <i v-if="hover && questionOrder !== 0" class="fas fa-chevron-left" />
         <span v-else>{{ questionOrder + 1 }}</span>
       </span>
-      <div
-        class="question-content"
-        v-html="convertMarkDown(question.content, question.image)"
-      ></div>
+      <div>
+        <ckeditor
+          outline
+          auto-grow
+          rows="1"
+          v-model="question.content"
+          :config="editorConfig"
+        >
+        </ckeditor>
+      </div>
       <div @click="increaseOrder" class="square" data-cy="nextQuestion">
         <i
           v-if="questionOrder !== questionNumber - 1"
@@ -94,6 +100,21 @@ export default class ResultComponent extends Vue {
 
   convertMarkDown(text: string, image: Image | null = null): string {
     return convertMarkDown(text, image);
+  }
+
+  data() {
+    return {
+      editorConfig: {
+        removePlugins: 'elementspath',
+        readOnly: true,
+        toolbarCanCollapse: true,
+        toolbarStartupExpanded: false,
+        language: 'en',
+        extraPlugins: 'mathjax',
+        mathJaxLib:
+          'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML'
+      }
+    };
   }
 }
 </script>
