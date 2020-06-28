@@ -19,33 +19,41 @@
 
       <v-card-text class="text-left" v-if="editQuestion">
         <v-text-field v-model="editQuestion.title" label="Title" />
-        <v-textarea
+        <span>Question Content</span>
+        <ckeditor
           outline
           rows="10"
           v-model="editQuestion.content"
-          label="Question"
-        ></v-textarea>
+          :config="editorConfig"
+        ></ckeditor>
         <div v-for="index in editQuestion.options.length" :key="index">
           <v-switch
             v-model="editQuestion.options[index - 1].correct"
             class="ma-4"
             label="Correct"
           />
-          <v-textarea
+          <span>Option {{ index }}</span>
+          <ckeditor
             outline
             rows="10"
             v-model="editQuestion.options[index - 1].content"
-            :label="`Option ${index}`"
-          ></v-textarea>
+            :config="editorConfig"
+          ></ckeditor>
         </div>
       </v-card-text>
 
-      <v-card-actions>
+      <v-card-actions v-if="!isMobile">
         <v-spacer />
-        <v-btn color="blue darken-1" @click="$emit('dialog', false)"
-          >Cancel</v-btn
-        >
-        <v-btn color="blue darken-1" @click="saveQuestion">Save</v-btn>
+        <v-btn color="error" @click="$emit('dialog', false)">Cancel</v-btn>
+        <v-btn color="primary" dark @click="saveQuestion">Save</v-btn>
+      </v-card-actions>
+      <v-card-actions v-else>
+        <v-spacer />
+        <v-btn fab color="primary" small @click="saveQuestion">
+          <v-icon medium class="mr-2">
+            far fa-save
+          </v-icon>
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -60,11 +68,23 @@ import RemoteServices from '@/services/RemoteServices';
 export default class EditQuestionDialog extends Vue {
   @Model('dialog', Boolean) dialog!: boolean;
   @Prop({ type: Question, required: true }) readonly question!: Question;
+  @Prop({ type: Boolean, required: true }) readonly isMobile!: boolean;
 
   editQuestion!: Question;
 
   created() {
     this.updateQuestion();
+  }
+
+  data() {
+    return {
+      editorConfig: {
+        extraPlugins: 'mathjax',
+        language: 'en',
+        mathJaxLib:
+          'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML'
+      }
+    };
   }
 
   @Watch('question', { immediate: true, deep: true })

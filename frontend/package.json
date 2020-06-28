@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "vue-cli-service serve --fix",
-    "build": "NODE_ENV=production vue-cli-service build --mode production",
+    "build": "NODE_ENV=production vue-cli-service build --no-unsafe-inline --mode production",
     "build:dev": "NODE_ENV=development vue-cli-service build --mode development",
     "lint": "vue-cli-service lint",
     "prettier": "prettier --single-quote --write \"**/**/*.{ts,js,css,scss,vue}\"",
@@ -16,6 +16,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.11.2",
     "axios": "^0.19.2",
+    "ckeditor4-vue": "^1.0.0",
     "material-design-icons-iconfont": "^5.0.1",
     "qrcode": "^1.4.4",
     "sanitize-html": "^1.23.0",

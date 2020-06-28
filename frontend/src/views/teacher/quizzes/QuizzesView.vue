@@ -1,10 +1,12 @@
 <template>
-  <div>
+  <div class="container">
+    <h2>Quizzes</h2>
     <quiz-form
       @switchMode="changeMode"
       @updateQuiz="updateQuiz"
       :edit-mode="editMode"
       :quiz="quiz"
+      :isMobile="isMobile"
     />
     <quiz-list
       v-if="!editMode"
@@ -12,6 +14,7 @@
       @deleteQuiz="deleteQuiz"
       @newQuiz="newQuiz"
       :quizzes="quizzes"
+      :isMobile="isMobile"
     />
   </div>
 </template>
@@ -30,12 +33,14 @@ import QuizList from '@/views/teacher/quizzes/QuizList.vue';
   }
 })
 export default class QuizzesView extends Vue {
+  isMobile: boolean = false;
   quizzes: Quiz[] = [];
   quiz: Quiz | null = null;
   editMode: boolean = false;
 
   async created() {
     await this.$store.dispatch('loading');
+    this.isMobile = window.innerWidth <= 500;
     try {
       this.quizzes = await RemoteServices.getNonGeneratedQuizzes();
     } catch (error) {
@@ -80,4 +85,21 @@ export default class QuizzesView extends Vue {
 }
 </script>
 
-<style lang="scss" scoped />
+<style lang="scss" scoped>
+.container {
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  h2 {
+    font-size: 26px;
+    margin: 20px 0;
+    text-align: center;
+    small {
+      font-size: 0.5em;
+    }
+  }
+}
+</style>

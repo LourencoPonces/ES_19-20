@@ -23,6 +23,7 @@ import DashboardStats from '@/models/statement/DashboardStats';
 const httpClient = axios.create();
 httpClient.defaults.timeout = 10000;
 httpClient.defaults.baseURL = process.env.VUE_APP_ROOT_API;
+httpClient.defaults.withCredentials = true;
 httpClient.defaults.headers.post['Content-Type'] = 'application/json';
 httpClient.interceptors.request.use(
   config => {
@@ -410,6 +411,21 @@ export default class RemoteServices {
     return httpClient
       .get(
         `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments/created`
+      )
+      .then(response => {
+        return response.data.map((tournament: any) => {
+          return new Tournament(tournament);
+        });
+      })
+      .catch(async error => {
+        console.log(this.errorMessage(error));
+      });
+  }
+
+  static async getSolvedTournaments(): Promise<Tournament[]> {
+    return httpClient
+      .get(
+        `/executions/${Store.getters.getCurrentCourse.courseExecutionId}/tournaments/solved`
       )
       .then(response => {
         return response.data.map((tournament: any) => {
