@@ -232,8 +232,11 @@
     v-else
     v-model="dialog"
     :assessment="assessment"
+    :topicConjunctions="topicConjunctions"
     v-on:set-status="setStatus"
-
+    v-on:save-assessment="saveAssessment"
+    v-on:delete-assessment="deleteAssessment"
+    v-on:close-edit-assessment="closeEditDialog"
   />
 </template>
 
@@ -255,8 +258,8 @@ import EditAssessmentMobile from '@/views/teacher/assessments/EditAssessmentMobi
   }
 })
 export default class AssessmentForm extends Vue {
-  @Prop(Assessment) readonly assessment!: Assessment;
-   @Prop({ type: Boolean, required: true }) readonly editMode!: boolean;
+  @Prop({ type: Assessment, required: true }) readonly assessment!: Assessment;
+  @Prop({ type: Boolean, required: true }) readonly editMode!: boolean;
   @Prop({ type: Boolean, required: true }) readonly isMobile!: boolean;
   @Prop(Boolean) readonly dialog!: boolean;
   currentTopicsSearch: string = '';
@@ -427,6 +430,14 @@ export default class AssessmentForm extends Vue {
 
   setStatus(id: number, status: string) {
     this.$emit('set-status', id, status);
+  }
+
+  deleteAssessment(id: number) {
+    this.$emit('delete-assessment', id);
+  }
+
+  closeEditDialog() {
+    this.$emit('close-edit-dialog');
   }
 }
 </script>

@@ -22,7 +22,7 @@
             />
 
             <v-spacer />
-            <v-btn color="primary" dark @click="$emit('newAssessment')"
+            <v-btn color="primary" dark @click="newAssessment()"
               >New Assessment</v-btn
             >
           </v-card-title>
@@ -162,7 +162,7 @@
           </v-card-title>
         </template>
         <template v-slot:item.title="{ item }">
-          <v-row @click="editAssessment(item.id, $event)">
+          <v-row @click="editAssessment(item.id)">
             <v-col align-self="center">
               <v-badge bordered :color="getStatusColor(item.status)" />
             </v-col>
@@ -172,24 +172,18 @@
           </v-row>
         </template>
       </v-data-table>
-      <assessment-form
-        v-if="editMode && assessment"
-        @switchMode="changeMode"
-        @updateAssessment="updateAssessment"
-        :assessment="assessment"
-        :dialog="dialog"
-        :isMobile="isMobile"
-        :editMode="editMode"
-        v-on:set-status="setStatus"
-      />
     </v-card>
     <assessment-form
       v-if="editMode && assessment"
       @switchMode="changeMode"
       @updateAssessment="updateAssessment"
       :assessment="assessment"
+      :dialog="dialog"
       :isMobile="isMobile"
       :editMode="editMode"
+      v-on:set-status="setStatus"
+      v-on:delete-assessment="deleteAssessment"
+      v-on:close-edit-dialog="closeAssessment"
     />
   </div>
 </template>
@@ -203,7 +197,7 @@ import Assessment from '@/models/management/Assessment';
 import AssessmentForm from '@/views/teacher/assessments/AssessmentForm.vue';
 
 @Component({
-   components: {
+  components: {
     'assessment-form': AssessmentForm
   }
 })
@@ -214,6 +208,7 @@ export default class AssessmentsView extends Vue {
   isMobile: boolean = false;
   search: string = '';
   dialog: boolean = false;
+  statusList = ['DISABLED', 'AVAILABLE', 'REMOVED'];
   headers: object = [
     {
       text: 'Actions',
@@ -238,7 +233,7 @@ export default class AssessmentsView extends Vue {
 
   closeAssessment() {
     this.dialog = false;
-    this.assessment = null;
+    this.changeMode();
   }
 
   async setStatus(assessmentId: number, status: string) {
@@ -258,11 +253,12 @@ export default class AssessmentsView extends Vue {
   async editAssessment(assessmentId: number, e?: Event) {
     if (e) e.preventDefault();
     try {
-    this.assessment = {
-      ...this.assessments.find(assessment => assessment.id === assessmentId)!
-    };
+      this.assessment = {
+        ...this.assessments.find(assessment => assessment.id === assessmentId)!
+      };
+
+      this.dialog = this.isMobile;
       this.editMode = true;
-      this.dialog = true;
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
@@ -275,6 +271,10 @@ export default class AssessmentsView extends Vue {
         this.assessments = this.assessments.filter(
           assessment => assessment.id !== assessmentId
         );
+        if (this.isMobile) {
+          this.dialog = false;
+          this.changeMode();
+        }
       } catch (error) {
         await this.$store.dispatch('error', error);
       }
@@ -323,6 +323,7 @@ export default class AssessmentsView extends Vue {
   newAssessment() {
     this.assessment = new Assessment();
     this.editMode = true;
+    this.dialog = this.isMobile;
   }
 }
 </script>
