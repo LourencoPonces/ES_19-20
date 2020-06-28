@@ -89,10 +89,12 @@ public class TournamentService {
         addCreator(tournamentDto, creator, tournament);
 
         entityManager.persist(tournament);
+        generateQuiz(tournament);
 
         creator.addCreatedTournament(tournament);
         creator.addParticipantTournament(tournament);
         entityManager.persist(creator);
+        entityManager.persist(new QuizAnswer(creator, tournament.getQuiz()));
 
         addTournamentToTopics(tournamentDto, courseExecution, tournament);
 
@@ -137,12 +139,7 @@ public class TournamentService {
         tournament.addParticipant(user);
         user.addParticipantTournament(tournament);
 
-        if (tournament.getQuiz() == null) {
-            if (tournament.getParticipants().size() >= 2)
-                generateQuiz(tournament);
-        } else {
-            entityManager.persist(new QuizAnswer(user, tournament.getQuiz()));
-        }
+        entityManager.persist(new QuizAnswer(user, tournament.getQuiz()));
 
         entityManager.persist(tournament);
         entityManager.persist(user);
@@ -204,6 +201,22 @@ public class TournamentService {
                                 .stream().filter(quizAnswer -> quizAnswer.getUser()
                                         .equals(user)).findFirst().get().isCompleted())
                 .map(TournamentDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Retryable(
+            value = { SQLException.class },
+            backoff = @Backoff(delay = 5000))
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<TournamentDto> getSolvedTournaments(int userId, int executionId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new TutorException(USER_NOT_FOUND, userId));
+
+        return user.getParticipantTournaments()
+                .stream()
+                .filter(tournament -> tournament.getCourseExecution().getId() == executionId)
+                .filter(tournament -> tournament.getStatus() == Tournament.Status.FINISHED)
+                .map(TournamentDto::new)
+                .sorted(Comparator.comparing(TournamentDto::getCreationDateDate).reversed())
                 .collect(Collectors.toList());
     }
 

@@ -211,6 +211,17 @@
                 <v-list-item-title>Created</v-list-item-title>
               </v-list-item-content>
             </v-list-item>
+            <v-list-item
+              to="/student/tournaments-solved"
+              data-cy="tournaments-solved"
+            >
+              <v-list-item-action>
+                <v-icon>done</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
+                <v-list-item-title>Solved</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
           </v-list>
         </v-menu>
         <!-- test My Area-->
@@ -463,6 +474,13 @@
               <v-icon>create</v-icon>
             </v-list-item-action>
             <v-list-item-content>Created Tournaments</v-list-item-content>
+          </v-list-item>
+
+          <v-list-item to="/student/tournaments-solved">
+            <v-list-item-action>
+              <v-icon>done</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>Solved Tournaments</v-list-item-content>
           </v-list-item>
 
           <v-list-item to="/student/stats">
