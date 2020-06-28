@@ -41,3 +41,15 @@ Desktop                              |  Mobile
 Desktop                              |  Mobile
 :-----------------------------------:|:-----------------------------------:
 ![](p5-images/teacher_topics.png) | ![](p5-images/teacher_topics_mobile.png)
+
+**Student Student Questions**
+
+Desktop                              |  Mobile
+:-----------------------------------:|:-----------------------------------:
+![](p5-images/student_studentQuestions.png) | ![](p5-images/student_studentQuestions_mobile.png)
+
+**Student Created Tournaments**
+
+Desktop                              |  Mobile
+:-----------------------------------:|:-----------------------------------:
+![](p5-images/student_createdTournaments.png) | ![](p5-images/student_createdTournaments_mobile.png)
