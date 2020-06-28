@@ -13,4 +13,7 @@ Refactor the application presentation, so it is more usable in smaller screens. 
 #### Screenshots
 
 **Teacher Questions**
-![](p5-images/teacher_questions.png) ![](p5-images/teacher_questions_mobile.png)
+
+Desktop                              |  Mobile
+:-----------------------------------:|:-----------------------------------:
+![](p5-images/teacher_questions.png) | ![](p5-images/teacher_questions_mobile.png)
