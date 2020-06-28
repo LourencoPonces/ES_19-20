@@ -4,7 +4,7 @@ spring.datasource.username= <DATABASE USERNAME>
 spring.datasource.password= <DATABASE PASSWORD>
 
 ## Jpa
-spring.jpa.database-platform=org.hibernate.dialect.PostgreSQL9Dialect
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQL10Dialect
 
 ## Resources
 figures.dir=${maven.basedir}/../data/images/
@@ -16,6 +16,12 @@ oauth.consumer.key=<FENIX CLIENT KEY>
 oauth.consumer.secret=<FENIX SECRET>
 callback.url=http://localhost:8081/login
 base.url=https://fenix.tecnico.ulisboa.pt
+
+# Authentication
+auth.secret=thisissupersecretshhhhhhhhhneedtomakeitlongenoughasdhflkjdsahfksahdflk
+auth.cookie.domain=localhost
+
+cors.allowed_origins=http://localhost:8081
 
 # Restart server
 spring.devtools.restart.enabled=true
