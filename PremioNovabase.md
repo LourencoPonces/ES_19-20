@@ -53,3 +53,15 @@ Desktop                              |  Mobile
 Desktop                              |  Mobile
 :-----------------------------------:|:-----------------------------------:
 ![](p5-images/student_createdTournaments.png) | ![](p5-images/student_createdTournaments_mobile.png)
+
+**Student Available Tournaments**
+
+Desktop                              |  Mobile
+:-----------------------------------:|:-----------------------------------:
+![](p5-images/student_availableTournaments.png) | ![](p5-images/student_availableTournaments_mobile.png)
+
+**Student Running Tournaments**
+
+Desktop                              |  Mobile
+:-----------------------------------:|:-----------------------------------:
+![](p5-images/student_runningTournaments.png) | ![](p5-images/student_runningTournaments_mobile.png)
