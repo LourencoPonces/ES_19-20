@@ -48,6 +48,7 @@
 <p align="right"><i>and <b>quiz management</b> for teachers</i></p>
 
 <p align="center">
+  <a href="#disclaimer">Disclaimer</a> •
   <a href="#about">About</a> •
   <a href="#technologies">Technologies</a> •
   <a href="#installation">Installation</a> •
@@ -55,6 +56,20 @@
   <a href="#contributing">Contributing</a> •
   <a href="#license">License</a>
 </p>
+
+# Disclaimer
+
+This project was done for the Software Engineering Course, alongside a team of six elements that appear's in the contributors tab. The main project was an idea from Pedro Correia - [Stramer1](https://github.com/Stramer1) and with the main contributions from Professor António Rito Silva [ritosilva](https://github.com/ritosilva). We (the team of six) just added some functionality on top during the three months of the project, from March to June. We were also nominees for the Novabase award, which has a `.md` here.
+
+The team of six is:
+ * Daniel Seara (me) - [Beu-Wolf](https://github.com/Beu-Wolf)
+ * Afonso Gonçalves - [afonsocrg](https://github.com/afonsocrg)
+ * André Breda - [abread](https://github.com/abread)
+ * Lourenço Ponces - [LourencoPonces](https://github.com/LourencoPonces)
+ * Marcelo Santos - [tosmarcel](https://github.com/tosmarcel)
+ * Mariana Oliveira - [tpoliveira-mariana](https://github.com/tpoliveira-mariana)
+
+</br>
 
 # About
 
