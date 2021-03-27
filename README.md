@@ -59,7 +59,7 @@
 
 # Disclaimer
 
-This project was done for the Software Engineering Course, alongside a team of six elements that appear's in the contributors tab. The main project was an idea from Pedro Correia - [Stramer1](https://github.com/Stramer1) and with the main contributions from Professor António Rito Silva [ritosilva](https://github.com/ritosilva). We (the team of six) just added some functionality on top during the three months of the project, from March to June. We were also nominees for the Novabase award, which has a `.md` here.
+This project was done for the [Software Engineering Course](https://fenix.tecnico.ulisboa.pt/disciplinas/ESof96451113264/2019-2020/2-semestre), alongside a team of six elements that appear's in the contributors tab. The main project was an idea from Pedro Correia - [Stramer1](https://github.com/Stramer1) and with the main contributions from Professor António Rito Silva [ritosilva](https://github.com/ritosilva). We (the team of six) just added some functionality on top during the three months of the project, from March to June. We were also nominees for the Novabase award, which has a `.md` here.
 
 The team of six is:
  * Afonso Gonçalves - [afonsocrg](https://github.com/afonsocrg)
